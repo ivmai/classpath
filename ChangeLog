@@ -1,5 +1,12 @@
 2005-01-02  Tom Tromey  <tromey@redhat.com>
 
+	* java/io/PrintStream.java: Implement Appendable.
+	(PrintStream(String)): New constructor.
+	(PrintStream(String,String)): Likewise.
+	(PrintStream(File)): New constructor.
+	(PrintStream(File,String)): Likewise.
+	(append): New methods.
+
 	* java/lang/System.java (getenv): Added @since.
 
 	* java/lang/System.java (getenv(String)): Rewrote.

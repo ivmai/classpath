@@ -1,5 +1,5 @@
 /* PrintStream.java -- OutputStream for printing output
-   Copyright (C) 1998, 1999, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -56,7 +56,7 @@ package java.io;
  * @author Aaron M. Renn <arenn@urbanophile.com>
  * @author Tom Tromey <tromey@cygnus.com>
  */
-public class PrintStream extends FilterOutputStream
+public class PrintStream extends FilterOutputStream implements Appendable
 {
   /**
    * This boolean indicates whether or not an error has ever occurred
@@ -134,6 +134,40 @@ public class PrintStream extends FilterOutputStream
 
     pw = new PrintWriter (new OutputStreamWriter (out, encoding), auto_flush);
     this.auto_flush = auto_flush;
+  }
+
+  /** @since 1.5 */
+  public PrintStream (String filename) throws FileNotFoundException
+  {
+    super (new FileOutputStream (filename));
+    pw = new PrintWriter (new OutputStreamWriter (out), false);
+    auto_flush = false;
+  }
+
+  /** @since 1.5 */
+  public PrintStream (String filename, String encoding)
+    throws FileNotFoundException
+  {
+    super (new FileOutputStream (filename));
+    pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);
+    auto_flush = false;
+  }
+
+  /** @since 1.5 */
+  public PrintStream (File file) throws FileNotFoundException
+  {
+    super (new FileOutputStream (file));
+    pw = new PrintWriter (new OutputStreamWriter (out), false);
+    auto_flush = false;
+  }
+
+  /** @since 1.5 */
+  public PrintStream (File file, String encoding)
+    throws FileNotFoundException
+  {
+    super (new FileOutputStream (file));
+    pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);
+    auto_flush = false;
   }
 
   /**
@@ -466,6 +500,28 @@ public class PrintStream extends FilterOutputStream
       {
         setError ();
       }
+  }
+
+  /** @since 1.5 */
+  public PrintStream append(char c) throws IOException
+  {
+    print(c);
+    return this;
+  }
+
+  /** @since 1.5 */
+  public PrintStream append(CharSequence cs) throws IOException
+  {
+    print(cs == null ? "null" : cs.toString());
+    return this;
+  }
+
+  /** @since 1.5 */
+  public PrintStream append(CharSequence cs, int start, int end)
+    throws IOException
+  {
+    print(cs == null ? "null" : cs.subSequence(start, end).toString());
+    return this;
   }
 } // class PrintStream
 
