@@ -64,7 +64,7 @@ public class BeanDescriptor extends FeatureDescriptor {
 	 ** @param beanClass the class of the Bean.
 	 ** @param customizerClass the class of the Bean's Customizer.
 	 **/
-	public BeanDescriptor(Class beanClass<?>, Class<?> customizerClass) {
+	public BeanDescriptor(Class<?> beanClass, Class<?> customizerClass) {
 		this.beanClass = beanClass;
 		this.customizerClass = customizerClass;
 

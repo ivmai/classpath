@@ -1,3 +1,9 @@
+2004-10-14  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/StringBuilder.java (append): Typo fix; indentation
+	fix.
+	* java/beans/BeanDescriptor.java (BeanDescriptor): Typo fix.
+
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
 	* java/beans/EventHandler.java (create): Now generic methods.

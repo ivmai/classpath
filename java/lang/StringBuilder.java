@@ -368,13 +368,13 @@ public final class StringBuilder
   {
     if (stringBuffer == null)
       return append("null");
-    synchronizedZZZ (stringBuffer)
-    {
-      int len = stringBuffer.count;
-      ensureCapacity(count + len);
-      System.arraycopy(stringBuffer.value, 0, value, count, len);
-      count += len;
-    }
+    synchronized (stringBuffer)
+      {
+	int len = stringBuffer.count;
+	ensureCapacity(count + len);
+	System.arraycopy(stringBuffer.value, 0, value, count, len);
+	count += len;
+      }
     return this;
   }
 
