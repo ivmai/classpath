@@ -1,5 +1,5 @@
 /* Readable.java -- A character source
-   Copyright (C) 2004 Free Software Foundation
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -65,6 +65,7 @@ public interface Readable
    * @throws NullPointerException if buf is null.
    * @throws ReadOnlyBufferException if buf is read only.
    */
-  int read(CharBuffer buf) throws IOException;
+  int read(CharBuffer buf)
+    throws IOException;
 
 }

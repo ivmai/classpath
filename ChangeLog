@@ -1,3 +1,18 @@
+2005-02-20  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/io/Closeable.java: Documented.
+	* java/io/Flushable.java: Documented.
+	* java/lang/Appendable.java: Corrected line overrun.
+	* java/lang/Readable.java: Corrected indentation.
+	* java/lang/TypeNotPresentException.java: Documented.
+	* java/lang/annotation/AnnotationFormatError.java: Likewise.
+	* java/lang/annotation/AnnotationTypeMismatchException.java: Likewise.
+	* java/lang/reflect/GenericArrayType.java: Likewise.
+	* java/lang/reflect/GenericSignatureFormatError.java: Likewise.
+	* java/lang/reflect/ParameterizedType.java: Likewise.
+	* java/lang/reflect/Type.java: Likewise.
+	* java/lang/reflect/WildcardType.java: Likewise.	
+
 2005-02-18  Bryce McKinlay  <mckinlay@redhat.com>
 
 	* java/util/LinkedHashMap (addEntry): Call remove() with key argument, 

@@ -1,5 +1,5 @@
-/* GenericSignatureFormatError.java
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* GenericSignatureFormatError.java - Thrown when a signature is malformed.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,9 +38,25 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
-public class GenericSignatureFormatError extends ClassFormatError
+/**
+ * Thrown on encountering a syntactically malformed signature in
+ * a reflective method.  During reflection, the generic type signature
+ * of a type, method or constructor may be interpreted by the virtual
+ * machine.  This error is thrown if this operation fails.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
+public class GenericSignatureFormatError
+  extends ClassFormatError
 {
+
+  /**
+   * Constructs a new <code>GenericSignatureFormatError</code>.
+   */
   public GenericSignatureFormatError()
   {
   }
+
 }

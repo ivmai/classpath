@@ -1,5 +1,5 @@
 /* Type.java - Superinterface for all types.
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,18 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+/**
+ * Represents any <code>Type</code> within the Java programming
+ * language.  This may be a primitive type (e.g. <code>int</code>,
+ * an array type (e.g. <code>double[]>/code>), a raw type
+ * (e.g. <code>Calendar</code>), a parameterized type
+ * (e.g. <code>List&lt;Boolean&gt;</code>, or a type
+ * variable (e.g. <code>T extends String</code>).
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */ 
 public interface Type
 {
 }

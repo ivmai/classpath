@@ -1,5 +1,5 @@
 /* Closeable.java -- Closeable object
-   Copyright (C) 2004 Free Software Foundation
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,27 @@ exception statement from your version. */
 
 package java.io;
 
+/**
+ * A <code>Closeable</code> class represents a stream of
+ * data, which can be closed when it is no longer needed.
+ * Closing a stream allows the resources it uses to be
+ * freed for an alternate use.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
 public interface Closeable
 {
-  void close() throws IOException;
+
+  /**
+   * Closes the stream represented by this class, thus freeing
+   * system resources. In that case that the stream is already
+   * in the closed state, this method has no effect.
+   *
+   * @throws IOException if an I/O error occurs in closing.
+   */
+  void close()
+    throws IOException;
+
 }

@@ -1,5 +1,5 @@
-/* Flushable.java -- flush()-able object
-   Copyright (C) 2004 Free Software Foundation
+/* Flushable.java -- Flushable object
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,26 @@ exception statement from your version. */
 
 package java.io;
 
+/**
+ * A <code>Flushable</code> class represents a stream of
+ * data, for which internally buffered data can be `flushed'.
+ * Flushing such a stream causes the buffered data to be
+ * written to the stream.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
 public interface Flushable
 {
-  void flush() throws IOException;
+
+  /**
+   * Flushes the stream represented by this class,
+   * so that any buffered data is written to the stream.
+   *
+   * @throws IOException if an I/O error occurs in flushing.
+   */
+  void flush()
+    throws IOException;
+
 }

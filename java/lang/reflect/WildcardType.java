@@ -1,5 +1,5 @@
-/* WildcardType.java
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* WildcardType.java -- A wildcard type expression e.g. ? extends String
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,8 +38,78 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+/**
+ * Represents a wildcard type expression, where the type variable
+ * is unnamed.  The simplest example of this is <code>?</code>,
+ * which represents any unbounded type.  Another example is
+ * <code>? extends Number</code>, which specifies any type
+ * which is a subclass of <code>Number</code> (<code>Number</code>
+ * is the upper bound).
+ * </p>
+ * <p>
+ * <code>? super String</code> gives the type a less common lower bound,
+ * which means that the type must be either a <code>String</code> or one
+ * of its superclasses. This can be useful in working with collections.
+ * You may want a method to add instances of a class to a collection
+ * with a more generic type (e.g. adding <code>String</code>s to
+ * a list of <code>Object</code>s), but don't want to allow users
+ * to pass in a collection with a more specific type.
+ * </p>
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
 public interface WildcardType extends Type
 {
+
+  /**
+   * <p>
+   * Returns an array of <code>Type</code>s, which specify the
+   * lower bounds of this type.  The default lower bound is
+   * <code>null</code>, which causes this method to return an
+   * empty array.
+   * </p>
+   * <p>
+   * In generating the array of <code>Type</code>s, each
+   * <code>ParameterizedType</code> or <code>TypeVariable</code> is
+   * created, (see the documentation for these classes for details of this
+   * process), if necessary, while all other types are simply
+   * resolved.
+   * </p>
+   *
+   * @return an array of <code>Type</code> objects, representing
+   *         the wildcard type's lower bounds.
+   * @throws TypeNotPresentException if any of the types referred to by
+   *         the lower bounds of this type do not actually exist.
+   * @throws MalformedParameterizedTypeException if any of the types
+   *         refer to a type which can not be instantiated.
+   */ 
   Type[] getLowerBounds();
+
+  /**
+   * <p>
+   * Returns an array of <code>Type</code>s, which specify the
+   * upper bounds of this type.  The default upper bound is
+   * <code>Object</code>, which causes this method to return an
+   * array, containing just the <code>Type</code> instance for
+   * <code>Object</code>.
+   * </p>
+   * <p>
+   * In generating the array of <code>Type</code>s, each
+   * <code>ParameterizedType</code> or <code>TypeVariable</code> is
+   * created, (see the documentation for these classes for details of this
+   * process), if necessary, while all other types are simply
+   * resolved.
+   * </p>
+   *
+   * @return an array of <code>Type</code> objects, representing
+   *         the wildcard type's upper bounds.
+   * @throws TypeNotPresentException if any of the types referred to by
+   *         the upper bounds of this type do not actually exist.
+   * @throws MalformedParameterizedTypeException if any of the types
+   *         refer to a type which can not be instantiated.
+   */ 
   Type[] getUpperBounds();
+
 }

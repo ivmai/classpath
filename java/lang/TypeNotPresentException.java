@@ -1,5 +1,5 @@
-/* TypeNotPresentException.java
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* TypeNotPresentException.java -- Thrown when a string-based type is missing
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,19 +38,60 @@ exception statement from your version. */
 
 package java.lang;
 
-public class TypeNotPresentException extends RuntimeException
+/**
+ * <p>
+ * Thrown when a type is accessed using a <code>String</code>-based
+ * representation, but no definition of the supplied type is found.
+ * This is effectively an unchecked equivalent of the existing
+ * <code>ClassNotFound</code> exception.  
+ * </p>
+ * <p>
+ * It may occur due to an attempt to load a missing class, interface or
+ * annotation, or when an undefined type variable is accessed.
+ * </p>
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @see ClassNotFoundException
+ * @since 1.5
+ */
+public class TypeNotPresentException
+  extends RuntimeException
 {
+  
+  /**
+   * Constructs a <code>TypeNotPresentException</code> for
+   * the supplied type.  The specified cause <code>Throwable</code>
+   * may be used to provide additional history, with regards to the
+   * root of the problem.  It is perfectly valid for this to be null,
+   * if the cause of the problem is unknown.
+   * 
+   * @param typeName the name of the missing type.
+   * @param cause the cause of this exception, or null if the cause
+   *              is unknown.
+   */
   public TypeNotPresentException(String typeName, Throwable cause)
   {
     super("type \"" + typeName + "\" not found", cause);
     this.typeName = typeName;
   }
 
+  /**
+   * Returns the name of the missing type.
+   *
+   * @return the missing type's name.
+   */
   public String typeName()
   {
     return typeName;
   }
 
+  /**
+   * The name of the missing type.
+   *
+   * @serial the missing type's name.
+   */
   // Name fixed by serialization.
   private String typeName;
+
 }

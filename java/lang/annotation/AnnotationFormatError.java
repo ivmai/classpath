@@ -1,5 +1,5 @@
-/* AnnotationFormatError.java - Thrown when annotation is malformed in class
-   Copyright (C) 2004 Free Software Foundation
+/* AnnotationFormatError.java - Thrown when an binary annotation is malformed
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -38,22 +38,67 @@ exception statement from your version. */
 package java.lang.annotation;
 
 /**
+ * Thrown when an annotation found in a class file is
+ * malformed.  When the virtual machine finds a class file
+ * containing annotations, it attempts to parse them.
+ * This error is thrown if this operation fails.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public class AnnotationFormatError extends Error
 {
+
+  /**
+   * Constructs a new <code>AnnotationFormatError</code>
+   * using the specified message to give details of the error.
+   *
+   * @param message the message to use in the error output.
+   */
   public AnnotationFormatError(String message)
   {
     super(message);
   }
 
+  /**
+   * <p>
+   * Constructs a new <code>AnnotationFormatError</code>
+   * using the specified message to give details of the error.
+   * The supplied cause <code>Throwable</code> is used to
+   * provide additional history, with regards to the root
+   * of the problem.  It is perfectly valid for this to be null, if
+   * the cause is unknown.
+   * </p>
+   * <p>
+   * <strong>Note</strong>: if a cause is supplied, the error
+   * message from this cause is not automatically included in the
+   * error message given by this error.
+   * </p>
+   *
+   * @param message the message to use in the error output
+   * @param cause the cause of this error, or null if the cause
+   *              is unknown.
+   */
   public AnnotationFormatError(String message, Throwable cause)
   {
     super(message, cause);
   }
 
+  /**
+   * Constructs a new <code>AnnotationFormatError</code> using
+   * the supplied cause <code>Throwable</code> to
+   * provide additional history, with regards to the root
+   * of the problem.  It is perfectly valid for this to be null, if
+   * the cause is unknown.  If the cause is not null, the error
+   * message from this cause will also be used as the message
+   * for this error.
+   *
+   * @param cause the cause of the error.
+   */
   public AnnotationFormatError(Throwable cause)
   {
     super(cause);
   }
+
 }

@@ -1,5 +1,5 @@
-/* GenericArrayType.java - Represent an array type with generic componet
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* GenericArrayType.java - Represent an array type with a generic component
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,7 +38,24 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
-public interface GenericArrayType extends Type
+/**
+ * Represents the type of an array's components, which may be
+ * either a parameterized type or a type variable.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
+public interface GenericArrayType 
+  extends Type
 {
+
+  /**
+   * Returns the <code>Type</code> of the components within the array.
+   *
+   * @return a <code>Type</code> instance representing the type of
+   *         the array's components.
+   */
   Type getGenericComponentType();
+
 }
