@@ -102,7 +102,8 @@ day_of_week + week_of_year</pre>
  * @see TimeZone
  * @see java.text.DateFormat 
  */
-public abstract class Calendar implements Serializable, Cloneable
+public abstract class Calendar
+  implements Serializable, Cloneable, Comparable<Calendar>
 {
   /**
    * Constant representing the era time field.
@@ -963,6 +964,13 @@ public abstract class Calendar implements Serializable, Cloneable
 	  break;
       }
     return max;
+  }
+
+  public int compareTo(Calendar other)
+  {
+    if (time < other.time)
+      return -1;
+    return time == other.time ? 0 : 1;
   }
 
   /**

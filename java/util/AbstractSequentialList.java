@@ -143,7 +143,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E>
   {
     Iterator<? extends E> ci = c.iterator();
     int size = c.size();
-    ListIterator i = listIterator(index);
+    ListIterator<E> i = listIterator(index);
     for (int pos = size; pos > 0; pos--)
       i.add(ci.next());
     return size > 0;

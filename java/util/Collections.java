@@ -89,7 +89,7 @@ public class Collections
    * @param l the list to check
    * @return true if it should be treated as sequential-access
    */
-  private static boolean isSequential(List l)
+  private static boolean isSequential(List<?> l)
   {
     return ! (l instanceof RandomAccess) && l.size() > LARGE_LIST_SIZE;
   }
@@ -113,7 +113,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class EmptySet extends AbstractSet
+  private static final class EmptySet<T> extends AbstractSet<T>
     implements Serializable
   {
     /**
@@ -140,9 +140,9 @@ public class Collections
      * Returns an iterator that does not iterate.
      */
     // This is really cheating! I think it's perfectly valid, though.
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
-      return EMPTY_LIST.iterator();
+      return (Iterator<T>) EMPTY_LIST.iterator();
     }
 
     // The remaining methods are optional, but provide a performance
@@ -158,7 +158,7 @@ public class Collections
     /**
      * This is true only if the given collection is also empty.
      */
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
       return c.isEmpty();
     }
@@ -190,7 +190,7 @@ public class Collections
     /**
      * Always succeeds with false result.
      */
-    public boolean removeAll(Collection c)
+    public boolean removeAll(Collection<?> c)
     {
       return false;
     }
@@ -198,7 +198,7 @@ public class Collections
     /**
      * Always succeeds with false result.
      */
-    public boolean retainAll(Collection c)
+    public boolean retainAll(Collection<?> c)
     {
       return false;
     }
@@ -214,7 +214,7 @@ public class Collections
     /**
      * We don't even need to use reflection!
      */
-    public Object[] toArray(Object[] a)
+    public T[] toArray(T[] a)
     {
       if (a.length > 0)
         a[0] = null;
@@ -243,7 +243,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class EmptyList extends AbstractList
+  private static final class EmptyList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
   {
     /**
@@ -269,7 +269,7 @@ public class Collections
     /**
      * No matter the index, it is out of bounds.
      */
-    public Object get(int index)
+    public T get(int index)
     {
       throw new IndexOutOfBoundsException();
     }
@@ -287,7 +287,7 @@ public class Collections
     /**
      * This is true only if the given collection is also empty.
      */
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
       return c.isEmpty();
     }
@@ -335,7 +335,7 @@ public class Collections
     /**
      * Always succeeds with false result.
      */
-    public boolean removeAll(Collection c)
+    public boolean removeAll(Collection<?> c)
     {
       return false;
     }
@@ -343,7 +343,7 @@ public class Collections
     /**
      * Always succeeds with false result.
      */
-    public boolean retainAll(Collection c)
+    public boolean retainAll(Collection<?> c)
     {
       return false;
     }
@@ -359,7 +359,7 @@ public class Collections
     /**
      * We don't even need to use reflection!
      */
-    public Object[] toArray(Object[] a)
+    public T[] toArray(T[] a)
     {
       if (a.length > 0)
         a[0] = null;
@@ -387,7 +387,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class EmptyMap extends AbstractMap
+  private static final class EmptyMap<K, V> extends AbstractMap<K, V>
     implements Serializable
   {
     /**
@@ -405,7 +405,7 @@ public class Collections
     /**
      * There are no entries.
      */
-    public Set entrySet()
+    public Set<Entry<K, V>> entrySet()
     {
       return EMPTY_SET;
     }
@@ -439,7 +439,7 @@ public class Collections
     /**
      * No mappings, so this returns null.
      */
-    public Object get(Object o)
+    public V get(Object o)
     {
       return null;
     }
@@ -455,7 +455,7 @@ public class Collections
     /**
      * No entries.
      */
-    public Set keySet()
+    public Set<K> keySet()
     {
       return EMPTY_SET;
     }
@@ -463,7 +463,7 @@ public class Collections
     /**
      * Remove always succeeds, with null result.
      */
-    public Object remove(Object o)
+    public V remove(Object o)
     {
       return null;
     }
@@ -480,7 +480,7 @@ public class Collections
      * No entries. Technically, EMPTY_SET, while more specific than a general
      * Collection, will work. Besides, that's what the JDK uses!
      */
-    public Collection values()
+    public Collection<V> values()
     {
       return EMPTY_SET;
     }
@@ -501,7 +501,7 @@ public class Collections
    * clever, but worth it for removing a duplicate of the search code.
    * Note: This code is also used in Arrays (for sort as well as search).
    */
-  static final int compare(Object o1, Object o2, Comparator c)
+  static final int compare(Object o1, Object o2, Comparator<?> c)
   {
     return c == null ? ((Comparable) o1).compareTo(o2) : c.compare(o1, o2);
   }
@@ -624,7 +624,7 @@ public class Collections
    * @throws UnsupportedOperationException if dest.listIterator() does not
    *         support the set operation
    */
-  public static <T> void copy(List<T> dest, List<T> source)
+  public static <T> void copy(List<? super T> dest, List<? extends T> source)
   {
     int pos = source.size();
     if (dest.size() < pos)
@@ -1019,7 +1019,7 @@ public class Collections
     ListIterator<T> i2 = l.listIterator(pos2);
     while (pos1 < pos2)
       {
-	Object o = i1.next();
+	T o = i1.next();
 	i1.set(i2.previous());
 	i2.set(o);
 	++pos1;
@@ -1040,7 +1040,7 @@ public class Collections
    */
   public static <T> Comparator<T> reverseOrder()
   {
-    return (Comparator<T>) rcInstance; // fixme?
+    return (Comparator<T>) rcInstance;
   }
 
   /**
@@ -1179,10 +1179,10 @@ public class Collections
     if (defaultRandom == null)
       {
         synchronized (Collections.class)
-	{
-	  if (defaultRandom == null)
-            defaultRandom = new Random();
-	}
+	  {
+	    if (defaultRandom == null)
+	      defaultRandom = new Random();
+	  }
       }
     shuffle(l, defaultRandom);
   }
@@ -1220,7 +1220,7 @@ public class Collections
   public static void shuffle(List<?> l, Random r)
   {
     int lsize = l.size();
-    ListIterator i = l.listIterator(lsize);
+    ListIterator<?> i = l.listIterator(lsize);
     boolean sequential = isSequential(l);
     Object[] a = null; // stores a copy of the list for the sequential case
 
@@ -1344,9 +1344,9 @@ public class Collections
     /**
      * This is true if the other collection only contains the element.
      */
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
-      Iterator i = c.iterator();
+      Iterator<?> i = c.iterator();
       int pos = c.size();
       while (--pos >= 0)
         if (! equals(i.next(), element))
@@ -1454,9 +1454,9 @@ public class Collections
     /**
      * This is true if the other collection only contains the element.
      */
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
-      Iterator i = c.iterator();
+      Iterator<?> i = c.iterator();
       int pos = c.size();
       while (--pos >= 0)
         if (! equals(i.next(), element))
@@ -1613,7 +1613,7 @@ public class Collections
     /**
      * Single entry.
      */
-    public V get(K key)
+    public V get(Object key)
     {
       return equals(key, k) ? v : null;
     }
@@ -1849,7 +1849,7 @@ public class Collections
         }
     }
 
-    public boolean containsAll(Collection c1)
+    public boolean containsAll(Collection<?> c1)
     {
       synchronized (mutex)
         {
@@ -1869,7 +1869,7 @@ public class Collections
     {
       synchronized (mutex)
         {
-          return new SynchronizedIterator(mutex, c.iterator());
+          return new SynchronizedIterator<T>(mutex, c.iterator());
         }
     }
 
@@ -2123,7 +2123,7 @@ public class Collections
     {
       synchronized (mutex)
         {
-          return new SynchronizedListIterator(mutex, list.listIterator());
+          return new SynchronizedListIterator<T>(mutex, list.listIterator());
         }
     }
 
@@ -2131,7 +2131,8 @@ public class Collections
     {
       synchronized (mutex)
         {
-          return new SynchronizedListIterator(mutex, list.listIterator(index));
+          return new SynchronizedListIterator<T>(mutex,
+						 list.listIterator(index));
         }
     }
 
@@ -2155,7 +2156,8 @@ public class Collections
     {
       synchronized (mutex)
         {
-          return new SynchronizedList(mutex, list.subList(fromIndex, toIndex));
+          return new SynchronizedList<T>(mutex,
+					 list.subList(fromIndex, toIndex));
         }
     }
   } // class SynchronizedList
@@ -2497,7 +2499,7 @@ public class Collections
         }
     }
 
-    public V get(K key)
+    public V get(Object key)
     {
       synchronized (mutex)
         {
@@ -2526,7 +2528,7 @@ public class Collections
       if (keys == null)
         synchronized (mutex)
           {
-            keys = new SynchronizedSet(mutex, m.keySet());
+            keys = new SynchronizedSet<K>(mutex, m.keySet());
           }
       return keys;
     }
@@ -2576,7 +2578,7 @@ public class Collections
       if (values == null)
         synchronized (mutex)
           {
-            values = new SynchronizedCollection(mutex, m.values());
+            values = new SynchronizedCollection<V>(mutex, m.values());
           }
       return values;
     }
@@ -2818,7 +2820,7 @@ public class Collections
    * @return a synchronized view of the sorted set
    * @see Serializable
    */
-  public static SortedSet<T> synchronizedSortedSet(SortedSet<T> s)
+  public static <T> SortedSet<T> synchronizedSortedSet(SortedSet<T> s)
   {
     return new SynchronizedSortedSet<T>(s);
   }
@@ -2993,7 +2995,7 @@ public class Collections
       return c.contains(o);
     }
 
-    public boolean containsAll(Collection c1)
+    public boolean containsAll(Collection<?> c1)
     {
       return c.containsAll(c1);
     }
@@ -3176,12 +3178,12 @@ public class Collections
 
     public ListIterator<T> listIterator()
     {
-      return new UnmodifiableListIterator(list.listIterator());
+      return new UnmodifiableListIterator<T>(list.listIterator());
     }
 
     public ListIterator<T> listIterator(int index)
     {
-      return new UnmodifiableListIterator(list.listIterator(index));
+      return new UnmodifiableListIterator<T>(list.listIterator(index));
     }
 
     public T remove(int index)
@@ -3322,7 +3324,6 @@ public class Collections
     /**
      * Cache the entry set.
      */
-    // fixme Set<? extends Entry<K, V>> ?
     private transient Set<Map.Entry<K, V>> entries;
 
     /**
@@ -3438,7 +3439,7 @@ public class Collections
       return m.equals(o);
     }
 
-    public V get(K key)
+    public V get(Object key)
     {
       return m.get(key);
     }

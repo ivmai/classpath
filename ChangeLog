@@ -1,3 +1,45 @@
+2004-08-15  Matthias Pfisterer  <Matthias.Pfisterer@web.de>
+	    Tom Tromey  <tromey@redhat.com>
+
+	* java/util/HashMap.java (HashMap): Fixed parameterization in
+	`new'.
+	(putAll): Fixed parameterization.
+	(containsValue): Likewise.
+	(clone): Likewise.
+	(getEntry): Likewise.
+	* java/util/Dictionary.java (remove): Fixed parameterization.
+	* java/util/Collections.java (shuffle): Fixed indentation and
+	type of iterator.
+	(copy): Fixed argument types.
+	(SingletonSet.containsAll): Fixed type parameterizations.
+	(SingletonList.containsAll): Likewise.
+	(EmptyMap.get): Likewise.
+	(isSequential): Likewise.
+	(EmptySet): Genericized.
+	(EmptyList): Likewise.
+	(EmptyMap): Likewise.
+	(compare): Likewise.
+	(SynchronizedCollection.containsAll): Fixed type
+	parameterization.
+	(SynchronizedCollection.iterator): Likewise.
+	(SynchronizedList.listIterator): Likewise.
+	(SynchronizedList.subList): Likewise.
+	(SynchronizedMap.keySet): Likewise.
+	(SynchronizedMap.values): Likewise.
+	(synchronizedSortedSet): Likewise.
+	(UnmodifiableCollection.containsAll): Likewise.
+	(UnmodifiableList.listIterator): Likewise.
+	* java/util/Calendar.java: Implement Comparable<Calendar>.
+	(compareTo): New method.
+	* java/util/Arrays.java (sort): Declare type variable.
+	(asList): Corrected argument type.
+	(ArrayList): Genericized.
+	* java/util/ArrayList.java: Genericized.
+	* java/util/AbstractSet.java (removeAll): Fix type errors in
+	iterator declarations.
+	* java/util/AbstractSequentialList.java (addAll): Genericize
+	iterator `i'.
+
 2004-08-08  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/Enum.java: Added package declaration.

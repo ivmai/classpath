@@ -2148,7 +2148,7 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  public static void sort(T[] a, Comparator<? super T> c)
+  public static <T> void sort(T[] a, Comparator<? super T> c)
   {
     sort(a, 0, a.length, c);
   }
@@ -2198,8 +2198,8 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  public static void sort(T[] a, int fromIndex, int toIndex,
-			  Comparator<? super T> c)
+  public static <T> void sort(T[] a, int fromIndex, int toIndex,
+			      Comparator<? super T> c)
   {
     if (fromIndex > toIndex)
       throw new IllegalArgumentException("fromIndex " + fromIndex
@@ -2331,7 +2331,7 @@ public class Arrays
    * @see RandomAccess
    * @see Arrays.ArrayList
    */
-  public static <T> List<T> asList(final Object[] a) // fixme `T...'
+  public static <T> List<T> asList(final T... a)
   {
     return new Arrays.ArrayList(a);
   }
@@ -2345,7 +2345,7 @@ public class Arrays
    * @author Eric Blake <ebb9@email.byu.edu>
    * @status updated to 1.4
    */
-  private static final class ArrayList extends AbstractList
+  private static final class ArrayList<E> extends AbstractList<E>
     implements Serializable, RandomAccess
   {
     // We override the necessary methods, plus others which will be much
@@ -2360,14 +2360,14 @@ public class Arrays
      * The array we are viewing.
      * @serial the array
      */
-    private final Object[] a;
+    private final E[] a;
 
     /**
      * Construct a list view of the array.
      * @param a the array to view
      * @throws NullPointerException if a is null
      */
-    ArrayList(Object[] a)
+    ArrayList(E[] a)
     {
       // We have to explicitly check.
       if (a == null)
@@ -2375,7 +2375,7 @@ public class Arrays
       this.a = a;
     }
 
-    public Object get(int index)
+    public E get(int index)
     {
       return a[index];
     }
@@ -2385,9 +2385,9 @@ public class Arrays
       return a.length;
     }
 
-    public Object set(int index, Object element)
+    public E set(int index, E element)
     {
-      Object old = a[index];
+      E old = a[index];
       a[index] = element;
       return old;
     }
@@ -2420,12 +2420,12 @@ public class Arrays
       return (Object[]) a.clone();
     }
 
-    public Object[] toArray(Object[] array)
+    public <T> T[] toArray(T[] array)
     {
       int size = a.length;
       if (array.length < size)
-        array = (Object[])
-          Array.newInstance(array.getClass().getComponentType(), size);
+        array = (T[]) Array.newInstance(array.getClass().getComponentType(),
+					size);
       else if (array.length > size)
         array[size] = null;
 

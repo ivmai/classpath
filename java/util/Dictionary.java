@@ -125,7 +125,7 @@ public abstract class Dictionary<K, V>
    * @return the value associated with the removed key
    * @throws NullPointerException if key is null
    */
-  public abstract V remove(K key);
+  public abstract V remove(Object key);
 
   /**
    * Returns the number of values currently in this Dictionary.

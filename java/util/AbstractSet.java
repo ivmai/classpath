@@ -125,17 +125,19 @@ public abstract class AbstractSet<E>
   {
     int oldsize = size();
     int count = c.size();
-    Iterator<E> i;
     if (oldsize < count)
       {
-	for (i = iterator(), count = oldsize; count > 0; count--)
-          if (c.contains(i.next()))
-            i.remove();
+	for (Iterator<E> i = iterator(), count = oldsize; count > 0; count--)
+	  {
+	    if (c.contains(i.next()))
+	      i.remove();
+	  }
       }
     else
-      for (i = c.iterator(); count > 0; count--)
-        remove(i.next());
+      {
+	for (Iterator<?> i = c.iterator(); count > 0; count--)
+	  remove(i.next());
+      }
     return oldsize != size();
   }
-
 }

@@ -256,7 +256,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
 
     if (initialCapacity == 0)
       initialCapacity = 1;
-    buckets = new HashEntry[initialCapacity];
+    buckets = new HashEntry<K, V>[initialCapacity];
     this.loadFactor = loadFactor;
     threshold = (int) (initialCapacity * loadFactor);
   }
@@ -385,7 +385,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
       {
         Map.Entry<? extends K, ? extends V> e = itr.next();
         // Optimize in case the Entry is one of our own.
-        if (e instanceof AbstractMap.BasicMapEntry)
+        if (e instanceof AbstractMap.BasicMapEntry<K, V>)
           {
             AbstractMap.BasicMapEntry<? extends K, ? extends V> entry
 	      = (AbstractMap.BasicMapEntry<? extends K, ? extends V>) e;
@@ -456,7 +456,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
   {
     for (int i = buckets.length - 1; i >= 0; i--)
       {
-        HashEntry e = buckets[i];
+        HashEntry<K, V> e = buckets[i];
         while (e != null)
           {
             if (equals(value, e.value))
@@ -475,16 +475,16 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    */
   public Object clone()
   {
-    HashMap copy = null;
+    HashMap<K, V> copy = null;
     try
       {
-        copy = (HashMap) super.clone();
+        copy = (HashMap<K, V>) super.clone();
       }
     catch (CloneNotSupportedException x)
       {
         // This is impossible.
       }
-    copy.buckets = new HashEntry[buckets.length];
+    copy.buckets = new HashEntry<K, V>[buckets.length];
     copy.putAllInternal(this);
     // Clear the entry cache. AbstractMap.clone() does the others.
     copy.entries = null;
@@ -660,7 +660,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
   // Package visible, for use in nested classes.
   final HashEntry<K, V> getEntry(Object o)
   {
-    if (! (o instanceof Map.Entry))
+    if (! (o instanceof Map.Entry<K, V>))
       return null;
     Map.Entry<K, V> me = (Map.Entry<K, V>) o;
     K key = me.getKey();
