@@ -1,5 +1,8 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/SecurityManager.java (currentLoadedClass): Updated
+	return type.
+
 	* java/lang/Float.java: Updated status.
 	* java/lang/Void.java: Updated status.
 	* java/lang/Double.java: Updated status.
