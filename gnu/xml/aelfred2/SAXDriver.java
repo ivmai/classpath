@@ -65,10 +65,8 @@ import java.util.Stack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
@@ -1031,7 +1029,7 @@ final public class SAXDriver
      */
     public int getLength ()
     {
-	return attributesList.size ();
+	return attributesList.size();
     }
 
     /**
@@ -1039,7 +1037,11 @@ final public class SAXDriver
      */
     public String getURI (int index)
     {
-	return ((Attribute) attributesList.get (index)).nameSpace;
+        if (index < 0 || index >= attributesList.size())
+          {
+            return null;
+          }
+	return ((Attribute) attributesList.get(index)).nameSpace;
     }
 
     /**
@@ -1047,7 +1049,11 @@ final public class SAXDriver
      */
     public String getLocalName (int index)
     {
-        Attribute attr = (Attribute) attributesList.get (index);
+        if (index < 0 || index >= attributesList.size())
+          {
+            return null;
+          }
+        Attribute attr = (Attribute) attributesList.get(index);
         // FIXME attr.localName is sometimes null, why?
         if (namespaces && attr.localName == null)
           {
@@ -1056,38 +1062,51 @@ final public class SAXDriver
             attr.localName = (ci == -1) ? attr.name :
               attr.name.substring(ci + 1);
           }
-        return attr.localName;
+        return (attr.localName == null) ? "" : attr.localName;
     }
 
     /**
      * <b>SAX2 Attributes</b> method (don't invoke on parser);
      */
-    public String getQName (int i)
+    public String getQName (int index)
     {
-    	return ((Attribute) attributesList.get (i)).name;
+        if (index < 0 || index >= attributesList.size())
+          {
+            return null;
+          }
+        Attribute attr = (Attribute) attributesList.get(index);
+    	return (attr.name == null) ? "" : attr.name;
     }
 
     /**
      * <b>SAX1 AttributeList</b> method (don't invoke on parser);
      */
-    public String getName (int i)
+    public String getName (int index)
     {
-    	return ((Attribute) attributesList.get (i)).name;
+    	return getQName(index);
     }
 
     /**
      * <b>SAX1 AttributeList, SAX2 Attributes</b> method
      * (don't invoke on parser);
      */
-    public String getType (int i)
+    public String getType (int index)
     {
-	String	type = parser.getAttributeType (elementName, getQName (i));
+        if (index < 0 || index >= attributesList.size())
+          {
+            return null;
+          }
+	String	type = parser.getAttributeType(elementName, getQName(index));
 	if (type == null)
+          {
 	    return "CDATA";
+          }
 	// ... use DeclHandler.attributeDecl to see enumerations
-      if (type == "ENUMERATION")
-        return "NMTOKEN";
-	return type;
+        if (type == "ENUMERATION")
+          {
+            return "NMTOKEN";
+          }
+        return type;
     }
 
 
@@ -1095,9 +1114,13 @@ final public class SAXDriver
      * <b>SAX1 AttributeList, SAX2 Attributes</b> method
      * (don't invoke on parser);
      */
-    public String getValue (int i)
+    public String getValue (int index)
     {
-    	return ((Attribute) attributesList.get (i)).value;
+        if (index < 0 || index >= attributesList.size())
+          {
+            return null;
+          }
+    	return ((Attribute) attributesList.get(index)).value;
     }
 
 
@@ -1106,14 +1129,19 @@ final public class SAXDriver
      */
     public int getIndex (String uri, String local)
     {
-	int length = getLength ();
+	int length = getLength();
 
-	for (int i = 0; i < length; i++) {
-	    if (!getURI (i).equals (uri))
+	for (int i = 0; i < length; i++)
+          {
+            if (!getURI(i).equals(uri))
+              {
 		continue;
-	    if (getLocalName (i).equals (local))
+              }
+	    if (getLocalName(i).equals(local))
+              {
 		return i;
-	}
+              }
+          }
 	return -1;
     }
 
@@ -1123,12 +1151,15 @@ final public class SAXDriver
      */
     public int getIndex (String xmlName)
     {
-	int length = getLength ();
+	int length = getLength();
 
-	for (int i = 0; i < length; i++) {
-	    if (getQName (i).equals (xmlName))
+	for (int i = 0; i < length; i++)
+          {
+            if (getQName(i).equals(xmlName))
+              {
 		return i;
-	}
+              }
+          }
 	return -1;
     }
 
@@ -1138,11 +1169,13 @@ final public class SAXDriver
      */
     public String getType (String uri, String local)
     {
-	int index = getIndex (uri, local);
+	int index = getIndex(uri, local);
 
 	if (index < 0)
+          {
 	    return null;
-	return getType (index);
+          }
+	return getType(index);
     }
 
 
@@ -1152,11 +1185,13 @@ final public class SAXDriver
      */
     public String getType (String xmlName)
     {
-	int index = getIndex (xmlName);
+	int index = getIndex(xmlName);
 
 	if (index < 0)
+          {
 	    return null;
-	return getType (index);
+          }
+	return getType(index);
     }
 
 
@@ -1165,11 +1200,13 @@ final public class SAXDriver
      */
     public String getValue (String uri, String local)
     {
-	int index = getIndex (uri, local);
+	int index = getIndex(uri, local);
 
 	if (index < 0)
+          {
 	    return null;
-	return getValue (index);
+          }
+	return getValue(index);
     }
 
 
@@ -1179,11 +1216,13 @@ final public class SAXDriver
      */
     public String getValue (String xmlName)
     {
-	int index = getIndex (xmlName);
+	int index = getIndex(xmlName);
 
 	if (index < 0)
+          {
 	    return null;
-	return getValue (index);
+          }
+	return getValue(index);
     }
 
 

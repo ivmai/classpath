@@ -1,5 +1,5 @@
-/* GdkGraphics2D.java
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+/* GdkGraphics2D.java --
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -40,7 +40,6 @@ package gnu.java.awt.peer.gtk;
 
 import gnu.classpath.Configuration;
 import gnu.java.awt.ClasspathToolkit;
-import gnu.java.awt.peer.ClasspathFontPeer;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -60,9 +59,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.Toolkit;
-import java.awt.color.ColorSpace;
 import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphJustificationInfo;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -80,7 +77,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DirectColorModel;
 import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImagingOpException;
 import java.awt.image.MultiPixelPackedSampleModel;
@@ -103,6 +99,10 @@ public class GdkGraphics2D extends Graphics2D
 
   static 
   {
+    if (! Configuration.GTK_CAIRO_ENABLED)
+      throw new Error("Grahics2D not implemented. "
+		      + "Cairo was not found or disabled at configure time");
+
     if (Configuration.INIT_LOAD_LIBRARY)
       System.loadLibrary("gtkpeer");
 
@@ -211,9 +211,7 @@ public class GdkGraphics2D extends Graphics2D
   GdkGraphics2D(GtkComponentPeer component)
   {
     this.component = component;
-
-    setFont(new Font("SansSerif", Font.PLAIN, 12));
-
+    
     if (component.isRealized())
       initComponentGraphics2D();
     else
@@ -230,6 +228,7 @@ public class GdkGraphics2D extends Graphics2D
     setTransform(new AffineTransform());
     setStroke(new BasicStroke());
     setRenderingHints(getDefaultHints());
+    setFont(new Font("SansSerif", Font.PLAIN, 12));
 
     stateStack = new Stack();
   }
@@ -1322,58 +1321,54 @@ public class GdkGraphics2D extends Graphics2D
   }
 
   // these are the most accelerated painting paths
-  native void cairoDrawGdkGlyphVector(GdkFontPeer f, GdkGlyphVector gv,
-                                      float x, float y);
+  native void cairoDrawGlyphVector(GdkFontPeer font, 
+                                   float x, float y, int n, 
+                                   int[] codes, float[] positions);
 
-  native void cairoDrawGdkTextLayout(GdkFontPeer f, GdkTextLayout gl, float x,
-                                     float y);
-
-  native void cairoDrawString(GdkFontPeer f, String str, float x, float y);
+  native void cairoDrawGdkTextLayout(GdkTextLayout gl, 
+                                     float x, float y);
 
   GdkFontPeer getFontPeer()
   {
     return (GdkFontPeer) getFont().getPeer();
   }
 
-  public void drawGdkGlyphVector(GdkGlyphVector gv, float x, float y)
-  {
-    cairoDrawGdkGlyphVector(getFontPeer(), gv, x, y);
-    updateBufferedImage();
-  }
-
   public void drawGdkTextLayout(GdkTextLayout gl, float x, float y)
   {
-    cairoDrawGdkTextLayout(getFontPeer(), gl, x, y);
-    updateBufferedImage();
+    cairoDrawGdkTextLayout (gl, x, y);
+    updateBufferedImage ();
   }
 
   public void drawString(String str, float x, float y)
   {
-    cairoDrawString(getFontPeer(), str, x, y);
-    updateBufferedImage();
+    drawGlyphVector(getFont().createGlyphVector(null, str), x, y);
+    updateBufferedImage ();
   }
 
   public void drawString(String str, int x, int y)
   {
-    drawString(str, (float) x, (float) y);
+    drawString (str, (float) x, (float) y);
   }
 
   public void drawString(AttributedCharacterIterator ci, int x, int y)
   {
-    drawString(ci, (float) x, (float) y);
+    drawString (ci, (float) x, (float) y);
   }
 
   public void drawGlyphVector(GlyphVector gv, float x, float y)
   {
-    if (gv instanceof GdkGlyphVector)
-      drawGdkGlyphVector((GdkGlyphVector) gv, x, y);
-    else
-      throw new java.lang.UnsupportedOperationException();
+    int n = gv.getNumGlyphs ();
+    int[] codes = gv.getGlyphCodes (0, n, null);
+    float[] positions = gv.getGlyphPositions (0, n, null);
+    
+    setFont (gv.getFont ());
+    cairoDrawGlyphVector (getFontPeer(), x, y, n, codes, positions);
+    updateBufferedImage ();
   }
 
   public void drawString(AttributedCharacterIterator ci, float x, float y)
   {
-    GlyphVector gv = font.createGlyphVector(getFontRenderContext(), ci);
+    GlyphVector gv = getFont().createGlyphVector(getFontRenderContext(), ci);
     drawGlyphVector(gv, x, y);
   }
 
@@ -1412,6 +1407,8 @@ public class GdkGraphics2D extends Graphics2D
 
   public Font getFont()
   {
+    if (font == null)
+      return new Font("SansSerif", Font.PLAIN, 12);
     return font;
   }
 
@@ -1421,16 +1418,9 @@ public class GdkGraphics2D extends Graphics2D
 
   static native void releasePeerGraphicsResource(GdkFontPeer f);
 
-  static native void getPeerTextMetrics(GdkFontPeer f, String str,
-                                        double[] metrics);
-
-  static native void getPeerFontMetrics(GdkFontPeer f, double[] metrics);
-
   public FontMetrics getFontMetrics()
   {
-    // the reason we go via the toolkit here is to try to get
-    // a cached object. the toolkit keeps such a cache.
-    return Toolkit.getDefaultToolkit().getFontMetrics(font);
+    return getFontMetrics(getFont());
   }
 
   public FontMetrics getFontMetrics(Font f)
@@ -1453,7 +1443,7 @@ public class GdkGraphics2D extends Graphics2D
   public String toString()
   {
     return  (getClass().getName()
-             + "[font=" + font.toString()
+             + "[font=" + getFont().toString()
              + ",color=" + fg.toString()
 	     + "]");
   }

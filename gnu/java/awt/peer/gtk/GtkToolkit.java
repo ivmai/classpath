@@ -51,7 +51,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.peer.DragSourceContextPeer;
 import java.awt.font.FontRenderContext;
-import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -68,7 +67,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Properties;
 import javax.imageio.spi.IIORegistry;
 
@@ -348,15 +346,18 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
 
   public FontMetrics getFontMetrics (Font font) 
   {
-    if (metricsCache.containsKey(font))
-      return (FontMetrics) metricsCache.get(font);
-    else
+    synchronized (metricsCache)
       {
-        FontMetrics m;
-        m = new GdkFontMetrics (font);
+        if (metricsCache.containsKey(font))
+          return (FontMetrics) metricsCache.get(font);
+      }
+
+    FontMetrics m = new GdkFontMetrics (font);
+    synchronized (metricsCache)
+      {
         metricsCache.put(font, m);
-        return m;
-      }    
+      }
+    return m;
   }
 
   public Image getImage (String filename) 
@@ -632,11 +633,18 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
     throw new Error("not implemented");
   }
 
+  public Rectangle getBounds()
+  {
+    int[] dims = new int[2];
+    getScreenSizeDimensions(dims);
+    return new Rectangle(0, 0, dims[0], dims[1]);
+  }
+  
   // ClasspathToolkit methods
 
   public GraphicsEnvironment getLocalGraphicsEnvironment()
   {
-    return new GdkGraphicsEnvironment();
+    return new GdkGraphicsEnvironment(this);
   }
 
   public Font createFont(int format, InputStream stream)

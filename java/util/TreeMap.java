@@ -729,7 +729,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    *         or are not Comparable with natural ordering
    * @throws NullPointerException if o1 or o2 is null with natural ordering
    */
-  final int compare(Object o1, Object o2)
+  final int compare(K o1, K o2)
   {
     return (comparator == null
             ? ((Comparable) o1).compareTo(o2)

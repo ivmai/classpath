@@ -397,15 +397,16 @@ public class AWTKeyStroke implements Serializable
    * </code>      
    *
    * @param s the string to parse
+   * @throws IllegalArgumentException if s is null or cannot be parsed
    * @return the specified keystroke
-   * @throws NullPointerException if s is null
-   * @throws IllegalArgumentException if s cannot be parsed
    */
   public static AWTKeyStroke getAWTKeyStroke(String s)
   {
+    if (s == null)
+      throw new IllegalArgumentException("null argument");
     StringTokenizer t = new StringTokenizer(s, " ");
     if (! t.hasMoreTokens())
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("no tokens '" + s + "'");
     int modifiers = 0;
     boolean released = false;
     String token = null;
@@ -436,7 +437,8 @@ public class AWTKeyStroke implements Serializable
                                          KeyEvent.VK_UNDEFINED, modifiers,
                                          false);
               }
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid 'typed' argument '"
+			    		       + s + "'");
           }
         else if ("pressed".equals(token))
           {
@@ -457,8 +459,11 @@ public class AWTKeyStroke implements Serializable
     while (t.hasMoreTokens());
     // Now token contains the VK name we must parse.
     Integer code = (Integer) vktable.get(token);
-    if (code == null || t.hasMoreTokens())
-      throw new IllegalArgumentException();
+    if (code == null)
+      throw new IllegalArgumentException("Unknown token '" + token
+					 + "' in '" + s + "'");
+    if (t.hasMoreTokens())
+      throw new IllegalArgumentException("Too many tokens: " + s);
     return getAWTKeyStroke(KeyEvent.CHAR_UNDEFINED, code.intValue(),
                            modifiers, released);
   }

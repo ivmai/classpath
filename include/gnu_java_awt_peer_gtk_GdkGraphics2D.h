@@ -46,12 +46,9 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoClosePath (
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoStroke (JNIEnv *env, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoFill (JNIEnv *env, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoClip (JNIEnv *env, jobject);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkGlyphVector (JNIEnv *env, jobject, jobject, jobject, jfloat, jfloat);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkTextLayout (JNIEnv *env, jobject, jobject, jobject, jfloat, jfloat);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawString (JNIEnv *env, jobject, jobject, jstring, jfloat, jfloat);
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGlyphVector (JNIEnv *env, jobject, jobject, jfloat, jfloat, jint, jintArray, jfloatArray);
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkTextLayout (JNIEnv *env, jobject, jobject, jfloat, jfloat);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_releasePeerGraphicsResource (JNIEnv *env, jclass, jobject);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_getPeerTextMetrics (JNIEnv *env, jclass, jobject, jstring, jdoubleArray);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics2D_getPeerFontMetrics (JNIEnv *env, jclass, jobject, jdoubleArray);
 
 #ifdef __cplusplus
 }

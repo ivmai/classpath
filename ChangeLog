@@ -1,3 +1,410 @@
+2005-02-14  Sven de Marothy  <sven@physto.se>
+
+        * java/util/Calendar.java 
+        (Calendar): Constructor should clear fields.
+
+2005-02-14  Sven de Marothy  <sven@physto.se>
+
+	* javax/swing/SpinnerDateModel.java: Implemented.
+
+2005-02-14  Sven de Marothy  <sven@physto.se>
+
+        * java/util/Calendar.java 
+        (clear): Dates should clear to local time.
+
+        * java/util/GregorianCalendar.java      
+        (computeTime): Fix priority problem with DAY_OF_WEEK,
+        Handle non-sunday-startig weeks and minimumDaysInFirstWeek.
+
+2005-02-13  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/AWTKeyStroke.java (getAWTKeyStroke(String)): Throw
+	IllegalArgumentException when the given String is null.
+
+	* javax/swing/KeyStroke.java (getKeyStroke(String)): Return null
+	when given keystoke sequence cannot be parsed.
+
+	* javax/swing/JRootPane.java (setJMenuBar): Remove current menubar
+	if one is installed. Only install the given menubar is not null.
+
+	* javax/swing/JViewport.java (getViewSize): Return an empty
+	Dimension when the view isn't set or preferred component size when
+	no viewSize is set.
+
+	* javax/swing/ViewportLayout.java (preferredLayoutSize): Return an
+	empty Dimension when there is no view set.
+	(minimumLayoutSize): Likewise.
+	(layoutContainer): Don't try to layout when there is no view.
+
+2005-02-13  Mark Wielaard  <mark@klomp.org>
+
+	# Fixes bug #11957
+	* java/io/ObjectInputStream.java (resolveClass): Don't check "void"
+	twice.
+
+2005-02-13  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/xml/aelfred2/SAXDriver.java: Ensure that null is returned when
+	attribute index is out of bounds.
+
+2005-02-12  Mark Wielaard  <mark@klomp.org>
+
+	Fixes bug #11949
+	* java/awt/BasicStroke.java (hashCode): Check for null dash.
+
+2005-02-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/awt/color/ClutProfileConverter.java,
+	gnu/java/awt/peer/ClasspathTextLayoutPeer.java,
+	gnu/java/awt/peer/gtk/GdkFontPeer.java,
+	gnu/java/awt/peer/gtk/GdkGlyphVector.java,
+	gnu/java/awt/peer/gtk/GdkGraphics2D.java,
+	gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java,
+	gnu/java/awt/peer/gtk/GdkPixbufDecoder.java,
+	gnu/java/awt/peer/gtk/GdkRobotPeer.java,
+	gnu/java/awt/peer/gtk/GdkTextLayout.java,
+	gnu/java/awt/peer/gtk/GtkButtonPeer.java,
+	gnu/java/awt/peer/gtk/GtkCheckboxMenuItemPeer.java,
+	gnu/java/awt/peer/gtk/GtkCheckboxPeer.java,
+	gnu/java/awt/peer/gtk/GtkChoicePeer.java,
+	gnu/java/awt/peer/gtk/GtkComponentPeer.java,
+	gnu/java/awt/peer/gtk/GtkContainerPeer.java,
+	gnu/java/awt/peer/gtk/GtkDialogPeer.java,
+	gnu/java/awt/peer/gtk/GtkFileDialogPeer.java,
+	gnu/java/awt/peer/gtk/GtkFontPeer.java,
+	gnu/java/awt/peer/gtk/GtkFramePeer.java,
+	gnu/java/awt/peer/gtk/GtkLabelPeer.java,
+	gnu/java/awt/peer/gtk/GtkMenuComponentPeer.java,
+	gnu/java/awt/peer/gtk/GtkMenuItemPeer.java,
+	gnu/java/awt/peer/gtk/GtkScrollPanePeer.java,
+	gnu/java/awt/peer/gtk/GtkTextComponentPeer.java,
+	gnu/java/awt/peer/gtk/GtkToolkit.java,
+	gnu/java/awt/peer/gtk/GtkWindowPeer.java,
+	gnu/java/io/EncodingManager.java,
+	gnu/java/io/decode/DecoderUTF8.java,
+	gnu/java/net/protocol/file/Connection.java,
+	gnu/java/net/protocol/ftp/ActiveModeDTP.java,
+	gnu/java/net/protocol/ftp/BlockInputStream.java,
+	gnu/java/net/protocol/ftp/BlockOutputStream.java,
+	gnu/java/net/protocol/ftp/CompressedOutputStream.java,
+	gnu/java/net/protocol/ftp/StreamInputStream.java,
+	gnu/java/net/protocol/ftp/StreamOutputStream.java,
+	gnu/java/net/protocol/http/Cookie.java,
+	gnu/java/net/protocol/http/HTTPConnection.java,
+	gnu/java/net/protocol/http/HTTPDateFormat.java,
+	gnu/java/net/protocol/http/Request.java,
+	gnu/java/nio/SelectorImpl.java,
+	gnu/java/rmi/dgc/DGCImpl.java,
+	gnu/java/rmi/server/UnicastConnectionManager.java,
+	gnu/java/security/pkcs/SignerInfo.java,
+	gnu/java/security/provider/EncodedKeyFactory.java,
+	gnu/java/security/provider/GnuDHPublicKey.java,
+	gnu/java/security/provider/PKIXCertPathValidatorImpl.java,
+	gnu/java/security/x509/X500DistinguishedName.java,
+	gnu/java/security/x509/X509CRL.java,
+	gnu/java/security/x509/X509CRLEntry.java,
+	gnu/java/security/x509/X509Certificate.java,
+	gnu/java/security/x509/ext/AuthorityKeyIdentifier.java,
+	gnu/java/security/x509/ext/CertificatePolicies.java,
+	gnu/java/security/x509/ext/PolicyConstraint.java,
+	gnu/xml/aelfred2/SAXDriver.java,
+	gnu/xml/dom/Consumer.java,
+	gnu/xml/dom/DomCharacterData.java,
+	gnu/xml/dom/DomDocument.java,
+	gnu/xml/dom/DomDocumentBuilder.java,
+	gnu/xml/dom/DomIterator.java,
+	gnu/xml/dom/DomNode.java,
+	gnu/xml/dom/DomXPathExpression.java,
+	gnu/xml/dom/DomXPathResult.java,
+	gnu/xml/dom/JAXPFactory.java,
+	gnu/xml/dom/ls/DomLSException.java,
+	gnu/xml/libxmlj/dom/GnomeDocumentBuilder.java,
+	gnu/xml/libxmlj/dom/GnomeXPathNodeList.java,
+	gnu/xml/libxmlj/sax/GnomeXMLReader.java,
+	gnu/xml/libxmlj/transform/GnomeTransformer.java,
+	gnu/xml/libxmlj/transform/GnomeTransformerFactory.java,
+	gnu/xml/libxmlj/util/XMLJ.java,
+	gnu/xml/pipeline/CallFilter.java,
+	gnu/xml/pipeline/DomConsumer.java,
+	gnu/xml/pipeline/LinkFilter.java,
+	gnu/xml/pipeline/NSFilter.java,
+	gnu/xml/pipeline/TeeConsumer.java,
+	gnu/xml/pipeline/ValidationConsumer.java,
+	gnu/xml/pipeline/WellFormednessFilter.java,
+	gnu/xml/pipeline/XIncludeFilter.java,
+	gnu/xml/pipeline/XsltFilter.java,
+	gnu/xml/transform/ApplyImportsNode.java,
+	gnu/xml/transform/Bindings.java,
+	gnu/xml/transform/DocumentFunction.java,
+	gnu/xml/transform/FormatNumberFunction.java,
+	gnu/xml/transform/NodeNumberNode.java,
+	gnu/xml/transform/NumberNode.java,
+	gnu/xml/transform/Stylesheet.java,
+	gnu/xml/transform/SystemPropertyFunction.java,
+	gnu/xml/transform/Template.java,
+	gnu/xml/transform/TemplatesImpl.java,
+	gnu/xml/transform/TransformerImpl.java,
+	gnu/xml/transform/ValueOfNode.java,
+	gnu/xml/transform/XSLURIResolver.java,
+	gnu/xml/util/DoParse.java,
+	gnu/xml/util/Resolver.java,
+	gnu/xml/xpath/Expr.java,
+	gnu/xml/xpath/FunctionCall.java,
+	gnu/xml/xpath/RelationalExpr.java,
+	gnu/xml/xpath/Selector.java,
+	gnu/xml/xpath/XPathParser.java,
+	java/beans/XMLDecoder.java,
+	java/text/SimpleDateFormat.java,
+	javax/swing/JPopupMenu.java,
+	javax/swing/JSpinner.java,
+	javax/swing/SortingFocusTraversalPolicy.java,
+	javax/swing/SwingUtilities.java,
+	javax/swing/plaf/basic/BasicComboBoxEditor.java,
+	javax/swing/plaf/basic/BasicComboBoxRenderer.java,
+	javax/swing/tree/DefaultMutableTreeNode.java,
+	javax/xml/parsers/DocumentBuilder.java,
+	javax/xml/parsers/DocumentBuilderFactory.java,
+	javax/xml/transform/sax/SAXTransformerFactory.java,
+	vm/reference/java/lang/VMClassLoader.java,
+	vm/reference/java/lang/VMProcess.java,
+	vm/reference/java/lang/VMRuntime.java,
+	vm/reference/java/lang/VMSystem.java,
+	vm/reference/java/security/VMAccessController.java:
+	Removed unused imports and expanded starred
+	imports.
+
+2005-02-12  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_awt_peer_gtk_GdkFontPeer.h,
+	include/gnu_java_awt_peer_gtk_GdkGraphics2D.h:
+	Regenerated.
+
+2005-02-12  Graydon Hoare  <graydon@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkGraphicsConfiguration.java: Add.
+
+2005-02-12  Graydon Hoare  <graydon@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkFontPeer.java
+	(getGlyphVector):
+	(getFontMetrics):
+	(getTextMetrics): New native methods.
+	* gnu/java/awt/peer/gtk/GdkFontMetrics.java: Remove native parts.
+	* gnu/java/awt/peer/gtk/GdkGlyphVector.java: Likewise.
+	* gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java: 
+	Hold reference to GtkToolkit.
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java
+	(cairoSetFont):
+	(cairoDrawGdkTextLayout):
+	(cairoDrawString): 
+	(getPeerTextMetrics):
+	(getPeerFontMetrics): Remove.
+	(setFont): Don't call cairoSetFont.
+	(cairoDrawGlyphVector): Accept font peer argument.
+	(drawGlyphVector): Pass font peer to cairoDrawGlyphVector.
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java:
+	(finalize): Call finish from here.
+	(produce): Not from here.
+	* gnu/java/awt/peer/gtk/GdkScreenGraphicsDevice.java:
+	Hold reference to GdkGraphicsEnvironment.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java:
+	(getFontMetrics): Change locking.
+	(getBounds): New method.
+	(getLocalGraphicsEnvironment): Pass reference to this.
+
+	* include/Makefile.am: Remove entries for GdkFontMetrics, GdkGlyphVector.
+	* include/gnu_java_awt_peer_gtk_GdkFontMetrics.h: Remove.
+	* include/gnu_java_awt_peer_gtk_GdkFontPeer.h: Regenerate.
+	* include/gnu_java_awt_peer_gtk_GdkGlyphVector.h: Remove.
+	* include/gnu_java_awt_peer_gtk_GdkGraphics2D.h: Regenerate.
+
+	* native/jni/gtk-peer/Makefile.am
+	Remove entries for GdkFontMetrics, GdkGlyphVector.
+	* native/jni/gtk-peer/gdkfont.h: Add #defines, remove struct glyphvec.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics2D.c
+	(ensure_metrics_cairo):
+	(Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetFont):
+	(Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawString):
+	(Java_gnu_java_awt_peer_gtk_GdkGraphics2D_getPeerFontMetrics):
+	(Java_gnu_java_awt_peer_gtk_GdkGraphics2D_getPeerTextMetrics):
+	(metrics_cairo):
+	(metrics_surface): Remove.
+	(Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGlyphVector):
+	Pass and install font peer.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkButtonPeer.c:
+	Release GDK lock while performing upcalls.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkFontMetrics.c: Remove.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkFontPeer.c
+	(Java_gnu_java_awt_peer_gtk_GdkFontPeer_getGlyphVector):
+	(Java_gnu_java_awt_peer_gtk_GdkFontPeer_getFontMetrics): 
+	(Java_gnu_java_awt_peer_gtk_GdkFontPeer_getTextMetrics): New methods.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGlyphVector.c: Remove.
+
+2005-02-11  Craig Black  <craig.black@aonix.com>
+
+	* gnu/java/awt/peer/gtk/GtkCheckboxMenuItem.java
+	(postMenuActionEvent): Implement to notify ItemListeners.
+	* java/awt/CheckboxMenuItem.java
+	(dispatchEventImpl): Update state on ItemEvent.
+	* java/awt/MenuItem.java
+	(processActionEvent): Retarget event source.
+
+2005-02-11  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkFileDialogPeer.c (create):
+	Use GTK's built-in file system backend.  Use GTK_RESPONSE_ACCEPT.
+	(handle_response): Use GTK_RESPONSE_ACCEPT.
+
+2005-02-10  Michael Koch  <konqueror@gmx.de>
+
+	* configure.ac: Define GTK_CAIRO in config.h
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c
+	(gtkInit): Compile Graphics2D stuff conditionally.
+
+2005-02-10  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/dom/DomAttr.java,
+	gnu/xml/dom/DomCDATA.java,
+	gnu/xml/dom/DomCDATASection.java,
+	gnu/xml/dom/DomCharacterData.java,
+	gnu/xml/dom/DomDOMException.java,
+	gnu/xml/dom/DomDoctype.java,
+	gnu/xml/dom/DomDocument.java,
+	gnu/xml/dom/DomDocumentConfiguration.java,
+	gnu/xml/dom/DomDocumentFragment.java,
+	gnu/xml/dom/DomElement.java,
+	gnu/xml/dom/DomEx.java,
+	gnu/xml/dom/DomFragment.java,
+	gnu/xml/dom/DomImpl.java,
+	gnu/xml/dom/DomIterator.java,
+	gnu/xml/dom/DomNamedNodeMap.java,
+	gnu/xml/dom/DomNode.java,
+	gnu/xml/dom/DomNsNode.java,
+	gnu/xml/dom/DomPI.java,
+	gnu/xml/dom/DomProcessingInstruction.java,
+	gnu/xml/dom/DomText.java,
+	gnu/xml/dom/DomLSEx.java,
+	gnu/xml/dom/DomLSException.java,
+	gnu/xml/dom/DomLSParser.java,
+	gnu/xml/dom/DomLSSerializer.java: Refactoring of exception and DOM
+	implementation class names to conform to Classpath guidelines. Make
+	DomLSException use JDK 1.4+ exception chaining.
+	* gnu/xml/util/SAXNullTransformerFactory.java,
+	gnu/xml/xpath/Predicate.java: Use constants relative to declaring
+	class or interface.
+
+2005-02-10  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTabbedPane.java
+	(Page.setDisplayedMnemonicIndex): Handle empty menmonic.
+
+2005-02-10  Graydon Hoare  <graydon@redhat.com>
+
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkEvents.c,
+	jni/gtk-peer/gnu_java_awt_peer_gtk_GtkComponentPeer.c,
+	jni/gtk-peer/gnu_java_awt_peer_gtk_GtkTextComponentPeer.c,
+	jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c:
+	Release GDK lock during upcalls.
+
+2005-02-10  Michael Koch  <konqueror@gmx.de>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImagePainter.c:
+	Merged file header from java-gui-20050128-branch.
+
+2005-02-10  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/Container.java (paramString):
+	If layoutMgr is null just return result of super.paramString().
+
+2005-02-10  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/text/Collator.java (getInstance(Locale)):
+	Added default collation pattern to handle case when resource
+	is missing and throw InternalError instead of returning null
+	should parsing fail.
+
+2005-02-09  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/net/protocol/jar/Connection.java (getJarFile): 
+	Rename jar_file to jf.
+
+2005-02-09  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/net/protocol/jar/Connection.java (getJarFile): Open
+	jar file with OPEN_DELETE.
+	* java/util/zip/ZipFile.java (ZipFile): Call deleteOnExit when
+	OPEN_DELETE is used.
+
+2005-02-09  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/Scrollbar.java: Reformatted.
+
+2005-02-08  Tom Tromey  <tromey@redhat.com>
+
+	* java/net/URI.java (AUTHORITY_REGEXP): Handle case where user
+	name or port is missing.
+	(AUTHORITY_USERINFO_GROUP, AUTHORITY_HOST_GROUP,
+	AUTHORITY_PORT_GROUP): Updated.
+
+2005-02-08  Craig Black  <craig.black@aonix.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics.c
+	(copyState): Pass a JNI global reference to signal handler.
+	(realize_cb): Use and free JNI global reference.
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkChoicePeer.c
+	(create): Pass a JNI global reference to signal handler.
+	(selection_changed): Match declaration.
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkGenericPeer.c
+	(dispose): Do not remove entries from state tables until after widget is
+	destroyed.
+
+2005-02-08  Michael Koch  <konqueror@gmx.de>
+
+	* native/jni/java-nio/java_nio_VMDirectByteBuffer.c
+	(NIOGetPointer): Handle case of pointer size != 32 bit.
+	(NIOGetRawData): Likewise.
+	(Java_java_nio_VMDirectByteBuffer_init): Likewise.
+	Fixed asking for primitive type 'long'.
+
+2005-02-08  Michael Koch  <konqueror@gmx.de>
+
+	* configure.ac: Define substition variable GTK_CAIRO_ENABLED.
+	Fix handling of GTK_CAIRO conditional.
+	* gnu/classpath/Configuration.java.in (GTK_CAIRO_ENABLED):
+	New constant.
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java (static):
+	Throw error when Cairo support was not enabled during configure time.
+
+2005-02-08  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/tree/DefaultMutableTreeNode.java:
+	Reworked Javadocs all over.
+	(getPathToRoot): Fixed direction of result array initialization.
+
+2005-02-07  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/ResourceBundle.java (getObject): Clarify
+	MissingResourceException detailed message.
+	(tryBundle(String,ClassLoader)): Likewise.
+
+2005-02-07  Craig Black  <craig.black@aonix.com>
+
+	* native/jni/classpath/native_state.c
+	(add_node): Update head pointer when moving node to front of list.
+
+2005-02-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* acinclude.m4:
+	(CLASSPATH_FIND_JAVAC): Add ECJ option.
+	(CLASSPATH_WITH_ECJ): New function.
+	(CLASSPATH_CHECK_ECJ): New function.
+	* examples/Makefile.am:
+	Allow examples to be built with ecj.
+	* lib/Makefile.am:
+	Allow Classpath to be built with ecj.
+
 2005-02-06  Mark Wielaard  <mark@klomp.org>
 
 	Reported by Timo Lindfors <timo.lindfors@iki.fi>
@@ -79,17 +486,17 @@
 
 2005-02-03  Dalibor Topic  <robilad@kaffe.org>
 
-        * libraries/javalib/gnu/regexp/RE.java,
-        libraries/javalib/java/io/ObjectInputStream.java,
-        libraries/javalib/java/io/ObjectStreamClass.java,
-        libraries/javalib/java/lang/SecurityManager.java,
-        libraries/javalib/java/security/AllPermission.java,
+	* libraries/javalib/gnu/regexp/RE.java,
+	libraries/javalib/java/io/ObjectInputStream.java,
+	libraries/javalib/java/io/ObjectStreamClass.java,
+	libraries/javalib/java/lang/SecurityManager.java,
+	libraries/javalib/java/security/AllPermission.java,
 	libraries/javalib/java/security/BasicPermission.java,
-        libraries/javalib/java/security/Permissions.java,
-        libraries/javalib/java/text/MessageFormat.java,
-        libraries/javalib/java/util/AbstractList.java:
-        Made 'inner' classes real public static inner classes,
-        and made them final where possible, or removed them 
+	libraries/javalib/java/security/Permissions.java,
+	libraries/javalib/java/text/MessageFormat.java,
+	libraries/javalib/java/util/AbstractList.java:
+	Made 'inner' classes real public static inner classes,
+	and made them final where possible, or removed them 
 	where unused. 
 
 2005-02-03  Michael Koch  <konqueror@gmx.de>
@@ -107,7 +514,7 @@
 
 	* java/util/Calendar.java 
 	(set) Invalidate all fields on first call to set().
-	
+
 2005-02-02  Mark Wielaard  <mark@klomp.org>
 
 	* vm/reference/java/lang/VMClassLoader.java: Remove SystemClassLoader
@@ -138,34 +545,34 @@
 
 2005-02-02  Robert Schuster  <thebohemian@gmx.net>
 
-        * gnu/java/beans/decoder/GrowableArrayContext.java: Fixed
-        assignment behavior by using java.lang.reflect.Array.set()
-        directly.
+	* gnu/java/beans/decoder/GrowableArrayContext.java: Fixed
+	assignment behavior by using java.lang.reflect.Array.set()
+	directly.
 
 2005-02-01  Dalibor Topic  <robilad@kaffe.org>
 
 	* gnu/java/beans/EmptyBeanInfo.java,
 	gnu/java/beans/info/ComponentBeanInfo.java,
- 	gnu/java/lang/SystemClassLoader.java:
+	gnu/java/lang/SystemClassLoader.java:
 	Removed unused files.
 
 2005-02-01  Sven de Marothy  <sven@physto.se>
 	
 	* java/util/GregorianCalendar.java
-        (computeTime): Fixed handling of time zones.
+	(computeTime): Fixed handling of time zones.
 
 2005-02-01  Sven de Marothy  <sven@physto.se>
 	
 	* java/util/Calendar.java
-        (clear): Set values to Epoch instead of zero.
-        (set): Set isSet to the relevant field pattern instead of just the
+	(clear): Set values to Epoch instead of zero.
+	(set): Set isSet to the relevant field pattern instead of just the
 	field.
-        * java/util/GregorianCalendar.java
-        (getBundle): Removed.
-        (getDayOfYear): Removed.
-        (getFirstDayOfMonth): New private method.
-        (nonLeniencyCheck): New private method.
-        (computeTime): Correct handling of insufficient data.
+	* java/util/GregorianCalendar.java
+	(getBundle): Removed.
+	(getDayOfYear): Removed.
+	(getFirstDayOfMonth): New private method.
+	(nonLeniencyCheck): New private method.
+	(computeTime): Correct handling of insufficient data.
 
 2005-02-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
