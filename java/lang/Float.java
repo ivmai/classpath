@@ -1,5 +1,5 @@
 /* Float.java -- object wrapper for float
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -52,7 +52,7 @@ package java.lang;
  * @since 1.0
  * @status updated to 1.4
  */
-public final class Float extends Number implements Comparable
+public final class Float extends Number implements Comparable<Float>
 {
   /**
    * Compatible with JDK 1.0+.
@@ -91,7 +91,13 @@ public final class Float extends Number implements Comparable
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('F');
+  public static final Class<Float> TYPE = VMClassLoader.getPrimitiveClass('F');
+
+  /**
+   * The number of bits needed to represent a <code>float</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 32;
 
   /**
    * The immutable value of this Float.
@@ -189,6 +195,20 @@ public final class Float extends Number implements Comparable
   public static Float valueOf(String s)
   {
     return new Float(parseFloat(s));
+  }
+
+  /**
+   * Returns a <code>Float</code> object wrapping the value.
+   * In contrast to the <code>Float</code> constructor, this method
+   * may cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Float</code>
+   */
+  public static Float valueOf(float val)
+  {
+    // We don't actually cache, but we could.
+    return new Float(val);
   }
 
   /**

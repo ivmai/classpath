@@ -1,5 +1,5 @@
 /* java.lang.Character -- Wrapper class for char, and Unicode subsets
-   Copyright (C) 1998, 1999, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -66,7 +66,7 @@ import gnu.java.lang.CharData;
  * @since 1.0
  * @status updated to 1.4
  */
-public final class Character implements Serializable, Comparable
+public final class Character implements Serializable, Comparable<Character>
 {
   /**
    * A subset of Unicode blocks.
@@ -1030,7 +1030,19 @@ public final class Character implements Serializable, Comparable
    *
    * @since 1.1
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('C');
+  public static final Class<Character> TYPE = VMClassLoader.getPrimitiveClass('C');
+
+  /**
+   * The number of bits needed to represent a <code>char</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 16;
+
+  // This caches some Character values, and is used by boxing
+  // conversions via valueOf().  We must cache at least 0..127;
+  // this constant controls how much we actually cache.
+  private static final int MAX_CACHE = 127;
+  private static Character[] charCache = new Character[MAX_CACHE + 1];
 
   /**
    * Lu = Letter, Uppercase (Informative).
@@ -2248,5 +2260,34 @@ public final class Character implements Serializable, Comparable
   public int compareTo(Object o)
   {
     return compareTo((Character) o);
+  }
+
+  /**
+   * Returns an <code>Character</code> object wrapping the value.
+   * In contrast to the <code>Character</code> constructor, this method
+   * will cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Character</code>
+   */
+  public static Character valueOf(char val)
+  {
+    if (val > MAX_CACHE)
+      return new Character(val);
+    synchronized (charCache)
+      {
+	if (charCache[val - MIN_CACHE] == null)
+	  charCache[val - MIN_CACHE] = new Character(val);
+	return charCache[val - MIN_CACHE];
+      }
+  }
+
+  /**
+   * Reverse the bytes in val.
+   * @since 1.5
+   */
+  public static char reverseBytes(char val)
+  {
+    return (char) (((val >> 8) & 0xff) | ((val << 8) & 0xff00));
   }
 } // class Character

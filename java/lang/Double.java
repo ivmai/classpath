@@ -1,5 +1,5 @@
 /* Double.java -- object wrapper for double
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -53,7 +53,7 @@ import gnu.classpath.Configuration;
  * @since 1.0
  * @status updated to 1.4
  */
-public final class Double extends Number implements Comparable
+public final class Double extends Number implements Comparable<Double>
 {
   /**
    * Compatible with JDK 1.0+.
@@ -93,7 +93,13 @@ public final class Double extends Number implements Comparable
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('D');
+  public static final Class<Double> TYPE = VMClassLoader.getPrimitiveClass('D');
+
+  /**
+   * The number of bits needed to represent a <code>double</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 64;
 
   /**
    * The immutable value of this Double.
@@ -192,6 +198,20 @@ public final class Double extends Number implements Comparable
   public static Double valueOf(String s)
   {
     return new Double(parseDouble(s));
+  }
+
+  /**
+   * Returns a <code>Double</code> object wrapping the value.
+   * In contrast to the <code>Double</code> constructor, this method
+   * may cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Double</code>
+   */
+  public static Double valueOf(double val)
+  {
+    // We don't actually cache, but we could.
+    return new Double(val);
   }
 
   /**

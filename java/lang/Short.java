@@ -1,5 +1,5 @@
 /* Short.java -- object wrapper for short
-   Copyright (C) 1998, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -51,7 +51,7 @@ package java.lang;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Short extends Number implements Comparable
+public final class Short extends Number implements Comparable<Short>
 {
   /**
    * Compatible with JDK 1.1+.
@@ -74,7 +74,20 @@ public final class Short extends Number implements Comparable
    * The primitive type <code>short</code> is represented by this
    * <code>Class</code> object.
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('S');
+  public static final Class<Short> TYPE = VMClassLoader.getPrimitiveClass('S');
+
+  /**
+   * The number of bits needed to represent a <code>short</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 16;
+
+  // This caches some Short values, and is used by boxing conversions
+  // via valueOf().  We must cache at least -128..127; these constants
+  // control how much we actually cache.
+  private static final int MIN_CACHE = -128;
+  private static final int MAX_CACHE = 127;
+  private static Short[] shortCache = new Short[MAX_CACHE - MIN_CACHE + 1];
 
   /**
    * The immutable value of this Short.
@@ -186,6 +199,26 @@ public final class Short extends Number implements Comparable
   public static Short valueOf(String s)
   {
     return new Short(parseShort(s, 10));
+  }
+
+  /**
+   * Returns a <code>Short</code> object wrapping the value.
+   * In contrast to the <code>Short</code> constructor, this method
+   * will cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Short</code>
+   */
+  public static Short valueOf(short val)
+  {
+    if (val < MIN_CACHE || val > MAX_CACHE)
+      return new Short(val);
+    synchronized (shortCache)
+      {
+	if (shortCache[val - MIN_CACHE] == null)
+	  shortCache[val - MIN_CACHE] = new Short(val);
+	return shortCache[val - MIN_CACHE];
+      }
   }
 
   /**
@@ -349,5 +382,14 @@ public final class Short extends Number implements Comparable
   public int compareTo(Object o)
   {
     return compareTo((Short)o);
+  }
+
+  /**
+   * Reverse the bytes in val.
+   * @since 1.5
+   */
+  public static short reverseBytes(int val)
+  {
+    return (short) (((val >> 8) & 0xff) | ((val << 8) & 0xff00));
   }
 }

@@ -1,5 +1,5 @@
 /* Byte.java -- object wrapper for byte
-   Copyright (C) 1998, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,7 +52,7 @@ package java.lang;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Byte extends Number implements Comparable
+public final class Byte extends Number implements Comparable<Byte>
 {
   /**
    * Compatible with JDK 1.1+.
@@ -75,7 +75,18 @@ public final class Byte extends Number implements Comparable
    * The primitive type <code>byte</code> is represented by this
    * <code>Class</code> object.
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('B');
+  public static final Class<Byte> TYPE = VMClassLoader.getPrimitiveClass('B');
+
+  /**
+   * The number of bits needed to represent a <code>byte</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 8;
+
+  // This caches Byte values, and is used by boxing conversions via
+  // valueOf().  We're required to cache all possible values here.
+  private static Byte[] byteCache = new Byte[MAX_VALUE - MIN_VALUE + 1];
+
 
   /**
    * The immutable value of this Byte.
@@ -189,6 +200,24 @@ public final class Byte extends Number implements Comparable
   public static Byte valueOf(String s)
   {
     return new Byte(parseByte(s, 10));
+  }
+
+  /**
+   * Returns a <code>Byte</code> object wrapping the value.
+   * In contrast to the <code>Byte</code> constructor, this method
+   * will cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Byte</code>
+   */
+  public static Byte valueOf(byte val)
+  {
+    synchronized (byteCache)
+      {
+	if (byteCache[val - MIN_CACHE] == null)
+	  byteCache[val - MIN_CACHE] = new Byte(val);
+	return byteCache[val - MIN_CACHE];
+      }
   }
 
   /**

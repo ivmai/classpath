@@ -1,3 +1,48 @@
+2004-10-09  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/Void.java (TYPE): Changed type.
+	* java/lang/Character.java: Implement Comparable<Character>.
+	(TYPE): Changed type.
+	(SIZE): New field.
+	(MAX_CACHE, charCache): New fields.
+	(valueOf): New method.
+	(reverseBytes): Likewise.
+	* java/lang/Double.java: Implement Comparable<Double>.
+	(TYPE): Changed type.
+	(SIZE): New field.
+	(valueOf): New method.
+	* java/lang/Float.java: Implement Comparable<Float>
+	(TYPE): Changed type.
+	(SIZE): New field.
+	(valueOf): New method.
+	* java/lang/Short.java: Implement Comparable<Short>.
+	(TYPE): Changed type.
+	(MIN_CACHE, MAX_CACHE, shortCache): New fields.
+	(valueOf): New method.
+	(reverseBytes): Likewise.
+	* java/lang/Byte.java: Implement Comparable<Byte>.
+	(TYPE): Changed type.
+	(SIZE): New field.
+	(byteCache): Likewise.
+	(valueOf): New method.
+	* java/lang/Boolean.java (TYPE): Changed type.
+	* java/lang/Long.java (TYPE): Changed type.
+	(SIZE): New field.
+	(valueOf): New method.
+	(bitCount, rotateLeft, rotateRight, highestOneBit,
+	numberOfLeadingZeros, lowestOneBit, numberOfTrailingZeros,
+	signum, reverseBytes, reverse): New methods.
+	Implement Comparable<Long>.
+	* java/lang/Integer.java: Implement Comparable<Integer>.
+	(SIZE): New field.
+	(intCache): Likewise.
+	(MIN_CACHE, MAX_CACHE): Likewise.
+	(valueOf): New method.
+	(bitCount, rotateLeft, rotateRight, highestOneBit,
+	numberOfLeadingZeros, lowestOneBit, numberOfTrailingZeros,
+	signum, reverseBytes, reverse): New methods.
+	(TYPE): Changed type.
+
 2004-09-27  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/Deprecated.java: Fixed retention.

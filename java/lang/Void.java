@@ -1,5 +1,5 @@
 /* Void.class - defines void.class
-   Copyright (C) 1998, 1999, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -57,7 +57,7 @@ public final class Void
    * The return type <code>void</code> is represented by this
    * <code>Class</code> object.
    */
-  public static final Class TYPE = VMClassLoader.getPrimitiveClass('V');
+  public static final Class<Void> TYPE = VMClassLoader.getPrimitiveClass('V');
 
   /**
    * Void is non-instantiable.
