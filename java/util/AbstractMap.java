@@ -353,7 +353,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    */
   public void putAll(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<K, V>> entries = m.entrySet().iterator();
+    Iterator<Map.Entry<K, V>> entries = ((Map<K,V>) m).entrySet().iterator();
     int pos = m.size();
     while (--pos >= 0)
       {

@@ -78,7 +78,7 @@ public class EnumMap<K extends Enum<K>, V>
 
   public EnumMap(Map<K, ? extends V> map)
   {
-    if (map instanceof EnumMap<K, ? extends V>)
+    if (map instanceof EnumMap)
       {
 	EnumMap<K, ? extends V> other = (EnumMap<K, ? extends V>) map;
 	store = (V[]) other.store.clone();
@@ -93,7 +93,7 @@ public class EnumMap<K extends Enum<K>, V>
 	    if (store == null)
 	      {
 		enumClass = key.getDeclaringClass();
-		store = new V[enumClass.getEnumConstants().length];
+		store = (V[]) new Object[enumClass.getEnumConstants().length];
 	      }
 	    int o = key.ordinal();
 	    if (store[o] == emptySlot)
@@ -123,20 +123,20 @@ public class EnumMap<K extends Enum<K>, V>
 
   public boolean containsKey(Object key)
   {
-    if (! (key instanceof Enum<K>))
+    if (! (key instanceof Enum))
       return false;
     Enum<K> e = (Enum<K>) key;
-    if (e.enumClass != enumClass)
+    if (e.getDeclaringClass() != enumClass)
       return false;
     return store[e.ordinal()] != emptySlot;
   }
 
   public V get(Object key)
   {
-    if (! (key instanceof Enum<K>))
+    if (! (key instanceof Enum))
       return null;
     Enum<K> e = (Enum<K>) key;
-    if (e.enumClass != enumClass)
+    if (e.getDeclaringClass() != enumClass)
       return null;
     return store[e.ordinal()];
   }
@@ -158,17 +158,17 @@ public class EnumMap<K extends Enum<K>, V>
 
   public V remove(Object key)
   {
-    if (! (key instanceof Enum<K>))
+    if (! (key instanceof Enum))
       return null;
     Enum<K> e = (Enum<K>) key;
-    if (e.enumClass != enumClass)
+    if (e.getDeclaringClass() != enumClass)
       return null;
     V result = store[e.ordinal()];
     if (result == emptySlot)
       result = null;
     else
       --cardinality;
-    store[e.ordinal()] = emptySlot;
+    store[e.ordinal()] = (V) emptySlot;
     return result;
   }
 
@@ -225,7 +225,7 @@ public class EnumMap<K extends Enum<K>, V>
 	      public void remove()
 	      {
 		--cardinality;
-		store[index] = emptySlot;
+		store[index] = (V) emptySlot;
 	      }
 	    };
 	  }
@@ -242,7 +242,7 @@ public class EnumMap<K extends Enum<K>, V>
 
 	  public boolean remove(Object o)
 	  {
-	    return EnumMap.this.remove(o);
+	    return EnumMap.this.remove(o) != null;
 	  }
 	};
       }
@@ -272,7 +272,7 @@ public class EnumMap<K extends Enum<K>, V>
 		return count < cardinality;
 	      }
 
-	      public K next()
+	      public V next()
 	      {
 		++count;
 		for (++index; store[index] == emptySlot; ++index)
@@ -283,7 +283,7 @@ public class EnumMap<K extends Enum<K>, V>
 	      public void remove()
 	      {
 		--cardinality;
-		store[index] = emptySlot;
+		store[index] = (V) emptySlot;
 	      }
 	    };
 	  }
@@ -320,7 +320,7 @@ public class EnumMap<K extends Enum<K>, V>
 		return count < cardinality;
 	      }
 
-	      public K next()
+	      public Map.Entry<K,V> next()
 	      {
 		++count;
 		for (++index; store[index] == emptySlot; ++index)
@@ -330,7 +330,7 @@ public class EnumMap<K extends Enum<K>, V>
 		return new AbstractMap.BasicMapEntry<K, V>(enumClass.getEnumConstants()[index],
 							   store[index])
 		{
-		  public V setValue(K newVal)
+		  public V setValue(V newVal)
 		  {
 		    value = newVal;
 		    return put(key, newVal);
@@ -341,7 +341,7 @@ public class EnumMap<K extends Enum<K>, V>
 	      public void remove()
 	      {
 		--cardinality;
-		store[index] = emptySlot;
+		store[index] = (V) emptySlot;
 	      }
 	    };
 	  }
@@ -353,7 +353,7 @@ public class EnumMap<K extends Enum<K>, V>
 
 	  public boolean contains(Object o)
 	  {
-	    if (! (o instanceof Map.Entry<K, V>))
+	    if (! (o instanceof Map.Entry))
 	      return false;
 	    Map.Entry<K, V> other = (Map.Entry<K, V>) o;
 	    return (containsKey(other.getKey())
@@ -363,10 +363,10 @@ public class EnumMap<K extends Enum<K>, V>
 
 	  public boolean remove(Object o)
 	  {
-	    if (! (o instanceof Map.Entry<K, V>))
+	    if (! (o instanceof Map.Entry))
 	      return false;
 	    Map.Entry<K, V> other = (Map.Entry<K, V>) o;
-	    return EnumMap.this.remove(other.getKey());
+	    return EnumMap.this.remove(other.getKey()) != null;
 	  }
 	};
       }
@@ -375,7 +375,7 @@ public class EnumMap<K extends Enum<K>, V>
 
   public boolean equals(Object o)
   {
-    if (! (o instanceof EnumMap<K, V>))
+    if (! (o instanceof EnumMap))
       return false;
     EnumMap<K, V> other = (EnumMap<K, V>) o;
     if (other.enumClass != enumClass || other.cardinality != cardinality)
@@ -385,8 +385,8 @@ public class EnumMap<K extends Enum<K>, V>
 
   public EnumMap<K, V> clone()
   {
-    EnumMap<K, V> r = (EnumMap<K, V>) super.clone();
-    r.store = (V[]) store.clone();
-    return r;
+    /* We don't use super.clone() as enums don't support it */
+    return new EnumMap(this);
   }
+
 }
