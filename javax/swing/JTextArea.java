@@ -38,8 +38,10 @@ exception statement from your version. */
 package javax.swing;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
@@ -103,12 +105,14 @@ public class JTextArea extends JTextComponent
   /**
    * Whether line wrapping is enabled or not.
    */
-  private boolean wrapping;
+  private boolean lineWrap;
 
   /**
    * The number of characters equal to a tab within the text.
    */
   private int tabSize = 8;
+
+  private boolean wrapStyleWord;
 
   /**
    * Creates a new <code>JTextArea</code> object.
@@ -221,7 +225,7 @@ public class JTextArea extends JTextComponent
    */
   public boolean getScrollableTracksViewportWidth()
   {
-    return wrapping ? true : super.getScrollableTracksViewportWidth();
+    return lineWrap ? true : super.getScrollableTracksViewportWidth();
   }
 
   /**
@@ -287,28 +291,57 @@ public class JTextArea extends JTextComponent
   /**
    * Checks whether line wrapping is enabled.
    *
-   * @return true if line wrapping is enabled, false otherwise
+   * @return <code>true</code> if line wrapping is enabled,
+   * <code>false</code> otherwise
    */
   public boolean getLineWrap()
   {
-    return wrapping;
+    return lineWrap;
   }
 
   /**
    * Enables/disables line wrapping.
    *
-   * @param wrapping true to enable line wrapping, false otherwise
+   * @param wrapping <code>true</code> to enable line wrapping,
+   * <code>false</code> otherwise
    */
   public void setLineWrap(boolean flag)
   {
-    if (wrapping == flag)
+    if (lineWrap == flag)
       return;
 
-    boolean oldValue = wrapping;
-    wrapping = flag;
-    firePropertyChange("lineWrap", oldValue, wrapping);
+    boolean oldValue = lineWrap;
+    lineWrap = flag;
+    firePropertyChange("lineWrap", oldValue, lineWrap);
   }
 
+  /**
+   * Checks whether word style wrapping is enabled.
+   *
+   * @return <code>true</code> if word style wrapping is enabled,
+   * <code>false</code> otherwise
+   */
+  public boolean getWrapStyleWord()
+  {
+    return wrapStyleWord;
+  }
+  
+  /**
+   * Enables/Disables word style wrapping.
+   *
+   * @param flag <code>true</code> to enable word style wrapping,
+   * <code>false</code> otherwise
+   */
+  public void setWrapStyleWord(boolean flag)
+  {
+    if (wrapStyleWord == flag)
+      return;
+    
+    boolean oldValue = wrapStyleWord;
+    wrapStyleWord = flag;
+    firePropertyChange("wrapStyleWord", oldValue, wrapStyleWord);
+  }
+  
   /**
    * Returns the number of characters used for a tab.
    * This defaults to 8.
@@ -338,6 +371,59 @@ public class JTextArea extends JTextComponent
     firePropertyChange("tabSize", oldValue, tabSize);
   }
 
+  protected int getColumnWidth()
+  {
+    FontMetrics metrics = getToolkit().getFontMetrics(getFont());
+    return metrics.charWidth('m');
+  }
+
+  public int getLineCount()
+  {
+    return getDocument().getDefaultRootElement().getElementCount();
+  }
+
+  public int getLineStartOffset(int line)
+     throws BadLocationException
+  {
+    int lineCount = getLineCount();
+    
+    if (line < 0 || line > lineCount)
+      throw new BadLocationException("Non-existing line number", line);
+
+    Element lineElem = getDocument().getDefaultRootElement().getElement(line);
+    return lineElem.getStartOffset();
+  }
+
+  public int getLineEndOffset(int line)
+     throws BadLocationException
+  {
+    int lineCount = getLineCount();
+    
+    if (line < 0 || line > lineCount)
+      throw new BadLocationException("Non-existing line number", line);
+
+    Element lineElem = getDocument().getDefaultRootElement().getElement(line);
+    return lineElem.getEndOffset();
+  }
+
+  public int getLineOfOffset(int offset)
+    throws BadLocationException
+  {
+    Document doc = getDocument();
+
+    if (offset < doc.getStartPosition().getOffset()
+	|| offset >= doc.getEndPosition().getOffset())
+      throw new BadLocationException("offset outside of document", offset);
+
+    return doc.getDefaultRootElement().getElementIndex(offset);
+  }
+
+  protected int getRowHeight()
+  {
+    FontMetrics metrics = getToolkit().getFontMetrics(getFont());
+    return metrics.getHeight();
+  }
+
   /**
    * Inserts the supplied text at the specified position.  Nothing
    * happens in the case that the model or the supplied string is null
@@ -345,30 +431,49 @@ public class JTextArea extends JTextComponent
    *
    * @param string The string of text to insert.
    * @param position The position at which to insert the supplied text.
-   * @throws IllegalArgumentException if the position is < 0 or greater
-   *         than the length of the current text.
+   * @throws IllegalArgumentException if the position is &lt; 0 or greater
+   * than the length of the current text.
    */
   public void insert(String string, int position)
   {
-      Document document;
+    // Retrieve the document model.
+    Document doc = getDocument();
       
-      /* Retrieve the document model */
-      document = getDocument();
-      /* Check the model and string for validity */
-      if (document == null || string == null || string.length() == 0)
-	  {
-	      return; /* Do nothing */
-	  }
-      /* Insert the text into the model */
-      try
-	  {
-	      document.insertString(position, string, null);
-	  }
-      catch (BadLocationException exception)
-	  {
-	      throw new IllegalArgumentException("The supplied position, " +
-						 position + ", was invalid.");
-	  }
+    // Check the model and string for validity.
+    if (doc == null
+	|| string == null
+	|| string.length() == 0)
+      return;
+
+    // Insert the text into the model.
+    try
+      {
+	doc.insertString(position, string, null);
+      }
+    catch (BadLocationException e)
+      {
+	throw new IllegalArgumentException("The supplied position, "
+					   + position + ", was invalid.");
+      }
   }
 
+  public void replaceRange(String text, int start, int end)
+  {
+    Document doc = getDocument();
+    
+    if (start > end
+	|| start < doc.getStartPosition().getOffset()
+	|| end >= doc.getEndPosition().getOffset())
+      throw new IllegalArgumentException();
+
+    try
+      {
+	doc.remove(start, end);
+	doc.insertString(start, text, null);
+      }
+    catch (BadLocationException e)
+      {
+	// This cannot happen as we check offset above.
+      }
+  }
 }

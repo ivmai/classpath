@@ -550,6 +550,12 @@ public class Demo
     return tabs;
   }
 
+  public static JComboBox mkComboBox(String[] names)
+  {
+    JComboBox box = new JComboBox(names);
+    return box;
+  }
+
   public static JSpinner mkSpinner()
   {
     JSpinner spinner = new JSpinner();
@@ -669,6 +675,11 @@ public class Demo
     return close;
   }
 
+  public static JColorChooser mkColorChooser()
+  {
+    return new JColorChooser();
+  }
+
   private static class PopUpAction
     implements ActionListener
   {
@@ -754,10 +765,30 @@ public class Demo
 		    mkSpinner(),
 		    panel);
 
+    new PopUpAction("TextField",
+		    mkTextField("Hello, World!"),
+		    panel);
+
+    new PopUpAction("ColorChooser",
+		    mkColorChooser(),
+		    panel);
+
+    new PopUpAction("ComboBox",
+		    mkComboBox(new String[] {"Stop",
+					     "Software",
+					     "Hoarders",
+					     "Support",
+					     "GNU!"}),
+		    panel);
+
     JButton exitDisposer = mkDisposerButton(frame);
     panel.add(exitDisposer);
 
     return panel;
   }
 
+  public static JTextField mkTextField(String sometext)
+  {
+    return new JTextField(sometext, 40);
+  }
 }

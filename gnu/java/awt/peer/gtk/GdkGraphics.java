@@ -116,7 +116,6 @@ public class GdkGraphics extends Graphics
 //    public Graphics create (int x, int y, int width, int height)
 //    {
 //      GdkGraphics g = new GdkGraphics (this);
-//      System.out.println ("translating by: " + x +" " + y);
 //      g.translate (x, y);
 //      g.clipRect (0, 0, width, height);
 
@@ -350,7 +349,6 @@ public class GdkGraphics extends Graphics
 
   public Rectangle getClipBounds ()
   {
-//      System.out.println ("returning CLIP: " + clip);
     return new Rectangle (clip.x, clip.y, clip.width, clip.height);
   }
 
@@ -396,7 +394,7 @@ public class GdkGraphics extends Graphics
   public void setColor (Color c)
   {
     if (c == null)
-      color = new Color (0, 0, 0);
+      color = Color.BLACK;
     else
       color = c;
 

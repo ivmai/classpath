@@ -1,5 +1,5 @@
 /* DefaultKeyboardFocusManager.java -- 
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,8 +38,15 @@ exception statement from your version. */
 
 package java.awt;
 
-import java.util.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 // FIXME: finish documentation
 public class DefaultKeyboardFocusManager extends KeyboardFocusManager
@@ -155,7 +162,7 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
                  && e.id != WindowEvent.WINDOW_DEACTIVATED)
           return false;
 
-        target.dispatchEvent (e);
+        redispatchEvent(target, e);
         return true;
       }
     else if (e instanceof FocusEvent)
@@ -197,7 +204,7 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
               setGlobalPermanentFocusOwner (null);
           }
 
-        target.dispatchEvent (e);
+        redispatchEvent(target, e);
 
         return true;
       }
@@ -258,7 +265,7 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
     Component focusOwner = getGlobalPermanentFocusOwner ();
 
     if (focusOwner != null)
-      focusOwner.dispatchEvent (e);
+      redispatchEvent(focusOwner, e);
 
     // Loop through all registered KeyEventPostProcessors, giving
     // each a chance to process this event.
@@ -311,7 +318,7 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
                         MenuItem item = menu.getItem (j);
                         MenuShortcut shortcut = item.getShortcut ();
 
-                        if (shortcut != null)
+                        if (item.isEnabled() && shortcut != null)
                           {
                             // Dispatch a new ActionEvent if:
                             //
@@ -443,7 +450,8 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
     FocusTraversalPolicy policy = focusCycleRoot.getFocusTraversalPolicy ();
 
     Component previous = policy.getComponentBefore (focusCycleRoot, focusComp);
-    previous.requestFocusInWindow ();
+    if (previous != null)
+      previous.requestFocusInWindow ();
   }
 
   public void focusNextComponent (Component comp)
@@ -453,7 +461,8 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
     FocusTraversalPolicy policy = focusCycleRoot.getFocusTraversalPolicy ();
 
     Component next = policy.getComponentAfter (focusCycleRoot, focusComp);
-    next.requestFocusInWindow ();
+    if (next != null)
+      next.requestFocusInWindow ();
   }
 
   public void upFocusCycle (Component comp)
@@ -465,7 +474,8 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
       {
         FocusTraversalPolicy policy = focusCycleRoot.getFocusTraversalPolicy ();
         Component defaultComponent = policy.getDefaultComponent (focusCycleRoot);
-        defaultComponent.requestFocusInWindow ();
+        if (defaultComponent != null)
+          defaultComponent.requestFocusInWindow ();
       }
     else
       {
@@ -485,7 +495,8 @@ public class DefaultKeyboardFocusManager extends KeyboardFocusManager
       {
         FocusTraversalPolicy policy = cont.getFocusTraversalPolicy ();
         Component defaultComponent = policy.getDefaultComponent (cont);
-        defaultComponent.requestFocusInWindow ();
+        if (defaultComponent != null)
+          defaultComponent.requestFocusInWindow ();        
         setGlobalCurrentFocusCycleRoot (cont);
       }
   }

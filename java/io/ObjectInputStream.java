@@ -51,7 +51,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
-
 /**
  * @author Tom Tromey (tromey@redhat.com)
  * @author Jeroen Frijters (jeroen@frijters.net)
@@ -307,6 +306,9 @@ public class ObjectInputStream extends InputStream
 	      Object obj = newObject(clazz, osc.firstNonSerializableParent);
 	      
 	      int handle = assignNewHandle(obj);
+	      Object prevObject = this.currentObject;
+	      ObjectStreamClass prevObjectStreamClass = this.currentObjectStreamClass;
+	      
 	      this.currentObject = obj;
 	      ObjectStreamClass[] hierarchy =
 		inputGetObjectStreamClasses(clazz);
@@ -354,8 +356,8 @@ public class ObjectInputStream extends InputStream
 		    }
 		}
 
-	      this.currentObject = null;
-	      this.currentObjectStreamClass = null;
+	      this.currentObject = prevObject;
+	      this.currentObjectStreamClass = prevObjectStreamClass;
 	      ret_val = processResolution(osc, obj, handle);
 		  
 	      break;
@@ -1795,7 +1797,8 @@ public class ObjectInputStream extends InputStream
    */
   private static native ClassLoader currentClassLoader (SecurityManager sm);
 
-  private void callReadMethod (Method readObject, Class klass, Object obj) throws IOException
+  private void callReadMethod (Method readObject, Class klass, Object obj)
+    throws ClassNotFoundException, IOException
   {
     try
       {
@@ -1809,6 +1812,8 @@ public class ObjectInputStream extends InputStream
 	  throw (RuntimeException) exception;
 	if (exception instanceof IOException)
 	  throw (IOException) exception;
+        if (exception instanceof ClassNotFoundException)
+          throw (ClassNotFoundException) exception;
 
 	throw new IOException("Exception thrown from readObject() on " +
 			       klass + ": " + exception.getClass().getName());

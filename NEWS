@@ -1,4 +1,4 @@
-New in release 0.11 (not released yet)
+New in release 0.11 (Sep 13, 2004)
 
 * javax.swing.Spring and SpringLayout support.
 * Added pluggable look and feel support for BasicTextFieldUI and
@@ -13,6 +13,28 @@ New in release 0.11 (not released yet)
 * Improved java.awt.image.BufferedImage support.
 * AWT 1.0 event model support.
 * GNU Classpath now comes with some example programs (see examples/README).
+* New javax.crypto, javax.crypto.interfaces, javax.crypto.spec, javax.net,
+  javax.net.ssl, javax.security.auth, javax.security.auth.callback,
+  javax.security.auth.login, javax.security.auth.x500, javax.security.sasl
+  and org.ietf.jgss packages are now officially part of GNU Classpath.
+  Extra crypto algorithms can be obtained from the GNU Crypto project,
+  a full TLS implementation is provided by the Jessie project.
+  http://www.gnu.org/software/gnu-crypto/
+  http://www.nongnu.org/jessie/
+* Frame.setIconImage() support.
+* AWT GDKGraphics scaling.
+* New configure flag --enable-gtk-cairo to build Graphics2D implementation
+  build on cairo and pangoft2.  Enabled at runtime by defining the system
+  property gnu.java.awt.peer.gtk.Graphics=Graphics2D.
+* javax.swing.JSpinner implemented.
+* Extensive documentation update for java.util collection classes.
+* java.awt.geom completed. Area, Arc2D, Ellipse2D and Line2D implemented.
+* GNU JAXP is no longer included with GNU Classpath. Runtime, compiler and
+  tool integrators are encouraged to directly integrate GNU JAXP.
+  This release has been tested against GNU JAXP 1.1.
+  http://www.gnu.org/software/classpathx/jaxp/jaxp.html
+* JColorChooser, JComboBox and JTextField implemented, including example
+  uses in GNU Classpath Examples swing Demo.
 
 Runtime interface Changes:
 
@@ -20,6 +42,12 @@ Runtime interface Changes:
   a reference implementation that most VMs can use.
 * java.lang.VMSystem has a new getenv(String) method and a reference C/JNI
   implementation that should work on most Posix like systems.
+* java.util.TimeZone has been split into a platform independent class and
+  a platform dependent class VMTimeZone.  GNU Classpath comes with a generic
+  way to get at the default time zone for Posix/GNU-like platforms.
+* [VM]AccessController improvements.  In particular it handles
+  `doPrivileged' calls better, and allows for recursive `doPrivileged'
+  calls in the same Thread. (see vm/reference/java/security/)
 
 New in release 0.10 (Jul 9, 2004)
 

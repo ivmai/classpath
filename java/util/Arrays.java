@@ -1020,7 +1020,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -1184,7 +1184,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -1348,7 +1348,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -1524,7 +1524,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -1700,7 +1700,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -1866,7 +1866,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -2036,7 +2036,7 @@ public class Arrays
   /**
    * Performs a recursive modified quicksort.
    *
-   * @param a the array to sort
+   * @param array the array to sort
    * @param from the start index (inclusive)
    * @param count the number of elements to sort
    */
@@ -2418,6 +2418,7 @@ public class Arrays
      * with the supplied element.
      *
      * @param index The index at which to place the new object.
+     * @param element The new object.
      * @return The object replaced by this operation.
      */
     public E set(int index, E element)
@@ -2489,7 +2490,7 @@ public class Arrays
      * is shrunk or enlarged to the size of the
      * internal array, and filled with its objects.
      *
-     * @param The array to fill with the objects in this list.
+     * @param array The array to fill with the objects in this list.
      * @return The array containing the objects in this list,
      *         which may or may not be == to array.
      */

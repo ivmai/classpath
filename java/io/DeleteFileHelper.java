@@ -47,7 +47,7 @@ import java.util.ArrayList;
  * @author Michael Koch (konqueror@gmx.de)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
-public final class DeleteFileHelper extends Thread
+final class DeleteFileHelper extends Thread
 {
   private static ArrayList<File> filesToDelete;
 
@@ -67,7 +67,8 @@ public final class DeleteFileHelper extends Thread
                 }
               catch (IllegalStateException e)
                 {
-                  // Shutdown is already in progress, so we can't register ours.
+                  // Shutdown is already in progress, so we can't
+                  // register ours.
                 }
                 
               return null;

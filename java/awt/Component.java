@@ -1,5 +1,5 @@
 /* Component.java -- a graphics component
-   Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -47,17 +47,18 @@ import java.awt.event.FocusListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.PaintEvent;
+import java.awt.event.WindowEvent;
 import java.awt.im.InputContext;
 import java.awt.im.InputMethodRequests;
 import java.awt.image.BufferStrategy;
@@ -69,8 +70,8 @@ import java.awt.peer.ComponentPeer;
 import java.awt.peer.LightweightPeer;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ObjectInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -83,6 +84,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
+
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleComponent;
 import javax.accessibility.AccessibleContext;
@@ -292,7 +294,7 @@ public abstract class Component
    * @see #getLocale()
    * @see #setLocale(Locale)
    */
-  Locale locale;
+  Locale locale = Locale.getDefault ();
 
   /**
    * True if the object should ignore repaint events (usually because it is
@@ -2269,7 +2271,7 @@ public abstract class Component
   {
     boolean handled = handleEvent (e);
 
-    if (!handled)
+    if (!handled && getParent() != null)
       // FIXME: need to translate event coordinates to parent's
       // coordinate space.
       handled = getParent ().postEvent (e);
@@ -3432,7 +3434,7 @@ public abstract class Component
    */
   public boolean isFocusTraversable()
   {
-    return enabled && visible && (peer == null || peer.isFocusTraversable());
+    return enabled && visible && (peer == null || isLightweight() || peer.isFocusTraversable());
   }
 
   /**
@@ -3447,7 +3449,11 @@ public abstract class Component
   }
 
   /**
-   * Specify whether this component can receive focus.
+   * Specify whether this component can receive focus. This method also
+   * sets the {@link #isFocusTraversableOverridden} field to 1, which
+   * appears to be the undocumented way {@link
+   * DefaultFocusTraversalPolicy#accept()} determines whether to respect
+   * the {@link #isFocusable()} method of the component.
    *
    * @param focusable the new focusable status
    * @since 1.4
@@ -3456,6 +3462,7 @@ public abstract class Component
   {
     firePropertyChange("focusable", this.focusable, focusable);
     this.focusable = focusable;
+    this.isFocusTraversableOverridden = 1;
   }
 
   /**
@@ -3715,7 +3722,7 @@ public abstract class Component
             Window toplevel = (Window) parent;
             if (toplevel.isFocusableWindow ())
               {
-                if (peer != null)
+                if (peer != null && !isLightweight())
                   // This call will cause a FOCUS_GAINED event to be
                   // posted to the system event queue if the native
                   // windowing system grants the focus request.
@@ -3801,7 +3808,7 @@ public abstract class Component
             Window toplevel = (Window) parent;
             if (toplevel.isFocusableWindow ())
               {
-                if (peer != null)
+                if (peer != null && !isLightweight())
                   // This call will cause a FOCUS_GAINED event to be
                   // posted to the system event queue if the native
                   // windowing system grants the focus request.
@@ -3922,6 +3929,7 @@ public abstract class Component
                 if (focusedWindow == toplevel)
                   {
                     if (peer != null
+                        && !isLightweight()
                         && !(this instanceof Window))
                       // This call will cause a FOCUS_GAINED event to be
                       // posted to the system event queue if the native
@@ -4499,7 +4507,7 @@ p   * <li>the set of backward traversal keys
    *
    * @return an AWT 1.0 event representing e
    */
-  private Event translateEvent (AWTEvent e)
+  static Event translateEvent (AWTEvent e)
   {
     Component target = (Component) e.getSource ();
     Event translated = null;
@@ -4691,6 +4699,7 @@ p   * <li>the set of backward traversal keys
    *
    * @param e the event to dispatch
    */
+
   void dispatchEventImpl (AWTEvent e)
   {
     Event oldEvent = translateEvent (e);
@@ -4699,7 +4708,30 @@ p   * <li>the set of backward traversal keys
       postEvent (oldEvent);
 
     if (eventTypeEnabled (e.id))
-      processEvent (e);
+      {
+        // the trick we use to communicate between dispatch and redispatch
+        // is to have KeyboardFocusManager.redispatch synchronize on the
+        // object itself. we then do not redispatch to KeyboardFocusManager
+        // if we are already holding the lock.
+        if (! Thread.holdsLock(e))
+          {
+            switch (e.id)
+              {
+              case WindowEvent.WINDOW_GAINED_FOCUS:
+              case WindowEvent.WINDOW_LOST_FOCUS:
+              case KeyEvent.KEY_PRESSED:
+              case KeyEvent.KEY_RELEASED:
+              case KeyEvent.KEY_TYPED:
+              case FocusEvent.FOCUS_GAINED:
+              case FocusEvent.FOCUS_LOST:
+                if (KeyboardFocusManager
+                    .getCurrentKeyboardFocusManager()
+                    .dispatchEvent(e))
+                    return;
+              }
+          }
+        processEvent (e);
+      }
   }
 
   /**
