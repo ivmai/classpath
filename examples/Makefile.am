@@ -1,6 +1,9 @@
 ## Input file for automake to generate the Makefile.in used by configure
 
 # Setup the compiler to use the GNU Classpath library we just build
+if FOUND_ECJ
+JCOMPILER = $(ECJ) -1.5 --bootclasspath '$(top_builddir)/lib' --classpath .
+else
 if FOUND_GCJ
 JCOMPILER = $(GCJ) --bootclasspath '$(top_builddir)/lib' --classpath . -C
 else
@@ -11,6 +14,7 @@ if FOUND_GCJX
 JCOMPILER = $(GCJX) -bootclasspath '' -sourcepath '' -classpath $(top_builddir)/lib:.
 else
 error dunno how to setup the JCOMPILER and compile
+endif
 endif
 endif
 endif

@@ -11,6 +11,9 @@ propertyfiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java org -nam
 compile_classpath = $(top_srcdir):$(top_srcdir)/vm/reference:$(top_srcdir)/external/w3c_dom:$(top_srcdir)/external/sax:.:$(USER_CLASSLIB)
 
 # handling source to bytecode compiler programs like gcj, jikes  and kjc
+if FOUND_ECJ
+JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
+else
 if FOUND_GCJ
 JAVAC = $(GCJ) --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.standard \
 && $(GCJ) -Wno-deprecated --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.awt \
@@ -30,6 +33,7 @@ endif # FOUND_GCJX
 endif # FOUND_KJC
 endif # FOUND_GCJ
 endif # FOUND_JIKES
+endif # FOUND_ECJ
 
 JAVAH = $(USER_JAVAH) -jni -classpath .:$(USER_CLASSLIB)
 
