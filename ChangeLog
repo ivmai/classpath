@@ -1,4 +1,18 @@
-2005-04-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+2005-04-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Class.java:
+	(newInstance): Returns an instance of T instead of Object.
+	(isEnum()): Now calls VMClass for a proper implementation.
+	(isSynthetic()): New method implemented.
+	(isAnnotation()): New method implemented.
+	* vm/reference/java/lang/VMClass.java:
+	(isEnum()): New native method.
+	(isSynthetic()): New native method.
+	(isAnnotation()): New native method.
+	* vm/reference/java/lang/reflect/Constructor.java:
+	(newInstance(Object...)): Changed input parameter to a vararg.
+
+2005-04-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/System.java:
 	(getenv()): Use Collections.unmodifiableMap to wrap an

@@ -248,7 +248,7 @@ public final class Constructor<T>
    * @throws ExceptionInInitializerError if construction triggered class
    *         initialization, which then failed
    */
-  public T newInstance(Object args[])
+  public T newInstance(Object... args)
     throws InstantiationException, IllegalAccessException,
            InvocationTargetException
   {
