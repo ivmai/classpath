@@ -301,7 +301,8 @@ public class EventHandler implements InvocationHandler
    * @param action Target property or method to invoke.
    * @return A constructed proxy object.
    */
-  public static Object create(Class listenerInterface, Object target, String action)
+  public static <T> T create(Class<T> listenerInterface, Object target,
+			     String action)
   {
     return create(listenerInterface, target, action, null, null);
   }
@@ -322,8 +323,8 @@ public class EventHandler implements InvocationHandler
    * @param eventPropertyName Name of property to extract from event.
    * @return A constructed proxy object.
    */
-  public static Object create(Class listenerInterface, Object target,
-			      String action, String eventPropertyName)
+  public static <T> T create(Class<T> listenerInterface, Object target,
+			     String action, String eventPropertyName)
   {
     return create(listenerInterface, target, action, eventPropertyName, null);
   }
@@ -371,9 +372,9 @@ public class EventHandler implements InvocationHandler
    * @param listenerMethodName Listener method to implement.
    * @return A constructed proxy object.
    */
-  public static Object create(Class listenerInterface, Object target,
-			      String action, String eventPropertyName,
-			      String listenerMethodName)
+  public static <T> T create(Class<T> listenerInterface, Object target,
+			     String action, String eventPropertyName,
+			     String listenerMethodName)
   {
     // Create EventHandler instance
     EventHandler eh = new EventHandler(target, action, eventPropertyName,
@@ -381,10 +382,9 @@ public class EventHandler implements InvocationHandler
 
     // Create proxy object passing in the event handler
     Object proxy = Proxy.newProxyInstance(listenerInterface.getClassLoader(),
-					  new Class[] {listenerInterface},
+					  new Class<?>[] {listenerInterface},
 					  eh);
 
-    return proxy;
+    return (T) proxy;
   }
-
 }

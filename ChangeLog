@@ -1,5 +1,18 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/beans/EventHandler.java (create): Now generic methods.
+	* java/beans/Beans.java (getInstanceOf): Updated argument type.
+	(isInstanceOf): Likewise.
+	* java/beans/BeanDescriptor.java (beanClass, customizerClass):
+	Updated type.
+	(BeanDescriptor): Updated argument types.
+	(getBeanClass, getCustomizerClass): Updated return types.
+
+	* java/lang/reflect/Proxy.java (getProxyClass): Updated argument
+	and return types.
+	(isProxyClass): Likewise.
+	(newProxyInstance): Likewise.
+
 	* java/applet/AppletContext.java (getApplets): Updated return
 	type.
 	(getStreamKeys): Likewise.
