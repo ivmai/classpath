@@ -1,5 +1,9 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/applet/AppletContext.java (getApplets): Updated return
+	type.
+	(getStreamKeys): Likewise.
+
 	* java/lang/String.java: Implement Comparable<String>.
 
 	* java/util/Properties.java: Extend Hashtable<Object, Object>.
