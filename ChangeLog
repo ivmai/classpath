@@ -1,3 +1,46 @@
+2005-01-27  Michael Koch  <konqueror@gmx.de>
+
+	* java/util/GregorianCalendar.java (getLeniarDay): 
+	Made private.
+
+2005-01-27  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/faq/faq.wml: type in faq code corrected
+
+2005-01-27  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/dnd/DropTarget.java (addDropTargetListener):
+	Clarified comments.
+
+2005-01-27  Graydon Hoare  <graydon@redhat.com>
+
+	* java/awt/dnd/DropTarget.java
+	(addDropTargetListener): Despite documentation, do not throw.
+	* javax/swing/JComponent.java: Set a default DropTarget.
+
+2005-01-27  Michael Koch  <konqueror@gmx.de>
+
+	* java/util/zip/ZipFile.java
+	(ZIP_MAGIC): New constant.
+	(ZipFile): Check if given file is really a zip file.
+	(checkZipFile): New method.
+	(checkClosed): New method.
+	(entries): Check if file was closed. Return an empty enumeration in
+	error case.
+	(getEntries): Use checkClosed().
+	(getEntry): Check if file was closed.
+	(getInputStream): Likewise.
+	(size): Likewise.
+
+2005-01-27  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/faq/faq.wml: current command to generate doc
+	added to the faq
+
+2005-01-27  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/docs/docs.wml: link to gjdoc-generated docs
+
 2005-01-27  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* javax/swing/SwingUtilities.java:
