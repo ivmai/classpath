@@ -49,7 +49,7 @@ import javax.print.attribute.PrintRequestAttribute;
 public final class Chromaticity extends EnumSyntax
   implements DocAttribute, PrintRequestAttribute, PrintJobAttribute
 {
-  private static final long serialVersionUID = -6890309414893262822L;
+  private static final long serialVersionUID = 4660543931355214012L;
 
   public static final Chromaticity MONOCHROME = new Chromaticity(0);
   public static final Chromaticity COLOR = new Chromaticity(1);
