@@ -701,7 +701,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
     Entry<T> e = first;
     for (int i = 0; i < size; i++)
       {
-        a[i] = e.data;
+        a[i] = (T) e.data;
         e = e.next;
       }
     return a;
@@ -796,7 +796,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
    * @author Original author unknown
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private final class LinkedListItr<T> implements ListIterator<T>
+  private final class LinkedListItr implements ListIterator<T>
   {
     /** Number of modifications we know about. */
     private int knownMod = modCount;

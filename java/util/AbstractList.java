@@ -467,7 +467,7 @@ while (i.hasNext())
         knownMod = modCount;
       }
 
-      public void set(Object o)
+      public void set(E o)
       {
         checkMod();
         if (lastReturned < 0)
@@ -475,7 +475,7 @@ while (i.hasNext())
         AbstractList.this.set(lastReturned, o);
       }
 
-      public void add(Object o)
+      public void add(E o)
       {
         checkMod();
         AbstractList.this.add(position++, o);

@@ -116,7 +116,7 @@ public class ArrayList<E> extends AbstractList<E>
     // Must explicitly check, to get correct exception.
     if (capacity < 0)
       throw new IllegalArgumentException();
-    data = new E[capacity];
+    data = (E[]) new Object[capacity];
   }
 
   /**
@@ -151,7 +151,7 @@ public class ArrayList<E> extends AbstractList<E>
     // so don't update modCount.
     if (size != data.length)
       {
-        E[] newData = new E[size];
+        E[] newData = (E[]) new Object[size];
         System.arraycopy(data, 0, newData, 0, size);
         data = newData;
       }
@@ -173,7 +173,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     if (minCapacity > current)
       {
-        E[] newData = new E[Math.max(current * 2, minCapacity)];
+        E[] newData = (E[]) new Object[Math.max(current * 2, minCapacity)];
         System.arraycopy(data, 0, newData, 0, size);
         data = newData;
       }
@@ -268,7 +268,7 @@ public class ArrayList<E> extends AbstractList<E>
    */
   public Object[] toArray()
   {
-    E[] array = new E[size];
+    E[] array = (E[]) new Object[size];
     System.arraycopy(data, 0, array, 0, size);
     return array;
   }
@@ -578,7 +578,7 @@ public class ArrayList<E> extends AbstractList<E>
     // the `size' field.
     s.defaultReadObject();
     int capacity = s.readInt();
-    data = new E[capacity];
+    data = (E[]) new Object[capacity];
     for (int i = 0; i < size; i++)
       data[i] = (E) s.readObject();
   }

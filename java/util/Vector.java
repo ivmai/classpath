@@ -129,7 +129,7 @@ public class Vector<T> extends AbstractList<T>
   public Vector(Collection<? extends T> c)
   {
     elementCount = c.size();
-    elementData = c.toArray(new T[elementCount]);
+    elementData = c.toArray((T[]) new Object[elementCount]);
   }
 
   /**
@@ -145,7 +145,7 @@ public class Vector<T> extends AbstractList<T>
   {
     if (initialCapacity < 0)
       throw new IllegalArgumentException();
-    elementData = new T[initialCapacity];
+    elementData = (T[]) new Object[initialCapacity];
     this.capacityIncrement = capacityIncrement;
   }
 
@@ -188,7 +188,7 @@ public class Vector<T> extends AbstractList<T>
     // vector since that is a much less likely case; it's more efficient to
     // not do the check and lose a bit of performance in that infrequent case
 
-    T[] newArray = new T[elementCount];
+    T[] newArray = (T[]) new Object[elementCount];
     System.arraycopy(elementData, 0, newArray, 0, elementCount);
     elementData = newArray;
   }
@@ -214,7 +214,7 @@ public class Vector<T> extends AbstractList<T>
     else
       newCapacity = elementData.length + capacityIncrement;
 
-    T[] newArray = new T[Math.max(newCapacity, minCapacity)];
+    T[] newArray = (T[]) new Object[Math.max(newCapacity, minCapacity)];
 
     System.arraycopy(elementData, 0, newArray, 0, elementCount);
     elementData = newArray;
@@ -778,7 +778,7 @@ public class Vector<T> extends AbstractList<T>
   public synchronized boolean addAll(int index, Collection<? extends T> c)
   {
     checkBoundInclusive(index);
-    Iterator itr = c.iterator();
+    Iterator<? extends T> itr = c.iterator();
     int csize = c.size();
 
     modCount++;

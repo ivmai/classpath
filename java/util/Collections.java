@@ -630,8 +630,8 @@ public class Collections
     if (dest.size() < pos)
       throw new IndexOutOfBoundsException("Source does not fit in dest");
 
-    Iterator<T> i1 = source.iterator();
-    ListIterator<T> i2 = dest.listIterator();
+    Iterator<? extends T> i1 = source.iterator();
+    ListIterator<? super T> i2 = dest.listIterator();
 
     while (--pos >= 0)
       {
@@ -824,7 +824,7 @@ public class Collections
   public static <T> T min(Collection<? extends T> c,
 			  Comparator<? super T> order)
   {
-    Iterator<T> itr = c.iterator();
+    Iterator<? extends T> itr = c.iterator();
     T min = itr.next();	// throws NoSuchElementExcception
     int csize = c.size();
     for (int i = 1; i < csize; i++)
@@ -1076,7 +1076,7 @@ public class Collections
      * @param b the second object
      * @return &lt;, ==, or &gt; 0 according to b.compareTo(a)
      */
-    public int compare(Object a, Object b)
+    public int compare(T a, T b)
     {
       return ((Comparable) b).compareTo(a);
     }
@@ -1702,7 +1702,7 @@ public class Collections
    */
   public static <T> void sort(List<T> l, Comparator<? super T> c)
   {
-    Object[] a = l.toArray();
+    T[] a = (T[]) l.toArray();
     Arrays.sort(a, c);
     ListIterator<T> i = l.listIterator(a.length);
     for (int pos = a.length; --pos >= 0; )
@@ -2541,7 +2541,7 @@ public class Collections
         }
     }
 
-    public void putAll(Map<K, V> map)
+    public void putAll(Map<? extends K, ? extends V> map)
     {
       synchronized (mutex)
         {
@@ -3399,7 +3399,7 @@ public class Collections
       {
         return new UnmodifiableIterator<T>(c.iterator())
 	{
-          public Object next()
+          public T next()
           {
             final T e = super.next();
             return new Map.Entry<K, V>()
@@ -3466,7 +3466,7 @@ public class Collections
       return keys;
     }
 
-    public void putAll(Map<K, V> m)
+    public void putAll(Map<? extends K, ? extends V> m)
     {
       throw new UnsupportedOperationException();
     }

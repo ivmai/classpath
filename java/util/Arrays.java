@@ -2219,7 +2219,7 @@ public class Arrays
               {
                 // not already sorted
                 int j = i;
-                Object elem = a[j];
+                T elem = a[j];
                 do
                   {
                     a[j] = a[j - 1];

@@ -269,7 +269,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
 
     if (initialCapacity == 0)
       initialCapacity = 1;
-    buckets = new HashEntry<K, V>[initialCapacity];
+    buckets = (HashEntry<K, V>[]) new HashEntry[initialCapacity];
     this.loadFactor = loadFactor;
     threshold = (int) (initialCapacity * loadFactor);
   }
@@ -562,7 +562,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
       {
         // This is impossible.
       }
-    copy.buckets = new HashEntry<K, V>[buckets.length];
+    copy.buckets = (HashEntry<K, V>[]) new HashEntry[buckets.length];
     copy.putAllInternal(this);
     // Clear the caches.
     copy.keys = null;
@@ -820,7 +820,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
    * @return the bucket number
    * @throws NullPointerException if key is null
    */
-  private int hash(K key)
+  private int hash(Object key)
   {
     // Note: Inline Math.abs here, for less method overhead, and to avoid
     // a bootstrap dependency, since Math relies on native methods.
@@ -839,7 +839,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
   // Package visible, for use in nested classes.
   HashEntry<K, V> getEntry(Object o)
   {
-    if (! (o instanceof Map.Entry<K, V>))
+    if (! (o instanceof Map.Entry))
       return null;
     K key = ((Map.Entry<K, V>) o).getKey();
     if (key == null)
@@ -899,7 +899,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
 
     int newcapacity = (buckets.length * 2) + 1;
     threshold = (int) (newcapacity * loadFactor);
-    buckets = new HashEntry<K, V>[newcapacity];
+    buckets = (HashEntry<K, V>[]) new HashEntry[newcapacity];
 
     for (int i = oldBuckets.length - 1; i >= 0; i--)
       {
@@ -975,13 +975,13 @@ public class Hashtable<K, V> extends Dictionary<K, V>
     s.defaultReadObject();
 
     // Read and use capacity.
-    buckets = new HashEntry<K, V>[s.readInt()];
+    buckets = (HashEntry<K, V>[]) new HashEntry[s.readInt()];
     int len = s.readInt();
 
     // Read and use key/value pairs.
     // TODO: should we be defensive programmers, and check for illegal nulls?
     while (--len >= 0)
-      put(s.readObject(), s.readObject());
+      put((K) s.readObject(), (V) s.readObject());
   }
 
   /**
@@ -1061,10 +1061,10 @@ public class Hashtable<K, V> extends Dictionary<K, V>
       next = e.next;
       last = e;
       if (type == VALUES)
-        return e.value;
+        return (T) e.value;
       if (type == KEYS)
-        return e.key;
-      return e;
+        return (T) e.key;
+      return (T) e;
     }
 
     /**
@@ -1141,7 +1141,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
      * @return the next element
      * @throws NoSuchElementException if there is none.
      */
-    public Object nextElement()
+    public T nextElement()
     {
       if (count == 0)
         throw new NoSuchElementException("Hashtable Enumerator");
@@ -1152,7 +1152,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
         e = buckets[--idx];
 
       next = e.next;
-      return type == VALUES ? e.value : e.key;
+      return type == VALUES ? (T) e.value : (T) e.key;
     }
   } // class Enumerator
 } // class Hashtable

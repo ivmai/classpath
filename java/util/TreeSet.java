@@ -151,7 +151,7 @@ public class TreeSet<T> extends AbstractSet<T>
   {
     map = new TreeMap<T, String>(sortedSet.comparator());
     Iterator<? extends T> itr = sortedSet.iterator();
-    ((TreeMap<T>) map).putKeysLinear(itr, sortedSet.size());
+    ((TreeMap<T, String>) map).putKeysLinear(itr, sortedSet.size());
   }
 
   /**
@@ -217,7 +217,7 @@ public class TreeSet<T> extends AbstractSet<T>
       {
         copy = (TreeSet<T>) super.clone();
         // Map may be either TreeMap or TreeMap.SubMap, hence the ugly casts.
-        copy.map = (SortedMap<T>) ((AbstractMap<T>) map).clone();
+        copy.map = (SortedMap<T, String>) ((AbstractMap<T, String>) map).clone();
       }
     catch (CloneNotSupportedException x)
       {
@@ -412,7 +412,7 @@ public class TreeSet<T> extends AbstractSet<T>
     s.defaultReadObject();
     Comparator<? super T> comparator = (Comparator<? super T>) s.readObject();
     int size = s.readInt();
-    map = new TreeMap<T>(comparator);
-    ((TreeMap<T>) map).putFromObjStream(s, size, false);
+    map = new TreeMap<T, String>(comparator);
+    ((TreeMap<T, String>) map).putFromObjStream(s, size, false);
   }
 }

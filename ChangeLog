@@ -1,5 +1,64 @@
 2005-01-11  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/AbstractList.java (set, add): Fixed argument types.
+	* java/util/ArrayList.java: Properly handle generic arrays.
+	* java/util/Arrays.java (sort): Fixed type of temporary 'elem'.
+	* java/util/BitSet.java (containsAll): Use correct variable name.
+	* java/util/Collections.java (copy): Use correct
+	parameterizations.
+	(min): Likewise.
+	(putAll): Likewise.
+	(compare): Fixed argument types.
+	(sort): Properly handle generic arrays.
+	* java/util/EnumSet.java (clone): Ignore
+	CloneNotSupportedException.
+	(addAll, contains, containsAll, remove, removeAll, retainAll,
+	copyOf, complementOf): Don't use generic instanceof.
+	(copyOf): Cast result of 'clone'.
+	* java/util/HashMap.java (HashMap): Properly handle generic
+	arrays.
+	(clone): Likewise.
+	(rehash): Likewise.
+	(readObject): Likewise.
+	(putAll): Don't use generic instanceof.
+	(getEntry): Likewise.
+	(putAllInternal): Use correct parameterizations.
+	(next): Fixed return type.
+	* java/util/Hashtable.java (Hashtable): Properly handle generic
+	arrays.
+	(clone): Likewise.
+	(rehash): Likewise.
+	(readObject): Likewise.
+	(hash): Fixed argument type.
+	(getEntry): Don't use generic instanceof.
+	(next): Cast return values.
+	(nextElement): Fixed return type.
+	* java/util/LinkedList.java (toArray): Added cast.
+	(LinkedListItr): Now generic.
+	* java/util/TreeMap.java (TreeMap): Now generic.
+	(Node): Likewise.
+	(left, right, parent): Updated types.
+	(firstKey, get, headMap, lastKey, remove, subMap, tailMap,
+	firstNode, getNode): Updated types.
+	* java/util/TreeSet.java (TreeSet): Fixed cast.
+	(clone): Likewise.
+	(readObject): Likewise.
+	* java/util/Vector.java (Vector): Properly handle generic arrays.
+	(trimToSize): Likewise.
+	(ensureCapacity): Likewise.
+	(toArray): Likewise.
+	(addAll): Fixed parameterization.
+	* java/util/WeakHashMap.java (WeakBucket): Now generic.
+	(value, next): Updated types.
+	(WeakEntry): Parameterized superinterface.
+	(key, getKey, getValue, setValue): Updated types.
+	(getEntry): Fixed type of local 'key'.
+	(get): Updated.
+	(put): Fixed return type.
+	(remove): Updated.
+
+2005-01-11  Tom Tromey  <tromey@redhat.com>
+
 	* .classpath: Updated for Eclipse 3.1.
 	* .settings/org.eclipse.jdt.core.prefs: New file.
 	* .settings/org.eclipse.jdt.ui.prefs: New file.

@@ -61,9 +61,17 @@ public class EnumSet<T extends Enum<T>>
 
   public EnumSet<T> clone()
   {
-    EnumSet<T> r = super.clone();
-    r.store = store.clone();
-    return r;
+  	try
+  	  {
+  		EnumSet<T> r = (EnumSet<T>) super.clone();
+  		r.store = (BitSet) store.clone();
+  		return r;
+  	  }
+  	catch (CloneNotSupportedException _)
+  	  {
+  		// Can't happen.
+  		return null;
+  	  }
   }
 
   public int size()
@@ -113,7 +121,7 @@ public class EnumSet<T extends Enum<T>>
   public boolean addAll(Collection<? extends T> c)
   {
     boolean result = false;
-    if (c instanceof EnumSet<T>)
+    if (c instanceof EnumSet)
       {
 	EnumSet<T> other = (EnumSet<T>) c;
 	if (enumClass == other.enumClass)
@@ -143,7 +151,7 @@ public class EnumSet<T extends Enum<T>>
 
   public boolean contains(Object o)
   {
-    if (! (o instanceof Enum<T>))
+    if (! (o instanceof Enum))
       return false;
     Enum<T> e = (Enum<T>) o;
     if (e.getDeclaringClass() != enumClass)
@@ -153,7 +161,7 @@ public class EnumSet<T extends Enum<T>>
 
   public boolean containsAll(Collection<?> c)
   {
-    if (c instanceof EnumSet<T>)
+    if (c instanceof EnumSet)
       {
 	EnumSet<T> other = (EnumSet<T>) c;
 	if (enumClass == other.enumClass)
@@ -165,7 +173,7 @@ public class EnumSet<T extends Enum<T>>
 
   public boolean remove(Object o)
   {
-    if (! (o instanceof Enum<T>))
+    if (! (o instanceof Enum))
       return false;
     Enum<T> e = (Enum<T>) o;
     if (e.getDeclaringClass() != enumClass)
@@ -177,7 +185,7 @@ public class EnumSet<T extends Enum<T>>
 
   public boolean removeAll(Collection<?> c)
   {
-    if (c instanceof EnumSet<T>)
+    if (c instanceof EnumSet)
       {
 	EnumSet<T> other = (EnumSet<T>) c;
 	if (enumClass != other.enumClass)
@@ -192,7 +200,7 @@ public class EnumSet<T extends Enum<T>>
 
   public boolean retainAll(Collection<?> c)
   {
-    if (c instanceof EnumSet<T>)
+    if (c instanceof EnumSet)
       {
 	EnumSet<T> other = (EnumSet<T>) c;
 	if (enumClass != other.enumClass)
@@ -228,7 +236,7 @@ public class EnumSet<T extends Enum<T>>
     // We can't just use `other.clone' since we don't want to make a
     // subclass.
     EnumSet<T> r = new EnumSet<T>();
-    r.store = other.store.clone();
+    r.store = (BitSet) other.store.clone();
     r.cardinality = other.cardinality;
     r.enumClass = other.enumClass;
     return r;
@@ -236,7 +244,7 @@ public class EnumSet<T extends Enum<T>>
 
   public static <T extends Enum<T>> EnumSet<T> copyOf(Collection<T> other)
   {
-    if (other instanceof EnumSet<T>)
+    if (other instanceof EnumSet)
       return copyOf((EnumSet<T>) other);
     EnumSet<T> r = new EnumSet<T>();
     for (T val : other)
@@ -258,7 +266,7 @@ public class EnumSet<T extends Enum<T>>
   public static <T extends Enum<T>> EnumSet<T> complementOf(EnumSet<T> other)
   {
     EnumSet<T> r = new EnumSet<T>();
-    r.store = other.store.clone();
+    r.store = (BitSet) other.store.clone();
     r.store.flip(0, r.store.size());
     r.cardinality = r.store.size() - other.cardinality;
     r.enumClass = other.enumClass;

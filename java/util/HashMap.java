@@ -256,7 +256,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
 
     if (initialCapacity == 0)
       initialCapacity = 1;
-    buckets = new HashEntry<K, V>[initialCapacity];
+    buckets = (HashEntry<K, V>[]) new HashEntry[initialCapacity];
     this.loadFactor = loadFactor;
     threshold = (int) (initialCapacity * loadFactor);
   }
@@ -386,7 +386,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
       {
         Map.Entry<? extends K, ? extends V> e = itr.next();
         // Optimize in case the Entry is one of our own.
-        if (e instanceof AbstractMap.BasicMapEntry<K, V>)
+        if (e instanceof AbstractMap.BasicMapEntry)
           {
             AbstractMap.BasicMapEntry<? extends K, ? extends V> entry
 	      = (AbstractMap.BasicMapEntry<? extends K, ? extends V>) e;
@@ -485,7 +485,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
       {
         // This is impossible.
       }
-    copy.buckets = new HashEntry<K, V>[buckets.length];
+    copy.buckets = (HashEntry<K, V>[]) new HashEntry[buckets.length];
     copy.putAllInternal(this);
     // Clear the entry cache. AbstractMap.clone() does the others.
     copy.entries = null;
@@ -661,7 +661,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
   // Package visible, for use in nested classes.
   final HashEntry<K, V> getEntry(Object o)
   {
-    if (! (o instanceof Map.Entry<K, V>))
+    if (! (o instanceof Map.Entry))
       return null;
     Map.Entry<K, V> me = (Map.Entry<K, V>) o;
     K key = me.getKey();
@@ -716,7 +716,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     while (itr.hasNext())
       {
         size++;
-	Map.Entry<K, V> e = itr.next();
+	Map.Entry<? extends K, ? extends V> e = itr.next();
 	K key = e.getKey();
 	int idx = hash(key);
 	addEntry(key, e.getValue(), idx, false);
@@ -738,7 +738,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
 
     int newcapacity = (buckets.length * 2) + 1;
     threshold = (int) (newcapacity * loadFactor);
-    buckets = new HashEntry<K, V>[newcapacity];
+    buckets = (HashEntry<K, V>[]) new HashEntry[newcapacity];
 
     for (int i = oldBuckets.length - 1; i >= 0; i--)
       {
@@ -800,7 +800,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     s.defaultReadObject();
 
     // Read and use capacity, followed by key/value pairs.
-    buckets = new HashEntry<K, V>[s.readInt()];
+    buckets = (HashEntry<K, V>[]) new HashEntry[s.readInt()];
     int len = s.readInt();
     size = len;
     while (len-- > 0)
@@ -868,7 +868,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
      * @throws ConcurrentModificationException if the HashMap was modified
      * @throws NoSuchElementException if there is none
      */
-    public Object next()
+    public T next()
     {
       if (knownMod != modCount)
         throw new ConcurrentModificationException();
@@ -883,10 +883,10 @@ public class HashMap<K, V> extends AbstractMap<K, V>
       next = e.next;
       last = e;
       if (type == VALUES)
-        return e.value;
+        return (T) e.value;
       if (type == KEYS)
-        return e.key;
-      return e;
+        return (T) e.key;
+      return (T) e;
     }
 
     /**

@@ -353,19 +353,19 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
    *
    * @author Jochen Hoenicke
    */
-  private static class WeakBucket extends WeakReference
+  private static class WeakBucket<K, V> extends WeakReference<K>
   {
     /**
      * The value of this entry.  The key is stored in the weak
      * reference that we extend.
      */
-    Object value;
+    V value;
 
     /**
      * The next bucket describing another entry that uses the same
      * slot.
      */
-    WeakBucket next;
+    WeakBucket<K, V> next;
 
     /**
      * The slot of this entry. This should be
@@ -388,7 +388,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
      * @param slot the slot.  This must match the slot where this bucket
      *        will be enqueued.
      */
-    public WeakBucket(Object key, ReferenceQueue queue, Object value,
+    public WeakBucket(K key, ReferenceQueue queue, V value,
                       int slot)
     {
       super(key, queue);
@@ -401,18 +401,18 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
      * current bucket.  It also keeps a strong reference to the
      * key; bad things may happen otherwise.
      */
-    class WeakEntry implements Map.Entry
+    class WeakEntry implements Map.Entry<K, V>
     {
       /**
        * The strong ref to the key.
        */
-      Object key;
+      K key;
 
       /**
        * Creates a new entry for the key.
        * @param key the key
        */
-      public WeakEntry(Object key)
+      public WeakEntry(K key)
       {
         this.key = key;
       }
@@ -430,7 +430,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
        * Returns the key.
        * @return the key
        */
-      public Object getKey()
+      public K getKey()
       {
         return key == NULL_KEY ? null : key;
       }
@@ -439,7 +439,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
        * Returns the value.
        * @return the value
        */
-      public Object getValue()
+      public V getValue()
       {
         return value;
       }
@@ -450,9 +450,9 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
        * @param newVal the new value
        * @return the old value
        */
-      public Object setValue(Object newVal)
+      public V setValue(V newVal)
       {
-        Object oldVal = value;
+        V oldVal = value;
         value = newVal;
         return oldVal;
       }
@@ -495,7 +495,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
      */
     WeakEntry getEntry()
     {
-      final Object key = this.get();
+      final K key = this.get();
       if (key == null)
         return null;
       return new WeakEntry(key);
@@ -762,7 +762,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
   public V get(Object key)
   {
     cleanQueue();
-    WeakBucket.WeakEntry entry = internalGet(key);
+    WeakBucket<K, V>.WeakEntry entry = internalGet(key);
     return entry == null ? null : entry.getValue();
   }
 
@@ -774,10 +774,10 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
    *         null if the key wasn't in this map, or if the mapped value
    *         was explicitly set to null.
    */
-  public Object put(K key, V value)
+  public V put(K key, V value)
   {
     cleanQueue();
-    WeakBucket.WeakEntry entry = internalGet(key);
+    WeakBucket<K, V>.WeakEntry entry = internalGet(key);
     if (entry != null)
       return entry.setValue(value);
 
@@ -799,7 +799,7 @@ public class WeakHashMap<K,V> extends AbstractMap<K,V>
   public V remove(Object key)
   {
     cleanQueue();
-    WeakBucket.WeakEntry entry = internalGet(key);
+    WeakBucket<K, V>.WeakEntry entry = internalGet(key);
     if (entry == null)
       return null;
 
