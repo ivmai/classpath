@@ -1,5 +1,15 @@
 2005-04-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* java/lang/System.java:
+	(getenv()): Use Collections.unmodifiableMap to wrap an
+	EnvironmentMap.
+	(EnvironmentCollection): Reduced to just String check changes.
+	(EnvironmentSet): Likewise.
+	(EnvironmentMap): Likewise.
+	(EnvironmentIterator): Removed.
+	
+2005-04-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* java/lang/StringBuilder.java:
 	Change references to System.arraycopy to
 	VMSystem.arraycopy.
