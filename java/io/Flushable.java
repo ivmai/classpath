@@ -1,5 +1,5 @@
-/* Channel.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* Flushable.java -- flush()-able object
+   Copyright (C) 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,22 +35,9 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.nio.channels;
+package java.io;
 
-import java.io.IOException;
-import java.io.Closeable;
-
-public interface Channel extends Closeable
+public interface Flushable
 {
-  /**
-   * Tells whether this channel is open or not
-   */
-  boolean isOpen();
-
-  /**
-   * Closes this channel
-   *
-   * @exception IOException If an error occurs
-   */
-  void close() throws IOException;
+  void flush() throws IOException;
 }

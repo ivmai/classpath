@@ -1,5 +1,5 @@
 /* Reader.java -- base class of classes that read input as a stream of chars
-   Copyright (C) 1998, 1999, 2000, 2003  Free Software Foundation
+   Copyright (C) 1998, 1999, 2000, 2003, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -53,7 +53,7 @@ package java.io;
  * @date April 21, 1998.  
  * @author Aaron M. Renn (arenn@urbanophile.com) 
  */
-public abstract class Reader
+public abstract class Reader implements Closeable
 {
   /**
    * This is the <code>Object</code> used for synchronizing critical code

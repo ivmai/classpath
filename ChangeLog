@@ -1,3 +1,16 @@
+2004-08-26  Tom Tromey  <tromey@redhat.com>
+
+	* java/io/Writer.java (Writer): Implements Closeable, Flushable,
+	Appendable.
+	(append): New methods.
+	* java/io/OutputStream.java (OutputStream): Implements Closeable,
+	Flushable.
+	* java/io/Reader.java (Reader): Implements Closeable.
+	* java/io/InputStream.java (InputStream): Implements Closeable.
+	* java/nio/channels/Channel.java (Channel): Extends Closeable.
+	* java/io/Flushable.java: New file.
+	* java/io/Closeable.java: New file.
+
 2004-08-16  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/AbstractQueue.java (addAll): Return a result.
