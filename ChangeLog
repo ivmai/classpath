@@ -13,6 +13,178 @@
 	* java/lang/reflect/Type.java: Likewise.
 	* java/lang/reflect/WildcardType.java: Likewise.	
 
+2005-02-20  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/SimpleTimeZone.java (getOffset): Calculate beforeEnd by
+	taking dstSavings into account.
+
+2005-02-20  Sven de Marothy <sven@physto.se>
+
+	* java/text/SimpleDateFormat.java,
+	(parse): Set DST_OFFSET to the correct value.
+
+2005-02-20  Rutger Ovidius  <ovidr@users.sourceforge.net>
+
+	* gnu/java/security/provider/Gnu.java (Gnu): Add SHA-160 alias.
+
+2005-02-20  Mark Wielaard  <mark@klomp.org>
+
+	* java/text/SimpleDateFormat.java
+	(SimpleDateFormat(String, DateFormatSymbols)): Throw
+	NullPointerException when formatData is null.
+
+2005-02-19  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java: Updated.
+	* gnu/java/locale/LocaleInformation_az_Cyrl.java: New file.
+
+2005-02-19  Archie Cobbs  <archie@dellroad.org>
+
+	* java/lang/Throwable.java: simplify initializing cause in constructor
+
+2005-02-19  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JToggleButton.java: Removed empty line.
+
+2005-02-18  Bryce McKinlay  <mckinlay@redhat.com>
+
+	* java/util/LinkedHashMap (addEntry): Call remove() with key argument, 
+	not the HashEntry. Reported by Jean-Marie White.
+
+2005-02-18  Mark Wielaard  <mark@klomp.org>
+
+	* doc/www.gnu.org/events/escape_fosdem05.wml: New event.
+	* doc/www.gnu.org/newsitems.txt: Add Escape the Java Trap.
+	* doc/www.gnu.org/events/events.wml: Likewise.
+2005-02-20  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/SimpleTimeZone.java (getOffset): Calculate beforeEnd by
+	taking dstSavings into account.
+
+2005-02-20  Sven de Marothy <sven@physto.se>
+
+	* java/text/SimpleDateFormat.java,
+	(parse): Set DST_OFFSET to the correct value.
+
+2005-02-20  Rutger Ovidius  <ovidr@users.sourceforge.net>
+
+	* gnu/java/security/provider/Gnu.java (Gnu): Add SHA-160 alias.
+
+2005-02-20  Mark Wielaard  <mark@klomp.org>
+
+	* java/text/SimpleDateFormat.java
+	(SimpleDateFormat(String, DateFormatSymbols)): Throw
+	NullPointerException when formatData is null.
+
+2005-02-19  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java: Updated.
+	* gnu/java/locale/LocaleInformation_az_Cyrl.java: New file.
+
+2005-02-19  Archie Cobbs  <archie@dellroad.org>
+
+	* java/lang/Throwable.java: simplify initializing cause in constructor
+
+2005-02-19  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JToggleButton.java: Removed empty line.
+
 2005-02-18  Bryce McKinlay  <mckinlay@redhat.com>
 
 	* java/util/LinkedHashMap (addEntry): Call remove() with key argument, 
@@ -44,7 +216,7 @@
 
 2005-02-18  Robert Schuster <thebohemian@gmx.net>
 
-        * java/nio/charset/Charset.java (forName): Throws
+	* java/nio/charset/Charset.java (forName): Throws
 	IllegalArgumentException when argument is null
 	and added documentation.
 
@@ -855,8 +1027,8 @@
 
 2005-02-14  Sven de Marothy  <sven@physto.se>
 
-        * java/util/Calendar.java 
-        (Calendar): Constructor should clear fields.
+	* java/util/Calendar.java 
+	(Calendar): Constructor should clear fields.
 
 2005-02-14  Sven de Marothy  <sven@physto.se>
 

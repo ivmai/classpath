@@ -430,7 +430,7 @@ public class SimpleDateFormat extends DateFormat
    *
    * @param pattern the non-localized pattern to use.
    * @param formatData the formatting symbols to use.
-   * @throws NullPointerException if the pattern is null.
+   * @throws NullPointerException if the pattern or formatData is null.
    * @throws IllegalArgumentException if the pattern is invalid.
    */
   public SimpleDateFormat(String pattern, DateFormatSymbols formatData)
@@ -439,6 +439,8 @@ public class SimpleDateFormat extends DateFormat
     calendar = new GregorianCalendar();
     computeCenturyStart ();
     tokens = new ArrayList();
+    if (formatData == null)
+      throw new NullPointerException("formatData");
     this.formatData = formatData;
     compileFormat(pattern);
     this.pattern = pattern;
@@ -1017,7 +1019,11 @@ public class SimpleDateFormat extends DateFormat
 			    found_zone = true;
 			    saw_timezone = true;
 			    TimeZone tz = TimeZone.getTimeZone (strings[0]);
-			    calendar.set (Calendar.DST_OFFSET, tz.getDSTSavings());
+			    // Check if it's a DST zone or ordinary 
+			    if(k == 3 || k == 4)
+			      calendar.set (Calendar.DST_OFFSET, tz.getDSTSavings());
+			    else
+			      calendar.set (Calendar.DST_OFFSET, 0);
                             offset = tz.getRawOffset ();
 			    pos.setIndex(index + strings[k].length());
 			    break;
