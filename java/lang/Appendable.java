@@ -58,8 +58,8 @@ import java.io.IOException;
  * any class that wishes to receive data from a <code>Formatter</code> instance.
  * </p>
  *
- * @author Tom Tromey <tromey@redhat.com>
- * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public interface Appendable
@@ -73,7 +73,8 @@ public interface Appendable
    * @return a reference to this object.
    * @throws IOException if an I/O error occurs.
    */
-  Appendable append(char c) throws IOException;
+  Appendable append(char c)
+    throws IOException;
 
   /**
    * Appends the specified sequence of Unicode characters to this
@@ -88,7 +89,8 @@ public interface Appendable
    * @return a reference to this object.
    * @throws IOException if an I/O error occurs.
    */
-  Appendable append(CharSequence seq) throws IOException;
+  Appendable append(CharSequence seq)
+    throws IOException;
 
   /**
    * Appends the specified subsequence of Unicode characters to this
@@ -113,5 +115,7 @@ public interface Appendable
    *         the start index occurs after the end index, or the end index is
    *         beyond the end of the sequence.
    */
-  Appendable append(CharSequence seq, int start, int end) throws IOException;
+  Appendable append(CharSequence seq, int start, int end)
+    throws IOException;
+
 }

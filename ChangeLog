@@ -1,3 +1,13 @@
+2005-02-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Appendable.java:
+	Changed formatting to match HEAD.
+	* java/text/MessageFormat.java:
+	Likewise.
+	* javax/swing/AbstractSet.java,
+	javax/swing/DefaultCellRenderer.java:
+	Finally removed.
+
 2005-01-31  Andrew John HUghes  <gnu_andrew@member.fsf.org>
 
 	* acinclude.m4:

@@ -247,18 +247,18 @@ public class MessageFormat extends Format
 	    // In both cases we fall through to inserting the
 	    // character here.
 	  }
-        // See if we have just a plain quote to insert.
+	// See if we have just a plain quote to insert.
 	else if (c == '\'' && index + 1 < max
 		 && pat.charAt(index + 1) == '\'')
 	  {
 	    buffer.append(c);
 	    ++index;
 	  }
-        // See if quoting should turn on.
-        else if (c == '\'')
-          quoted = true;
+	// See if quoting should turn on.
+	else if (c == '\'')
+	  quoted = true;
 	else if (c == '{')
-          ++brace_depth;
+	  ++brace_depth;
 	else if (c == '}')
 	  {
 	    if (--brace_depth == 0)
@@ -267,9 +267,9 @@ public class MessageFormat extends Format
 	// Check for TERM after braces, because TERM might be `}'.
 	else if (c == term)
 	  break;
-        // All characters, including opening and closing quotes, are
-        // inserted here.
-        buffer.append(c);
+	// All characters, including opening and closing quotes, are
+	// inserted here.
+	buffer.append(c);
       }
     return index;
   }
