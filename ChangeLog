@@ -1,3 +1,9 @@
+2004-09-18  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/annotation/Retention.java: Documented.
+	* java/lang/annotation/RetentionPolicy.java: Documented.
+	* java/lang/StringBuilder.java: Updated documentation.
+
 2004-09-07  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/SuppressWarnings.java: Document.

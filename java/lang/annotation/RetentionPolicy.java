@@ -38,11 +38,23 @@ exception statement from your version. */
 package java.lang.annotation;
 
 /**
+ * This enum is used to control the lifetime of an annotation.
+ *
+ * @see Retention
+ *
  * @since 1.5
  */
 public enum RetentionPolicy
 {
+  /** Indicates that the annotation should be stored in class files.  */
   CLASS,
+
+  /** Indicates that the annotation should be available at runtime.  */
   RUNTIME,
+
+  /**
+   * Indicates that the annotation should only be available when
+   * parsing the source code.
+   */
   SOURCE
 }

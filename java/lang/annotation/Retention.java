@@ -38,10 +38,17 @@ exception statement from your version. */
 package java.lang.annotation;
 
 /**
+ * This annotation is used to specify the desired lifetime of another
+ * annotation.
+ *
+ * @see RetentionPolicy
  * @since 1.5
  */
 @Documented @Retention(RUNTIME) @Target(ANNOTATION_TYPE)
 public @interface Retention
 {
+  /**
+   * The value holds the lifetime of the annotation.
+   */
   RetentionPolicy value();
 }

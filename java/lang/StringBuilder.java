@@ -62,16 +62,17 @@ import java.io.Serializable;
  *
  * <p>Classpath's StringBuilder is capable of sharing memory with Strings for
  * efficiency.  This will help when a StringBuilder is converted to a String
- * and the StringBuilder is not changed after that (quite common when performing
- * string concatenation).
+ * and the StringBuilder is not changed after that (quite common when
+ * performing string concatenation).
  *
  * @author Paul Fisher
  * @author John Keiser
  * @author Tom Tromey
  * @author Eric Blake <ebb9@email.byu.edu>
  * @see String
- * @since 1.0
- * @status updated to 1.4
+ * @see StringBuffer
+ *
+ * @since 1.5
  */
 public final class StringBuilder
   implements Serializable, CharSequence, Appendable
