@@ -1,5 +1,14 @@
 2004-08-07  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/AbstractQueue.java: New file.
+	* java/util/LinkedList.java (element): New method.
+	(offer): Likewise.
+	(peek): Likewise.
+	(poll): Likewise.
+	(remove): Likewise.
+	(LinkedList): Implement Queue.
+	* java/util/Queue.java: New file.
+
 	* java/lang/Enum.java: New file.
 	* java/lang/Object.java (getClass): Now generic.
 

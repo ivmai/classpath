@@ -72,7 +72,7 @@ import java.lang.reflect.Array;
  * @status missing javadoc, but complete to 1.4
  */
 public class LinkedList<T> extends AbstractSequentialList<T>
-  implements List<T>, Cloneable, Serializable
+  implements List<T>, Queue<T>, Cloneable, Serializable
 {
   /**
    * Compatible with JDK 1.2.
@@ -705,6 +705,50 @@ public class LinkedList<T> extends AbstractSequentialList<T>
         e = e.next;
       }
     return a;
+  }
+
+  /**
+   * @since 1.5
+   */
+  public boolean offer(T value)
+  {
+    return add(value);
+  }
+
+  /**
+   * @since 1.5
+   */
+  public T element()
+  {
+    return getFirst();
+  }
+
+  /**
+   * @since 1.5
+   */
+  public T peek()
+  {
+    if (size == 0)
+      return null;
+    return getFirst();
+  }
+
+  /**
+   * @since 1.5
+   */
+  public T poll()
+  {
+    if (size == 0)
+      return null;
+    return removeFirst();
+  }
+
+  /**
+   * @since 1.5
+   */
+  public T remove()
+  {
+    return removeFirst();
   }
 
   /**
