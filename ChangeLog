@@ -1,5 +1,23 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/ClassLoader.java (defineClass): New method.
+	(findClass): Updated return type.
+	(findLoadedClass): Likewise.
+	(findSystemClass): Likewise.
+	(findResources): Likewise.
+	(getSystemResources): Likewise.
+	(loadClass): Likewise.
+	(resolveClass): Updated argument type.
+	(setSigners): Likewise.
+	(loadedClasses, definedPackages): Updated types.
+	(packageAssertionStatus): Likewise.
+	(systemClassAssertionStatus): Likewise.
+	(classAssertionStatus): Likewise.
+	(defineClass): Updated return type.
+	(getResource): Likewise.
+	(clearAssertionStatus): Clear packageAssertionStatus and
+	classAssertionStatus.
+
 	* java/lang/Void.java (TYPE): Changed type.
 	* java/lang/Character.java: Implement Comparable<Character>.
 	(TYPE): Changed type.
