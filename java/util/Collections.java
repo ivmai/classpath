@@ -60,7 +60,7 @@ import java.io.Serializable;
  * modify the set.
  *
  * @author Original author unknown
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see Collection
  * @see Set
  * @see List
@@ -214,7 +214,7 @@ public class Collections
     /**
      * We don't even need to use reflection!
      */
-    public T[] toArray(T[] a)
+    public <E> E[] toArray(E[] a)
     {
       if (a.length > 0)
         a[0] = null;
@@ -359,7 +359,7 @@ public class Collections
     /**
      * We don't even need to use reflection!
      */
-    public T[] toArray(T[] a)
+    public <E> E[] toArray(E[] a)
     {
       if (a.length > 0)
         a[0] = null;
@@ -1579,7 +1579,7 @@ public class Collections
     /**
      * There is a single immutable entry.
      */
-    public Set<AbstractMap.BasicMapEntry<K, V>> entrySet()
+    public Set<Map.Entry<K, V>> entrySet()
     {
       if (entries == null)
         entries = singleton(new AbstractMap.BasicMapEntry<K, V>(k, v)

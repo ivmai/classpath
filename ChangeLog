@@ -1,5 +1,42 @@
 2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* java/util/Collections.java
+	all occurences of
+	(toArray(E[] a)): fixed parameteric type to be different
+	from collection type
+	(entrySet()): immutable version retyped to return Map.Entry<K,V>
+	* java/util/TreeMap.java
+	Completion of generic typing for all methods and variables
+	(entries, comparator): generically typed
+	(TreeMap(Comparator<? super K>): likewise
+	(TreeMap(Map <? extends K, ? extends V>): likewise
+	(TreeMap(SortedMap<K, ? extends V> sm): likewise
+	(comparator()): likewise
+	(containsKey(Object)): cast to K for getKey()
+	(entrySet()): generically typed
+	(get(Object)): cast to K for getKey()
+	(keySet()): generically typed
+	(put(K,V)): likewise
+	(putAll(Map<? extends K, ? extends V>)): likewise
+	(remove(Object)): removed invalid generic typing
+	(values()): generically typed
+	(deleteFixup(Node<K,V>, Node<K,V>)): likewise
+	(highestLessThan(K)): likewise
+	(insertFixup(Node<K,V>)): likewise
+	(lastNode()): likewise
+	(lowestGreatThan(K, boolean): likewise
+	(predecessor(Node<K,V>)): likewise
+	(putKeysLinear(Iterator<K>, int)): likewise and doc
+	correction
+	(removeNode(Node<K,V>)): generically typed
+	(rotateLeft(Node<K,V>)): likewise
+	(rotateRight(Node<K,V>)): likewise
+	(sucessor(Node<K,V>)): likewise
+	(SubMap): generically typed with SK and SV
+	
+
+2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* java/util/EnumMap.java
 	Corrected comment for accuracy.
 	* java/util/EnumSet.java
