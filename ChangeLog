@@ -1,3 +1,54 @@
+2005-02-05  C. Brian Jones  <cbj@gnu.org>
+
+	* gnu/java/rmi/registry/: added back to classpath again, used by core library
+	* gnu/java/rmi/registry/RegistryImpl.java: ditto
+	* gnu/java/rmi/registry/RegistryImpl_Skel.java: ditto
+	* gnu/java/rmi/registry/RegistryImpl_Stub.java: ditto
+
+2005-02-06  Mark Wielaard  <mark@klomp.org>
+
+	* doc/api/Makefile.am (create_html): Remove gjdoc -public flag.
+
+2005-02-05  Sven de Marothy  <sven@physto.se>
+
+        * java/text/SimpleDateFormat.java
+        (parse): Tweak handling of 2-year dates
+        * java/util/Calendar.java
+        (clear): Clear fields to correct value.
+        * java/util/GregorianCalendar.java
+        (computeTime): Correct handling of time zones.
+        Correct field minimum values.
+
+2005-02-05  C. Brian Jones  <cbj@gnu.org>
+
+	* gnu/java/rmi/rmic/: added to cp-tools and removed from classpath
+	* gnu/java/rmi/rmic/Compile_gcj.java: ditto
+	* gnu/java/rmi/rmic/Compile_jikes.java: ditto
+	* gnu/java/rmi/rmic/Compile_kjc.java: ditto
+	* gnu/java/rmi/rmic/Compiler.java: ditto
+	* gnu/java/rmi/rmic/CompilerProcess.java: ditto
+	* gnu/java/rmi/rmic/RMICException.java: ditto
+	* gnu/java/rmi/rmic/RMIC.java: ditto
+	* gnu/java/rmi/rmic/TabbedWriter.java: ditto
+	* gnu/java/rmi/registry/: added to cp-tools and removed from classpath
+	* gnu/java/rmi/registry/RegistryImpl.java: ditto
+	* gnu/java/rmi/registry/RegistryImpl_Skel.java: ditto
+	* gnu/java/rmi/registry/RegistryImpl_Stub.java: ditto
+
+2005-02-05  Mark Wielaard  <mark@klomp.org>
+
+	* doc/api/Makefile.am (classpathbox): Use class logo and target _top.
+
+2005-02-04  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/aelfred2/SAXDriver.java: Corrected implementation of
+	isDeclared methods. Improved performance of isSpecified methods.
+
+2005-02-04  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/SortingFocusTraversalPolicy.java
+	(getSortedCycle): Fixed initialization of set.
+
 2005-02-03  Robert Schuster  <thebohemian@gmx.net>
 
 	* gnu/java/nio/charset/ISO_8859_1.java,
