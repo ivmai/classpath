@@ -1,3 +1,57 @@
+2005-02-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/text/SimpleDateFormat.java
+	Lots of documentation updates.
+	(readObject(java.io.ObjectInputStream)): Wraps
+	IllegalArgumentException as specified.
+	(compileFormat(String)): Uses standardChars
+	rather than the local pattern characters.
+	Throws IllegalArgumentException rather than
+	storing a -1 field.
+	(toString()): Extended to include all variables
+	in a better format.
+	(translateLocalizedPattern(String, String, String)):
+	Renamed to better define the use of this method.
+
+2005-02-02  Dalibor Topic  <robilad@kaffe.org>
+
+	* gnu/java/net/GetSystemPropertyAction.java:
+	Removed.
+	* gnu/java/net/protocol/ftp/FTPURLConnection.java:
+	Use gnu.java.security.action.GetPropertyAction instead 
+	of gnu.java.net.GetSystemPropertyAction.
+
+2005-02-02  Robert Schuster  <thebohemian@gmx.net>
+
+        * gnu/java/beans/decoder/GrowableArrayContext.java: Fixed
+        assignment behavior by using java.lang.reflect.Array.set()
+        directly.
+
+2005-02-01  Dalibor Topic  <robilad@kaffe.org>
+
+	* gnu/java/beans/EmptyBeanInfo.java,
+	gnu/java/beans/info/ComponentBeanInfo.java,
+ 	gnu/java/lang/SystemClassLoader.java:
+	Removed unused files.
+
+2005-02-01  Sven de Marothy  <sven@physto.se>
+	
+	* java/util/GregorianCalendar.java
+        (computeTime): Fixed handling of time zones.
+
+2005-02-01  Sven de Marothy  <sven@physto.se>
+	
+	* java/util/Calendar.java
+        (clear): Set values to Epoch instead of zero.
+        (set): Set isSet to the relevant field pattern instead of just the
+	field.
+        * java/util/GregorianCalendar.java
+        (getBundle): Removed.
+        (getDayOfYear): Removed.
+        (getFirstDayOfMonth): New private method.
+        (nonLeniencyCheck): New private method.
+        (computeTime): Correct handling of insufficient data.
+
 2005-02-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* javax/security/auth/callback/Callback.java,

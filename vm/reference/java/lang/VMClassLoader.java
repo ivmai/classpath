@@ -40,7 +40,6 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.classpath.SystemProperties;
-import gnu.java.lang.SystemClassLoader;
 import gnu.java.util.EmptyEnumeration;
 
 import java.io.File;
