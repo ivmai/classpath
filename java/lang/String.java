@@ -1,5 +1,5 @@
 /* String.java -- immutable character sequences; the object of string literals
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -72,6 +72,8 @@ import java.util.regex.Pattern;
  * @author Paul N. Fisher
  * @author Eric Blake (ebb9@email.byu.edu)
  * @author Per Bothner (bothner@cygnus.com)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  * @status updated to 1.4; but could use better data sharing via offset field
  */
@@ -724,22 +726,6 @@ public final class String
           return result;
       }
     return count - anotherString.count;
-  }
-
-  /**
-   * Behaves like <code>compareTo(java.lang.String)</code> unless the Object
-   * is not a <code>String</code>.  Then it throws a
-   * <code>ClassCastException</code>.
-   *
-   * @param o the object to compare against
-   * @return the comparison
-   * @throws NullPointerException if o is null
-   * @throws ClassCastException if o is not a <code>String</code>
-   * @since 1.2
-   */
-  public int compareTo(Object o)
-  {
-    return compareTo((String) o);
   }
 
   /**

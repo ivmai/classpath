@@ -1,5 +1,5 @@
 /* AbstractCollection.java -- Abstract implementation of most of Collection
-   Copyright (C) 1998, 2000, 2001, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000, 2001, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -61,7 +61,9 @@ import java.lang.reflect.Array;
  *
  * @author Original author unknown
  * @author Bryce McKinlay
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see Collection
  * @see AbstractSet
  * @see AbstractList
@@ -399,15 +401,24 @@ public abstract class AbstractCollection<E>
   {
     int size = size();
     if (a.length < size)
-      a = (Object[]) Array.newInstance(a.getClass().getComponentType(),
+      a = (T[]) Array.newInstance(a.getClass().getComponentType(),
                                        size);
     else if (a.length > size)
       a[size] = null;
 
     Iterator<E> itr = iterator();
     for (int pos = 0; pos < size; pos++)
-      a[pos] = itr.next();
-
+      {
+	try
+	  {
+	    a[pos] = (T) (itr.next());
+	  }
+	catch (ClassCastException exception)
+	  {
+	    throw new ArrayStoreException("The element is of the wrong type "+
+					  "for storing in this array.");
+	  }
+      }
     return a;
   }
 

@@ -1,5 +1,5 @@
 /* Deprecated - Annotation to mark elements as deprecated
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,13 +39,15 @@ package java.lang;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This annotation is used as a marker to indicate that the annotated
  * declaration is deprecated and should not be used in new code.
  * This replaces the old "@deprecated" javadoc tag.
  *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 @Documented @Retention(RUNTIME)

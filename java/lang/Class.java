@@ -81,8 +81,8 @@ import java.util.HashSet;
  * see {@link ObjectStreamClass}.
  *
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
- * @author Tom Tromey <tromey@cygnus.com>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
  * @since 1.0
  * @see ClassLoader
  */

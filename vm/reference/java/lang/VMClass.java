@@ -1,5 +1,5 @@
 /* VMClass.java -- VM Specific Class methods
-   Copyright (C) 2003, 2004 Free Software Foundation
+   Copyright (C) 2003, 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -49,9 +49,11 @@ import java.lang.reflect.Method;
 
 /**
  *
- * @author Etienne Gagnon <etienne.gagnon@uqam.ca>
- * @author Archie Cobbs <archie@dellroad.org>
- * @author C. Brian Jones <cbj@gnu.org>
+ * @author Etienne Gagnon (etienne.gagnon@uqam.ca)
+ * @author Archie Cobbs (archie@dellroad.org)
+ * @author C. Brian Jones (cbj@gnu.org)
+ * @author Tom Tromey (tromey@cygnus.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 final class VMClass 
 {
@@ -293,5 +295,5 @@ final class VMClass
   /**
    * Downcast object to the class' type.
    */
-  static native Object cast(Object obj, Class k);
+  static native <K> K cast(Object obj, Class<K> k);
 } // class VMClass

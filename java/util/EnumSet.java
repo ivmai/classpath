@@ -1,5 +1,5 @@
 /* EnumSet.java - Set of enum objects
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,7 +38,14 @@ exception statement from your version. */
 
 package java.util;
 
-/** @since 1.5 */
+import java.io.Serializable;
+
+/**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5 
+ */
+
 // FIXME: serialization is special.
 public class EnumSet<T extends Enum<T>>
   extends AbstractSet<T>

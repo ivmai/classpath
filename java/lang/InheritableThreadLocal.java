@@ -1,5 +1,5 @@
 /* InheritableThreadLocal -- a ThreadLocal which inherits values across threads
-   Copyright (C) 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -55,8 +55,10 @@ import java.util.WeakHashMap;
  * is in transferring items like User ID or Transaction ID across threads
  * automatically.
  *
- * @author Mark Wielaard <mark@klomp.org>
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Mark Wielaard (mark@klomp.org)
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see ThreadLocal
  * @since 1.2
  * @status updated to 1.4
@@ -70,8 +72,8 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T>
    * equals.
    */
   private static final
-  Map<Thread, ArrayList<InheritableThreadLocals<T>>> threadMap
-    = Collections.synchronizedMap(new WeakHashMap<Thread, ArrayList<InheritableThreadLocals<T>>>());
+  Map<Thread, ArrayList<InheritableThreadLocal<T>>> threadMap
+    = Collections.synchronizedMap(new WeakHashMap<Thread, ArrayList<InheritableThreadLocal<T>>>());
 
   /**
    * Creates a new InheritableThreadLocal that has no values associated

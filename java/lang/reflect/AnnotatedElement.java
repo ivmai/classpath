@@ -1,5 +1,5 @@
 /* AnnotatedElement.java
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,13 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import java.lang.annotation.Annotation;
+
+/**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
 public interface AnnotatedElement
 {
   <T extends Annotation> T getAnnotation(Class<T> annoType);

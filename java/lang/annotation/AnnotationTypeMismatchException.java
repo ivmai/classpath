@@ -1,5 +1,5 @@
 /* AnnotationTypeMismatchException.java - Thrown when annotation has changed
-   Copyright (C) 2004 Free Software Foundation
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,11 @@ exception statement from your version. */
 
 package java.lang.annotation;
 
+import java.lang.reflect.Method;
+
 /**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public class AnnotationTypeMismatchException extends RuntimeException

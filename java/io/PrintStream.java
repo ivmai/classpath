@@ -53,8 +53,9 @@ package java.io;
  * <p>
  * This class converts char's into byte's using the system default encoding.
  *
- * @author Aaron M. Renn <arenn@urbanophile.com>
- * @author Tom Tromey <tromey@cygnus.com>
+ * @author Aaron M. Renn (arenn@urbanophile.com)
+ * @author Tom Tromey (tromey@cygnus.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class PrintStream extends FilterOutputStream implements Appendable
 {
@@ -137,7 +138,8 @@ public class PrintStream extends FilterOutputStream implements Appendable
   }
 
   /** @since 1.5 */
-  public PrintStream (String filename) throws FileNotFoundException
+  public PrintStream (String filename)
+    throws FileNotFoundException
   {
     super (new FileOutputStream (filename));
     pw = new PrintWriter (new OutputStreamWriter (out), false);
@@ -146,7 +148,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
 
   /** @since 1.5 */
   public PrintStream (String filename, String encoding)
-    throws FileNotFoundException
+    throws FileNotFoundException, UnsupportedEncodingException
   {
     super (new FileOutputStream (filename));
     pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);
@@ -163,7 +165,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
 
   /** @since 1.5 */
   public PrintStream (File file, String encoding)
-    throws FileNotFoundException
+    throws FileNotFoundException, UnsupportedEncodingException
   {
     super (new FileOutputStream (file));
     pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);

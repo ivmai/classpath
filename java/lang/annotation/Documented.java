@@ -1,5 +1,5 @@
 /* Documented.java - Indicates documented source element
-   Copyright (C) 2004 Free Software Foundation
+   Copyright (C) 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,11 @@ exception statement from your version. */
 
 package java.lang.annotation;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 @Documented @Retention(RUNTIME)

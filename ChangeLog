@@ -1,3 +1,36 @@
+2005-01-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/io/PrintStream.java:
+	(PrintStream(String, String)): added UnsupportedEncodingException
+	(PrintStream(File, String)): added UnsupportedEncodingException
+	* java/lang/Deprecated.java:
+	Changed import to java.lang.annotation.RetentionPolicy.RUNTIME
+	* java/lang/InheritableThreadLocal.java:
+	Corrected typo `Locals' to `Local'
+	* java/lang/String.java:
+	(compareTo(Object)): removed
+	* java/lang/annotation/AnnotationTypeMismatchException.java:
+	Added import of java.lang.reflect.Method
+	* java/lang/annotation/Documentation.java:
+	Added import of java.lang.annotation.RetentionPolicy.RUNTIME
+	* java/lang/annotation/Inherited.java:
+	Added import of java.lang.annotation.RetentionPolicy.RUNTIME
+	Added import of java.lang.annotation.ElementType.ANNOTATION_TYPE
+	* java/lang/annotation/Retention.java: ditto
+	* java/lang/annotation/Target.java: ditto
+	* java/lang/reflect/AnnotatedElement.java:
+	Added import of java.lang.annotation.Annotation
+	* java/util/AbstractCollection.java:
+	(toArray(T[])): converted returned type to T[] from Object[]
+	* java/util/EnumMap.java:
+	Added import of java.io.Serializable
+	* java/util/EnumSet.java: ditto
+	* java/util/TreeSet.java:
+	(TreeSet(SortedMap<T,String> backingMap)): type of input parameter
+	corrected.
+	* vm/reference/java/lang/VMClass.java:
+	(cast(Object, Class<K>)): typed method parameterically
+	
 2005-01-02  Tom Tromey  <tromey@redhat.com>
 
 	* java/io/PrintStream.java: Implement Appendable.
