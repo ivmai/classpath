@@ -50,7 +50,7 @@ package java.lang;
  * @author Warren Levy
  * @author Eric Blake <ebb9@email.byu.edu>
  * @since 1.0
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public final class Integer extends Number implements Comparable<Integer>
 {

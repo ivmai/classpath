@@ -64,7 +64,7 @@ import gnu.java.lang.CharData;
  * @author Eric Blake <ebb9@email.byu.edu>
  * @see CharData
  * @since 1.0
- * @status updated to 1.4
+ * @status partly updated to 1.5; some things still missing
  */
 public final class Character implements Serializable, Comparable<Character>
 {

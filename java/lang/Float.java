@@ -50,7 +50,7 @@ package java.lang;
  * @author Andrew Haley <aph@cygnus.com>
  * @author Eric Blake <ebb9@email.byu.edu>
  * @since 1.0
- * @status updated to 1.4
+ * @status partly updated to 1.5
  */
 public final class Float extends Number implements Comparable<Float>
 {

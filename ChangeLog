@@ -1,5 +1,15 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/Float.java: Updated status.
+	* java/lang/Void.java: Updated status.
+	* java/lang/Double.java: Updated status.
+	* java/lang/Long.java: Updated status.
+	* java/lang/Character.java: Updated status.
+	* java/lang/Integer.java: Updated status.
+	* java/lang/Short.java: Updated status.
+	* java/lang/Byte.java: Updated status.
+	* java/lang/Boolean.java: Updated status.
+
 	* java/lang/ClassLoader.java (defineClass): New method.
 	(findClass): Updated return type.
 	(findLoadedClass): Likewise.

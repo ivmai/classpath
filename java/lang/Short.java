@@ -49,7 +49,7 @@ package java.lang;
  * @author John Keiser
  * @author Eric Blake <ebb9@email.byu.edu>
  * @since 1.1
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public final class Short extends Number implements Comparable<Short>
 {
