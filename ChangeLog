@@ -517,6 +517,75 @@
 	* java/util/EnumSet.java: New file.
 	* java/util/BitSet.java (containsAll): New method.
 
+2004-08-29  Mark Wielaard  <mark@klomp.org>
+
+	* resource/org/.cvsignore: New file.
+	* resource/org/ietf/.cvsignore: Likewise.
+	* resource/org/ietf/jgss/.cvsignore: Likewise.
+
+2004-08-29  Michael Koch  <konqueror@gmx.de>
+
+	* configure.ac: Depend on automake 1.9.
+	* INSTALL: Likewise.
+	* INSTALL: Updated to depend on automake 1.9 and libtool 1.5.
+	* autogen.sh: Likewise.
+	* configure.ac (AM_INIT_AUTOMAKE): Depend on automake 1.9, support
+	long paths in dist tarball.
+
+2004-08-28  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/TimeZone.java (defaultZone): Try a couple of ways to get
+	a TimeZoneId string and then try to convert that to a TimeZone with
+	getDefaultSystemTimeZone(String).
+	(timezones0): Changed type from Hashtable to HashMap.
+	(timezones): Create HashMap, not Hashtable.
+	(getDefaultTimeZone): New method, rewritten from CNI version.
+	(readTimeZoneFile): New method.
+	(readtzFile): Likewise.
+	(skipFully): Likewise.
+
+2004-08-28  Mark Wielaard  <mark@klomp.org>
+
+	* java/lang/System.java (getenv): Do security checks and call
+	VMSystem.getenv().
+	* vm/reference/java/lang/VMSystem.java (getenv): New static native
+	method.
+	* native/jni/java-lang/java_lang_VMSystem.c (getenv): New function.
+	* include/java_lang_VMSystem.h: Regenerated.
+	* NEWS: Mention new VMSystem.getenv() method and reference
+	implementation in Runtime Interface section.
+
+2004-08-27  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/Arrays.java
+	(sort(byte[], int, int)): Check fromIndex < 0.
+	(sort(char[], int, int)): Likewise.
+	(sort(short[], int, int)): Likewise.
+	(sort(int[], int, int)): Likewise.
+	(sort(long[], int, int)): Likewise.
+	(sort(float[], int, int)): Likewise.
+	(sort(double[], int, int)): Likewise.
+	(sort(Object[], int, int, Comparator)): Likewise.
+	(qsort(byte[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(char[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(short[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(int[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(long[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(float[], int, int)): Honor lower bound from in insertion sort.
+	(qsort(double[], int, int)): Honor lower bound from in insertion sort.
+
+2004-08-27  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/RenderingHints.java: Documented.
+	(RenderingHints): Accept null init Map.
+	(putAll): Preprocess map to generate appropriate exceptions.
+	(remove): Cast object to Key and remove from hintMap.
+
+2004-08-27  Sven de Marothy  <sven@physto.se>
+
+ 	* java/awt/geom/Area.java
+	Implemented.
+
 2004-08-26  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/reflect/AnnotatedElement.java: New file.
@@ -549,11 +618,186 @@
 	* java/io/Flushable.java: New file.
 	* java/io/Closeable.java: New file.
 
+2004-08-25  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/geom/Arc2D.java (ArcIterator): Make package private.
+
+2004-08-25  Sven de Marothy <sven@physto.se>
+
+	* java/awt/geom/Arc2D.java
+	Reformatted.
+	(setArc()): Correct documentation to say 'upper left corner'.
+	(setArcByTangent,contains,intersects): Implemented.
+	(containsAngle): Corrected to handle negative extents.
+	ArcIterator: Set to private.
+	ArcIterator: Corrected for CHORD-type arcs, negative extents.
+	* java/awt/geom/Ellipse2D.java
+	Documented.
+	(contains,intersects): Implemented.
+	* java/awt/geom/Line2D.java
+	(linesIntersect): Correct handling of special cases.
+
+2004-08-24  Andrew John Hughes <gnu_andrew@member.fsf.org>
+
+	* java/awt/Label.java, java/awt/Canvas.java
+	Added accessibility classes to AWT Label and Canvas,
+	as well as additional documentation for Canvas.
+	
+2004-08-24  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/awt/KeyboardFocusManager.java
+	Added missing documentation.
+ 
+2004-08-22  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/newsitems.txt: news on JSpinner and java crypto
+
+2004-08-22  Casey Marshall  <csm@gnu.org>
+
+	* java/security/cert/X509CRLSelector.java
+	(match): remove unreachable try-catch clauses.
+	Reported by: Dalibor Topic <robilad@kaffe.org>
+
+2004-08-21  Casey Marshall  <csm@gnu.org>
+
+	* java/security/AccessController.java
+	Removed FIXME comment.
+	(doPriviliged(PrivilegedAction)): push and pop a null context.
+	(doPrivileged(PrivilegedExceptionAction)): likewise.
+	(doPrivileged(PrivilegedAction,AccessControlContext)): only pass
+	the context to `VMAccessController.pushContext'.
+	(doPrivileged(PrivilegedExceptionAction,AccessControlContext)):
+	likewise.
+	* vm/reference/java/security/VMAccessController.java
+	(contexts): use a ThreadLocal for this field.
+	(pushContext): only take the context as parameter; insert it
+	into a thread local stack.
+	(popContext): take no arguments. Handle new form of `contexts'
+	stack.
+	(getContext): set `inGetContext' as early as possible.
+	Include the call just prior to `doPrivileged' too.
+	Handle new form of `contexts' stack.
+ 
+2004-08-20  Casey Marshall  <csm@gnu.org>
+
+	* java/security/cert/X509CRLSelector.java: new file.
+	* java/security/cert/X509CertSelector.java: new file.
+
+2004-08-18  Casey Marshall  <csm@gnu.org>
+
+	* lib/Makefile.am (dist-hook): add `org' to remove commands, too.
+
+2004-08-18  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/swing/JTextArea.java
+	Implemented insert() method and added additional
+	documentation.
+ 
+2004-08-18  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+ 
+	* javax/swing/SpinnerListModel.java, javax/swing/SpinnerModel.java
+	Implemented SpinnerListModel.  Added documentation to
+	SpinnerModel.
+ 
+2004-08-18  Bryce McKinlay  <mckinlay@redhat.com>
+ 
+ 	PR libgcj/17081
+	* java/net/URI.java (string): New field. Make all other fields
+	transient.
+	(readObject): Implemented.
+	(writeObject): Implemented.
+	(URI): Set 'string'.
+
+2004-08-18  Bryce McKinlay  <mckinlay@redhat.com>
+
+	PR libgcj/17079
+	* java/util/logging/Handler.java (isLoggable): Accept record if its
+	log level equals the threshold level. From Robin Green.
+
+2004-08-17  Casey Marshall <csm@gnu.org>
+
+	* lib/Makefile.am (dist-hook): copy `org' too.
+
+2004-08-17  Casey Marshall <csm@gnu.org>
+
+	* autogen.sh: use `head -n 1' instead of `head -1'.
+
+2004-08-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/AbstractCollection.java, java/util/AbstractList.java,
+	java/util/AbstractMap.java, java/util/AbstractSequentialList.java,
+	java/util/ArrayList.java, java/util/Arrays.java,
+ 	java/util/BitSet.java, java/util/Calendar.java,
+ 	java/util/Collection.java, java/util/ListIterator.java,
+ 	java/util/Map.java, java/util/SortedSet.java:
+ 	Added additional exceptions to documentation, along
+ 	with some additions and corrections.
+ 
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	* .classpath: Updated.
+
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+ 	Bug 9596.
+	* java/lang/Class.java (getName): Fixed javadoc.
+ 
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+        Bug 9949.
+	* java/text/AttributedString.java (AttributedString): Use
+	ArrayList to build array of attribute ranges.  Don't use
+	`attribs' before it is set.
+
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	Bug 9948.
+	* javax/swing/JDesktopPane.java (LIVE_DRAG_MODE): Now final.
+	(OUTLINE_DRAG_MODE): LIVE_DRAG_MODE.
+	* javax/swing/plaf/basic/BasicSplitPaneUI.java
+	(NON_CONTINUOUS_DIVIDER): Now final.  Initialize.
+
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	Bug 9946.
+	* gnu/java/security/util/Prime.java (generateRandomPrime): Use
+	return result from `add'.
+
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	Bug 9944.
+	* java/rmi/server/UID.java (UID): Read `nextCount', not count.
+
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	* NEWS: Mention VMCompiler.
+	* java/lang/Compiler.java: Rewrote in terms of VMCompiler.
+	* vm/reference/java/lang/VMCompiler.java: New file.
+
+2004-08-16  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/File.java File(String,String): Fixed handling of empty
+	path.
+
 2004-08-16  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/AbstractQueue.java (addAll): Return a result.
 	(element): Fixed typo.
 	* java/util/PriorityQueue.java: New file.
+
+2004-08-15  Casey Marshall  <csm@gnu.org>
+
+	* java/security/DummyKeyPairGenerator.java (clone): removed
+	useless instanceof check.
+	* java/security/DummyMessageDigest.java (clone): likewise.
+	* java/security/DummySignature.java (clone): likewise.
+	* java/security/MessageDigest.java (clone): remove useless
+	instanceof check.
+	* java/security/MessageDigestSpi.java (clone): likewise.
+	* java/security/Signature.java (clone): provide meaningful
+	implementation.
+	* java/security/SignatureSpi.java (clone): likewise.
+	* javax/crypto/MacSpi.java (clone): likewise.
 
 2004-08-15  Matthias Pfisterer  <Matthias.Pfisterer@web.de>
 	    Tom Tromey  <tromey@redhat.com>
@@ -596,6 +840,369 @@
 	iterator declarations.
 	* java/util/AbstractSequentialList.java (addAll): Genericize
 	iterator `i'.
+
+2004-08-14  Ka-Hing Cheung  <kahing@javabsp.org>
+
+	* javax/swing/AbstractSpinnerModel.java,
+ 	javax/swing/JSpinner.java,
+	javax/swing/SpinnerNumberModel.java,
+ 	javax/swing/plaf/basic/BasicSpinnerUI.java:
+ 	New files.
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+ 	(initClassDefaults): Added defaults for BasicSpinnerUI.
+ 
+2004-08-14  Mark Wielaard  <mark@klomp.org>
+ 
+	* examples/gnu/classpath/examples/swing/Demo.java (mkSpinner):
+ 	New method.
+ 	(mkButtonBar): Add Spinner.
+
+2004-08-14  Casey Marshall <csm@gnu.org>
+ 
+	The Big Crypto Merge of 2004.
+ 
+	* configure.ac: generate jgss resource Makefiles.
+
+	* lib/Makefile.am: updated for jgss resources.
+ 
+	* lib/gen-classlist.sh.in: updated for classes in org/.
+
+	* javax/security/auth/x500/X500Principal.java: replaced with GNU
+ 	Crypto's version.
+ 
+	* resource/org/Makefile.am,
+	* resource/org/ietf/Makefile.am,
+	* resource/org/ietf/jgss/Makefile.am:
+	new files.
+ 
+	Files imported from GNU Crypto.
+	* javax/crypto/BadPaddingException.java
+	* javax/crypto/Cipher.java
+	* javax/crypto/CipherInputStream.java
+	* javax/crypto/CipherOutputStream.java
+	* javax/crypto/CipherSpi.java
+	* javax/crypto/EncryptedPrivateKeyInfo.java
+	* javax/crypto/ExemptionMechanism.java
+	* javax/crypto/ExemptionMechanismException.java
+	* javax/crypto/ExemptionMechanismSpi.java
+	* javax/crypto/IllegalBlockSizeException.java
+	* javax/crypto/KeyAgreement.java
+	* javax/crypto/KeyAgreementSpi.java
+	* javax/crypto/KeyGenerator.java
+	* javax/crypto/KeyGeneratorSpi.java
+	* javax/crypto/Mac.java
+	* javax/crypto/MacSpi.java
+	* javax/crypto/Makefile.am
+	* javax/crypto/NoSuchPaddingException.java
+	* javax/crypto/NullCipher.java
+	* javax/crypto/NullCipherImpl.java
+	* javax/crypto/SealedObject.java
+	* javax/crypto/SecretKey.java
+	* javax/crypto/SecretKeyFactory.java
+	* javax/crypto/SecretKeyFactorySpi.java
+	* javax/crypto/ShortBufferException.java
+	* javax/crypto/interfaces/DHKey.java
+	* javax/crypto/interfaces/DHPrivateKey.java
+	* javax/crypto/interfaces/DHPublicKey.java
+	* javax/crypto/interfaces/PBEKey.java
+	* javax/crypto/spec/DESKeySpec.java
+	* javax/crypto/spec/DESedeKeySpec.java
+	* javax/crypto/spec/DHGenParameterSpec.java
+	* javax/crypto/spec/DHParameterSpec.java
+	* javax/crypto/spec/DHPrivateKeySpec.java
+	* javax/crypto/spec/DHPublicKeySpec.java
+	* javax/crypto/spec/IvParameterSpec.java
+	* javax/crypto/spec/PBEKeySpec.java
+	* javax/crypto/spec/PBEParameterSpec.java
+	* javax/crypto/spec/RC2ParameterSpec.java
+	* javax/crypto/spec/RC5ParameterSpec.java
+	* javax/crypto/spec/SecretKeySpec.java
+	* javax/security/auth/AuthPermission.java
+	* javax/security/auth/DestroyFailedException.java
+	* javax/security/auth/Destroyable.java
+	* javax/security/auth/Policy.java
+	* javax/security/auth/PrivateCredentialPermission.java
+	* javax/security/auth/RefreshFailedException.java
+	* javax/security/auth/Refreshable.java
+	* javax/security/auth/Subject.java
+	* javax/security/auth/SubjectDomainCombiner.java
+	* javax/security/auth/callback/Callback.java
+	* javax/security/auth/callback/CallbackHandler.java
+	* javax/security/auth/callback/ChoiceCallback.java
+	* javax/security/auth/callback/ConfirmationCallback.java
+	* javax/security/auth/callback/LanguageCallback.java
+	* javax/security/auth/callback/NameCallback.java
+	* javax/security/auth/callback/PasswordCallback.java
+	* javax/security/auth/callback/TextInputCallback.java
+	* javax/security/auth/callback/TextOutputCallback.java
+	* javax/security/auth/callback/UnsupportedCallbackException.java
+	* javax/security/auth/login/AccountExpiredException.java
+	* javax/security/auth/login/AppConfigurationEntry.java
+	* javax/security/auth/login/Configuration.java
+	* javax/security/auth/login/CredentialExpiredException.java
+	* javax/security/auth/login/FailedLoginException.java
+	* javax/security/auth/login/LoginContext.java
+	* javax/security/auth/login/LoginException.java
+	* javax/security/auth/login/NullConfiguration.java
+	* javax/security/auth/x500/X500PrivateCredential.java
+	* javax/security/sasl/AuthenticationException.java
+	* javax/security/sasl/AuthorizeCallback.java
+	* javax/security/sasl/RealmCallback.java
+	* javax/security/sasl/RealmChoiceCallback.java
+	* javax/security/sasl/Sasl.java
+	* javax/security/sasl/SaslClient.java
+	* javax/security/sasl/SaslClientFactory.java
+	* javax/security/sasl/SaslException.java
+	* javax/security/sasl/SaslServer.java
+	* javax/security/sasl/SaslServerFactory.java
+	* org/ietf/jgss/ChannelBinding.java
+	* org/ietf/jgss/GSSContext.java
+	* org/ietf/jgss/GSSCredential.java
+	* org/ietf/jgss/GSSException.java
+	* org/ietf/jgss/GSSManager.java
+	* org/ietf/jgss/GSSName.java
+	* org/ietf/jgss/MessageProp.java
+	* org/ietf/jgss/Oid.java
+	* resources/org/ietf/jgss/MessagesBundle.properties
+
+	Files imported from Jessie <http://www.nongnu.org/jessie/>
+	* javax/net/ServerSocketFactory.java
+	* javax/net/SocketFactory.java
+	* javax/net/VanillaServerSocketFactory.java
+	* javax/net/VanillaSocketFactory.java
+	* javax/net/ssl/HandshakeCompletedEvent.java
+	* javax/net/ssl/HandshakeCompletedListener.java
+	* javax/net/ssl/HostnameVerifier.java
+	* javax/net/ssl/HttpsURLConnection.java
+	* javax/net/ssl/KeyManager.java
+	* javax/net/ssl/KeyManagerFactory.java
+	* javax/net/ssl/KeyManagerFactorySpi.java
+	* javax/net/ssl/ManagerFactoryParameters.java
+	* javax/net/ssl/SSLContext.java
+	* javax/net/ssl/SSLContextSpi.java
+	* javax/net/ssl/SSLException.java
+	* javax/net/ssl/SSLHandshakeException.java
+	* javax/net/ssl/SSLKeyException.java
+	* javax/net/ssl/SSLPeerUnverifiedException.java
+	* javax/net/ssl/SSLPermission.java
+	* javax/net/ssl/SSLProtocolException.java
+	* javax/net/ssl/SSLServerSocket.java
+	* javax/net/ssl/SSLServerSocketFactory.java
+	* javax/net/ssl/SSLSession.java
+	* javax/net/ssl/SSLSessionBindingEvent.java
+	* javax/net/ssl/SSLSessionBindingListener.java
+	* javax/net/ssl/SSLSessionContext.java
+	* javax/net/ssl/SSLSocket.java
+	* javax/net/ssl/SSLSocketFactory.java
+	* javax/net/ssl/TrivialHostnameVerifier.java
+	* javax/net/ssl/TrustManager.java
+	* javax/net/ssl/TrustManagerFactory.java
+	* javax/net/ssl/TrustManagerFactorySpi.java
+	* javax/net/ssl/X509KeyManager.java
+	* javax/net/ssl/X509TrustManager.java
+	* javax/security/cert/Certificate.java
+	* javax/security/cert/CertificateEncodingException.java
+	* javax/security/cert/CertificateException.java
+	* javax/security/cert/CertificateExpiredException.java
+	* javax/security/cert/CertificateNotYetValidException.java
+	* javax/security/cert/CertificateParsingException.java
+	* javax/security/cert/X509CertBridge.java
+	* javax/security/cert/X509Certificate.java
+
+2004-08-14  Casey Marshall <csm@gnu.org>
+
+	Author e-mail updated for all files.
+	* gnu/java/security/OID.java (equals): test if the aurgment is an
+	instance of OID.
+	(compareTo): use `equals'.
+	* gnu/java/security/der/BitString.java (equals): test if the
+	argument is an instance of BitString.
+	* gnu/java/security/der/DERReader.java: Removed NIO imports.  Made
+	class final. Made fields private.
+	(<init>): new constructor.
+	(skip): new method.
+	(makeString): made static; don't use NIO.
+	(fromIso88591, fromUtf16Be, fromUtf8): new methods.
+	* gnu/java/security/der/DERWriter.java: fixed imports.
+	(writeString): don't use NIO.
+	(toIso88591, toUtf16Be, toUtf8): new methods.
+	* gnu/java/security/der/DERValue.java: formatting changes only.
+	* gnu/java/security/der/DER.java: likewise.
+ 
+2004-08-14  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Add --enable-gtk-cairo checking (cairo, pangoft2).
+	* include/Makefile.am: Add rules for
+	gnu_java_awt_peer_gtk_GdkClasspathFontPeer.h,
+	gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.h,
+	gnu_java_awt_peer_gtk_GdkGlyphVector.h and
+	gnu_java_awt_peer_gtk_GdkGraphics2D.h.
+	* include/gnu_java_awt_peer_gtk_GdkClasspathFontPeer.h: New generated
+	file.
+	* include/gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.h: Idem.
+	* include/gnu_java_awt_peer_gtk_GdkGlyphVector.h: Idem.
+	* include/gnu_java_awt_peer_gtk_GdkGraphics.h: Regenerated.
+	* include/gnu_java_awt_peer_gtk_GdkGraphics2D.h: New generated file.
+	* include/gnu_java_awt_peer_gtk_GtkFramePeer.h: Regenerated.
+	* native/jni/gtk-peer/Makefile.am: Add gtk_cairo_c_source_files when
+	GTK_CAIRO is set.
+	* native/jni/gtk-peer/
+	gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.c: Declare variables
+	at top of functions/block.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics2D.c: Likewise.
+
+2004-08-14  Mark Wielaard  <mark@klomp.org>
+
+	* examples/.cvsignore: New file.
+
+2004-08-14  Mark Wielaard  <mark@klomp.org>
+
+	* java/lang/Rectangle.java (intersects): Check r.width and r.height
+	first.
+ 
+2004-08-13  Tom Tromey  <tromey@redhat.com>
+
+	* java/nio/CharBuffer.java (put): Fix typo.
+	* java/nio/DoubleBuffer.java (put): Fix typo.
+	* java/nio/FloatBuffer.java (put): Fix typo.
+	* java/nio/IntBuffer.java (put): Fix typo.
+	* java/nio/LongBuffer.java (put): Fix typo.
+	* java/nio/ShortBuffer.java (put): Fix typo.
+
+2004-08-12  Guilhem Lavaux  <guilhem@kaffe.org>
+
+ 	* java/net/URL.java (URL): Delete whitespaces in the protocol string.
+
+2004-08-12  Tom Tromey  <tromey@redhat.com>
+
+	* vm/reference/java/lang/VMClassLoader.java: Added security
+	comment.
+
+2004-08-10  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/newsitems.txt: added newitem about generics branch 
+
+2004-08-09  Florian Weimer  <fw@deneb.enyo.de>
+
+	* java/nio/ByteBuffer.java (put): Fix typo.
+
+2004-08-09  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+PR AWT/16121
+	* native/jni/gtk-peer/gthread-jni.c: Include stdio.h.  Eliminate
+	type-punning compiler warnings using unions.
+	(throw): Replace bzero with memset.
+ 
+2004-08-09  Andreas Tobler  <a.tobler@schweiz.ch>
+             Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkPixbufDecoder.c: Move
+	NSA_PB macros to gtkpeer.h.  Include gtkpeer.h.
+	* native/jni/gtk-peer/gtkpeer.h: Move NSA_PB macros here.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c
+	(nativeSetIconImageFromDecoder): Use NSA_GET_PB_PTR macro.
+
+2004-08-09  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JMenuItem.java
+	(getMenuDragMouseListeners): New method.
+	(getMenuKeyListeners): Likewise.
+
+2004-08-09  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/AbstractButton.java
+	(model): Made protected.
+	(actionListener): Likewise.
+	(changeListener): Likewise.
+	(itemListener): Likewise.
+	(multiClickThreshhold): New field.
+	(getActionListeners): New method.
+	(getChangeListeners): Likewise.
+	(getItemListeners): Likewise.
+	(fireItemStateChanged): Simplified implementation.
+	(fireActionPerformed): Likewise.
+	(fireStateChanged): Likewise.
+	(getMultiClickThreshhold): New method.
+	(setMultiClickThreshhold): Likewise.
+
+2004-08-09  Craig Black  <craig.black@aonix.com>
+ 
+	* gnu/java/awt/peer/gtk/GdkGraphics.java 
+	(drawImage): Add support for scaling pixmaps.
+	* include/gnu_java_awt_peer_gtk_GdkGraphics.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics.c
+	(copyAndScalePixmap): New native method.
+
+2004-08-08  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* java/awt/Button.java (Button()): Use empty string rather than
+	null in no-label constructor.
+
+2004-08-08  Mark Wielaard  <mark@klomp.org>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkPixbufDecoder.c:
+	#include gdk.h, not gtk.h. #include jni.h, native_state.h, string.h
+	and stdlib.h, not gtkpeer.h.
+	(*vm): New static variable.
+	(areaPreparedID): Make static.
+	(areaUpdatedID): Likewise.
+	(area_prepared): Get and use JNIEnv through stored JavaVM *vm.
+	(area_prepared): Likewise.
+	(area_updated): Likewise.
+	(closed): Likewise.
+	(initStaticState): Initialize *vm javaVM.
+	(pumpBytes): Use given env, not global gdk_env.
+
+2004-08-08  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/geom/CubicCurve2D.java (solveCubic): Removed duplicate
+	comments.
+
+2004-08-08  Mark Wielaard  <mark@klomp.org>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c: Reindent.
+
+2004-08-08  David Jee  <djee@redhat.com>
+
+	PR AWT/16682
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java
+	(nativeSetIconImage): Rename to nativeSetIconImageFromDecoder.
+	(nativeSetIconImageFromData): New native method declaration.
+	(setIconImage): Handle images not produced from GdkPixbufDecoder.
+	* gnu/java/awt/peer/gtk/GtkImage.java
+	(getPixelCache): New method.
+	(getColorModel): New method.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c
+	(nativeSetIconImage): Rename to nativeSetIconImageFromDecoder.
+	(free_pixbuf_data): New helper function.
+	(nativeSetIconImageFromData): New function.
+ 
+2004-08-08  Kim Ho  <kho@redhat.com>
+
+	* java/awt/Component.java:
+	(processMouseEvent): Consume event after
+	listeners process it.
+	(processMouseMotionEvent): ditto.
+	(processMouseWheelEvent): ditto.
+	* java/awt/Container.java:
+	(acquireComponentForMouseEvent):
+	Do not dispatch to events that have been
+	removed from the Container.
+	(handleEvent): Consume the MouseEvents.
+	* javax/swing/RepaintManager.java:
+	(paintDirtyRegions): Do not add to list of 
+	damaged areas if the component has no root.
+
+2004-08-08  Graydon Hoare  <graydon@redhat.com>
+
+	PR SWING/16576
+	* javax/swing/JLayeredPane.java
+	(setLayer): Permit changing layer after addition.
+	(setPosition): Permit over-length positions.
+	(layerToRange): Compare intValue()s.
+	* javax/swing/Box.java (createHorizontalBox): Implement.
+	(createRigidArea): Likewise.
+	(createVerticalBox): Likewise.
 
 2004-08-08  Tom Tromey  <tromey@redhat.com>
 
@@ -653,6 +1260,12 @@
 	* java/lang/annotation/Annotation.java: New file.
 	* java/lang/Override.java: Fixed formatting.
 	* java/lang/Deprecated.java: Now Documented.
+
+2004-08-06  Tom Tromey  <tromey@redhat.com>
+
+	* java/net/DatagramSocket.java: Fixed typo.
+
+	* java/awt/image/Kernel.java (clone): Use super.clone().
 
 2004-08-06  Tom Tromey  <tromey@redhat.com>
 
@@ -714,6 +1327,17 @@
 	external/Makefile.am,
 	lib/Makefile.am:
 	Fixed usage of find.
+
+2004-08-01  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/geom/CubicCurve2.java: Reindent.
+	(contains): Implemented.
+	(intersects): Implemented.
+	* java/awt/geom/QuadCurve2D.java: Likewise.
+	* java/awt/geom/GeneralPath.java: Reindent and document.
+	Fully (re)implemented using separate xpoints and ypoints
+	float[] coords.
+	* java/awt/geom/RoundRectangle2D.java: Several bugfixes (Bug #6007).
 
 2004-08-01  Mark Wielaard  <mark@klomp.org>
 
@@ -4564,7 +5188,7 @@
 
 	--portable-native-sync implemented for GTK2:
 	
-	* gnu/native/jni/gtk-peer/gthread-jni.c: Indentation fixes.
+	* native/jni/gtk-peer/gthread-jni.c: Indentation fixes.
 	Implemented missing functions for GTK2.
 	Added error handling.
 	Renamed static functions out of the g_ namespace.

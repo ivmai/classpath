@@ -105,7 +105,9 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E>
    * @throws ClassCastException if o cannot be added to this list due to its
    *         type
    * @throws IllegalArgumentException if o cannot be added to this list for
-   *         some other reason
+   *         some other reason.
+   * @throws NullPointerException if o is null and the list does not permit
+   *         the addition of null values.
    */
   public void add(int index, E o)
   {
@@ -137,6 +139,8 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E>
    * @throws IllegalArgumentException if some element of c cannot be added
    *         to this list for some other reason
    * @throws NullPointerException if the specified collection is null
+   * @throws NullPointerException if an object, o, in c is null and the list
+   *         does not permit the addition of null values.
    * @see #add(int, Object)
    */
   public boolean addAll(int index, Collection<? extends E> c)
@@ -214,6 +218,8 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E>
    *         type
    * @throws IllegalArgumentException if o cannot be added to this list for
    *         some other reason
+   * @throws NullPointerException if o is null and the list does not allow
+   *         a value to be set to null.
    */
   public E set(int index, E o)
   {

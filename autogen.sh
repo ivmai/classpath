@@ -3,36 +3,32 @@
 set -e
 
 LIBTOOLIZE=libtoolize
-${LIBTOOLIZE} --version | head -1
-echo "libtoolize: minimum version required: 1.4.2"
+${LIBTOOLIZE} --version | head -n 1
+echo "libtoolize: minimum version required: 1.5"
 
 AUTOCONF=autoconf
-${AUTOCONF} --version | head -1
+${AUTOCONF} --version | head -n 1
 echo "autoconf: minimum version required: 2.59"
 
 # Autoheader is part of autoconf
 AUTOHEADER=autoheader
-${AUTOHEADER} --version | head -1
+${AUTOHEADER} --version | head -n 1
 echo "autoheader: minimum version required: 2.59"
 
 AUTOMAKE=automake
-if test -x /usr/bin/automake-1.8; then
-  AUTOMAKE=/usr/bin/automake-1.8
-elif test -x /usr/bin/automake-1.7; then
-  AUTOMAKE=/usr/bin/automake-1.7
+if test -x /usr/bin/automake-1.9; then
+  AUTOMAKE=/usr/bin/automake-1.9
 fi
-${AUTOMAKE} --version | head -1
-echo "automake: minimum version required: 1.7.0"
+${AUTOMAKE} --version | head -n 1
+echo "automake: minimum version required: 1.9.0"
 
 # Aclocal is part of automake
 ACLOCAL=aclocal
-if test -x /usr/bin/aclocal-1.8; then
-  ACLOCAL=/usr/bin/aclocal-1.8
-elif test -x /usr/bin/aclocal-1.7; then
-  ACLOCAL=/usr/bin/aclocal-1.7
+if test -x /usr/bin/aclocal-1.9; then
+  ACLOCAL=/usr/bin/aclocal-1.9
 fi
-${ACLOCAL} --version | head -1
-echo "aclocal: minimum version required: 1.7.0"
+${ACLOCAL} --version | head -n 1
+echo "aclocal: minimum version required: 1.9.0"
 
 echo "libtoolize ..."
 ${LIBTOOLIZE} --force --copy

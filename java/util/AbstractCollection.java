@@ -132,11 +132,13 @@ public abstract class AbstractCollection<E>
    * @return true if the add operation caused the Collection to change
    * @throws UnsupportedOperationException if the add operation is not
    *         supported on this collection
-   * @throws NullPointerException if this collection does not support null,
-   *         or if the specified collection is null
-   * @throws ClassCastException if an object in c is of the wrong type
-   * @throws IllegalArgumentException if some aspect of an object in c prevents
-   *         it from being added
+   * @throws NullPointerException if the specified collection is null
+   * @throws ClassCastException if the type of any element in c is
+   *         not a valid type for addition.
+   * @throws IllegalArgumentException if some aspect of any element
+   *         in c prevents it being added.
+   * @throws NullPointerException if any element in c is null and this
+   *         collection doesn't allow null values.
    * @see #add(Object)
    */
   public boolean addAll(Collection<? extends E> c)
@@ -271,6 +273,7 @@ public abstract class AbstractCollection<E>
    * @return true if the remove operation caused the Collection to change
    * @throws UnsupportedOperationException if this collection's Iterator
    *         does not support the remove method
+   * @throws NullPointerException if the collection, c, is null.
    * @see Iterator#remove()
    */
   public boolean removeAll(Collection<?> c)
@@ -291,8 +294,10 @@ public abstract class AbstractCollection<E>
    * @return true if the remove operation caused the Collection to change
    * @throws UnsupportedOperationException if this collection's Iterator
    *         does not support the remove method
+   * @throws NullPointerException if the collection, c, is null.
    * @see Iterator#remove()
    */
+  // Package visible for use throughout java.util.
   boolean removeAllInternal(Collection<?> c)
   {
     Iterator<E> itr = iterator();
@@ -319,6 +324,7 @@ public abstract class AbstractCollection<E>
    * @return true if the remove operation caused the Collection to change
    * @throws UnsupportedOperationException if this collection's Iterator
    *         does not support the remove method
+   * @throws NullPointerException if the collection, c, is null.
    * @see Iterator#remove()
    */
   public boolean retainAll(Collection<?> c)
@@ -340,8 +346,10 @@ public abstract class AbstractCollection<E>
    * @return true if the remove operation caused the Collection to change
    * @throws UnsupportedOperationException if this collection's Iterator
    *         does not support the remove method
+   * @throws NullPointerException if the collection, c, is null.
    * @see Iterator#remove()
    */
+  // Package visible for use throughout java.util.
   boolean retainAllInternal(Collection<?> c)
   {
     Iterator<E> itr = iterator();

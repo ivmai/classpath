@@ -546,7 +546,9 @@ public abstract class Calendar
    * if they are invalid.
    * @param field the time field. One of the time field constants.
    * @return the value of the specified field
-   *
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    * @specnote Not final since JDK 1.4
    */
   public int get(int field)
@@ -564,6 +566,9 @@ public abstract class Calendar
    * @param field the time field. One of the time field constants.
    * @return the value of the specified field, undefined if
    * <code>areFieldsSet</code> or <code>isSet[field]</code> is false.
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    */
   protected final int internalGet(int field)
   {
@@ -575,7 +580,9 @@ public abstract class Calendar
    * the time in milliseconds.
    * @param field the time field. One of the time field constants
    * @param value the value to be set.
-   *
+   * @throws ArrayIndexOutOfBoundsException if field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    * @specnote Not final since JDK 1.4
    */
   public void set(int field, int value)
@@ -679,6 +686,9 @@ public abstract class Calendar
   /**
    * Clears the values of the specified time field.
    * @param field the time field. One of the time field constants.
+   * @throws ArrayIndexOutOfBoundsException if field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    */
   public final void clear(int field)
   {
@@ -691,6 +701,9 @@ public abstract class Calendar
   /**
    * Determines if the specified field has a valid value.
    * @return true if the specified field has a value.
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    */
   public final boolean isSet(int field)
   {
@@ -764,6 +777,9 @@ public abstract class Calendar
    * it does what you expect: Jan, 25 + 10 Days is Feb, 4.
    * @param field the time field. One of the time field constants.
    * @param amount the amount of time.
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    */
   public abstract void add(int field, int amount);
 
@@ -778,6 +794,9 @@ public abstract class Calendar
    * The date June, 31 is automatically converted to July, 1.
    * @param field the time field. One of the time field constants.
    * @param up the direction, true for up, false for down.
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    */
   public abstract void roll(int field, boolean up);
 
@@ -791,6 +810,9 @@ public abstract class Calendar
    * @param field the time field. One of the time field constants.
    * @param amount the amount to roll by, positive for rolling up,
    * negative for rolling down.  
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    * @since JDK1.2
    */
   public void roll(int field, int amount)
@@ -926,6 +948,9 @@ public abstract class Calendar
    * This value is dependent on the values of the other fields.
    * @param field the time field. One of the time field constants.
    * @return the actual minimum value.
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    * @since jdk1.2
    */
   public int getActualMinimum(int field)
@@ -949,6 +974,9 @@ public abstract class Calendar
    * This value is dependent on the values of the other fields.
    * @param field the time field. One of the time field constants.
    * @return the actual maximum value.  
+   * @throws ArrayIndexOutOfBoundsException if the field is outside
+   *         the valid range.  The value of field must be >= 0 and
+   *         <= <code>FIELD_COUNT</code>.
    * @since jdk1.2
    */
   public int getActualMaximum(int field)

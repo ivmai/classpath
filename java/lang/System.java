@@ -616,16 +616,19 @@ public final class System
   }
 
   /**
-   * This used to get an environment variable, but following Sun's lead,
-   * it now throws an Error. Use <code>getProperty</code> instead.
+   * Gets the value of an environment variable.
    *
    * @param name the name of the environment variable
-   * @return this does not return
-   * @throws Error this is not supported
-   * @deprecated use {@link #getProperty(String)}; getenv is not supported
+   * @return the string value of the variable or null when the
+   *         environment variable is not defined.
+   * @throws NullPointerException
+   * @throws SecurityException if permission is denied
+   * @since 1.5
    */
   public static String getenv(String name)
   {
+    if (name == null)
+      throw new NullPointerException();
     SecurityManager sm = Runtime.securityManager; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("getenv." + name));

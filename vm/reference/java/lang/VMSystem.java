@@ -1,5 +1,5 @@
 /* VMSystem.java -- helper for java.lang.system
-   Copyright (C) 1998, 2002, 2005 Free Software Foundation
+   Copyright (C) 1998, 2002, 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -144,7 +144,13 @@ final class VMSystem
   static native Map<String, String> getenv();
 
   /**
-   * Return a single element from the current environment.
+   * Gets the value of an environment variable from the current
+   * environment.
+   * Always returning null is a valid (but not very useful) implementation.
+   *
+   * @param name The name of the environment variable (will not be null).
+   * @return The string value of the variable or null when the
+   *         environment variable is not defined.
    */
   static String getenv(String k)
   {
@@ -159,33 +165,31 @@ final class VMSystem
    * This method can also return null if the stream is created somewhere 
    * else in the VM startup sequence.
    */
-
-    static InputStream makeStandardInputStream()
-    {
-	return new BufferedInputStream(new FileInputStream(FileDescriptor.in));
-    }
-
+  static InputStream makeStandardInputStream()
+  {
+    return new BufferedInputStream(new FileInputStream(FileDescriptor.in));
+  }
+  
   /**
    * Helper method which creates the standard output stream.
    * VM implementors may choose to construct these streams differently.
    * This method can also return null if the stream is created somewhere 
    * else in the VM startup sequence.
    */
-
-    static PrintStream makeStandardOutputStream()
-    {
-	return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)), true);
-    }
+  static PrintStream makeStandardOutputStream()
+  {
+    return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)), true);
+  }
+  
   /**
    * Helper method which creates the standard error stream.
    * VM implementors may choose to construct these streams differently.
    * This method can also return null if the stream is created somewhere 
    * else in the VM startup sequence.
    */
-
-    static PrintStream makeStandardErrorStream()
-    {
-	return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.err)), true);
-    }
-
+  static PrintStream makeStandardErrorStream()
+  {
+    return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.err)), true);
+  }
+ 
 }

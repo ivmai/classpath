@@ -92,6 +92,21 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
   }
 
   /**
+   * Returns a set view of the mappings in this Map.  Each element in the
+   * set must be an implementation of Map.Entry.  The set is backed by
+   * the map, so that changes in one show up in the other.  Modifications
+   * made while an iterator is in progress cause undefined behavior.  If
+   * the set supports removal, these methods must be valid:
+   * <code>Iterator.remove</code>, <code>Set.remove</code>,
+   * <code>removeAll</code>, <code>retainAll</code>, and <code>clear</code>.
+   * Element addition is not supported via this set.
+   *
+   * @return the entry set
+   * @see Map.Entry
+   */
+  public abstract Set entrySet();
+
+  /**
    * Remove all entries from this Map (optional operation). This default
    * implementation calls entrySet().clear(). NOTE: If the entry set does
    * not permit clearing, then this will fail, too. Subclasses often
@@ -153,8 +168,9 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * This implementation does a linear search, O(n), over the
    * <code>entrySet()</code>, returning <code>true</code> if a match
    * is found, <code>false</code> if the iteration ends. A match is
-   * defined as <code>(value == null ? v == null : value.equals(v))</code>
-   * Subclasses are unlikely to implement this more efficiently.
+   * defined as a value, v, where <code>(value == null ? v == null :
+   * value.equals(v))</code>.  Subclasses are unlikely to implement
+   * this more efficiently.
    *
    * @param value the value to search for
    * @return true if the map contains the value
@@ -169,21 +185,6 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
         return true;
     return false;
   }
-
-  /**
-   * Returns a set view of the mappings in this Map.  Each element in the
-   * set must be an implementation of Map.Entry.  The set is backed by
-   * the map, so that changes in one show up in the other.  Modifications
-   * made while an iterator is in progress cause undefined behavior.  If
-   * the set supports removal, these methods must be valid:
-   * <code>Iterator.remove</code>, <code>Set.remove</code>,
-   * <code>removeAll</code>, <code>retainAll</code>, and <code>clear</code>.
-   * Element addition is not supported via this set.
-   *
-   * @return the entry set
-   * @see Map.Entry
-   */
-  public abstract Set<Map.Entry<K, V>> entrySet();
 
   /**
    * Compares the specified object with this map for equality. Returns
@@ -277,33 +278,76 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
     if (keys == null)
       keys = new AbstractSet<K>()
       {
+	/**
+	 * Retrieves the number of keys in the backing map.
+	 *
+	 * @return The number of keys.
+	 */
         public int size()
         {
           return AbstractMap.this.size();
         }
 
+	/**
+	 * Returns true if the backing map contains the
+	 * supplied key.
+	 *
+	 * @param key The key to search for.
+	 * @return True if the key was found, false otherwise.
+ 	 */
         public boolean contains(Object key)
         {
           return containsKey(key);
         }
 
+	/**
+	 * Returns an iterator which iterates over the keys
+	 * in the backing map, using a wrapper around the
+	 * iterator returned by <code>entrySet()</code>.
+	 *
+	 * @return An iterator over the keys.
+	 */
         public Iterator<K> iterator()
         {
           return new Iterator()
           {
+	    /**
+	     * The iterator returned by <code>entrySet()</code>.
+	     */
             private final Iterator<Map.Entry<K, V>> map_iterator
 	      = entrySet().iterator();
 
+	    /**
+	     * Returns true if a call to <code>next()</code> will
+	     * return another key.
+	     *
+	     * @return True if the iterator has not yet reached
+	     *         the last key.
+	     */
             public boolean hasNext()
             {
               return map_iterator.hasNext();
             }
 
-            public K next()
+	    /**
+	     * Returns the key from the next entry retrieved
+	     * by the underlying <code>entrySet()</code> iterator.
+	     *
+	     * @return The next key.
+	     */ 
+           public K next()
             {
               return map_iterator.next().getKey();
             }
 
+	    /**
+	     * Removes the map entry which has a key equal
+	     * to that returned by the last call to
+	     * <code>next()</code>.
+	     *
+	     * @throws UnsupportedOperationException if the
+	     *         map doesn't support removal.
+	     */
             public void remove()
             {
               map_iterator.remove();
@@ -344,11 +388,13 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    *
    * @param m the mapping to load into this map
    * @throws UnsupportedOperationException if the operation is not supported
-   * @throws ClassCastException if a key or value is of the wrong type
+   *         by this map.
+   * @throws ClassCastException if a key or value is of the wrong type for
+   *         adding to this map.
    * @throws IllegalArgumentException if something about a key or value
-   *         prevents it from existing in this map
-   * @throws NullPointerException if the map forbids null keys or values, or
-   *         if <code>m</code> is null.
+   *         prevents it from existing in this map.
+   * @throws NullPointerException if the map forbids null keys or values.
+   * @throws NullPointerException if <code>m</code> is null.
    * @see #put(Object, Object)
    */
   public void putAll(Map<? extends K, ? extends V> m)
@@ -373,7 +419,9 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * implementations override it for efficiency.
    *
    * @param key the key to remove
-   * @return the value the key mapped to, or null if not present
+   * @return the value the key mapped to, or null if not present.
+   *         Null may also be returned if null values are allowed
+   *         in the map and the value of this mapping is null.
    * @throws UnsupportedOperationException if deletion is unsupported
    * @see Iterator#remove()
    */
@@ -462,33 +510,77 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
     if (values == null)
       values = new AbstractCollection<V>()
       {
-        public int size()
+ 	/**
+	 * Returns the number of values stored in
+	 * the backing map.
+	 *
+	 * @return The number of values.
+	 */
+       public int size()
         {
           return AbstractMap.this.size();
         }
 
+	/**
+	 * Returns true if the backing map contains
+	 * the supplied value.
+	 *
+	 * @param value The value to search for.
+	 * @return True if the value was found, false otherwise.
+	 */
         public boolean contains(Object value)
         {
           return containsValue(value);
         }
 
+	/**
+	 * Returns an iterator which iterates over the
+	 * values in the backing map, by using a wrapper
+	 * around the iterator returned by <code>entrySet()</code>.
+	 *
+	 * @return An iterator over the values.
+	 */
         public Iterator<V> iterator()
         {
           return new Iterator()
           {
+	    /**
+	     * The iterator returned by <code>entrySet()</code>.
+	     */
             private final Iterator<Map.Entry<K, V>> map_iterator
 	      = entrySet().iterator();
 
+ 	    /**
+ 	     * Returns true if a call to <code>next()</call> will
+ 	     * return another value.
+ 	     *
+ 	     * @return True if the iterator has not yet reached
+ 	     * the last value.
+ 	     */
             public boolean hasNext()
             {
               return map_iterator.hasNext();
             }
 
+ 	    /**
+ 	     * Returns the value from the next entry retrieved
+ 	     * by the underlying <code>entrySet()</code> iterator.
+ 	     *
+ 	     * @return The next value.
+ 	     */
             public V next()
             {
               return map_iterator.next().getValue();
             }
 
+ 	    /**
+ 	     * Removes the map entry which has a key equal
+ 	     * to that returned by the last call to
+ 	     * <code>next()</code>.
+ 	     *
+ 	     * @throws UnsupportedOperationException if the
+ 	     *         map doesn't support removal.
+ 	     */
             public void remove()
             {
               map_iterator.remove();
@@ -535,6 +627,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @author Eric Blake <ebb9@email.byu.edu>
    */
   // XXX - FIXME Use fully qualified implements as gcj 3.1 workaround.
+  //       Bug still exists in 3.4.1
   static class BasicMapEntry<K, V> implements Map.Entry<K, V>
   {
     /**
@@ -629,7 +722,13 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      *
      * @param newVal the new value to store
      * @return the old value
-     * @throws NullPointerException if the map forbids null values
+     * @throws NullPointerException if the map forbids null values.
+     * @throws UnsupportedOperationException if the map doesn't support
+     *          <code>put()</code>.
+     * @throws ClassCastException if the value is of a type unsupported
+     *         by the map.
+     * @throws IllegalArgumentException if something else about this
+     *         value prevents it being stored in the map.
      */
     public V setValue(V newVal)
     {

@@ -25,7 +25,7 @@ CLASSPATH_MODULE="-module -version-info ${LIBVERSION}"
 AC_SUBST(CLASSPATH_MODULE)
 
 AC_PREREQ(2.59)
-AM_INIT_AUTOMAKE(1.7.0)
+AM_INIT_AUTOMAKE([1.9.0 gnu std-options tar-ustar])
 AC_CONFIG_HEADERS([include/config.h])
 AC_PREFIX_DEFAULT(/usr/local/classpath)
 
@@ -68,9 +68,23 @@ AC_ARG_ENABLE([gtk-peer],
               [COMPILE_GTK_PEER=yes])
 AM_CONDITIONAL(CREATE_GTK_PEER_LIBRARIES, test "x${COMPILE_GTK_PEER}" = xyes)
 
+dnl -----------------------------------------------------------
 dnl GTK native peer error checking 
+dnl -----------------------------------------------------------
 AC_ARG_ENABLE([gtk-peers],,AC_MSG_ERROR([No --enable-gtk-peers (or --disable-gtk-peers) option; you want --enable-gtk-peer]))
 
+dnl ------------------------------------------------------------
+dnl determine whether to enable the cairo GTK Graphics2D backend
+dnl ------------------------------------------------------------
+AC_ARG_ENABLE([gtk-cairo],
+              [AS_HELP_STRING(--enable-gtk-cairo,build the cairo Graphics2D implementation on GTK [default=no])],
+              [case "${enableval}" in
+                yes) GTK_CAIRO=yes ;;
+                no) GTK_CAIRO=no ;;
+                *) GTK_CAIRO=yes ;;
+              esac],
+              [GTK_CAIRO=no])
+AM_CONDITIONAL(GTK_CAIRO, test "x${enable_gtk_cairo}" = xyes)
 
 dnl -----------------------------------------------------------
 dnl Regenerate headers at build time (disabled by default)
@@ -146,6 +160,15 @@ if test "x${COMPILE_JNI}" = xyes; then
      AC_SUBST(GTK_LIBS)
   fi
 
+  if test "x${enable_gtk_cairo}" = xyes
+  then
+    PKG_CHECK_MODULES(CAIRO, cairo)
+    PKG_CHECK_MODULES(PANGOFT2, pangoft2)
+  fi
+  AC_SUBST(CAIRO_LIBS)
+  AC_SUBST(CAIRO_CFLAGS)
+  AC_SUBST(PANGOFT2_LIBS)
+  AC_SUBST(PANGOFT2_CFLAGS)
 fi
 
 CLASSPATH_WITH_JAVAH
@@ -324,6 +347,9 @@ resource/gnu/regexp/Makefile
 resource/java/Makefile
 resource/java/util/Makefile
 resource/java/security/Makefile
+resource/org/Makefile
+resource/org/ietf/Makefile
+resource/org/ietf/jgss/Makefile
 lib/Makefile
 lib/gen-classlist.sh
 examples/Makefile])
