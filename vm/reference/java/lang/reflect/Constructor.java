@@ -259,4 +259,12 @@ public final class Constructor<T>
 				   int slot)
     throws InstantiationException, IllegalAccessException,
            InvocationTargetException;
+
+  /** FIXME
+   * @since 1.5
+   */
+  public TypeVariable<?>[] getTypeParameters()
+  {
+    return new TypeVariable<?>[0];
+  }
 }

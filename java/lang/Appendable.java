@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.io.IOException;
+
 /**
  * <p>
  * An <code>Appendable</code> object is one to which a sequence of Unicode
@@ -71,7 +73,7 @@ public interface Appendable
    * @return a reference to this object.
    * @throws IOException if an I/O error occurs.
    */
-  Appendable append(char c);
+  Appendable append(char c) throws IOException;
 
   /**
    * Appends the specified sequence of Unicode characters to this
@@ -86,7 +88,7 @@ public interface Appendable
    * @return a reference to this object.
    * @throws IOException if an I/O error occurs.
    */
-  Appendable append(CharSequence seq);
+  Appendable append(CharSequence seq) throws IOException;
 
   /**
    * Appends the specified subsequence of Unicode characters to this
@@ -111,6 +113,5 @@ public interface Appendable
    *         the start index occurs after the end index, or the end index is
    *         beyond the end of the sequence.
    */
-  Appendable append(CharSequence seq, int start, int end);
-
+  Appendable append(CharSequence seq, int start, int end) throws IOException;
 }

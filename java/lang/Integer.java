@@ -663,11 +663,11 @@ public final class Integer extends Number implements Comparable<Integer>
   public static int reverse(int val)
   {
     // Successively swap alternating bit groups.
-    x = ((x >> 1) & 0x55555555) + ((x << 1) & ~0x55555555);
-    x = ((x >> 2) & 0x33333333) + ((x << 2) & ~0x33333333);
-    x = ((x >> 4) & 0x0f0f0f0f) + ((x << 4) & ~0x0f0f0f0f);
-    x = ((x >> 8) & 0x00ff00ff) + ((x << 8) & ~0x00ff00ff);
-    return ((x >> 16) & 0x0000ffff) + ((x << 16) & ~0x0000ffff);
+    val = ((val >> 1) & 0x55555555) + ((val << 1) & ~0x55555555);
+    val = ((val >> 2) & 0x33333333) + ((val << 2) & ~0x33333333);
+    val = ((val >> 4) & 0x0f0f0f0f) + ((val << 4) & ~0x0f0f0f0f);
+    val = ((val >> 8) & 0x00ff00ff) + ((val << 8) & ~0x00ff00ff);
+    return ((val >> 16) & 0x0000ffff) + ((val << 16) & ~0x0000ffff);
   }
 
   /**

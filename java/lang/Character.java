@@ -2276,9 +2276,9 @@ public final class Character implements Serializable, Comparable<Character>
       return new Character(val);
     synchronized (charCache)
       {
-	if (charCache[val - MIN_CACHE] == null)
-	  charCache[val - MIN_CACHE] = new Character(val);
-	return charCache[val - MIN_CACHE];
+	if (charCache[val - MIN_VALUE] == null)
+	  charCache[val - MIN_VALUE] = new Character(val);
+	return charCache[val - MIN_VALUE];
       }
   }
 

@@ -214,9 +214,9 @@ public final class Byte extends Number implements Comparable<Byte>
   {
     synchronized (byteCache)
       {
-	if (byteCache[val - MIN_CACHE] == null)
-	  byteCache[val - MIN_CACHE] = new Byte(val);
-	return byteCache[val - MIN_CACHE];
+	if (byteCache[val - MIN_VALUE] == null)
+	  byteCache[val - MIN_VALUE] = new Byte(val);
+	return byteCache[val - MIN_VALUE];
       }
   }
 

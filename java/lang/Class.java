@@ -1263,7 +1263,7 @@ public final class Class<K> implements Serializable
    */
   public K cast(Object obj)
   {
-    return VMClassLoader.cast(obj, this);
+    return VMClass.cast(obj, this);
   }
 
   /**

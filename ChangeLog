@@ -1,3 +1,31 @@
+2004-11-01  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/AbstractMap.java: Removed old FIXME comment.
+
+	* java/lang/Long.java (rotateRight): Fixed return type.
+	* java/lang/Integer.java (reverse): Use correct name for
+	variable.
+	* java/lang/Character.java (valueOf): Use MIN_VALUE, not
+	MIN_CACHE.
+	* java/lang/Byte.java (valueOf): Use MIN_VALUE, not MIN_CACHE.
+
+	* gnu/java/util/DoubleEnumeration.java: Genericized.
+
+	* java/lang/Appendable.java (append): Throws IOException.
+
+	* java/util/Hashtable.java: Genericized.
+
+	* java/util/HashMap.java (putAll): Use correct type for iterator.
+	(putAllInternal): Likewise.
+	* java/lang/Class.java (cast): Call VMClass.cast.
+	* java/util/Collections.java (UnmodifiableMap.remove): Corrected
+	return type.
+	(entrySet): Likewise.
+	(entries): Corrected type.
+
+	* vm/reference/java/lang/reflect/Constructor.java
+	(getTypeParameters): Stubbed.
+
 2004-10-14  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/StringBuilder.java (append): Typo fix; indentation

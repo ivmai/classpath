@@ -380,7 +380,8 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    */
   public void putAll(Map<? extends K, ? extends V> m)
   {
-    Iterator<? extends K, ? extends V> itr = m.entrySet().iterator();
+    Iterator<Map.Entry<? extends K, ? extends V>> itr
+      = m.entrySet().iterator();
     while (itr.hasNext())
       {
         Map.Entry<? extends K, ? extends V> e = itr.next();
@@ -709,7 +710,8 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    */
   void putAllInternal(Map<? extends K, ? extends V> m)
   {
-    Iterator<? extends K, ? extends V> itr = m.entrySet().iterator();
+    Iterator<Map.Entry<? extends K, ? extends V>> itr
+      = m.entrySet().iterator();
     size = 0;
     while (itr.hasNext())
       {
@@ -815,7 +817,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    *
    * @author Jon Zeppieri
    */
-  private final class HashIterator implements Iterator
+  private final class HashIterator<T> implements Iterator<T>
   {
     /**
      * The type of this Iterator: {@link #KEYS}, {@link #VALUES},

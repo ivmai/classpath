@@ -566,7 +566,7 @@ public final class Long extends Number implements Comparable<Long>
    * @param distance the number of bits by which to rotate
    * @since 1.5
    */
-  public static int rotateRight(long x, int distance)
+  public static long rotateRight(long x, int distance)
   {
     // This trick works because the shift operators implicitly mask
     // the shift count.

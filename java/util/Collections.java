@@ -405,7 +405,7 @@ public class Collections
     /**
      * There are no entries.
      */
-    public Set<Entry<K, V>> entrySet()
+    public Set<Map.Entry<K, V>> entrySet()
     {
       return EMPTY_SET;
     }
@@ -1563,7 +1563,7 @@ public class Collections
     /**
      * Cache the entry set.
      */
-    private transient Set<BasicMapEntry<K, V>> entries;
+    private transient Set<AbstractMap.BasicMapEntry<K, V>> entries;
 
     /**
      * Construct a singleton.
@@ -1579,7 +1579,7 @@ public class Collections
     /**
      * There is a single immutable entry.
      */
-    public Set<BasicMapEntry<K, V>> entrySet()
+    public Set<AbstractMap.BasicMapEntry<K, V>> entrySet()
     {
       if (entries == null)
         entries = singleton(new AbstractMap.BasicMapEntry<K, V>(k, v)
@@ -2467,14 +2467,14 @@ public class Collections
       if (entries == null)
         synchronized (mutex)
           {
-            entries = new SynchronizedSet<K, V>(mutex, m.entrySet())
+            entries = new SynchronizedSet<Map.Entry<K, V>>(mutex, m.entrySet())
             {
               public Iterator<Map.Entry<K, V>> iterator()
               {
                 synchronized (super.mutex)
                   {
-                    return new SynchronizedIterator<K, V>(super.mutex,
-							  c.iterator())
+                    return new SynchronizedIterator<Map.Entry<K, V>>(super.mutex,
+								     c.iterator())
                     {
                       public Map.Entry<K, V> next()
                       {
@@ -3471,7 +3471,7 @@ public class Collections
       throw new UnsupportedOperationException();
     }
 
-    public Map.Entry<K, V> remove(Object o)
+    public V remove(Object o)
     {
       throw new UnsupportedOperationException();
     }
