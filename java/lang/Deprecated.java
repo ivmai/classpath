@@ -41,6 +41,13 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
+/**
+ * This annotation is used as a marker to indicate that the annotated
+ * declaration is deprecated and should not be used in new code.
+ * This replaces the old "@deprecated" javadoc tag.
+ *
+ * @since 1.5
+ */
 @Documented @Retention(SOURCE)
 public @interface Deprecated
 {

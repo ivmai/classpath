@@ -42,6 +42,14 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 import static java.lang.annotation.ElementType.METHOD;
 
+/**
+ * This annotation is used as a marker to indicate that the annotated
+ * method declaration is intended to override another method in the
+ * class hierarchy.  If this is not the case, the compiler will emit a
+ * warning.
+ *
+ * @since 1.5
+ */
 @Retention(SOURCE) @Target(METHOD)
 public @interface Override
 {
