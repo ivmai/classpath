@@ -1,5 +1,11 @@
 2004-08-07  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/ref/WeakReference.java: Now generic.
+	* java/lang/ref/SoftReference.java: Now generic.
+	* java/lang/ref/ReferenceQueue.java: Now generic.
+	* java/lang/ref/Reference.java: Now generic.
+	* java/lang/ref/PhantomReference.java: Now generic.
+
 	* java/lang/annotation/AnnotationFormatError.java: New file.
 	* java/lang/annotation/IncompleteAnnotationException.java: New
 	file.
