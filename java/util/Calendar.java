@@ -728,6 +728,7 @@ public abstract class Calendar
     isSet[WEEK_OF_MONTH] = false;
     isSet[DAY_OF_WEEK] = false;
     isSet[DAY_OF_WEEK_IN_MONTH] = false;
+    isSet[ERA] = false;
 
     if (! explicitDSTOffset)
       isSet[DST_OFFSET] = false; // May have crossed a DST boundary.
