@@ -91,7 +91,7 @@ import java.io.Serializable;
  * @author Jon Zeppieri
  * @author Warren Levy
  * @author Bryce McKinlay
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see HashMap
  * @see TreeMap
  * @see IdentityHashMap

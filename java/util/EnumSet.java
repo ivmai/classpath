@@ -61,17 +61,19 @@ public class EnumSet<T extends Enum<T>>
 
   public EnumSet<T> clone()
   {
-  	try
-  	  {
-  		EnumSet<T> r = (EnumSet<T>) super.clone();
-  		r.store = (BitSet) store.clone();
-  		return r;
-  	  }
-  	catch (CloneNotSupportedException _)
-  	  {
-  		// Can't happen.
-  		return null;
-  	  }
+    EnumSet<T> r;
+
+    try
+      {
+	r = (EnumSet<T>) super.clone();
+      }
+    catch (CloneNotSupportedException _)
+      {
+	/* Can't happen */
+	return null;
+      }
+    r.store = (BitSet) store.clone();
+    return r;
   }
 
   public int size()

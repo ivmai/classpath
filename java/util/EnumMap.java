@@ -385,7 +385,7 @@ public class EnumMap<K extends Enum<K>, V>
 
   public EnumMap<K, V> clone()
   {
-    /* We don't use super.clone() as enums don't support it */
+    /* This constructor provides this functionality */
     return new EnumMap(this);
   }
 
