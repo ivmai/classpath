@@ -1007,10 +1007,9 @@ public abstract class ClassLoader
 	  {
 	    File f = new File(tok.nextToken());
 	    File[] files = f.listFiles();
-	    for (int i = 0; i < files.length; i++)
-	      {
+	    if (files != null)
+	      for (int i = 0; i < files.length; i++)
 		list.add(files[i].toURL());
-	      }
 	  }
 	catch(Exception x)
 	  {
