@@ -921,7 +921,7 @@ class SubList<E> extends AbstractList<E>
  * @author Eric Blake <ebb9@email.byu.edu>
  */
 final class RandomAccessSubList<E> extends SubList<E>
-  implements RandomAccess<E>
+  implements RandomAccess
 {
   /**
    * Construct the sublist.

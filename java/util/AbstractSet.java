@@ -127,7 +127,8 @@ public abstract class AbstractSet<E>
     int count = c.size();
     if (oldsize < count)
       {
-	for (Iterator<E> i = iterator(), count = oldsize; count > 0; count--)
+	Iterator<E> i;
+	for (i = iterator(), count = oldsize; count > 0; count--)
 	  {
 	    if (c.contains(i.next()))
 	      i.remove();
@@ -135,7 +136,8 @@ public abstract class AbstractSet<E>
       }
     else
       {
-	for (Iterator<?> i = c.iterator(); count > 0; count--)
+	Iterator<?> i;
+	for (i = c.iterator(); count > 0; count--)
 	  remove(i.next());
       }
     return oldsize != size();
