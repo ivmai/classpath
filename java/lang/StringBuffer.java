@@ -72,7 +72,8 @@ import java.io.Serializable;
  * @since 1.0
  * @status updated to 1.4
  */
-public final class StringBuffer implements Serializable, CharSequence
+public final class StringBuffer
+  implements Serializable, CharSequence, Appendable
 {
   /**
    * Compatible with JDK 1.0+.
@@ -145,6 +146,25 @@ public final class StringBuffer implements Serializable, CharSequence
     count = str.count;
     value = new char[count + DEFAULT_CAPACITY];
     str.getChars(0, count, value, 0);
+  }
+
+  /**
+   * Create a new <code>StringBuffer</code> with the characters in the
+   * specified <code>CharSequence</code>. Initial capacity will be the
+   * length of the sequence plus 16; if the sequence reports a length
+   * less than or equal to 0, then the initial capacity will be 16.
+   *
+   * @param seq the initializing <code>CharSequence</code>
+   * @throws NullPointerException if str is null
+   * @since 1.5
+   */
+  public StringBuffer(CharSequence seq)
+  {
+    int len = seq.length();
+    count = len <= 0 ? 0 : len;
+    value = new char[count + DEFAULT_CAPACITY];
+    for (int i = 0; i < len; ++i)
+      value[i] = seq.charAt(i);
   }
 
   /**
@@ -403,6 +423,43 @@ public final class StringBuffer implements Serializable, CharSequence
   {
     ensureCapacity_unsynchronized(count + 1);
     value[count++] = ch;
+    return this;
+  }
+
+  /**
+   * Append the characters in the <code>CharSequence</code> to this
+   * buffer.
+   *
+   * @param seq the <code>CharSequence</code> providing the characters
+   * @return this <code>StringBuffer</code>
+   * @since 1.5
+   */
+  public synchronized StringBuffer append(CharSequence seq)
+  {
+    return append(seq, 0, seq.length());
+  }
+
+  /**
+   * Append some characters from the <code>CharSequence</code> to this
+   * buffer.  If the argument is null, the four characters "null" are
+   * appended.
+   *
+   * @param seq the <code>CharSequence</code> providing the characters
+   * @param start the starting index
+   * @param end one past the final index
+   * @return this <code>StringBuffer</code>
+   * @since 1.5
+   */
+  public synchronized StringBuffer append(CharSequence seq, int start, int end)
+  {
+    if (seq == null)
+      return append("null");
+    if (end - start > 0)
+      {
+	ensureCapacity_unsynchronized(count + end - start);
+	for (; start < end; ++start)
+	  value[count++] = seq.charAt(start);
+      }
     return this;
   }
 
