@@ -1,5 +1,11 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/Properties.java: Extend Hashtable<Object, Object>.
+	(save): Mark as @Deprecated.
+	* java/lang/System.java (clearProperty): New method.
+	(setProperty): Check for empty key.
+	(getProperty): Likewise.
+
 	* java/lang/SecurityManager.java (currentLoadedClass): Updated
 	return type.
 

@@ -557,6 +557,10 @@ public final class System
    */
   public static String getProperty(String key, String def)
   {
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.equals(""))
+      throw new IllegalArgumentException("empty key");
     SecurityManager sm = Runtime.securityManager; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
@@ -577,10 +581,37 @@ public final class System
    */
   public static String setProperty(String key, String value)
   {
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.equals(""))
+      throw new IllegalArgumentException("empty key");
     SecurityManager sm = Runtime.securityManager; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new PropertyPermission(key, "write"));
     return (String) properties.setProperty(key, value);
+  }
+
+  /**
+   * Remove a single system property by name. A security check may be
+   * performed, <code>checkPropertyAccess(key, "write")</code>.
+   *
+   * @param key the name of the system property to remove
+   * @return the previous value, or null
+   * @throws SecurityException if permission is denied
+   * @throws NullPointerException if key is null
+   * @throws IllegalArgumentException if key is ""
+   * @since 1.5
+   */
+  public static String clearProperty(String key)
+  {
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.equals(""))
+      throw new IllegalArgumentException("empty key");
+    SecurityManager sm = Runtime.securityManager; // Be thread-safe.
+    if (sm != null)
+      sm.checkPermission(new PropertyPermission(key, "write"));
+    return (String) properties.remove(key);
   }
 
   /**
