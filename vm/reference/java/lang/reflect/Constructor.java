@@ -1,5 +1,5 @@
 /* java.lang.reflect.Constructor - reflection of Java constructors
-   Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -73,10 +73,11 @@ import java.util.Arrays;
  * @since 1.1
  * @status updated to 1.4
  */
-public final class Constructor
-extends AccessibleObject implements Member
+public final class Constructor<T>
+  extends AccessibleObject
+  implements GenericDeclaration, Member
 {
-  private Class clazz;
+  private Class<T> clazz;
   private int slot;
   private Class[] parameterTypes;
   private Class[] exceptionTypes;
@@ -98,7 +99,7 @@ extends AccessibleObject implements Member
    * Gets the class that declared this constructor.
    * @return the class that declared this member
    */
-  public Class getDeclaringClass()
+  public Class<T> getDeclaringClass()
   {
     return clazz;
   }
@@ -129,7 +130,7 @@ extends AccessibleObject implements Member
    *
    * @return a list of the types of the constructor's parameters
    */
-  public Class[] getParameterTypes()
+  public Class<?>[] getParameterTypes()
   {
     if (parameterTypes == null)
       return new Class[0];
@@ -143,7 +144,7 @@ extends AccessibleObject implements Member
    *
    * @return a list of the types in the constructor's throws clause
    */
-  public Class[] getExceptionTypes()
+  public Class<?>[] getExceptionTypes()
   {
     if (exceptionTypes == null)
       return new Class[0];
@@ -247,15 +248,15 @@ extends AccessibleObject implements Member
    * @throws ExceptionInInitializerError if construction triggered class
    *         initialization, which then failed
    */
-  public Object newInstance(Object args[])
+  public T newInstance(Object args[])
     throws InstantiationException, IllegalAccessException,
            InvocationTargetException
   {
     return constructNative(args, clazz, slot);
   }
 
-  private native Object constructNative(Object[] args, Class declaringClass,
-                                        int slot)
+  private native T constructNative(Object[] args, Class declaringClass,
+				   int slot)
     throws InstantiationException, IllegalAccessException,
            InvocationTargetException;
 }

@@ -1,5 +1,24 @@
 2004-08-26  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/reflect/AnnotatedElement.java: New file.
+	* vm/reference/java/lang/reflect/Constructor.java (Constructor):
+	Now generic.  Implements GenericDeclaration.
+	(clazz): Now generic.
+	(getDeclaringClass): Likewise.
+	(getExceptionTypes): Likewise.
+	(getParameterTypes): Likewise.
+	(newInstance): Likewise.
+	(constructNative): Likewise.
+	* java/lang/reflect/GenericDeclaration.java: New file.
+	* java/lang/reflect/GenericSignatureFormatError.java: New file.
+	* java/lang/reflect/WildcardType.java: New file.
+	* java/lang/reflect/TypeVariable.java: New file.
+	* java/lang/reflect/ParameterizedType.java: New file.
+	* java/lang/MalformedParameterizedTypeException.java: New file.
+	* java/lang/TypeNotPresentException.java: New file.
+	* java/lang/reflect/GenericArrayType.java: New file.
+	* java/lang/reflect/Type.java: New file.
+
 	* java/io/Writer.java (Writer): Implements Closeable, Flushable,
 	Appendable.
 	(append): New methods.
