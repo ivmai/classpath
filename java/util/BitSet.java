@@ -1,5 +1,5 @@
 /* BitSet.java -- A vector of bits.
-   Copyright (C) 1998, 1999, 2000, 2001  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -734,5 +734,16 @@ public class BitSet implements Cloneable, Serializable
         System.arraycopy(bits, 0, nd, 0, bits.length);
         bits = nd;
       }
+  }
+
+  // This is used by EnumSet for efficiency.
+  final boolean containsAll(BitSet other)
+  {
+    for (int i = bs.bits.length - 1; i >= 0; i--)
+      {
+	if ((bits[i] & bs.bits[i]) != bs.bits[i])
+	  return false;
+      }
+    return true;
   }
 }
