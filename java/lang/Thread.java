@@ -1,5 +1,5 @@
 /* Thread -- an independent thread of executable code
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation
 
 This file is part of GNU Classpath.
@@ -80,6 +80,7 @@ import java.util.WeakHashMap;
  * @author Tom Tromey
  * @author John Keiser
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see Runnable
  * @see Runtime#exit(int)
  * @see #run()
@@ -433,6 +434,19 @@ public class Thread implements Runnable
   /**
    * Originally intended to destroy this thread, this method was never
    * implemented by Sun, and is hence a no-op.
+   *
+   * @deprecated This method was originally intended to simply destroy
+   *             the thread without performing any form of cleanup operation.
+   *             However, it was never implemented.  It is now deprecated
+   *             for the same reason as <code>suspend()</code>,
+   *             <code>stop()</code> and <code>resume()</code>; namely,
+   *             it is prone to deadlocks.  If a thread is destroyed while
+   *             it still maintains a lock on a resource, then this resource
+   *             will remain locked and any attempts by other threads to
+   *             access the resource will result in a deadlock.  Thus, even
+   *             an implemented version of this method would be still be
+   *             deprecated, due to its unsafe nature.
+   * @throws NoSuchMethodError as this method was never implemented.
    */
   public void destroy()
   {
@@ -1057,6 +1071,12 @@ public class Thread implements Runnable
 
   public enum State
   {
-    BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING
+    BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING;
+
+    /**
+     * For compatability with Sun's JDK
+     */
+    private static final long serialVersionUID = 605505746047245783L;
   }
+
 }

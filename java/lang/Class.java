@@ -48,6 +48,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.AllPermission;
@@ -90,7 +91,8 @@ import java.util.HashSet;
  * @since 1.0
  * @see ClassLoader
  */
-public final class Class<T> implements Serializable
+public final class Class<T> 
+  implements Serializable, Type
 {
   /**
    * Compatible with JDK 1.0+.

@@ -45,6 +45,12 @@ import java.io.Serializable;
 public abstract class Enum<T extends Enum<T>>
   implements Comparable<T>, Serializable
 {
+
+  /**
+   * For compatability with Sun's JDK
+   */
+  private static final long serialVersionUID = -4300926546619394005L;
+
   String name;
   int ordinal;
 
