@@ -1,5 +1,7 @@
 2004-11-03  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/Collection.java (iterator): Fixed return type.
+
 	* java/util/AbstractSet.java (removeAll): Fixed iterator
 	declaration.
 	* java/util/AbstractList.java (RandomAccessSubList): RandomAccess

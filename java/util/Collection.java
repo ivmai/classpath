@@ -200,7 +200,7 @@ public interface Collection<E> extends Iterable<E>
    *
    * @return an Iterator over the elements of this collection, in any order.
    */
-  Iterator iterator();
+  Iterator<E> iterator();
 
   /**
    * Remove a single occurrence of an object from this collection. That is,
