@@ -103,16 +103,6 @@ public final class StringBuilder
   char[] value;
 
   /**
-   * True if the buffer is shared with another object (StringBuilder or
-   * String); this means the buffer must be copied before writing to it again.
-   * Note that this has permissions set this way so that String can get the
-   * value.
-   *
-   * @serial whether the buffer is shared
-   */
-  boolean shared;
-
-  /**
    * The default capacity of a buffer.
    */
   private final static int DEFAULT_CAPACITY = 16;
@@ -211,19 +201,13 @@ public final class StringBuilder
    */
   public void ensureCapacity(int minimumCapacity)
   {
-    if (shared || minimumCapacity > value.length)
+    if (minimumCapacity > value.length)
       {
-        // We don't want to make a larger vector when `shared' is
-        // set.  If we do, then setLength becomes very inefficient
-        // when repeatedly reusing a StringBuilder in a loop.
-        int max = (minimumCapacity > value.length
-                   ? value.length * 2 + 2
-                   : value.length);
+        int max = value.length * 2 + 2;
         minimumCapacity = (minimumCapacity < max ? max : minimumCapacity);
         char[] nb = new char[minimumCapacity];
         System.arraycopy(value, 0, nb, 0, count);
         value = nb;
-        shared = false;
       }
   }
 
@@ -661,12 +645,7 @@ public final class StringBuilder
       throw new StringIndexOutOfBoundsException();
     if (len == 0)
       return "";
-    // Don't copy unless substring is smaller than 1/4 of the buffer.
-    boolean share_buffer = ((len << 2) >= value.length);
-    if (share_buffer)
-      this.shared = true;
-    // Package constructor avoids an array copy.
-    return new String(value, beginIndex, len, share_buffer);
+    return new String(value, beginIndex, len);
   }
 
   /**
@@ -951,7 +930,6 @@ public final class StringBuilder
    */
   public String toString()
   {
-    // The string will set this.shared = true.
     return new String(this);
   }
 

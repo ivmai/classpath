@@ -1,3 +1,11 @@
+2004-12-18  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/String.java (String(StringBuilder)): Rewrote.
+	* java/lang/StringBuilder.java (shared): Removed.
+	(ensureCapacity): Updated.
+	(substrinng): Likewise.
+	(toString): Likewise.
+
 2004-11-06  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/Void.java (TYPE): Added cast to initializer.

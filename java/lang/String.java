@@ -449,22 +449,7 @@ public final class String
    */
   public String(StringBuilder buffer)
   {
-    synchronized (buffer)
-      {
-        offset = 0;
-        count = buffer.count;
-        // Share unless buffer is 3/4 empty.
-        if ((count << 2) < buffer.value.length)
-          {
-            value = new char[count];
-            System.arraycopy(buffer.value, 0, value, 0, count);
-          }
-        else
-          {
-            buffer.shared = true;
-            value = buffer.value;
-          }
-      }
+    this(buffer.value, 0, buffer.count);
   }
 
   /**
