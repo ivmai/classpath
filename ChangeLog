@@ -1,3 +1,16 @@
+2005-02-06  Mark Wielaard  <mark@klomp.org>
+
+	Reported by Timo Lindfors <timo.lindfors@iki.fi>
+	java/util/regex/Matcher.java (lookingAt): Set position when match
+	found.
+	(matches): Implemented through lookingAt().
+
+2005-02-06  Mark Wielaard  <mark@klomp.org>
+
+	Fix suggested by Timo Lindfors <timo.lindfors@iki.fi>
+	* java/util/regex/Pattern.java (split(CharSequence,int)):
+	Fix while empties > 0 loops.
+
 2005-02-05  C. Brian Jones  <cbj@gnu.org>
 
 	* gnu/java/rmi/registry/: added back to classpath again, used by core library
@@ -178,7 +191,7 @@
 	javax/swing/DefaultCellRenderer.java:
 	Finally removed.
 
-2005-01-31  Andrew John HUghes  <gnu_andrew@member.fsf.org>
+2005-01-31  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* acinclude.m4:
 	(CLASSPATH_FIND_JAVAC): Add ECJ option.
