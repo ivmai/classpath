@@ -1,5 +1,7 @@
 2004-10-09  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/String.java: Implement Comparable<String>.
+
 	* java/util/Properties.java: Extend Hashtable<Object, Object>.
 	(save): Mark as @Deprecated.
 	* java/lang/System.java (clearProperty): New method.

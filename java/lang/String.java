@@ -75,7 +75,8 @@ import java.util.regex.Pattern;
  * @since 1.0
  * @status updated to 1.4; but could use better data sharing via offset field
  */
-public final class String implements Serializable, Comparable, CharSequence
+public final class String
+  implements Serializable, Comparable<String>, CharSequence
 {
   // WARNING: String is a CORE class in the bootstrap cycle. See the comments
   // in vm/reference/java/lang/Runtime for implications of this fact.
