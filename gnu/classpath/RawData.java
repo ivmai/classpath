@@ -1,5 +1,5 @@
 /* RawData.java -- Pointer to VM specific data
-   Copyright (C) 1999, 2000  Free Software Foundation
+   Copyright (C) 1999, 2000, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -42,7 +42,6 @@ package gnu.classpath;
 /** A type used to indicate special data used by native code that should not 
     be marked by the garbage collector. */
 
-public final class RawData
+public abstract class RawData
 {
-   private RawData() { }
 }

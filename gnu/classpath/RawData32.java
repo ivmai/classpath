@@ -1,5 +1,5 @@
-/* gnu_java_nio_NIOServerSocket.c - Native methods for NIOServerSocket class
-   Copyright (C) 2003 Free Software Foundation, Inc.
+/* RawData32.java -- 32 bit Pointer
+   Copyright (C) 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
- 
+
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -35,21 +35,18 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-#include <config.h>
-#include <errno.h>
+package gnu.classpath;
 
-#include <jni.h>
-#include <jcl.h>
-
-#include "gnu_java_nio_NIOServerSocket.h"
-
-#define IO_EXCEPTION "java/io/IOException"
-
-JNIEXPORT jobject JNICALL
-Java_gnu_java_nio_NIOServerSocket_getPlainSocketImpl (JNIEnv *env,
-						      jclass class
-						 __attribute__ ((__unused__)))
+/**
+ * A type used to indicate special data used by native code that should not 
+ * be marked by the garbage collector.
+ */
+public final class RawData32 extends RawData
 {
-  JCL_ThrowException (env, IO_EXCEPTION, "gnu.java.nio.NIOServerSocket.getPlainSocketImpl(): not implemented");
-  return NULL;
+   final int data;
+   
+   public RawData32(int data)
+   {
+     this.data = data;
+   }
 }

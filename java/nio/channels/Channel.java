@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package java.nio.channels;
 
 import java.io.IOException;
@@ -44,6 +45,9 @@ public interface Channel extends Closeable
 {
   /**
    * Tells whether this channel is open or not
+   *
+   * @return <code>true</code>if channel is open,
+   * </code>false</code> otherwise
    */
   boolean isOpen();
 

@@ -128,8 +128,8 @@ public class Raster
 						  int w, int h, int bands,
 						  Point location)
   {
-    // FIXME: Implement;
-    throw new UnsupportedOperationException("not implemented yet");
+    SampleModel sm = new BandedSampleModel(dataType, w, h, bands);
+    return createWritableRaster(sm, location);
   }
 
   public static WritableRaster createBandedRaster(int dataType,
@@ -139,8 +139,9 @@ public class Raster
 						  int[] bandOffsets,
 						  Point location)
   {
-    // FIXME: Implement;
-    throw new UnsupportedOperationException("not implemented yet");
+    SampleModel sm = new BandedSampleModel(dataType, w, h, scanlineStride,
+					   bankIndices, bandOffsets);
+    return createWritableRaster(sm, location);
   }
   
   public static WritableRaster createPackedRaster(int dataType,
@@ -204,8 +205,10 @@ public class Raster
 				    int[] bandOffsets,
 				    Point location)
   {
-    // FIXME: Implement;
-    throw new UnsupportedOperationException("not implemented yet");
+    SampleModel sm = new BandedSampleModel(dataBuffer.getDataType(),
+					   w, h, scanlineStride,
+					   bankIndices, bandOffsets);
+    return createWritableRaster(sm, dataBuffer, location);
   }
   
   public static WritableRaster
@@ -213,12 +216,26 @@ public class Raster
 		     int w, int h,
 		     int scanlineStride,
 		     int[] bandMasks,
-		     Point location) {
+		     Point location)
+ {
     SampleModel sm =
       new SinglePixelPackedSampleModel(dataBuffer.getDataType(),
 				       w, h,
 				       scanlineStride,
 				       bandMasks);
+    return createWritableRaster(sm, dataBuffer, location);
+  }
+  
+  public static WritableRaster
+  createPackedRaster(DataBuffer dataBuffer,
+		     int w, int h,
+		     int bitsPerPixel,
+		     Point location)
+  {
+    SampleModel sm =
+      new MultiPixelPackedSampleModel(dataBuffer.getDataType(),
+				       w, h,
+				       bitsPerPixel);
     return createWritableRaster(sm, dataBuffer, location);
   }
     

@@ -94,7 +94,8 @@ final class DeleteFileHelper extends Thread
       }
   }
 
-  private DeleteFileHelper()
+  // Package-private to avoid a trampoline constructor.
+  DeleteFileHelper()
   {
   }
   

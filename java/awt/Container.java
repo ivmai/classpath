@@ -148,7 +148,7 @@ public class Container extends Component
   /**
    * Returns the component at the specified index.
    *
-   * @param index The index of the component to retrieve.
+   * @param n The index of the component to retrieve.
    *
    * @return The requested component.
    *
@@ -232,7 +232,7 @@ public class Container extends Component
    * Adds the specified component to this container at the end of the
    * component list.
    *
-   * @param component The component to add to the container.
+   * @param comp The component to add to the container.
    *
    * @return The same component that was added.
    */
@@ -248,7 +248,7 @@ public class Container extends Component
    * <code>add(Component, Object)</code>.
    *
    * @param name The name of the component to be added.
-   * @param component The component to be added.
+   * @param comp The component to be added.
    *
    * @return The same component that was added.
    *
@@ -264,7 +264,7 @@ public class Container extends Component
    * Adds the specified component to this container at the specified index
    * in the component list.
    *
-   * @param component The component to be added.
+   * @param comp The component to be added.
    * @param index The index in the component list to insert this child
    * at, or -1 to add at the end of the list.
    *
@@ -283,7 +283,7 @@ public class Container extends Component
    * component list.  The layout manager will use the specified constraints
    * when laying out this component.
    *
-   * @param component The component to be added to this container.
+   * @param comp The component to be added to this container.
    * @param constraints The layout constraints for this component.
    */
   public void add(Component comp, Object constraints)
@@ -296,7 +296,7 @@ public class Container extends Component
    * in the component list.  The layout manager will use the specified
    * constraints when layout out this component.
    *
-   * @param component The component to be added.
+   * @param comp The component to be added.
    * @param constraints The layout constraints for this component.
    * @param index The index in the component list to insert this child
    * at, or -1 to add at the end of the list.
@@ -315,7 +315,7 @@ public class Container extends Component
    * method.  Any subclass doing this must call the superclass version of
    * this method in order to ensure proper functioning of the container.
    *
-   * @param component The component to be added.
+   * @param comp The component to be added.
    * @param constraints The layout constraints for this component, or
    * <code>null</code> if there are no constraints.
    * @param index The index in the component list to insert this child
@@ -707,7 +707,7 @@ public class Container extends Component
    * a superclass method so that lightweight components are properly
    * drawn.
    *
-   * @param graphics The graphics context for this paint job.
+   * @param g The graphics context for this paint job.
    */
   public void paint(Graphics g)
   {
@@ -727,7 +727,7 @@ public class Container extends Component
    * a superclass method so that lightweight components are properly
    * drawn.
    *
-   * @param graphics The graphics context for this update.
+   * @param g The graphics context for this update.
    */
   public void update(Graphics g)
   {
@@ -741,7 +741,7 @@ public class Container extends Component
    * a superclass method so that lightweight components are properly
    * drawn.
    *
-   * @param graphics The graphics context for this print job.
+   * @param g The graphics context for this print job.
    */
   public void print(Graphics g)
   {
@@ -752,7 +752,7 @@ public class Container extends Component
   /**
    * Paints all of the components in this container.
    *
-   * @param graphics The graphics context for this paint job.
+   * @param g The graphics context for this paint job.
    */
   public void paintComponents(Graphics g)
   {
@@ -763,7 +763,7 @@ public class Container extends Component
   /**
    * Prints all of the components in this container.
    *
-   * @param graphics The graphics context for this print job.
+   * @param g The graphics context for this print job.
    */
   public void printComponents(Graphics g)
   {
@@ -777,9 +777,9 @@ public class Container extends Component
    *
    * @param listener The listener to add.
    */
-  public synchronized void addContainerListener(ContainerListener l)
+  public synchronized void addContainerListener(ContainerListener listener)
   {
-    containerListener = AWTEventMulticaster.add(containerListener, l);
+    containerListener = AWTEventMulticaster.add(containerListener, listener);
   }
 
   /**
@@ -788,9 +788,9 @@ public class Container extends Component
    *
    * @param listener The listener to remove.
    */
-  public synchronized void removeContainerListener(ContainerListener l)
+  public synchronized void removeContainerListener(ContainerListener listener)
   {
-    containerListener = AWTEventMulticaster.remove(containerListener, l);
+    containerListener = AWTEventMulticaster.remove(containerListener, listener);
   }
 
   /**
@@ -826,7 +826,7 @@ public class Container extends Component
    * <code>ContainerEvent</code>, otherwise it calls the superclass
    * method.
    *
-   * @param event The event to be processed.
+   * @param e The event to be processed.
    */
   protected void processEvent(AWTEvent e)
   {
@@ -840,7 +840,7 @@ public class Container extends Component
    * Called when a container event occurs if container events are enabled.
    * This method calls any registered listeners.
    *
-   * @param event The event that occurred.
+   * @param e The event that occurred.
    */
   protected void processContainerEvent(ContainerEvent e)
   {
@@ -861,7 +861,7 @@ public class Container extends Component
   /**
    * AWT 1.0 event processor.
    *
-   * @param event The event that occurred.
+   * @param e The event that occurred.
    *
    * @deprecated use {@link #dispatchEvent(AWTEvent)} instead
    */
@@ -906,7 +906,8 @@ public class Container extends Component
    * unless the point does not exist within this container, in which
    * case <code>null</code> is returned.
    *
-   * @param point The point to return the component at.
+   * @param x The x position of the point to return the component at.
+   * @param y The y position of the point to return the component at.
    *
    * @return The component containing the specified point, or <code>null</code>
    * if there is no such point.
@@ -942,7 +943,7 @@ public class Container extends Component
    * unless the point does not exist within this container, in which
    * case <code>null</code> is returned.
    *
-   * @param point The point to return the component at.
+   * @param p The point to return the component at.
    * @return The component containing the specified point, or <code>null</code>
    * if there is no such point.
    */
@@ -1018,7 +1019,7 @@ public class Container extends Component
    * Tests whether or not the specified component is contained within
    * this components subtree.
    *
-   * @param component The component to test.
+   * @param comp The component to test.
    *
    * @return <code>true</code> if this container is an ancestor of the
    * specified component, <code>false</code> otherwise.
@@ -1057,7 +1058,7 @@ public class Container extends Component
    * Writes a listing of this container to the specified stream starting
    * at the specified indentation point.
    *
-   * @param stream The <code>PrintStream</code> to write to.
+   * @param out The <code>PrintStream</code> to write to.
    * @param indent The indentation point.
    */
   public void list(PrintStream out, int indent)
@@ -1074,7 +1075,7 @@ public class Container extends Component
    * Writes a listing of this container to the specified stream starting
    * at the specified indentation point.
    *
-   * @param stream The <code>PrintWriter</code> to write to.
+   * @param out The <code>PrintWriter</code> to write to.
    * @param indent The indentation point.
    */
   public void list(PrintWriter out, int indent)

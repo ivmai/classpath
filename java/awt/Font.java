@@ -161,6 +161,26 @@ public static final int HANGING_BASELINE = 2;
    */
   public static final int LAYOUT_NO_LIMIT_CONTEXT = 4;
 
+  /**
+   * The logical name of this font.
+   *
+   * @since 1.0
+   */
+  protected String name;
+
+  /**
+   * The size of this font in pixels.
+   *
+   * @since 1.0
+   */
+  protected int size;
+
+  /**
+   * The style of this font -- PLAIN, BOLD, ITALIC or BOLD+ITALIC.
+   *
+   * @since 1.0
+   */
+  protected int style;
 
 // Serialization constant
 private static final long serialVersionUID = -4206021311591459213L;
@@ -266,7 +286,7 @@ private static final long serialVersionUID = -4206021311591459213L;
   * Returns a <code>Font</code> object from the passed property name.
   *
   * @param propname The name of the system property.
-  * @param default Value to use if the property is not found.
+  * @param defval Value to use if the property is not found.
   *
   * @return The requested font, or <code>default</code> if the property 
   * not exist or is malformed.
@@ -617,7 +637,7 @@ private static final long serialVersionUID = -4206021311591459213L;
   * GlyphVector} with a mapped glyph for each input glyph code. 
   *
   * @param ctx The rendering context used for precise glyph placement.
-  * @param chars Array of characters to convert to glyphs.
+  * @param glyphCodes Array of characters to convert to glyphs.
   *
   * @return A new {@link GlyphVector} containing glyphs mapped from str,
   * through the font's cmap table.

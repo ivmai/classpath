@@ -1,3 +1,4 @@
+/* -*-java-*- */
 /* gnu.classpath.Configuration
    Copyright (C) 1998, 2001, 2003 Free Software Foundation, Inc.
 
@@ -56,7 +57,7 @@ public interface Configuration
    * It is set according to the value of 'version' in the configure[.in] file
    * and used to set the System property gnu.classpath.version.
    */
-  String CLASSPATH_VERSION = "0.11+cvs";
+  String CLASSPATH_VERSION = "0.12+cvs";
 
   /**
    * The value of DEBUG is substituted according to whether the
@@ -110,4 +111,16 @@ public interface Configuration
    * Name of default AWT peer library.
    */
   String default_awt_peer_toolkit = "gnu.java.awt.peer.gtk.GtkToolkit";
+
+  /**
+   * Whether to automatically run the init* methods in java.lang.System
+   * (the default) at class initialization time or whether to have the VM
+   * explicitly invoke them.
+   *
+   * The default is false, meaning the VM does not explicitly run the
+   * initializers. 
+   * 
+   */
+  boolean JAVA_LANG_SYSTEM_EXPLICIT_INITIALIZATION = 
+	  false;
 }

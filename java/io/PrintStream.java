@@ -89,6 +89,11 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   private class ForwardStream extends OutputStream
   {
+    // This is package-private to avoid a trampoline constructor.
+    ForwardStream ()
+    {
+    }
+
     public void close () throws IOException
     {
       out.close ();
@@ -263,7 +268,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * values are printed as "true" and <code>false</code> values are printed
    * as "false".
    *
-   * @param b The <code>boolean</code> value to print
+   * @param bool The <code>boolean</code> value to print
    */
   public void print (boolean bool)
   {
@@ -357,7 +362,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * This method prints an array of characters to the stream.  The actual
    * value printed depends on the system default encoding.
    *
-   * @param s The array of characters to print.
+   * @param charArray The array of characters to print.
    */
   public void print (char[] charArray)
   {
@@ -381,7 +386,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * <p>
    * This method prints a line termination sequence after printing the value.
    *
-   * @param b The <code>boolean</code> value to print
+   * @param bool The <code>boolean</code> value to print
    */
   public void println (boolean bool)
   {
@@ -486,7 +491,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * <p>
    * This method prints a line termination sequence after printing the value.
    *
-   * @param s The array of characters to print.
+   * @param charArray The array of characters to print.
    */
   public void println (char[] charArray)
   {
@@ -498,7 +503,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * enabled, printing a newline character will cause the stream to be
    * flushed after the character is written.
    * 
-   * @param b The byte to be written
+   * @param oneByte The byte to be written
    */
   public void write (int oneByte)
   {

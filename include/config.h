@@ -187,13 +187,13 @@
 #define PACKAGE_NAME "GNU Classpath"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Classpath 0.11+cvs"
+#define PACKAGE_STRING "GNU Classpath 0.12+cvs"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "classpath"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.11+cvs"
+#define PACKAGE_VERSION "0.12+cvs"
 
 /* Define if you want to synchronize VM threads portably by default; undef
    otherwise */
@@ -215,7 +215,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "0.11+cvs"
+#define VERSION "0.12+cvs"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
