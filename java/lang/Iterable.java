@@ -1,5 +1,5 @@
-/* Enumeration.java -- Interface for enumerating lists of objects
-   Copyright (C) 1998, 1999, 2001, 2004 Free Software Foundation, Inc.
+/* Iterable.java -- Notes collection over which one may iterate
+   Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,47 +35,12 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.util;
 
-/* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
- * "The Java Language Specification", ISBN 0-201-63451-1.
- * Status:  Believed complete and correct
- */
+package java.lang;
 
-/**
- * Interface for lists of objects that can be returned in sequence. Successive
- * objects are obtained by the nextElement method.
- * <p>
- * As of Java 1.2, the Iterator interface provides the same functionality, but
- * with shorter method names and a new optional method to remove items from the
- * list. If writing for 1.2, consider using Iterator instead. Enumerations over
- * the new collections classes, for use with legacy APIs that require them, can
- * be obtained by the enumeration method in class Collections.
- *
- * @author Warren Levy <warrenl@cygnus.com>
- * @author Eric Blake <ebb9@email.byu.edu>
- * @see Iterator
- * @see Hashtable
- * @see Vector
- * @since 1.0
- * @status updated to 1.4
- */
-public interface Enumeration<E>
+import java.util.Iterator;
+
+public interface Iterable<E>
 {
-  /**
-   * Tests whether there are elements remaining in the enumeration.
-   *
-   * @return true if there is at least one more element in the enumeration,
-   *         that is, if the next call to nextElement will not throw a
-   *         NoSuchElementException.
-   */
-  boolean hasMoreElements();
-
-  /**
-   * Obtain the next element in the enumeration.
-   *
-   * @return the next element in the enumeration
-   * @throws NoSuchElementException if there are no more elements
-   */
-  E nextElement();
+  Iterator<E> iterator ();
 }

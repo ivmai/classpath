@@ -1,5 +1,5 @@
 /* AbstractSet.java -- Abstract implementation of most of Set
-   Copyright (C) 1998, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -58,7 +58,9 @@ package java.util;
  * @since 1.2
  * @status updated to 1.4
  */
-public abstract class AbstractSet extends AbstractCollection implements Set
+public abstract class AbstractSet<E>
+  extends AbstractCollection<E>
+  implements Set<E>
 {
   /**
    * The main constructor, for use by subclasses.
@@ -79,9 +81,9 @@ public abstract class AbstractSet extends AbstractCollection implements Set
    */
   public boolean equals(Object o)
   {
-    return (o == this ||
-            (o instanceof Set && ((Set) o).size() == size()
-             && containsAll((Collection) o)));
+    return (o == this
+	    || (o instanceof Set && ((Set) o).size() == size()
+		&& containsAll((Collection) o)));
   }
 
   /**
@@ -94,7 +96,7 @@ public abstract class AbstractSet extends AbstractCollection implements Set
    */
   public int hashCode()
   {
-    Iterator itr = iterator();
+    Iterator<E> itr = iterator();
     int hash = 0;
     int pos = size();
     while (--pos >= 0)
@@ -119,11 +121,11 @@ public abstract class AbstractSet extends AbstractCollection implements Set
    * @see Collection#contains(Object)
    * @see Iterator#remove()
    */
-  public boolean removeAll(Collection c)
+  public boolean removeAll(Collection<?> c)
   {
     int oldsize = size();
     int count = c.size();
-    Iterator i;
+    Iterator<E> i;
     if (oldsize < count)
       {
 	for (i = iterator(), count = oldsize; count > 0; count--)

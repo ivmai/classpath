@@ -1,5 +1,5 @@
 /* Arrays.java -- Utility class with methods to operate on arrays
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -361,7 +361,8 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  public static int binarySearch(Object[] a, Object key, Comparator c)
+  // FIXME why "super"?
+  <T> public static int binarySearch(T[] a, T key, Comparator<? super T> c)
   {
     int low = 0;
     int hi = a.length - 1;
@@ -2148,7 +2149,7 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  public static void sort(Object[] a, Comparator c)
+  public static void sort(T[] a, Comparator<? super T> c)
   {
     sort(a, 0, a.length, c);
   }
@@ -2198,7 +2199,8 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  public static void sort(Object[] a, int fromIndex, int toIndex, Comparator c)
+  public static void sort(T[] a, int fromIndex, int toIndex,
+			  Comparator<? super T> c)
   {
     if (fromIndex > toIndex)
       throw new IllegalArgumentException("fromIndex " + fromIndex
@@ -2330,7 +2332,7 @@ public class Arrays
    * @see RandomAccess
    * @see Arrays.ArrayList
    */
-  public static List asList(final Object[] a)
+  <T> public static List<T> asList(final Object[] a) // fixme `T...'
   {
     return new Arrays.ArrayList(a);
   }

@@ -78,8 +78,8 @@ import java.lang.reflect.Array;
  * @since 1.0
  * @status updated to 1.4
  */
-public class Vector extends AbstractList
-  implements List, RandomAccess, Cloneable, Serializable
+public class Vector<T> extends AbstractList<T>
+  implements List<T>, RandomAccess, Cloneable, Serializable
 {
   /**
    * Compatible with JDK 1.0+.
@@ -91,7 +91,7 @@ public class Vector extends AbstractList
    * in positions 0 through elementCount - 1, and all remaining slots are null.
    * @serial the elements
    */
-  protected Object[] elementData;
+  protected T[] elementData;
 
   /**
    * The number of elements currently in the vector, also returned by
@@ -126,10 +126,10 @@ public class Vector extends AbstractList
    * @throws NullPointerException if c is null
    * @since 1.2
    */
-  public Vector(Collection c)
+  public Vector(Collection<? extends T> c)
   {
     elementCount = c.size();
-    elementData = c.toArray(new Object[elementCount]);
+    elementData = c.toArray(new T[elementCount]);
   }
 
   /**
@@ -145,7 +145,7 @@ public class Vector extends AbstractList
   {
     if (initialCapacity < 0)
       throw new IllegalArgumentException();
-    elementData = new Object[initialCapacity];
+    elementData = new T[initialCapacity];
     this.capacityIncrement = capacityIncrement;
   }
 
@@ -188,7 +188,7 @@ public class Vector extends AbstractList
     // vector since that is a much less likely case; it's more efficient to
     // not do the check and lose a bit of performance in that infrequent case
 
-    Object[] newArray = new Object[elementCount];
+    T[] newArray = new T[elementCount];
     System.arraycopy(elementData, 0, newArray, 0, elementCount);
     elementData = newArray;
   }
@@ -214,7 +214,7 @@ public class Vector extends AbstractList
     else
       newCapacity = elementData.length + capacityIncrement;
 
-    Object[] newArray = new Object[Math.max(newCapacity, minCapacity)];
+    T[] newArray = new T[Math.max(newCapacity, minCapacity)];
 
     System.arraycopy(elementData, 0, newArray, 0, elementCount);
     elementData = newArray;
@@ -280,9 +280,9 @@ public class Vector extends AbstractList
    * @see #iterator()
    */
   // No need to synchronize as the Enumeration is not thread-safe!
-  public Enumeration elements()
+  public Enumeration<T> elements()
   {
-    return new Enumeration()
+    return new Enumeration<T>()
     {
       private int i = 0;
 
@@ -291,7 +291,7 @@ public class Vector extends AbstractList
         return i < elementCount;
       }
 
-      public Object nextElement()
+      public T nextElement()
       {
         if (i >= elementCount)
           throw new NoSuchElementException();
@@ -381,7 +381,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt;= size()
    * @see #get(int)
    */
-  public synchronized Object elementAt(int index)
+  public synchronized T elementAt(int index)
   {
     checkBoundExclusive(index);
     return elementData[index];
@@ -393,7 +393,7 @@ public class Vector extends AbstractList
    * @return the first Object in the Vector
    * @throws NoSuchElementException the Vector is empty
    */
-  public synchronized Object firstElement()
+  public synchronized T firstElement()
   {
     if (elementCount == 0)
       throw new NoSuchElementException();
@@ -407,7 +407,7 @@ public class Vector extends AbstractList
    * @return the last Object in the Vector
    * @throws NoSuchElementException the Vector is empty
    */
-  public synchronized Object lastElement()
+  public synchronized T lastElement()
   {
     if (elementCount == 0)
       throw new NoSuchElementException();
@@ -423,7 +423,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException the index is out of range
    * @see #set(int, Object)
    */
-  public void setElementAt(Object obj, int index)
+  public void setElementAt(T obj, int index)
   {
     set(index, obj);
   }
@@ -450,7 +450,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt; size()
    * @see #add(int, Object)
    */
-  public synchronized void insertElementAt(Object obj, int index)
+  public synchronized void insertElementAt(T obj, int index)
   {
     checkBoundInclusive(index);
     if (elementCount == elementData.length)
@@ -468,7 +468,7 @@ public class Vector extends AbstractList
    *
    * @param obj the object to add to the Vector
    */
-  public synchronized void addElement(Object obj)
+  public synchronized void addElement(T obj)
   {
     if (elementCount == elementData.length)
       ensureCapacity(elementCount + 1);
@@ -566,11 +566,11 @@ public class Vector extends AbstractList
    * @throws NullPointerException if <code>a</code> is null
    * @since 1.2
    */
-  public synchronized Object[] toArray(Object[] a)
+  <S> public synchronized S[] toArray(S[] a)
   {
     if (a.length < elementCount)
-      a = (Object[]) Array.newInstance(a.getClass().getComponentType(),
-                                       elementCount);
+      a = (S[]) Array.newInstance(a.getClass().getComponentType(),
+				  elementCount);
     else if (a.length > elementCount)
       a[elementCount] = null;
     System.arraycopy(elementData, 0, a, 0, elementCount);
@@ -585,7 +585,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt;= size()
    * @since 1.2
    */
-  public Object get(int index)
+  public T get(int index)
   {
     return elementAt(index);
   }
@@ -600,10 +600,10 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt;= size()
    * @since 1.2
    */
-  public synchronized Object set(int index, Object element)
+  public synchronized T set(int index, T element)
   {
     checkBoundExclusive(index);
-    Object temp = elementData[index];
+    T temp = elementData[index];
     elementData[index] = element;
     return temp;
   }
@@ -615,7 +615,7 @@ public class Vector extends AbstractList
    * @return true, as specified by List
    * @since 1.2
    */
-  public boolean add(Object o)
+  public boolean add(T o)
   {
     addElement(o);
     return true;
@@ -643,7 +643,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt; size()
    * @since 1.2
    */
-  public void add(int index, Object element)
+  public void add(int index, T element)
   {
     insertElementAt(element, index);
   }
@@ -656,10 +656,10 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt;= size()
    * @since 1.2
    */
-  public synchronized Object remove(int index)
+  public synchronized T remove(int index)
   {
     checkBoundExclusive(index);
-    Object temp = elementData[index];
+    T temp = elementData[index];
     modCount++;
     elementCount--;
     if (index < elementCount)
@@ -685,7 +685,7 @@ public class Vector extends AbstractList
    * @throws NullPointerException if c is null
    * @since 1.2
    */
-  public synchronized boolean containsAll(Collection c)
+  public synchronized boolean containsAll(Collection<?> c)
   {
     // Here just for the sychronization.
     return super.containsAll(c);
@@ -701,7 +701,7 @@ public class Vector extends AbstractList
    * @throws NullPointerException if c is null
    * @since 1.2
    */
-  public synchronized boolean addAll(Collection c)
+  public synchronized boolean addAll(Collection<? extends T> c)
   {
     return addAll(elementCount, c);
   }
@@ -714,7 +714,7 @@ public class Vector extends AbstractList
    * @throws NullPointerException if c is null
    * @since 1.2
    */
-  public synchronized boolean removeAll(Collection c)
+  public synchronized boolean removeAll(Collection<?> c)
   {
     if (c == null)
       throw new NullPointerException();
@@ -743,7 +743,7 @@ public class Vector extends AbstractList
    * @throws NullPointerException if c is null
    * @since 1.2
    */
-  public synchronized boolean retainAll(Collection c)
+  public synchronized boolean retainAll(Collection<?> c)
   {
     if (c == null)
       throw new NullPointerException();
@@ -775,7 +775,7 @@ public class Vector extends AbstractList
    * @throws ArrayIndexOutOfBoundsException index &lt; 0 || index &gt; size()
    * @since 1.2
    */
-  public synchronized boolean addAll(int index, Collection c)
+  public synchronized boolean addAll(int index, Collection<? extends T> c)
   {
     checkBoundInclusive(index);
     Iterator itr = c.iterator();
@@ -849,12 +849,12 @@ public class Vector extends AbstractList
    * @see ConcurrentModificationException
    * @since 1.2
    */
-  public synchronized List subList(int fromIndex, int toIndex)
+  public synchronized List<T> subList(int fromIndex, int toIndex)
   {
-    List sub = super.subList(fromIndex, toIndex);
+    List<T> sub = super.subList(fromIndex, toIndex);
     // We must specify the correct object to synchronize upon, hence the
     // use of a non-public API
-    return new Collections.SynchronizedList(this, sub);
+    return new Collections.SynchronizedList<T>(this, sub);
   }
 
   /**

@@ -1,5 +1,5 @@
 /* Collection.java -- Interface that represents a collection of objects
-   Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -83,7 +83,7 @@ package java.util;
  * @since 1.2
  * @status updated to 1.4
  */
-public interface Collection
+public interface Collection<E> extends Iterable<E>
 {
   /**
    * Add an element to this collection.
@@ -99,7 +99,7 @@ public interface Collection
    * @throws IllegalArgumentException if o cannot be added to this
    *   collection for some other reason.
    */
-  boolean add(Object o);
+  boolean add(E o);
 
   /**
    * Add the contents of a given collection to this collection.
@@ -116,7 +116,7 @@ public interface Collection
    * @throws IllegalArgumentException if some element of c cannot be added
    *   to this collection for some other reason.
    */
-  boolean addAll(Collection c);
+  boolean addAll(Collection<? extends E> c);
 
   /**
    * Clear the collection, such that a subsequent call to isEmpty() would
@@ -232,7 +232,7 @@ public interface Collection
    *   collection does not support removing null values.
    * @throws NullPointerException if c itself is null.
    */
-  boolean removeAll(Collection c);
+  boolean removeAll(Collection<?> c);
 
   /**
    * Remove all elements of this collection that are not contained in a given
@@ -247,7 +247,7 @@ public interface Collection
    *   collection does not support retaining null values.
    * @throws NullPointerException if c itself is null.
    */
-  boolean retainAll(Collection c);
+  boolean retainAll(Collection<?> c);
 
   /**
    * Get the number of elements in this collection.
@@ -282,5 +282,5 @@ public interface Collection
    * @throws ArrayStoreException if the type of any element of the
    *   collection is not a subtype of the element type of a.
    */
-  Object[] toArray(Object[] a);
+  <T> T[] toArray(T[] a);
 }

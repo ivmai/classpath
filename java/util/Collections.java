@@ -1,5 +1,5 @@
 /* Collections.java -- Utility class with methods to operate on collections
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -530,7 +530,8 @@ public class Collections
    * @throws NullPointerException if a null element has compareTo called
    * @see #sort(List)
    */
-  public static int binarySearch(List l, Object key)
+  <T extends Object & Comparable<? super T>>
+  public static int binarySearch(List<? extends T> l, T key)
   {
     return binarySearch(l, key, null);
   }
@@ -562,7 +563,7 @@ public class Collections
    *         ordering (only possible when c is null)
    * @see #sort(List, Comparator)
    */
-  public static int binarySearch(List l, Object key, Comparator c)
+  <T> public static int binarySearch(List<T> l, T key, Comparator<? super T> c)
   {
     int pos = 0;
     int low = 0;
@@ -572,7 +573,7 @@ public class Collections
     // if the list is sequential-access.
     if (isSequential(l))
       {
-	ListIterator itr = l.listIterator();
+	ListIterator<T> itr = l.listIterator();
         int i = 0;
         while (low <= hi)
           {
@@ -623,14 +624,14 @@ public class Collections
    * @throws UnsupportedOperationException if dest.listIterator() does not
    *         support the set operation
    */
-  public static void copy(List dest, List source)
+  <T> public static void copy(List<T> dest, List<T> source)
   {
     int pos = source.size();
     if (dest.size() < pos)
       throw new IndexOutOfBoundsException("Source does not fit in dest");
 
-    Iterator i1 = source.iterator();
-    ListIterator i2 = dest.listIterator();
+    Iterator<T> i1 = source.iterator();
+    ListIterator<T> i2 = dest.listIterator();
 
     while (--pos >= 0)
       {
@@ -646,16 +647,16 @@ public class Collections
    * @param c the Collection to iterate over
    * @return an Enumeration backed by an Iterator over c
    */
-  public static Enumeration enumeration(Collection c)
+  <T> public static Enumeration<T> enumeration(Collection<T> c)
   {
-    final Iterator i = c.iterator();
-    return new Enumeration()
+    final Iterator<T> i = c.iterator();
+    return new Enumeration<T>()
     {
       public final boolean hasMoreElements()
       {
 	return i.hasNext();
       }
-      public final Object nextElement()
+      public final T nextElement()
       {
 	return i.next();
       }
@@ -671,9 +672,9 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation.
    */
-  public static void fill(List l, Object val)
+  <T> public static void fill(List<T> l, T val)
   {
-    ListIterator itr = l.listIterator();
+    ListIterator<T> itr = l.listIterator();
     for (int i = l.size() - 1; i >= 0; --i)
       {
 	itr.next();
@@ -694,7 +695,7 @@ public class Collections
    * @return the index where found, or -1
    * @since 1.4
    */
-  public static int indexOfSubList(List source, List target)
+  public static int indexOfSubList(List<?> source, List<?> target)
   {
     int ssize = source.size();
     for (int i = 0, j = target.size(); j <= ssize; i++, j++)
@@ -716,7 +717,7 @@ public class Collections
    * @return the index where found, or -1
    * @since 1.4
    */
-  public static int lastIndexOfSubList(List source, List target)
+  public static int lastIndexOfSubList(List<?> source, List<?> target)
   {
     int ssize = source.size();
     for (int i = ssize - target.size(), j = ssize; i >= 0; i--, j--)
@@ -735,9 +736,9 @@ public class Collections
    * @see ArrayList
    * @since 1.4
    */
-  public static ArrayList list(Enumeration e)
+  <T> public static ArrayList<T> list(Enumeration<T> e)
   {
-    ArrayList l = new ArrayList();
+    ArrayList<T> l = new ArrayList<T>();
     while (e.hasMoreElements())
       l.add(e.nextElement());
     return l;
@@ -754,7 +755,8 @@ public class Collections
    * @exception ClassCastException if elements in c are not mutually comparable
    * @exception NullPointerException if null.compareTo is called
    */
-  public static Object max(Collection c)
+  <T extends Object & Comparable<? super T>>
+  public static T max(Collection<? extends T> c)
   {
     return max(c, null);
   }
@@ -773,14 +775,15 @@ public class Collections
    * @throws NullPointerException if null is compared by natural ordering
    *        (only possible when order is null)
    */
-  public static Object max(Collection c, Comparator order)
+  <T> public static T max(Collection<? extends T> c,
+			  Comparator<? super T> order)
   {
-    Iterator itr = c.iterator();
-    Object max = itr.next(); // throws NoSuchElementException
+    Iterator<? extends T> itr = c.iterator();
+    T max = itr.next(); // throws NoSuchElementException
     int csize = c.size();
     for (int i = 1; i < csize; i++)
       {
-	Object o = itr.next();
+	T o = itr.next();
 	if (compare(max, o, order) < 0)
 	  max = o;
       }
@@ -798,7 +801,8 @@ public class Collections
    * @throws ClassCastException if elements in c are not mutually comparable
    * @throws NullPointerException if null.compareTo is called
    */
-  public static Object min(Collection c)
+  <T extends Object & Comparable<? super T>>
+  public static T min(Collection<? extends T> c)
   {
     return min(c, null);
   }
@@ -817,14 +821,15 @@ public class Collections
    * @throws NullPointerException if null is compared by natural ordering
    *        (only possible when order is null)
    */
-  public static Object min(Collection c, Comparator order)
+  <T> public static T min(Collection<? extends T> c,
+			  Comparator<? super T> order)
   {
-    Iterator itr = c.iterator();
-    Object min = itr.next();	// throws NoSuchElementExcception
+    Iterator<T> itr = c.iterator();
+    T min = itr.next();	// throws NoSuchElementExcception
     int csize = c.size();
     for (int i = 1; i < csize; i++)
       {
-	Object o = itr.next();
+	T o = itr.next();
 	if (compare(min, o, order) > 0)
 	  min = o;
       }
@@ -846,9 +851,9 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  public static List nCopies(final int n, final Object o)
+  <T> public static List<T> nCopies(final int n, final T o)
   {
-    return new CopiesList(n, o);
+    return new CopiesList<T>(n, o);
   }
 
   /**
@@ -857,7 +862,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class CopiesList extends AbstractList
+  private static final class CopiesList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
   {
     /**
@@ -875,7 +880,7 @@ public class Collections
      * The repeated list element.
      * @serial the list contents
      */
-    private final Object element;
+    private final T element;
 
     /**
      * Constructs the list.
@@ -884,7 +889,7 @@ public class Collections
      * @param o the object
      * @throws IllegalArgumentException if n &lt; 0
      */
-    CopiesList(int n, Object o)
+    CopiesList(int n, T o)
     {
       if (n < 0)
 	throw new IllegalArgumentException();
@@ -903,7 +908,7 @@ public class Collections
     /**
      * The same element is returned.
      */
-    public Object get(int index)
+    public T get(int index)
     {
       if (index < 0 || index >= n)
         throw new IndexOutOfBoundsException();
@@ -939,11 +944,11 @@ public class Collections
     /**
      * A subList is just another CopiesList.
      */
-    public List subList(int from, int to)
+    public List<T> subList(int from, int to)
     {
       if (from < 0 || to > n)
         throw new IndexOutOfBoundsException();
-      return new CopiesList(to - from, element);
+      return new CopiesList<T>(to - from, element);
     }
 
     /**
@@ -986,9 +991,9 @@ public class Collections
    *         it being added to the list
    * @since 1.4
    */
-  public static boolean replaceAll(List list, Object oldval, Object newval)
+  <T> public static boolean replaceAll(List<T> list, T oldval, T newval)
   {
-    ListIterator itr = list.listIterator();
+    ListIterator<T> itr = list.listIterator();
     boolean replace_occured = false;
     for (int i = list.size(); --i >= 0; )
       if (AbstractCollection.equals(oldval, itr.next()))
@@ -1006,12 +1011,12 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static void reverse(List l)
+  <T> public static void reverse(List<T> l)
   {
-    ListIterator i1 = l.listIterator();
+    ListIterator<T> i1 = l.listIterator();
     int pos1 = 1;
     int pos2 = l.size();
-    ListIterator i2 = l.listIterator(pos2);
+    ListIterator<T> i2 = l.listIterator(pos2);
     while (pos1 < pos2)
       {
 	Object o = i1.next();
@@ -1033,9 +1038,9 @@ public class Collections
    * @see Comparable
    * @see Serializable
    */
-  public static Comparator reverseOrder()
+  <T>public static Comparator<T> reverseOrder<T>()
   {
-    return rcInstance;
+    return (Comparator<T>) rcInstance; // fixme?
   }
 
   /**
@@ -1049,8 +1054,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class ReverseComparator
-    implements Comparator, Serializable
+  private static final class ReverseComparator<T>
+    implements Comparator<T>, Serializable
   {
     /**
      * Compatible with JDK 1.4.
@@ -1107,7 +1112,7 @@ public class Collections
    * @throws UnsupportedOperationException if the list does not support set
    * @since 1.4
    */
-  public static void rotate(List list, int distance)
+  public static void rotate(List<?> list, int distance)
   {
     int size = list.size();
     distance %= size;
@@ -1169,7 +1174,7 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static void shuffle(List l)
+  public static void shuffle(List<?> l)
   {
     if (defaultRandom == null)
       {
@@ -1212,7 +1217,7 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static void shuffle(List l, Random r)
+  public static void shuffle(List<?> l, Random r)
   {
     int lsize = l.size();
     ListIterator i = l.listIterator(lsize);
@@ -1251,9 +1256,9 @@ public class Collections
    * @return an immutable Set containing only o
    * @see Serializable
    */
-  public static Set singleton(Object o)
+  <T> public static Set<T> singleton(T o)
   {
-    return new SingletonSet(o);
+    return new SingletonSet<T>(o);
   }
 
   /**
@@ -1262,7 +1267,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SingletonSet extends AbstractSet
+  private static final class SingletonSet<T> extends AbstractSet<T>
     implements Serializable
   {
     /**
@@ -1275,13 +1280,13 @@ public class Collections
      * The single element; package visible for use in nested class.
      * @serial the singleton
      */
-    final Object element;
+    final T element;
 
     /**
      * Construct a singleton.
      * @param o the element
      */
-    SingletonSet(Object o)
+    SingletonSet(T o)
     {
       element = o;
     }
@@ -1297,9 +1302,9 @@ public class Collections
     /**
      * Returns an iterator over the lone element.
      */
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
-      return new Iterator()
+      return new Iterator<T>()
       {
         private boolean hasNext = true;
 
@@ -1308,7 +1313,7 @@ public class Collections
           return hasNext;
         }
 
-        public Object next()
+        public T next()
         {
           if (hasNext)
           {
@@ -1384,9 +1389,9 @@ public class Collections
    * @see RandomAccess
    * @since 1.3
    */
-  public static List singletonList(Object o)
+  <T> public static List<T> singletonList(T o)
   {
-    return new SingletonList(o);
+    return new SingletonList<T>(o);
   }
 
   /**
@@ -1395,7 +1400,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SingletonList extends AbstractList
+  private static final class SingletonList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
   {
     /**
@@ -1407,13 +1412,13 @@ public class Collections
      * The single element.
      * @serial the singleton
      */
-    private final Object element;
+    private final T element;
 
     /**
      * Construct a singleton.
      * @param o the element
      */
-    SingletonList(Object o)
+    SingletonList(T o)
     {
       element = o;
     }
@@ -1429,7 +1434,7 @@ public class Collections
     /**
      * Only index 0 is valid.
      */
-    public Object get(int index)
+    public T get(int index)
     {
       if (index == 0)
         return element;
@@ -1486,7 +1491,7 @@ public class Collections
     /**
      * Sublists are limited in scope.
      */
-    public List subList(int from, int to)
+    public List<T> subList(int from, int to)
     {
       if (from == to && (to == 0 || to == 1))
         return EMPTY_LIST;
@@ -1524,9 +1529,9 @@ public class Collections
    * @see Serializable
    * @since 1.3
    */
-  public static Map singletonMap(Object key, Object value)
+  <K, V> public static Map<K, V> singletonMap(K key, V value)
   {
-    return new SingletonMap(key, value);
+    return new SingletonMap<K, V>(key, value);
   }
 
   /**
@@ -1535,7 +1540,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SingletonMap extends AbstractMap
+  private static final class SingletonMap<K, V> extends AbstractMap<K, V>
     implements Serializable
   {
     /**
@@ -1547,25 +1552,25 @@ public class Collections
      * The single key.
      * @serial the singleton key
      */
-    private final Object k;
+    private final K k;
 
     /**
      * The corresponding value.
      * @serial the singleton value
      */
-    private final Object v;
+    private final V v;
 
     /**
      * Cache the entry set.
      */
-    private transient Set entries;
+    private transient Set<BasicMapEntry<K, V>> entries;
 
     /**
      * Construct a singleton.
      * @param key the key
      * @param value the value
      */
-    SingletonMap(Object key, Object value)
+    SingletonMap(K key, V value)
     {
       k = key;
       v = value;
@@ -1574,12 +1579,12 @@ public class Collections
     /**
      * There is a single immutable entry.
      */
-    public Set entrySet()
+    public Set<BasicMapEntry<K, V>> entrySet()
     {
       if (entries == null)
-        entries = singleton(new AbstractMap.BasicMapEntry(k, v)
+        entries = singleton(new AbstractMap.BasicMapEntry<K, V>(k, v)
         {
-          public Object setValue(Object o)
+          public V setValue(V o)
           {
             throw new UnsupportedOperationException();
           }
@@ -1608,7 +1613,7 @@ public class Collections
     /**
      * Single entry.
      */
-    public Object get(Object key)
+    public V get(K key)
     {
       return equals(key, k) ? v : null;
     }
@@ -1624,7 +1629,7 @@ public class Collections
     /**
      * Return the keyset.
      */
-    public Set keySet()
+    public Set<K> keySet()
     {
       if (keys == null)
         keys = singleton(k);
@@ -1643,7 +1648,7 @@ public class Collections
      * Return the values. Technically, a singleton, while more specific than
      * a general Collection, will work. Besides, that's what the JDK uses!
      */
-    public Collection values()
+    public Collection<V> values()
     {
       if (values == null)
         values = singleton(v);
@@ -1673,7 +1678,7 @@ public class Collections
    * @throws NullPointerException if some element is null
    * @see Arrays#sort(Object[])
    */
-  public static void sort(List l)
+  <T extends Comparable<? super T>> public static void sort(List<T> l)
   {
     sort(l, null);
   }
@@ -1695,11 +1700,11 @@ public class Collections
    *        (only possible when c is null)
    * @see Arrays#sort(Object[], Comparator)
    */
-  public static void sort(List l, Comparator c)
+  <T> public static void sort(List<T> l, Comparator<? super T> c)
   {
     Object[] a = l.toArray();
     Arrays.sort(a, c);
-    ListIterator i = l.listIterator(a.length);
+    ListIterator<T> i = l.listIterator(a.length);
     for (int pos = a.length; --pos >= 0; )
       {
 	i.previous();
@@ -1719,7 +1724,7 @@ public class Collections
    *         list.size()
    * @since 1.4
    */
-  public static void swap(List l, int i, int j)
+  public static void swap(List<?> l, int i, int j)
   {
     l.set(i, l.set(j, l.get(i)));
   }
@@ -1752,9 +1757,9 @@ public class Collections
    * @return a synchronized view of the collection
    * @see Serializable
    */
-  public static Collection synchronizedCollection(Collection c)
+  <T> public static Collection<T> synchronizedCollection(Collection<T> c)
   {
-    return new SynchronizedCollection(c);
+    return new SynchronizedCollection<T>(c);
   }
 
   /**
@@ -1765,8 +1770,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  static class SynchronizedCollection
-    implements Collection, Serializable
+  static class SynchronizedCollection<T>
+    implements Collection<T>, Serializable
   {
     /**
      * Compatible with JDK 1.4.
@@ -1777,7 +1782,7 @@ public class Collections
      * The wrapped collection. Package visible for use by subclasses.
      * @serial the real collection
      */
-    final Collection c;
+    final Collection<T> c;
 
     /**
      * The object to synchronize on.  When an instance is created via public
@@ -1792,7 +1797,7 @@ public class Collections
      * @param c the collection to wrap
      * @throws NullPointerException if c is null
      */
-    SynchronizedCollection(Collection c)
+    SynchronizedCollection(Collection<T> c)
     {
       this.c = c;
       mutex = this;
@@ -1806,13 +1811,13 @@ public class Collections
      * @param sync the mutex
      * @param c the collection
      */
-    SynchronizedCollection(Object sync, Collection c)
+    SynchronizedCollection(Object sync, Collection<T> c)
     {
       this.c = c;
       mutex = sync;
     }
 
-    public boolean add(Object o)
+    public boolean add(T o)
     {
       synchronized (mutex)
         {
@@ -1820,7 +1825,7 @@ public class Collections
         }
     }
 
-    public boolean addAll(Collection col)
+    public boolean addAll(Collection<? extends T> col)
     {
       synchronized (mutex)
         {
@@ -1860,7 +1865,7 @@ public class Collections
         }
     }
 
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
       synchronized (mutex)
         {
@@ -1876,7 +1881,7 @@ public class Collections
         }
     }
 
-    public boolean removeAll(Collection col)
+    public boolean removeAll(Collection<?> col)
     {
       synchronized (mutex)
         {
@@ -1884,7 +1889,7 @@ public class Collections
         }
     }
 
-    public boolean retainAll(Collection col)
+    public boolean retainAll(Collection<?> col)
     {
       synchronized (mutex)
         {
@@ -1908,7 +1913,7 @@ public class Collections
         }
     }
 
-    public Object[] toArray(Object[] a)
+    <T> public T[] toArray(T[] a)
     {
       synchronized (mutex)
         {
@@ -1932,7 +1937,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class SynchronizedIterator implements Iterator
+  private static class SynchronizedIterator<T> implements Iterator<T>
   {
     /**
      * The object to synchronize on. Package visible for use by subclass.
@@ -1942,20 +1947,20 @@ public class Collections
     /**
      * The wrapped iterator.
      */
-    private final Iterator i;
+    private final Iterator<T> i;
 
     /**
      * Only trusted code creates a wrapper, with the specified sync.
      * @param sync the mutex
      * @param i the wrapped iterator
      */
-    SynchronizedIterator(Object sync, Iterator i)
+    SynchronizedIterator(Object sync, Iterator<T> i)
     {
       this.i = i;
       mutex = sync;
     }
 
-    public Object next()
+    public T next()
     {
       synchronized (mutex)
         {
@@ -2006,11 +2011,11 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  public static List synchronizedList(List l)
+  <T> public static List<T> synchronizedList(List<T> l)
   {
     if (l instanceof RandomAccess)
-      return new SynchronizedRandomAccessList(l);
-    return new SynchronizedList(l);
+      return new SynchronizedRandomAccessList<T>(l);
+    return new SynchronizedList<T>(l);
   }
 
   /**
@@ -2021,8 +2026,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  static class SynchronizedList extends SynchronizedCollection
-    implements List
+  static class SynchronizedList<T> extends SynchronizedCollection<T>
+    implements List<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -2034,14 +2039,14 @@ public class Collections
      * excessive casting. Package visible for use by subclass.
      * @serial the wrapped list
      */
-    final List list;
+    final List<T> list;
 
     /**
      * Wrap a given list.
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    SynchronizedList(List l)
+    SynchronizedList(List<T> l)
     {
       super(l);
       list = l;
@@ -2052,13 +2057,13 @@ public class Collections
      * @param sync the mutex
      * @param l the list
      */
-    SynchronizedList(Object sync, List l)
+    SynchronizedList(Object sync, List<T> l)
     {
       super(sync, l);
       list = l;
     }
 
-    public void add(int index, Object o)
+    public void add(int index, T o)
     {
       synchronized (mutex)
         {
@@ -2066,7 +2071,7 @@ public class Collections
         }
     }
 
-    public boolean addAll(int index, Collection c)
+    public boolean addAll(int index, Collection<? extends T> c)
     {
       synchronized (mutex)
         {
@@ -2082,7 +2087,7 @@ public class Collections
         }
     }
 
-    public Object get(int index)
+    public T get(int index)
     {
       synchronized (mutex)
         {
@@ -2114,7 +2119,7 @@ public class Collections
         }
     }
 
-    public ListIterator listIterator()
+    public ListIterator<T> listIterator()
     {
       synchronized (mutex)
         {
@@ -2122,7 +2127,7 @@ public class Collections
         }
     }
 
-    public ListIterator listIterator(int index)
+    public ListIterator<T> listIterator(int index)
     {
       synchronized (mutex)
         {
@@ -2130,7 +2135,7 @@ public class Collections
         }
     }
 
-    public Object remove(int index)
+    public T remove(int index)
     {
       synchronized (mutex)
         {
@@ -2138,7 +2143,7 @@ public class Collections
         }
     }
 
-    public Object set(int index, Object o)
+    public T set(int index, T o)
     {
       synchronized (mutex)
         {
@@ -2146,7 +2151,7 @@ public class Collections
         }
     }
 
-    public List subList(int fromIndex, int toIndex)
+    public List<T> subList(int fromIndex, int toIndex)
     {
       synchronized (mutex)
         {
@@ -2162,8 +2167,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SynchronizedRandomAccessList
-    extends SynchronizedList implements RandomAccess
+  private static final class SynchronizedRandomAccessList<T>
+    extends SynchronizedList<T> implements RandomAccess
   {
     /**
      * Compatible with JDK 1.4.
@@ -2175,7 +2180,7 @@ public class Collections
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    SynchronizedRandomAccessList(List l)
+    SynchronizedRandomAccessList(List<T> l)
     {
       super(l);
     }
@@ -2186,18 +2191,18 @@ public class Collections
      * @param sync the mutex
      * @param l the list
      */
-    SynchronizedRandomAccessList(Object sync, List l)
+    SynchronizedRandomAccessList(Object sync, List<T> l)
     {
       super(sync, l);
     }
 
-    public List subList(int fromIndex, int toIndex)
+    public List<T> subList(int fromIndex, int toIndex)
     {
       synchronized (mutex)
         {
-          return new SynchronizedRandomAccessList(mutex,
-                                                  list.subList(fromIndex,
-                                                               toIndex));
+          return new SynchronizedRandomAccessList<T>(mutex,
+						     list.subList(fromIndex,
+								  toIndex));
         }
     }
   } // class SynchronizedRandomAccessList
@@ -2208,33 +2213,34 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SynchronizedListIterator
-    extends SynchronizedIterator implements ListIterator
+  private static final class SynchronizedListIterator<T>
+    extends SynchronizedIterator<T> implements ListIterator<T>
   {
     /**
      * The wrapped iterator, stored both here and in the superclass to
      * avoid excessive casting.
      */
-    private final ListIterator li;
+    private final ListIterator<T> li;
 
     /**
      * Only trusted code creates a wrapper, with the specified sync.
      * @param sync the mutex
      * @param li the wrapped iterator
      */
-    SynchronizedListIterator(Object sync, ListIterator li)
+    SynchronizedListIterator(Object sync, ListIterator<T> li)
     {
       super(sync, li);
       this.li = li;
     }
 
-    public void add(Object o)
+    public void add(T o)
     {
       synchronized (mutex)
         {
           li.add(o);
         }
     }
+
     public boolean hasPrevious()
     {
       synchronized (mutex)
@@ -2251,7 +2257,7 @@ public class Collections
         }
     }
 
-    public Object previous()
+    public T previous()
     {
       synchronized (mutex)
         {
@@ -2267,7 +2273,7 @@ public class Collections
         }
     }
 
-    public void set(Object o)
+    public void set(T o)
     {
       synchronized (mutex)
         {
@@ -2301,9 +2307,9 @@ public class Collections
    * @return a synchronized view of the map
    * @see Serializable
    */
-  public static Map synchronizedMap(Map m)
+  <K, V> public static Map<K, V> synchronizedMap(Map<K, V> m)
   {
-    return new SynchronizedMap(m);
+    return new SynchronizedMap<K, V>(m);
   }
 
   /**
@@ -2312,7 +2318,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class SynchronizedMap implements Map, Serializable
+  private static class SynchronizedMap<K, V> implements Map<K, V>, Serializable
   {
     /**
      * Compatible with JDK 1.4.
@@ -2323,7 +2329,7 @@ public class Collections
      * The wrapped map.
      * @serial the real map
      */
-    private final Map m;
+    private final Map<K, V> m;
 
     /**
      * The object to synchronize on.  When an instance is created via public
@@ -2337,24 +2343,24 @@ public class Collections
     /**
      * Cache the entry set.
      */
-    private transient Set entries;
+    private transient Set<Map.Entry<K, V>> entries;
 
     /**
      * Cache the key set.
      */
-    private transient Set keys;
+    private transient Set<K> keys;
 
     /**
      * Cache the value collection.
      */
-    private transient Collection values;
+    private transient Collection<V> values;
 
     /**
      * Wrap a given map.
      * @param m the map to wrap
      * @throws NullPointerException if m is null
      */
-    SynchronizedMap(Map m)
+    SynchronizedMap(Map<K, V> m)
     {
       this.m = m;
       mutex = this;
@@ -2367,7 +2373,7 @@ public class Collections
      * @param sync the mutex
      * @param m the map
      */
-    SynchronizedMap(Object sync, Map m)
+    SynchronizedMap(Object sync, Map<K, V> m)
     {
       this.m = m;
       mutex = sync;
@@ -2401,15 +2407,15 @@ public class Collections
     // means "return a SynchronizedSet, except that the iterator() method
     // returns an SynchronizedIterator whose next() method returns a
     // synchronized wrapper around its normal return value".
-    public Set entrySet()
+    public Set<Map.Entry<K, V>> entrySet()
     {
       // Define this here to spare some nesting.
-      class SynchronizedMapEntry implements Map.Entry
+      class SynchronizedMapEntry<K, V> implements Map.Entry<K, V>
       {
-        final Map.Entry e;
-        SynchronizedMapEntry(Object o)
+        final Map.Entry<K, V> e;
+        SynchronizedMapEntry(Map.Entry<K, V> o)
         {
-          e = (Map.Entry) o;
+          e = o;
         }
         public boolean equals(Object o)
         {
@@ -2418,14 +2424,14 @@ public class Collections
               return e.equals(o);
             }
         }
-        public Object getKey()
+        public K getKey()
         {
           synchronized (mutex)
             {
               return e.getKey();
             }
         }
-        public Object getValue()
+        public V getValue()
         {
           synchronized (mutex)
             {
@@ -2439,7 +2445,7 @@ public class Collections
               return e.hashCode();
             }
         }
-        public Object setValue(Object value)
+        public V setValue(V value)
         {
           synchronized (mutex)
             {
@@ -2459,19 +2465,20 @@ public class Collections
       if (entries == null)
         synchronized (mutex)
           {
-            entries = new SynchronizedSet(mutex, m.entrySet())
+            entries = new SynchronizedSet<K, V>(mutex, m.entrySet())
             {
-              public Iterator iterator()
+              public Iterator<Map.Entry<K, V>> iterator()
               {
                 synchronized (super.mutex)
                   {
-                    return new SynchronizedIterator(super.mutex, c.iterator())
+                    return new SynchronizedIterator<K, V>(super.mutex,
+							  c.iterator())
                     {
-                      public Object next()
+                      public Map.Entry<K, V> next()
                       {
                         synchronized (super.mutex)
                           {
-                            return new SynchronizedMapEntry(super.next());
+                            return new SynchronizedMapEntry<K, V>(super.next());
                           }
                       }
                     };
@@ -2490,7 +2497,7 @@ public class Collections
         }
     }
 
-    public Object get(Object key)
+    public V get(K key)
     {
       synchronized (mutex)
         {
@@ -2514,7 +2521,7 @@ public class Collections
         }
     }
 
-    public Set keySet()
+    public Set<K> keySet()
     {
       if (keys == null)
         synchronized (mutex)
@@ -2524,7 +2531,7 @@ public class Collections
       return keys;
     }
 
-    public Object put(Object key, Object value)
+    public V put(K key, V value)
     {
       synchronized (mutex)
         {
@@ -2532,7 +2539,7 @@ public class Collections
         }
     }
 
-    public void putAll(Map map)
+    public void putAll(Map<K, V> map)
     {
       synchronized (mutex)
         {
@@ -2540,7 +2547,7 @@ public class Collections
         }
     }
 
-    public Object remove(Object o)
+    public V remove(Object o)
     {
       synchronized (mutex)
         {
@@ -2564,7 +2571,7 @@ public class Collections
         }
     }
 
-    public Collection values()
+    public Collection<V> values()
     {
       if (values == null)
         synchronized (mutex)
@@ -2599,9 +2606,9 @@ public class Collections
    * @return a synchronized view of the set
    * @see Serializable
    */
-  public static Set synchronizedSet(Set s)
+  <T> public static Set<T> synchronizedSet(Set<T> s)
   {
-    return new SynchronizedSet(s);
+    return new SynchronizedSet<T>(s);
   }
 
   /**
@@ -2612,8 +2619,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  static class SynchronizedSet extends SynchronizedCollection
-    implements Set
+  static class SynchronizedSet<T> extends SynchronizedCollection<T>
+    implements Set<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -2625,7 +2632,7 @@ public class Collections
      * @param s the set to wrap
      * @throws NullPointerException if s is null
      */
-    SynchronizedSet(Set s)
+    SynchronizedSet(Set<T> s)
     {
       super(s);
     }
@@ -2635,7 +2642,7 @@ public class Collections
      * @param sync the mutex
      * @param s the set
      */
-    SynchronizedSet(Object sync, Set s)
+    SynchronizedSet(Object sync, Set<T> s)
     {
       super(sync, s);
     }
@@ -2687,9 +2694,9 @@ public class Collections
    * @return a synchronized view of the sorted map
    * @see Serializable
    */
-  public static SortedMap synchronizedSortedMap(SortedMap m)
+  <K, V> public static SortedMap<K, V> synchronizedSortedMap(SortedMap<K, V> m)
   {
-    return new SynchronizedSortedMap(m);
+    return new SynchronizedSortedMap<K, V>(m);
   }
 
   /**
@@ -2698,8 +2705,9 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SynchronizedSortedMap extends SynchronizedMap
-    implements SortedMap
+  private static final class SynchronizedSortedMap<K, V>
+    extends SynchronizedMap<K, V>
+    implements SortedMap<K, V>
   {
     /**
      * Compatible with JDK 1.4.
@@ -2711,14 +2719,14 @@ public class Collections
      * excessive casting.
      * @serial the wrapped map
      */
-    private final SortedMap sm;
+    private final SortedMap<K, V> sm;
 
     /**
      * Wrap a given map.
      * @param sm the map to wrap
      * @throws NullPointerException if sm is null
      */
-    SynchronizedSortedMap(SortedMap sm)
+    SynchronizedSortedMap(SortedMap<K, V> sm)
     {
       super(sm);
       this.sm = sm;
@@ -2729,13 +2737,13 @@ public class Collections
      * @param sync the mutex
      * @param sm the map
      */
-    SynchronizedSortedMap(Object sync, SortedMap sm)
+    SynchronizedSortedMap(Object sync, SortedMap<K, V> sm)
     {
       super(sync, sm);
       this.sm = sm;
     }
 
-    public Comparator comparator()
+    public Comparator<? super K> comparator()
     {
       synchronized (mutex)
         {
@@ -2743,7 +2751,7 @@ public class Collections
         }
     }
 
-    public Object firstKey()
+    public K firstKey()
     {
       synchronized (mutex)
         {
@@ -2751,15 +2759,15 @@ public class Collections
         }
     }
 
-    public SortedMap headMap(Object toKey)
+    public SortedMap<K, V> headMap(K toKey)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedMap(mutex, sm.headMap(toKey));
+          return new SynchronizedSortedMap<K, V>(mutex, sm.headMap(toKey));
         }
     }
 
-    public Object lastKey()
+    public K lastKey()
     {
       synchronized (mutex)
         {
@@ -2767,19 +2775,20 @@ public class Collections
         }
     }
 
-    public SortedMap subMap(Object fromKey, Object toKey)
+    public SortedMap<K, V> subMap(K fromKey, K toKey)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedMap(mutex, sm.subMap(fromKey, toKey));
+          return new SynchronizedSortedMap<K, V>(mutex,
+						 sm.subMap(fromKey, toKey));
         }
     }
 
-    public SortedMap tailMap(Object fromKey)
+    public SortedMap<K, V> tailMap(K fromKey)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedMap(mutex, sm.tailMap(fromKey));
+          return new SynchronizedSortedMap<K, V>(mutex, sm.tailMap(fromKey));
         }
     }
   } // class SynchronizedSortedMap
@@ -2809,9 +2818,9 @@ public class Collections
    * @return a synchronized view of the sorted set
    * @see Serializable
    */
-  public static SortedSet synchronizedSortedSet(SortedSet s)
+  public static SortedSet<T> synchronizedSortedSet(SortedSet<T> s)
   {
-    return new SynchronizedSortedSet(s);
+    return new SynchronizedSortedSet<T>(s);
   }
 
   /**
@@ -2820,8 +2829,9 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class SynchronizedSortedSet extends SynchronizedSet
-    implements SortedSet
+  private static final class SynchronizedSortedSet<T>
+    extends SynchronizedSet<T>
+    implements SortedSet<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -2833,14 +2843,14 @@ public class Collections
      * excessive casting.
      * @serial the wrapped set
      */
-    private final SortedSet ss;
+    private final SortedSet<T> ss;
 
     /**
      * Wrap a given set.
      * @param ss the set to wrap
      * @throws NullPointerException if ss is null
      */
-    SynchronizedSortedSet(SortedSet ss)
+    SynchronizedSortedSet(SortedSet<T> ss)
     {
       super(ss);
       this.ss = ss;
@@ -2851,13 +2861,13 @@ public class Collections
      * @param sync the mutex
      * @param l the list
      */
-    SynchronizedSortedSet(Object sync, SortedSet ss)
+    SynchronizedSortedSet(Object sync, SortedSet<T> ss)
     {
       super(sync, ss);
       this.ss = ss;
     }
 
-    public Comparator comparator()
+    public Comparator<? super T> comparator()
     {
       synchronized (mutex)
         {
@@ -2865,7 +2875,7 @@ public class Collections
         }
     }
 
-    public Object first()
+    public T first()
     {
       synchronized (mutex)
         {
@@ -2873,15 +2883,15 @@ public class Collections
         }
     }
 
-    public SortedSet headSet(Object toElement)
+    public SortedSet<T> headSet(T toElement)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedSet(mutex, ss.headSet(toElement));
+          return new SynchronizedSortedSet<T>(mutex, ss.headSet(toElement));
         }
     }
 
-    public Object last()
+    public T last()
     {
       synchronized (mutex)
         {
@@ -2889,20 +2899,21 @@ public class Collections
         }
     }
 
-    public SortedSet subSet(Object fromElement, Object toElement)
+    public SortedSet<T> subSet(T fromElement, T toElement)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedSet(mutex,
-                                           ss.subSet(fromElement, toElement));
+          return new SynchronizedSortedSet<T>(mutex,
+					      ss.subSet(fromElement,
+							toElement));
         }
     }
 
-    public SortedSet tailSet(Object fromElement)
+    public SortedSet<T> tailSet(T fromElement)
     {
       synchronized (mutex)
         {
-          return new SynchronizedSortedSet(mutex, ss.tailSet(fromElement));
+          return new SynchronizedSortedSet<T>(mutex, ss.tailSet(fromElement));
         }
     }
   } // class SynchronizedSortedSet
@@ -2925,9 +2936,9 @@ public class Collections
    * @return a read-only view of the collection
    * @see Serializable
    */
-  public static Collection unmodifiableCollection(Collection c)
+  <T> public static Collection<T> unmodifiableCollection(Collection<T> c)
   {
-    return new UnmodifiableCollection(c);
+    return new UnmodifiableCollection<T>(c);
   }
 
   /**
@@ -2936,8 +2947,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableCollection
-    implements Collection, Serializable
+  private static class UnmodifiableCollection<T>
+    implements Collection<T>, Serializable
   {
     /**
      * Compatible with JDK 1.4.
@@ -2948,26 +2959,26 @@ public class Collections
      * The wrapped collection. Package visible for use by subclasses.
      * @serial the real collection
      */
-    final Collection c;
+    final Collection<T> c;
 
     /**
      * Wrap a given collection.
      * @param c the collection to wrap
      * @throws NullPointerException if c is null
      */
-    UnmodifiableCollection(Collection c)
+    UnmodifiableCollection(Collection<T> c)
     {
       this.c = c;
       if (c == null)
         throw new NullPointerException();
     }
 
-    public boolean add(Object o)
+    public boolean add(T o)
     {
       throw new UnsupportedOperationException();
     }
 
-    public boolean addAll(Collection c)
+    public boolean addAll(Collection<? extends T> c)
     {
       throw new UnsupportedOperationException();
     }
@@ -2992,9 +3003,9 @@ public class Collections
       return c.isEmpty();
     }
 
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
-      return new UnmodifiableIterator(c.iterator());
+      return new UnmodifiableIterator<T>(c.iterator());
     }
 
     public boolean remove(Object o)
@@ -3002,12 +3013,12 @@ public class Collections
       throw new UnsupportedOperationException();
     }
 
-    public boolean removeAll(Collection c)
+    public boolean removeAll(Collection<?> c)
     {
       throw new UnsupportedOperationException();
     }
 
-    public boolean retainAll(Collection c)
+    public boolean retainAll(Collection<?> c)
     {
       throw new UnsupportedOperationException();
     }
@@ -3022,7 +3033,7 @@ public class Collections
       return c.toArray();
     }
 
-    public Object[] toArray(Object[] a)
+    <S> public S[] toArray(S[] a)
     {
       return c.toArray(a);
     }
@@ -3039,23 +3050,23 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableIterator implements Iterator
+  private static class UnmodifiableIterator<T> implements Iterator<T>
   {
     /**
      * The wrapped iterator.
      */
-    private final Iterator i;
+    private final Iterator<T> i;
 
     /**
      * Only trusted code creates a wrapper.
      * @param i the wrapped iterator
      */
-    UnmodifiableIterator(Iterator i)
+    UnmodifiableIterator(Iterator<T> i)
     {
       this.i = i;
     }
 
-    public Object next()
+    public T next()
     {
       return i.next();
     }
@@ -3087,11 +3098,11 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  public static List unmodifiableList(List l)
+  <T> public static List<T> unmodifiableList(List<T> l)
   {
     if (l instanceof RandomAccess)
-      return new UnmodifiableRandomAccessList(l);
-    return new UnmodifiableList(l);
+      return new UnmodifiableRandomAccessList<T>(l);
+    return new UnmodifiableList<T>(l);
   }
 
   /**
@@ -3101,8 +3112,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableList extends UnmodifiableCollection
-    implements List
+  private static class UnmodifiableList<T> extends UnmodifiableCollection<T>
+    implements List<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -3115,25 +3126,25 @@ public class Collections
      * excessive casting. Package visible for use by subclass.
      * @serial the wrapped list
      */
-    final List list;
+    final List<T> list;
 
     /**
      * Wrap a given list.
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    UnmodifiableList(List l)
+    UnmodifiableList(List<T> l)
     {
       super(l);
       list = l;
     }
 
-    public void add(int index, Object o)
+    public void add(int index, T o)
     {
       throw new UnsupportedOperationException();
     }
 
-    public boolean addAll(int index, Collection c)
+    public boolean addAll(int index, Collection<? extends T> c)
     {
       throw new UnsupportedOperationException();
     }
@@ -3143,7 +3154,7 @@ public class Collections
       return list.equals(o);
     }
 
-    public Object get(int index)
+    public T get(int index)
     {
       return list.get(index);
     }
@@ -3163,27 +3174,27 @@ public class Collections
       return list.lastIndexOf(o);
     }
 
-    public ListIterator listIterator()
+    public ListIterator<T> listIterator()
     {
       return new UnmodifiableListIterator(list.listIterator());
     }
 
-    public ListIterator listIterator(int index)
+    public ListIterator<T> listIterator(int index)
     {
       return new UnmodifiableListIterator(list.listIterator(index));
     }
 
-    public Object remove(int index)
+    public T remove(int index)
     {
       throw new UnsupportedOperationException();
     }
 
-    public Object set(int index, Object o)
+    public T set(int index, T o)
     {
       throw new UnsupportedOperationException();
     }
 
-    public List subList(int fromIndex, int toIndex)
+    public List<T> subList(int fromIndex, int toIndex)
     {
       return unmodifiableList(list.subList(fromIndex, toIndex));
     }
@@ -3196,8 +3207,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class UnmodifiableRandomAccessList
-    extends UnmodifiableList implements RandomAccess
+  private static final class UnmodifiableRandomAccessList<T>
+    extends UnmodifiableList<T> implements RandomAccess
   {
     /**
      * Compatible with JDK 1.4.
@@ -3209,7 +3220,7 @@ public class Collections
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    UnmodifiableRandomAccessList(List l)
+    UnmodifiableRandomAccessList(List<T> l)
     {
       super(l);
     }
@@ -3220,26 +3231,26 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static final class UnmodifiableListIterator
-    extends UnmodifiableIterator implements ListIterator
+  private static final class UnmodifiableListIterator<T>
+    extends UnmodifiableIterator<T> implements ListIterator<T>
   {
     /**
      * The wrapped iterator, stored both here and in the superclass to
      * avoid excessive casting.
      */
-    private final ListIterator li;
+    private final ListIterator<T> li;
 
     /**
      * Only trusted code creates a wrapper.
      * @param li the wrapped iterator
      */
-    UnmodifiableListIterator(ListIterator li)
+    UnmodifiableListIterator(ListIterator<T> li)
     {
       super(li);
       this.li = li;
     }
 
-    public void add(Object o)
+    public void add(T o)
     {
       throw new UnsupportedOperationException();
     }
@@ -3254,7 +3265,7 @@ public class Collections
       return li.nextIndex();
     }
 
-    public Object previous()
+    public T previous()
     {
       return li.previous();
     }
@@ -3264,7 +3275,7 @@ public class Collections
       return li.previousIndex();
     }
 
-    public void set(Object o)
+    public void set(T o)
     {
       throw new UnsupportedOperationException();
     }
@@ -3284,9 +3295,9 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  public static Map unmodifiableMap(Map m)
+  <K, V> public static Map<K, V> unmodifiableMap(Map<K, V> m)
   {
-    return new UnmodifiableMap(m);
+    return new UnmodifiableMap<K, V>(m);
   }
 
   /**
@@ -3295,7 +3306,7 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableMap implements Map, Serializable
+  private static class UnmodifiableMap<K, V> implements Map<K, V>, Serializable
   {
     /**
      * Compatible with JDK 1.4.
@@ -3306,29 +3317,30 @@ public class Collections
      * The wrapped map.
      * @serial the real map
      */
-    private final Map m;
+    private final Map<K, V> m;
 
     /**
      * Cache the entry set.
      */
-    private transient Set entries;
+    // fixme Set<? extends Entry<K, V>> ?
+    private transient Set<Map.Entry<K, V>> entries;
 
     /**
      * Cache the key set.
      */
-    private transient Set keys;
+    private transient Set<K> keys;
 
     /**
      * Cache the value collection.
      */
-    private transient Collection values;
+    private transient Collection<V> values;
 
     /**
      * Wrap a given map.
      * @param m the map to wrap
      * @throws NullPointerException if m is null
      */
-    UnmodifiableMap(Map m)
+    UnmodifiableMap(Map<K, V> m)
     {
       this.m = m;
       if (m == null)
@@ -3350,10 +3362,10 @@ public class Collections
       return m.containsValue(value);
     }
 
-    public Set entrySet()
+    public Set<Map.Entry<K, V>> entrySet()
     {
       if (entries == null)
-        entries = new UnmodifiableEntrySet(m.entrySet());
+        entries = new UnmodifiableEntrySet<Map.Entry<K, V>>(m.entrySet());
       return entries;
     }
 
@@ -3363,7 +3375,8 @@ public class Collections
      *
      * @author Eric Blake <ebb9@email.byu.edu>
      */
-    private static final class UnmodifiableEntrySet extends UnmodifiableSet
+    private static final class UnmodifiableEntrySet<T extends Map.Entry<K, V>>
+      extends UnmodifiableSet<T>
       implements Serializable
     {
       /**
@@ -3375,30 +3388,30 @@ public class Collections
        * Wrap a given set.
        * @param s the set to wrap
        */
-      UnmodifiableEntrySet(Set s)
+      UnmodifiableEntrySet(Set<T> s)
       {
         super(s);
       }
 
       // The iterator must return unmodifiable map entries.
-      public Iterator iterator()
+      public Iterator<T> iterator()
       {
-        return new UnmodifiableIterator(c.iterator())
+        return new UnmodifiableIterator<T>(c.iterator())
 	{
           public Object next()
           {
-            final Map.Entry e = (Map.Entry) super.next();
-            return new Map.Entry()
+            final T e = super.next();
+            return new Map.Entry<K, V>()
 	    {
               public boolean equals(Object o)
               {
                 return e.equals(o);
               }
-              public Object getKey()
+              public K getKey()
               {
                 return e.getKey();
               }
-              public Object getValue()
+              public V getValue()
               {
                 return e.getValue();
               }
@@ -3406,7 +3419,7 @@ public class Collections
               {
                 return e.hashCode();
               }
-              public Object setValue(Object value)
+              public V setValue(V value)
               {
                 throw new UnsupportedOperationException();
               }
@@ -3425,12 +3438,12 @@ public class Collections
       return m.equals(o);
     }
 
-    public Object get(Object key)
+    public V get(K key)
     {
       return m.get(key);
     }
 
-    public Object put(Object key, Object value)
+    public V put(K key, V value)
     {
       throw new UnsupportedOperationException();
     }
@@ -3445,19 +3458,19 @@ public class Collections
       return m.isEmpty();
     }
 
-    public Set keySet()
+    public Set<K> keySet()
     {
       if (keys == null)
-        keys = new UnmodifiableSet(m.keySet());
+        keys = new UnmodifiableSet<K>(m.keySet());
       return keys;
     }
 
-    public void putAll(Map m)
+    public void putAll(Map<K, V> m)
     {
       throw new UnsupportedOperationException();
     }
 
-    public Object remove(Object o)
+    public Map.Entry<K, V> remove(Object o)
     {
       throw new UnsupportedOperationException();
     }
@@ -3472,10 +3485,10 @@ public class Collections
       return m.toString();
     }
 
-    public Collection values()
+    public Collection<V> values()
     {
       if (values == null)
-        values = new UnmodifiableCollection(m.values());
+        values = new UnmodifiableCollection<V>(m.values());
       return values;
     }
   } // class UnmodifiableMap
@@ -3494,9 +3507,9 @@ public class Collections
    * @return a read-only view of the set
    * @see Serializable
    */
-  public static Set unmodifiableSet(Set s)
+  <T> public static Set<T> unmodifiableSet(Set<T> s)
   {
-    return new UnmodifiableSet(s);
+    return new UnmodifiableSet<T>(s);
   }
 
   /**
@@ -3505,8 +3518,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableSet extends UnmodifiableCollection
-    implements Set
+  private static class UnmodifiableSet<T> extends UnmodifiableCollection<T>
+    implements Set<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -3518,7 +3531,7 @@ public class Collections
      * @param s the set to wrap
      * @throws NullPointerException if s is null
      */
-    UnmodifiableSet(Set s)
+    UnmodifiableSet(Set<T> s)
     {
       super(s);
     }
@@ -3548,9 +3561,9 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  public static SortedMap unmodifiableSortedMap(SortedMap m)
+  <K, V> public static SortedMap<K, V> unmodifiableSortedMap(SortedMap<K, V> m)
   {
-    return new UnmodifiableSortedMap(m);
+    return new UnmodifiableSortedMap<K, V>(m);
   }
 
   /**
@@ -3559,8 +3572,9 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableSortedMap extends UnmodifiableMap
-    implements SortedMap
+  private static class UnmodifiableSortedMap<K, V>
+    extends UnmodifiableMap<K, V>
+    implements SortedMap<K, V>
   {
     /**
      * Compatible with JDK 1.4.
@@ -3572,47 +3586,47 @@ public class Collections
      * excessive casting.
      * @serial the wrapped map
      */
-    private final SortedMap sm;
+    private final SortedMap<K, V> sm;
 
     /**
      * Wrap a given map.
      * @param sm the map to wrap
      * @throws NullPointerException if sm is null
      */
-    UnmodifiableSortedMap(SortedMap sm)
+    UnmodifiableSortedMap(SortedMap<K, V> sm)
     {
       super(sm);
       this.sm = sm;
     }
 
-    public Comparator comparator()
+    public Comparator<? super K> comparator()
     {
       return sm.comparator();
     }
 
-    public Object firstKey()
+    public K firstKey()
     {
       return sm.firstKey();
     }
 
-    public SortedMap headMap(Object toKey)
+    public SortedMap<K, V> headMap(K toKey)
     {
-      return new UnmodifiableSortedMap(sm.headMap(toKey));
+      return new UnmodifiableSortedMap<K, V>(sm.headMap(toKey));
     }
 
-    public Object lastKey()
+    public K lastKey()
     {
       return sm.lastKey();
     }
 
-    public SortedMap subMap(Object fromKey, Object toKey)
+    public SortedMap<K, V> subMap(K fromKey, K toKey)
     {
-      return new UnmodifiableSortedMap(sm.subMap(fromKey, toKey));
+      return new UnmodifiableSortedMap<K, V>(sm.subMap(fromKey, toKey));
     }
 
-    public SortedMap tailMap(Object fromKey)
+    public SortedMap<K, V> tailMap(K fromKey)
     {
-      return new UnmodifiableSortedMap(sm.tailMap(fromKey));
+      return new UnmodifiableSortedMap<K, V>(sm.tailMap(fromKey));
     }
   } // class UnmodifiableSortedMap
 
@@ -3630,9 +3644,9 @@ public class Collections
    * @return a read-only view of the set
    * @see Serializable
    */
-  public static SortedSet unmodifiableSortedSet(SortedSet s)
+  <T> public static SortedSet<T> unmodifiableSortedSet(SortedSet<T> s)
   {
-    return new UnmodifiableSortedSet(s);
+    return new UnmodifiableSortedSet<T>(s);
   }
 
   /**
@@ -3641,8 +3655,8 @@ public class Collections
    *
    * @author Eric Blake <ebb9@email.byu.edu>
    */
-  private static class UnmodifiableSortedSet extends UnmodifiableSet
-    implements SortedSet
+  private static class UnmodifiableSortedSet<T> extends UnmodifiableSet<T>
+    implements SortedSet<T>
   {
     /**
      * Compatible with JDK 1.4.
@@ -3654,47 +3668,47 @@ public class Collections
      * excessive casting.
      * @serial the wrapped set
      */
-    private SortedSet ss;
+    private SortedSet<T> ss;
 
     /**
      * Wrap a given set.
      * @param ss the set to wrap
      * @throws NullPointerException if ss is null
      */
-    UnmodifiableSortedSet(SortedSet ss)
+    UnmodifiableSortedSet(SortedSet<T> ss)
     {
       super(ss);
       this.ss = ss;
     }
 
-    public Comparator comparator()
+    public Comparator<? super T> comparator()
     {
       return ss.comparator();
     }
 
-    public Object first()
+    public T first()
     {
       return ss.first();
     }
 
-    public SortedSet headSet(Object toElement)
+    public SortedSet<T> headSet(T toElement)
     {
-      return new UnmodifiableSortedSet(ss.headSet(toElement));
+      return new UnmodifiableSortedSet<T>(ss.headSet(toElement));
     }
 
-    public Object last()
+    public T last()
     {
       return ss.last();
     }
 
-    public SortedSet subSet(Object fromElement, Object toElement)
+    public SortedSet<T> subSet(T fromElement, T toElement)
     {
-      return new UnmodifiableSortedSet(ss.subSet(fromElement, toElement));
+      return new UnmodifiableSortedSet<T>(ss.subSet(fromElement, toElement));
     }
 
-    public SortedSet tailSet(Object fromElement)
+    public SortedSet<T> tailSet(T fromElement)
     {
-      return new UnmodifiableSortedSet(ss.tailSet(fromElement));
+      return new UnmodifiableSortedSet<T>(ss.tailSet(fromElement));
     }
   } // class UnmodifiableSortedSet
 } // class Collections

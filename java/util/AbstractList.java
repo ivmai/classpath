@@ -1,5 +1,5 @@
 /* AbstractList.java -- Abstract implementation of most of List
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -68,7 +68,9 @@ package java.util;
  * @since 1.2
  * @status updated to 1.4
  */
-public abstract class AbstractList extends AbstractCollection implements List
+public abstract class AbstractList<E>
+  extends AbstractCollection<E>
+  implements List<E>
 {
   /**
    * A count of the number of structural modifications that have been made to
@@ -101,7 +103,7 @@ public abstract class AbstractList extends AbstractCollection implements List
    * @return the element at that position
    * @throws IndexOutOfBoundsException if index &lt; 0 || index &gt;= size()
    */
-  public abstract Object get(int index);
+  public abstract E get(int index);
 
   /**
    * Insert an element into the list at a given position (optional operation).
@@ -123,7 +125,7 @@ public abstract class AbstractList extends AbstractCollection implements List
    *         some other reason
    * @see #modCount
    */
-  public void add(int index, Object o)
+  public void add(int index, E o)
   {
     throw new UnsupportedOperationException();
   }
@@ -144,7 +146,7 @@ public abstract class AbstractList extends AbstractCollection implements List
    *         some other reason
    * @see #add(int, Object)
    */
-  public boolean add(Object o)
+  public boolean add(E o)
   {
     add(size(), o);
     return true;
@@ -173,9 +175,9 @@ public abstract class AbstractList extends AbstractCollection implements List
    * @throws NullPointerException if the specified collection is null
    * @see #add(int, Object)
    */
-  public boolean addAll(int index, Collection c)
+  public boolean addAll(int index, Collection<? extends E> c)
   {
-    Iterator itr = c.iterator();
+    Iterator<? extends E> itr = c.iterator();
     int size = c.size();
     for (int pos = size; pos > 0; pos--)
       add(index++, itr.next());
@@ -227,7 +229,7 @@ public abstract class AbstractList extends AbstractCollection implements List
     if (size != ((List) o).size())
       return false;
 
-    Iterator itr1 = iterator();
+    Iterator<E> itr1 = iterator();
     Iterator itr2 = ((List) o).iterator();
 
     while (--size >= 0)
@@ -259,7 +261,7 @@ while (i.hasNext())
   public int hashCode()
   {
     int hashCode = 1;
-    Iterator itr = iterator();
+    Iterator<E> itr = iterator();
     int pos = size();
     while (--pos >= 0)
       hashCode = 31 * hashCode + hashCode(itr.next());
@@ -277,7 +279,7 @@ while (i.hasNext())
    */
   public int indexOf(Object o)
   {
-    ListIterator itr = listIterator();
+    ListIterator<E> itr = listIterator();
     int size = size();
     for (int pos = 0; pos < size; pos++)
       if (equals(o, itr.next()))
@@ -297,10 +299,10 @@ while (i.hasNext())
    * @return an Iterator over the elements of this list, in order
    * @see #modCount
    */
-  public Iterator iterator()
+  public Iterator<E> iterator()
   {
     // Bah, Sun's implementation forbids using listIterator(0).
-    return new Iterator()
+    return new Iterator<E>()
     {
       private int pos = 0;
       private int size = size();
@@ -320,7 +322,7 @@ while (i.hasNext())
         return pos < size;
       }
 
-      public Object next()
+      public E next()
       {
         checkMod();
         if (pos == size)
@@ -354,7 +356,7 @@ while (i.hasNext())
   public int lastIndexOf(Object o)
   {
     int pos = size();
-    ListIterator itr = listIterator(pos);
+    ListIterator<E> itr = listIterator(pos);
     while (--pos >= 0)
       if (equals(o, itr.previous()))
         return pos;
@@ -368,7 +370,7 @@ while (i.hasNext())
    * @return a ListIterator over the elements of this list, in order, starting
    *         at the beginning
    */
-  public ListIterator listIterator()
+  public ListIterator<E> listIterator()
   {
     return listIterator(0);
   }
@@ -391,13 +393,13 @@ while (i.hasNext())
    * @throws IndexOutOfBoundsException if index &lt; 0 || index &gt; size()
    * @see #modCount
    */
-  public ListIterator listIterator(final int index)
+  public ListIterator<E> listIterator(final int index)
   {
     if (index < 0 || index > size())
       throw new IndexOutOfBoundsException("Index: " + index + ", Size:"
                                           + size());
 
-    return new ListIterator()
+    return new ListIterator<E>()
     {
       private int knownMod = modCount;
       private int position = index;
@@ -423,7 +425,7 @@ while (i.hasNext())
         return position > 0;
       }
 
-      public Object next()
+      public E next()
       {
         checkMod();
         if (position == size)
@@ -432,7 +434,7 @@ while (i.hasNext())
         return get(position++);
       }
 
-      public Object previous()
+      public E previous()
       {
         checkMod();
         if (position == 0)
@@ -498,7 +500,7 @@ while (i.hasNext())
    * @throws IndexOutOfBoundsException if index &lt; 0 || index &gt;= size()
    * @see #modCount
    */
-  public Object remove(int index)
+  public E remove(int index)
   {
     throw new UnsupportedOperationException();
   }
@@ -522,7 +524,7 @@ while (i.hasNext())
    */
   protected void removeRange(int fromIndex, int toIndex)
   {
-    ListIterator itr = listIterator(fromIndex);
+    ListIterator<E> itr = listIterator(fromIndex);
     for (int index = fromIndex; index < toIndex; index++)
       {
         itr.next();
@@ -545,7 +547,7 @@ while (i.hasNext())
    * @throws IllegalArgumentException if o cannot be added to this list for
    *         some other reason
    */
-  public Object set(int index, Object o)
+  public E set(int index, E o)
   {
     throw new UnsupportedOperationException();
   }
@@ -594,7 +596,7 @@ while (i.hasNext())
    * @see ConcurrentModificationException
    * @see RandomAccess
    */
-  public List subList(int fromIndex, int toIndex)
+  public List<E> subList(int fromIndex, int toIndex)
   {
     // This follows the specification of AbstractList, but is inconsistent
     // with the one in List. Don't you love Sun's inconsistencies?
@@ -604,8 +606,8 @@ while (i.hasNext())
       throw new IndexOutOfBoundsException();
 
     if (this instanceof RandomAccess)
-      return new RandomAccessSubList(this, fromIndex, toIndex);
-    return new SubList(this, fromIndex, toIndex);
+      return new RandomAccessSubList<E>(this, fromIndex, toIndex);
+    return new SubList<E>(this, fromIndex, toIndex);
   }
 
 } // class AbstractList
@@ -619,11 +621,11 @@ while (i.hasNext())
  * @author Original author unknown
  * @author Eric Blake <ebb9@email.byu.edu>
  */
-class SubList extends AbstractList
+class SubList<E> extends AbstractList<E>
 {
   // Package visible, for use by iterator.
   /** The original list. */
-  final AbstractList backingList;
+  final AbstractList<E> backingList;
   /** The index of the first element of the sublist. */
   final int offset;
   /** The size of the sublist. */
@@ -636,7 +638,7 @@ class SubList extends AbstractList
    * @param fromIndex the lower bound, inclusive
    * @param toIndex the upper bound, exclusive
    */
-  SubList(AbstractList backing, int fromIndex, int toIndex)
+  SubList(AbstractList<E> backing, int fromIndex, int toIndex)
   {
     backingList = backing;
     modCount = backing.modCount;
@@ -706,7 +708,7 @@ class SubList extends AbstractList
    * @param o the new value
    * @return the old value
    */
-  public Object set(int index, Object o)
+  public E set(int index, E o)
   {
     checkMod();
     checkBoundsExclusive(index);
@@ -719,7 +721,7 @@ class SubList extends AbstractList
    * @param index the location to get from
    * @return the object at that location
    */
-  public Object get(int index)
+  public E get(int index)
   {
     checkMod();
     checkBoundsExclusive(index);
@@ -732,7 +734,7 @@ class SubList extends AbstractList
    * @param index the index to insert at
    * @param o the object to add
    */
-  public void add(int index, Object o)
+  public void add(int index, E o)
   {
     checkMod();
     checkBoundsInclusive(index);
@@ -747,11 +749,11 @@ class SubList extends AbstractList
    * @param index the index to remove
    * @return the removed object
    */
-  public Object remove(int index)
+  public E remove(int index)
   {
     checkMod();
     checkBoundsExclusive(index);
-    Object o = backingList.remove(index + offset);
+    E o = backingList.remove(index + offset);
     size--;
     modCount = backingList.modCount;
     return o;
@@ -781,7 +783,7 @@ class SubList extends AbstractList
    * @param c the collection to insert
    * @return true if this list was modified, in other words, c is non-empty
    */
-  public boolean addAll(int index, Collection c)
+  public boolean addAll(int index, Collection<? extends E> c)
   {
     checkMod();
     checkBoundsInclusive(index);
@@ -798,7 +800,7 @@ class SubList extends AbstractList
    * @param c the collection to insert
    * @return true if this list was modified, in other words, c is non-empty
    */
-  public boolean addAll(Collection c)
+  public boolean addAll(Collection<? extends E> c)
   {
     return addAll(size, c);
   }
@@ -808,7 +810,7 @@ class SubList extends AbstractList
    *
    * @return an iterator over the sublist
    */
-  public Iterator iterator()
+  public Iterator<E> iterator()
   {
     return listIterator();
   }
@@ -820,14 +822,15 @@ class SubList extends AbstractList
    * @param index the start location of the iterator
    * @return a list iterator over the sublist
    */
-  public ListIterator listIterator(final int index)
+  public ListIterator<E> listIterator(final int index)
   {
     checkMod();
     checkBoundsInclusive(index);
 
-    return new ListIterator()
+    return new ListIterator<E>()
     {
-      private final ListIterator i = backingList.listIterator(index + offset);
+      private final ListIterator<E> i
+	= backingList.listIterator(index + offset);
       private int position = index;
 
       public boolean hasNext()
@@ -842,7 +845,7 @@ class SubList extends AbstractList
         return position > 0;
       }
 
-      public Object next()
+      public E next()
       {
         if (position == size)
           throw new NoSuchElementException();
@@ -850,7 +853,7 @@ class SubList extends AbstractList
         return i.next();
       }
 
-      public Object previous()
+      public E previous()
       {
         if (position == 0)
           throw new NoSuchElementException();
@@ -876,12 +879,12 @@ class SubList extends AbstractList
         modCount = backingList.modCount;
       }
 
-      public void set(Object o)
+      public void set(E o)
       {
         i.set(o);
       }
 
-      public void add(Object o)
+      public void add(E o)
       {
         i.add(o);
         size++;
@@ -917,8 +920,8 @@ class SubList extends AbstractList
  *
  * @author Eric Blake <ebb9@email.byu.edu>
  */
-final class RandomAccessSubList extends SubList
-  implements RandomAccess
+final class RandomAccessSubList<E> extends SubList<E>
+  implements RandomAccess<E>
 {
   /**
    * Construct the sublist.
@@ -927,7 +930,7 @@ final class RandomAccessSubList extends SubList
    * @param fromIndex the lower bound, inclusive
    * @param toIndex the upper bound, exclusive
    */
-  RandomAccessSubList(AbstractList backing, int fromIndex, int toIndex)
+  RandomAccessSubList(AbstractList<E> backing, int fromIndex, int toIndex)
   {
     super(backing, fromIndex, toIndex);
   }
