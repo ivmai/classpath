@@ -1,5 +1,5 @@
 /* ThreadLocal -- a variable with a unique value per thread
-   Copyright (C) 2000, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -82,7 +82,7 @@ import java.util.WeakHashMap;
  * @since 1.2
  * @status updated to 1.4
  */
-public class ThreadLocal
+public class ThreadLocal<T>
 {
   /**
    * Placeholder to distinguish between uninitialized and null set by the
@@ -93,8 +93,8 @@ public class ThreadLocal
 
   /**
    * The stored value. Package visible for use by InheritableThreadLocal. */
-  Object value;
-	
+  T value;
+
   /**
    * Maps Threads to values. Uses a WeakHashMap so if a Thread is garbage
    * collected the reference to the Value will disappear. A null value means
@@ -102,8 +102,9 @@ public class ThreadLocal
    * <code>set(Thread, Object)</code> and <code>get(Thread)</code> methods
    * access it. Package visible for use by InheritableThreadLocal.
    */
-  final Map valueMap = Collections.synchronizedMap(new WeakHashMap());
-	
+  final Map<Thread, T> valueMap
+    = Collections.synchronizedMap(new WeakHashMap<Thread, T>());
+
   /**
    * Creates a ThreadLocal object without associating any value to it yet.
    */
@@ -119,7 +120,7 @@ public class ThreadLocal
    *
    * @return the initial value of the variable in this thread
    */
-  protected Object initialValue()
+  protected T initialValue()
   {
     return null;
   }
@@ -132,18 +133,18 @@ public class ThreadLocal
    *
    * @return the value of the variable in this thread
    */
-  public Object get()
+  public T get()
   {
     Thread currentThread = Thread.currentThread();
     // Note that we don't have to synchronize, as only this thread will
     // ever modify the returned value and valueMap is a synchronizedMap.
-    Object value = valueMap.get(currentThread);
+    T value = valueMap.get(currentThread);
     if (value == null)
       {
         value = initialValue();
-        valueMap.put(currentThread, value == null ? NULL : value);
+        valueMap.put(currentThread, value == null ? (T) NULL : value);
       }
-    return value == NULL ? null : value;
+    return value == (T) NULL ? null : value;
   }
 
   /**
@@ -154,10 +155,10 @@ public class ThreadLocal
    *
    * @param value the value to set this thread's view of the variable to
    */
-  public void set(Object value)
+  public void set(T value)
   {
     // Note that we don't have to synchronize, as only this thread will
     // ever modify the returned value and valueMap is a synchronizedMap.
-    valueMap.put(Thread.currentThread(), value == null ? NULL : value);
+    valueMap.put(Thread.currentThread(), value == null ? (T) NULL : value);
   }
 }

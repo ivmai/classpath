@@ -1,3 +1,27 @@
+2004-08-06  Tom Tromey  <tromey@redhat.com>
+
+	* vm/reference/java/lang/VMClass.java (cast): Declare.
+	* java/io/SequenceInputStream.java (SequenceInputStream):
+	Constructor now generic.
+	(e): Updated.
+	(getNextStream): Likewise.
+	* java/lang/Thread.java (UncaughtExceptionHandler): New
+	interface.
+	(State): New enum.
+	* java/lang/Readable.java: New file.
+	* java/lang/Appendable.java: New file.
+	* java/lang/Iterable.java: Documented.
+	* java/lang/Class.java (asSubClass): New method.
+	(Class): Now generic.
+	* java/lang/Boolean.java (parseBoolean): New methods.
+	(compareTo): Likewise.
+	(Boolean): Now implements Comparable.
+	* java/lang/ThreadLocal.java: Now generic.
+	* java/lang/InheritableThreadLocal.java: Now generic.
+	* java/lang/Deprecated.java: New file.
+	* java/lang/Override.java: New file.
+	* java/lang/SuppressWarnings.java: New file.
+
 2004-08-05  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/Iterable.java: New file.

@@ -290,4 +290,8 @@ final class VMClass
    */
   static native void throwException(Throwable t);
 
+  /**
+   * Downcast object to the class' type.
+   */
+  static native Object cast(Object obj, Class k);
 } // class VMClass

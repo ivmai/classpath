@@ -969,4 +969,14 @@ public class Thread implements Runnable
     group.removeThread(this);
     vmThread = null;
   }
+
+  interface UncaughtExceptionHandler
+  {
+    void uncaughtException(Thread thr, Throwable exc);
+  }
+
+  public enum State
+  {
+    BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING
+  }
 }

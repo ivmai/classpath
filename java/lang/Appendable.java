@@ -1,5 +1,5 @@
-/* Iterable.java -- Notes collection over which one may iterate
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* Appendable.java -- Something to which characters can be appended
+   Copyright (C) 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,22 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package java.lang;
 
-import java.util.Iterator;
-
-/**
- * This interface is used to indicate that a given class can be
- * iterated over.  The compiler uses this interface to determine which
- * classes are suitable targets of the <code>foreach</code> construct.
- *
- * @since 1.5
- */
-public interface Iterable<E>
+public interface Appendable
 {
-  /**
-   * Returns an iterator for the collection.
-   */
-  Iterator<E> iterator ();
+  Appendable append(char c);
+  Appendable append(CharSequence seq);
 }

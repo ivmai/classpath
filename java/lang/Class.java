@@ -86,7 +86,7 @@ import java.util.HashSet;
  * @since 1.0
  * @see ClassLoader
  */
-public final class Class implements Serializable
+public final class Class<K> implements Serializable
 {
   /**
    * Compatible with JDK 1.0+.
@@ -144,9 +144,9 @@ public final class Class implements Serializable
    * @throws ExceptionInInitializerError if the class loads, but an exception
    *         occurs during initialization
    */
-  public static Class forName(String name) throws ClassNotFoundException
+  public static Class<?> forName(String name) throws ClassNotFoundException
   {
-    Class result = VMClass.forName (name);
+    Class<?> result = VMClass.forName (name);
     if (result == null)
       result = Class.forName(name, true,
 			     VMSecurityManager.getClassContext()[1].getClassLoader());
@@ -180,8 +180,8 @@ public final class Class implements Serializable
    * @see ClassLoader
    * @since 1.2
    */
-  public static Class forName(String name, boolean initialize,
-                              ClassLoader classloader)
+  public static Class<?> forName(String name, boolean initialize,
+				 ClassLoader classloader)
     throws ClassNotFoundException
   {
     if (classloader == null)
@@ -191,14 +191,14 @@ public final class Class implements Serializable
         if (sm != null)
           {
             // Get the calling class and classloader
-            Class c = VMSecurityManager.getClassContext()[1];
+            Class<?> c = VMSecurityManager.getClassContext()[1];
             ClassLoader cl = c.getClassLoader();
             if (cl != null)
               sm.checkPermission(new RuntimePermission("getClassLoader"));
           }
 	if (name.startsWith("["))
 	  return VMClass.loadArrayClass(name, null);
-	Class c = VMClassLoader.loadClass(name, true);
+	Class<?> c = VMClassLoader.loadClass(name, true);
 	if (c != null)
 	  {
 	    if (initialize)
@@ -209,7 +209,7 @@ public final class Class implements Serializable
       }
     if (name.startsWith("["))
       return VMClass.loadArrayClass(name, classloader);
-    Class c = classloader.loadClass(name);
+    Class<?> c = classloader.loadClass(name);
     classloader.resolveClass(c);
     if (initialize)
       VMClass.initialize(c);
@@ -289,7 +289,7 @@ public final class Class implements Serializable
    * @see Array
    * @since 1.1
    */
-  public Class getComponentType()
+  public Class<?> getComponentType()
   {
     return VMClass.getComponentType (this);
   }
@@ -308,7 +308,8 @@ public final class Class implements Serializable
    * @see #getConstructors()
    * @since 1.1
    */
-  public Constructor getConstructor(Class[] types) throws NoSuchMethodException
+  public Constructor<K> getConstructor(Class... types)
+    throws NoSuchMethodException
   {
     memberAccessCheck(Member.PUBLIC);
     Constructor[] constructors = getDeclaredConstructors(true);
@@ -353,7 +354,7 @@ public final class Class implements Serializable
    * @see #getDeclaredConstructors()
    * @since 1.1
    */
-  public Constructor getDeclaredConstructor(Class[] types)
+  public Constructor<K> getDeclaredConstructor(Class... types)
     throws NoSuchMethodException
   {
     memberAccessCheck(Member.DECLARED);
@@ -482,7 +483,7 @@ public final class Class implements Serializable
    * @see #getDeclaredMethods()
    * @since 1.1
    */
-  public Method getDeclaredMethod(String methodName, Class[] types)
+  public Method getDeclaredMethod(String methodName, Class... types)
     throws NoSuchMethodException
   {
     memberAccessCheck(Member.DECLARED);
@@ -641,17 +642,16 @@ public final class Class implements Serializable
     
     public boolean equals(Object o)
     {
-      if(o instanceof MethodKey)
+      if (o instanceof MethodKey)
 	{
-	  MethodKey m = (MethodKey)o;
-	  if(m.name.equals(name) && m.params.length == params.length && m.returnType == returnType)
+	  MethodKey m = (MethodKey) o;
+	  if (m.name.equals(name) && m.params.length == params.length
+	      && m.returnType == returnType)
 	    {
-	      for(int i = 0; i < params.length; i++)
+	      for (int i = 0; i < params.length; i++)
 		{
-		  if(m.params[i] != params[i])
-		    {
-		      return false;
-		    }
+		  if (m.params[i] != params[i])
+		    return false;
 		}
 	      return true;
 	    }
@@ -687,7 +687,7 @@ public final class Class implements Serializable
    * @see #getMethods()
    * @since 1.1
    */
-  public Method getMethod(String methodName, Class[] types)
+  public Method getMethod(String methodName, Class... types)
     throws NoSuchMethodException
   {
     memberAccessCheck(Member.PUBLIC);
@@ -1006,7 +1006,7 @@ public final class Class implements Serializable
    * @throws NullPointerException if c is null
    * @since 1.1
    */
-  public boolean isAssignableFrom(Class c)
+  public boolean isAssignableFrom(Class<?> c)
   {
     return VMClass.isAssignableFrom (this, c);
   }
@@ -1241,6 +1241,29 @@ public final class Class implements Serializable
           return status.equals(Boolean.TRUE);
       }
     return c.defaultAssertionStatus;
+  }
+
+  /**
+   * FIXME
+   * @since 1.5
+   */
+  <T> public Class<? extends T> asSubclass(Class<T> klass)
+  {
+    if (! klass.isAssignableFrom(this))
+      throw new ClassCastException();
+    return (Class<? extends T>) klass;
+  }
+
+  /**
+   * Return object, cast to this Class' type.
+   *
+   * @param obj the object to cast
+   * @throws ClassCastException  if obj is not an instance of this class
+   * @since 1.5
+   */
+  public K cast(Object obj)
+  {
+    return VMClassLoader.cast(obj, this);
   }
 
   /**

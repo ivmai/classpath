@@ -1,4 +1,4 @@
-/* Iterable.java -- Notes collection over which one may iterate
+/* Override - Annotation to indicate that a method should be an override
    Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,22 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-
 package java.lang;
 
-import java.util.Iterator;
-
-/**
- * This interface is used to indicate that a given class can be
- * iterated over.  The compiler uses this interface to determine which
- * classes are suitable targets of the <code>foreach</code> construct.
- *
- * @since 1.5
- */
-public interface Iterable<E>
+@Retention(SOURCE)
+@Target(METHOD)
+public @interface Override
 {
-  /**
-   * Returns an iterator for the collection.
-   */
-  Iterator<E> iterator ();
 }
