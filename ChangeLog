@@ -3,7 +3,109 @@
 	* java/lang/StringBuilder.java:
 	Change references to System.arraycopy to
 	VMSystem.arraycopy.
-	
+
+2005-04-01  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/AssertionError.java: Typo fix.
+
+2005-04-01  Michael Koch  <konqueror@gmx.de>
+
+	* java/io/PipedInputStream.java
+	(read): Make sure a positive byte value is returned. Revised javadoc.
+	Thanks to Olafur Bragason for reporting these bugs.
+
+2005-04-01  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* java/awt/image/IndexColorModel.java
+	(getRGB): Check if pixel is negative.
+
+2005-03-31  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* javax/swing/text/JTextComponent.java (viewToModel): New method.
+
+2005-03-31  Audrius Meskauskas  <audriusa@bluewin.ch>
+	* org/omg/CORBA/ORBPackage/InconsistentTypeCode.java,
+	org/omg/CORBA/ORBPackage/InvalidName.java,
+	org/omg/CORBA/ORBPackage/package.html: New files.
+
+2005-03-31  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java
+	(getClipBounds): Handle clip being null.
+	(setClip): Likewise.
+	* java/beans/beancontext/BeanContextSupport.java
+	(add): Implemented.
+	(addAll): Likewise.
+	(clear): Likewise.
+	(removeAll): Likewise.
+	(retainAll): Likewise.
+
+2005-03-30  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java:
+	(drawImage): Don't notify the image observer for offscreen images.
+	* gnu/java/awt/peer/gtk/GtkImagePainter.java:
+	(setPixels): Don't notify the image observer.
+
+2005-03-30  Michael Koch  <konqueror@gmx.de>
+
+	* java/beans/beancontext/BeanContextServicesSupport.java
+	(BeanContextServicesSupport): Reimplemented.
+	(addBeanContextServicesListener): Implemented.
+	(initialize): Likewise.
+	(removeBeanContextServicesListener): Likewise.
+	* java/beans/beancontext/BeanContextSupport.java
+	(add): Likewise.
+	(addBeanContextMembershipListener): Likewise.
+	(getLocale): Likewise.
+	(initialize): Likewise.
+	(iterator): Likewise.
+	(remove): Likewise.
+	(toArray): Likewise.
+
+2005-03-30  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/image/ConvolveOp.java:
+	Removed comment added by eclipse.
+
+2005-03-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/xml/aelfred2/XmlParser.java:
+	Revert my typo fix.
+
+2005-03-30  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/geom/CubicCurve2D.java,
+	java/awt/geom/QuadCurve2D.java:
+	Fixed typo in name of Brian Cough.
+
+2005-03-29  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/java-nio/gnu_java_nio_VMSelector.c
+	(Java_gnu_java_nio_VMSelector_select): Use GetStaticMethodID
+	for Thread.interrupted().
+		
+2005-03-29  Jeroen Frijters  <jeroen@frijters.net>
+
+	* gnu/classpath/SystemProperties.java (static): Converted encoding
+	aliases	to lower case and removed redudant aliases.
+	* gnu/java/io/EncodingManager.java
+	(findEncoderConstructor, findDecoderConstructor): Call new method
+	resolveAlias().
+	(resolveAlias): New method.
+	* java/lang/System.java (getProperties): Removed uppercase aliases
+	from comments.
+
+2005-03-28  Tom Tromey  <tromey@redhat.com>
+
+	* java/net/URL.java (DEFAULT_SEARCH_PATH): Added
+	org.metastatic.jessie.
+
+2005-03-28  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/ClassLoader.java (loadClass): Resolve class even if
+	it was already found.
+
 2005-03-28  Sven de Marothy  <sven@physto.se>
 
 	* gnu/java/io/decode/DecoderUnicodeBig.java,
