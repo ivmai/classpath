@@ -151,7 +151,6 @@ public final class StringBuilder
    *
    * @param seq the initializing <code>CharSequence</code>
    * @throws NullPointerException if str is null
-   * @since 1.5
    */
   public StringBuilder(CharSequence seq)
   {
@@ -346,7 +345,6 @@ public final class StringBuilder
    * @param stringBuffer the <code>StringBuilder</code> to convert and append
    * @return this <code>StringBuilder</code>
    * @see #append(Object)
-   * @since 1.4
    */
   public StringBuilder append(StringBuffer stringBuffer)
   {
@@ -434,7 +432,6 @@ public final class StringBuilder
    *
    * @param seq the <code>CharSequence</code> providing the characters
    * @return this <code>StringBuilder</code>
-   * @since 1.5
    */
   public StringBuilder append(CharSequence seq)
   {
@@ -450,7 +447,6 @@ public final class StringBuilder
    * @param start the starting index
    * @param end one past the final index
    * @return this <code>StringBuilder</code>
-   * @since 1.5
    */
   public StringBuilder append(CharSequence seq, int start,
 			      int end)
@@ -532,7 +528,6 @@ public final class StringBuilder
    * @param end the index after the last character to delete
    * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if start or end are out of bounds
-   * @since 1.2
    */
   public StringBuilder delete(int start, int end)
   {
@@ -554,7 +549,6 @@ public final class StringBuilder
    * @param index the index of the character to delete
    * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if index is out of bounds
-   * @since 1.2
    */
   public StringBuilder deleteCharAt(int index)
   {
@@ -573,7 +567,6 @@ public final class StringBuilder
    * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if start or end are out of bounds
    * @throws NullPointerException if str is null
-   * @since 1.2
    */
   public StringBuilder replace(int start, int end, String str)
   {
@@ -601,7 +594,6 @@ public final class StringBuilder
    * @return new String which is a substring of this StringBuilder
    * @throws StringIndexOutOfBoundsException if beginIndex is out of bounds
    * @see #substring(int, int)
-   * @since 1.2
    */
   public String substring(int beginIndex)
   {
@@ -620,7 +612,6 @@ public final class StringBuilder
    * @throws IndexOutOfBoundsException if beginIndex or endIndex is out of
    *         bounds
    * @see #substring(int, int)
-   * @since 1.4
    */
   public CharSequence subSequence(int beginIndex, int endIndex)
   {
@@ -636,7 +627,6 @@ public final class StringBuilder
    * @return new String which is a substring of this StringBuilder
    * @throws StringIndexOutOfBoundsException if beginIndex or endIndex is out
    *         of bounds
-   * @since 1.2
    */
   public String substring(int beginIndex, int endIndex)
   {
@@ -659,7 +649,6 @@ public final class StringBuilder
    * @return this <code>StringBuilder</code>
    * @throws NullPointerException if <code>str</code> is <code>null</code>
    * @throws StringIndexOutOfBoundsException if any index is out of bounds
-   * @since 1.2
    */
   public StringBuilder insert(int offset,
 			      char[] str, int str_offset, int len)
@@ -836,7 +825,6 @@ public final class StringBuilder
    * @return location (base 0) of the String, or -1 if not found
    * @throws NullPointerException if str is null
    * @see #indexOf(String, int)
-   * @since 1.4
    */
   public int indexOf(String str)
   {
@@ -853,7 +841,6 @@ public final class StringBuilder
    * @param fromIndex index to start the search
    * @return location (base 0) of the String, or -1 if not found
    * @throws NullPointerException if str is null
-   * @since 1.4
    */
   public int indexOf(String str, int fromIndex)
   {
@@ -873,7 +860,6 @@ public final class StringBuilder
    * @return location (base 0) of the String, or -1 if not found
    * @throws NullPointerException if str is null
    * @see #lastIndexOf(String, int)
-   * @since 1.4
    */
   public int lastIndexOf(String str)
   {
@@ -890,7 +876,6 @@ public final class StringBuilder
    * @param fromIndex index to start the search
    * @return location (base 0) of the String, or -1 if not found
    * @throws NullPointerException if str is null
-   * @since 1.4
    */
   public int lastIndexOf(String str, int fromIndex)
   {

@@ -4039,7 +4039,7 @@ public class Collections
    * The implementation of {@link #unmodifiableCollection(Collection)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class UnmodifiableCollection<T>
     implements Collection<T>, Serializable
