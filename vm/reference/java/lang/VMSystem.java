@@ -1,5 +1,5 @@
 /* VMSystem.java -- helper for java.lang.system
-   Copyright (C) 1998, 2002 Free Software Foundation
+   Copyright (C) 1998, 2002, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.util.Map;
 import java.util.Properties;
 
 import java.io.*;
@@ -136,6 +137,21 @@ final class VMSystem
    * @see java.util.Date
    */
    public static native long currentTimeMillis();
+
+  /**
+   * Return an unmodifiable Map representing the current environment.
+   */
+  static native Map<String, String> getenv();
+
+  /**
+   * Return a single element from the current environment.
+   */
+  static String getenv(String k)
+  {
+    // Inefficient but portable default implementation.
+    Map<String, String> m = getenv();
+    return m.get(k);
+  }
 
   /**
    * Helper method which creates the standard input stream.

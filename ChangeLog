@@ -1,3 +1,9 @@
+2005-01-02  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/System.java (getenv(String)): Rewrote.
+	(getenv): New method.
+	* vm/reference/java/lang/VMSystem.java (getenv): New methods.
+
 2004-12-18  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/String.java (String(StringBuilder)): Rewrote.
