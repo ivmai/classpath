@@ -9,6 +9,7 @@ classes
 classes.awt
 classes.locale1
 classes.locale2
+classes.locale
 classes.standard
 classes.standardx
 classes.xml

@@ -1114,11 +1114,14 @@ public final class Class<T> implements Serializable
 	  }
 	if (constructor == null)
 	  throw new InstantiationException(getName());
-	if (!Modifier.isPublic(constructor.getModifiers()))
+	if (!Modifier.isPublic(constructor.getModifiers())
+            || !Modifier.isPublic(getModifiers()))
 	  {
 	    final Constructor finalConstructor = constructor;
-	    AccessController.doPrivileged(new PrivilegedAction() {
-		public Object run() {
+	    AccessController.doPrivileged(new PrivilegedAction()
+	      {
+		public Object run()
+	        {
 		  finalConstructor.setAccessible(true);
 		  return null;
 		}
@@ -1131,7 +1134,8 @@ public final class Class<T> implements Serializable
 	  }	    
       }
     int modifiers = constructor.getModifiers();
-    if (!Modifier.isPublic(modifiers))
+    if (!Modifier.isPublic(modifiers)
+        || !Modifier.isPublic(getModifiers()))
       {
 	Class caller = VMStackWalker.getCallingClass();
 	if (caller != null &&
