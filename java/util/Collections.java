@@ -1038,7 +1038,7 @@ public class Collections
    * @see Comparable
    * @see Serializable
    */
-  public static <T> Comparator<T> reverseOrder<T>()
+  public static <T> Comparator<T> reverseOrder()
   {
     return (Comparator<T>) rcInstance; // fixme?
   }

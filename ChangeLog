@@ -1,5 +1,7 @@
 2004-08-08  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/Collections.java (reverseOrder): Syntax fix.
+
 	* external/jaxp/source/gnu/xml/aelfred2/XmlParser.java: Don't use
 	`enum' keyword.
 
