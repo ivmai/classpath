@@ -2,7 +2,7 @@
 // http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
-// $Id: Attributes.java,v 1.1 2003-02-01 02:10:41 cbj Exp $
+// $Id: Attributes.java,v 1.1.1.1 2003-02-01 02:10:41 cbj Exp $
 
 package org.xml.sax;
 

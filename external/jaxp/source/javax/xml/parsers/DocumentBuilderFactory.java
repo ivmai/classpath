@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentBuilderFactory.java,v 1.1 2003-02-01 02:10:26 cbj Exp $
+ * $Id: DocumentBuilderFactory.java,v 1.1.1.1 2003-02-01 02:10:26 cbj Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -43,7 +43,7 @@ import org.xml.sax.*;
  * W3C DOM APIs don't include portable bootstrapping.
  *
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilderFactory.java,v 1.1 2003-02-01 02:10:26 cbj Exp $
+ * @version	$Id: DocumentBuilderFactory.java,v 1.1.1.1 2003-02-01 02:10:26 cbj Exp $
  */
 public abstract class DocumentBuilderFactory {
 

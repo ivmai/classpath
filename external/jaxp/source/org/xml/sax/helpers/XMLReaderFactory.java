@@ -3,7 +3,7 @@
 // Written by David Megginson
 // and by David Brownell
 // NO WARRANTY!  This class is in the Public Domain.
-// $Id: XMLReaderFactory.java,v 1.1 2003-02-01 02:10:48 cbj Exp $
+// $Id: XMLReaderFactory.java,v 1.1.1.1 2003-02-01 02:10:48 cbj Exp $
 
 package org.xml.sax.helpers;
 import java.io.BufferedReader;

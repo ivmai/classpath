@@ -1,5 +1,5 @@
 /*
- * $Id: LinkFilter.java,v 1.1 2003-02-01 02:10:19 cbj Exp $
+ * $Id: LinkFilter.java,v 1.1.1.1 2003-02-01 02:10:19 cbj Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -37,7 +37,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 
-// $Id: LinkFilter.java,v 1.1 2003-02-01 02:10:19 cbj Exp $
+// $Id: LinkFilter.java,v 1.1.1.1 2003-02-01 02:10:19 cbj Exp $
 
 /**
  * Pipeline filter to remember XHTML links found in a document,

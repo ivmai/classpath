@@ -1,5 +1,5 @@
 /*
- * $Id: DOMLocator.java,v 1.1 2003-02-01 02:10:28 cbj Exp $
+ * $Id: DOMLocator.java,v 1.1.1.1 2003-02-01 02:10:28 cbj Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * 
  * This file is part of GNU JAXP, a library.

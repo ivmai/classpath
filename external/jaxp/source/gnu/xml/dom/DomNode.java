@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.1 2003-02-01 02:10:17 cbj Exp $
+ * $Id: DomNode.java,v 1.1.1.1 2003-02-01 02:10:17 cbj Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.1 2003-02-01 02:10:17 cbj Exp $
+// $Id: DomNode.java,v 1.1.1.1 2003-02-01 02:10:17 cbj Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.

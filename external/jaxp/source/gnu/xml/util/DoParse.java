@@ -1,5 +1,5 @@
 /*
- * $Id: DoParse.java,v 1.1 2003-02-01 02:10:23 cbj Exp $
+ * $Id: DoParse.java,v 1.1.1.1 2003-02-01 02:10:23 cbj Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -50,7 +50,7 @@ import gnu.xml.pipeline.XIncludeFilter;
 import gnu.xml.pipeline.XsltFilter;
 
 
-// $Id: DoParse.java,v 1.1 2003-02-01 02:10:23 cbj Exp $
+// $Id: DoParse.java,v 1.1.1.1 2003-02-01 02:10:23 cbj Exp $
 
 /**
  * This class provides a driver which may be invoked from the command line

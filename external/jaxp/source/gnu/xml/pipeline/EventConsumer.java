@@ -1,5 +1,5 @@
 /*
- * $Id: EventConsumer.java,v 1.1 2003-02-01 02:10:18 cbj Exp $
+ * $Id: EventConsumer.java,v 1.1.1.1 2003-02-01 02:10:18 cbj Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.

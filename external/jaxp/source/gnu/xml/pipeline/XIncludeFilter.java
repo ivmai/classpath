@@ -1,5 +1,5 @@
 /*
- * $Id: XIncludeFilter.java,v 1.1 2003-02-01 02:10:22 cbj Exp $
+ * $Id: XIncludeFilter.java,v 1.1.1.1 2003-02-01 02:10:22 cbj Exp $
  * Copyright (C) 2001-2002 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -50,7 +50,7 @@ import gnu.xml.util.Resolver;
 
 
 
-// $Id: XIncludeFilter.java,v 1.1 2003-02-01 02:10:22 cbj Exp $
+// $Id: XIncludeFilter.java,v 1.1.1.1 2003-02-01 02:10:22 cbj Exp $
 
 /**
  * Filter to process an XPointer-free subset of

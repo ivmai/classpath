@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.1 2003-02-01 02:10:12 cbj Exp $
+ * $Id: XmlParser.java,v 1.1.1.1 2003-02-01 02:10:12 cbj Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.1 2003-02-01 02:10:12 cbj Exp $
+// $Id: XmlParser.java,v 1.1.1.1 2003-02-01 02:10:12 cbj Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
