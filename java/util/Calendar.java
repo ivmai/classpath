@@ -51,7 +51,7 @@ import java.lang.reflect.InvocationTargetException;
  * integer fields which represent <code>YEAR</code>,
  * <code>MONTH</code>, <code>DAY</code>, etc.  The <code>Date</code>
  * object represents a time in milliseconds since the Epoch. <br>
- * 
+ *
  * This class is locale sensitive.  To get the Object matching the
  * current locale you can use <code>getInstance</code>.  You can even provide
  * a locale or a timezone.  <code>getInstance</code> returns currently
@@ -78,13 +78,13 @@ import java.lang.reflect.InvocationTargetException;
  * and for the first line all fields are set, that line is used to
  * compute the day. <br>
  *
- * 
+ *
 <pre>month + day_of_month
 month + week_of_month + day_of_week
 month + day_of_week_of_month + day_of_week
 day_of_year
 day_of_week + week_of_year</pre>
- * 
+ *
  * The hour_of_day-field takes precedence over the ampm and
  * hour_of_ampm fields. <br>
  *
@@ -92,7 +92,7 @@ day_of_week + week_of_year</pre>
  *
  * To convert a calendar to a human readable form and vice versa,  use
  * the <code>java.text.DateFormat</code> class. <br>
- * 
+ *
  * Other useful things you can do with an calendar, is
  * <code>roll</code>ing fields (that means increase/decrease a
  * specific field by one, propagating overflows), or
@@ -101,7 +101,7 @@ day_of_week + week_of_year</pre>
  * @see Date
  * @see GregorianCalendar
  * @see TimeZone
- * @see java.text.DateFormat 
+ * @see java.text.DateFormat
  */
 public abstract class Calendar
   implements Serializable, Cloneable, Comparable<Calendar>
@@ -110,43 +110,52 @@ public abstract class Calendar
    * Constant representing the era time field.
    */
   public static final int ERA = 0;
+
   /**
    * Constant representing the year time field.
    */
   public static final int YEAR = 1;
+
   /**
    * Constant representing the month time field.  This field
    * should contain one of the JANUARY,...,DECEMBER constants below.
    */
   public static final int MONTH = 2;
+
   /**
    * Constant representing the week of the year field.
    * @see #setFirstDayOfWeek(int)
    */
   public static final int WEEK_OF_YEAR = 3;
+
   /**
    * Constant representing the week of the month time field.
    * @see #setFirstDayOfWeek(int)
    */
   public static final int WEEK_OF_MONTH = 4;
+
   /**
    * Constant representing the day time field, synonym for DAY_OF_MONTH.
    */
   public static final int DATE = 5;
+
   /**
    * Constant representing the day time field.
    */
   public static final int DAY_OF_MONTH = 5;
+
   /**
    * Constant representing the day of year time field.  This is
    * 1 for the first day in month.
    */
   public static final int DAY_OF_YEAR = 6;
+
   /**
    * Constant representing the day of week time field.  This field
    * should contain one of the SUNDAY,...,SATURDAY constants below.
    */
   public static final int DAY_OF_WEEK = 7;
+
   /**
    * Constant representing the day-of-week-in-month field.  For
    * instance this field contains 2 for the second thursday in a
@@ -154,42 +163,51 @@ public abstract class Calendar
    * from the end of the month.
    */
   public static final int DAY_OF_WEEK_IN_MONTH = 8;
+
   /**
    * Constant representing the part of the day for 12-hour clock.  This
    * should be one of AM or PM.
    */
   public static final int AM_PM = 9;
+
   /**
    * Constant representing the hour time field for 12-hour clock.
    */
   public static final int HOUR = 10;
+
   /**
    * Constant representing the hour of day time field for 24-hour clock.
    */
   public static final int HOUR_OF_DAY = 11;
+
   /**
    * Constant representing the minute of hour time field.
    */
   public static final int MINUTE = 12;
+
   /**
    * Constant representing the second time field.
    */
   public static final int SECOND = 13;
+
   /**
    * Constant representing the millisecond time field.
    */
   public static final int MILLISECOND = 14;
+
   /**
    * Constant representing the time zone offset time field for the
    * time given in the other fields.  It is measured in
-   * milliseconds.  The default is the offset of the time zone.  
+   * milliseconds.  The default is the offset of the time zone.
    */
   public static final int ZONE_OFFSET = 15;
+
   /**
    * Constant representing the daylight saving time offset in
-   * milliseconds.  The default is the value given by the time zone.  
+   * milliseconds.  The default is the value given by the time zone.
    */
   public static final int DST_OFFSET = 16;
+
   /**
    * Number of time fields.
    */
@@ -199,26 +217,32 @@ public abstract class Calendar
    * Constant representing Sunday.
    */
   public static final int SUNDAY = 1;
+
   /**
    * Constant representing Monday.
    */
   public static final int MONDAY = 2;
+
   /**
    * Constant representing Tuesday.
    */
   public static final int TUESDAY = 3;
+
   /**
    * Constant representing Wednesday.
    */
   public static final int WEDNESDAY = 4;
+
   /**
    * Constant representing Thursday.
    */
   public static final int THURSDAY = 5;
+
   /**
    * Constant representing Friday.
    */
   public static final int FRIDAY = 6;
+
   /**
    * Constant representing Saturday.
    */
@@ -228,50 +252,62 @@ public abstract class Calendar
    * Constant representing January.
    */
   public static final int JANUARY = 0;
+
   /**
    * Constant representing February.
    */
   public static final int FEBRUARY = 1;
+
   /**
    * Constant representing March.
    */
   public static final int MARCH = 2;
+
   /**
    * Constant representing April.
    */
   public static final int APRIL = 3;
+
   /**
    * Constant representing May.
    */
   public static final int MAY = 4;
+
   /**
    * Constant representing June.
    */
   public static final int JUNE = 5;
+
   /**
    * Constant representing July.
    */
   public static final int JULY = 6;
+
   /**
    * Constant representing August.
    */
   public static final int AUGUST = 7;
+
   /**
    * Constant representing September.
    */
   public static final int SEPTEMBER = 8;
+
   /**
    * Constant representing October.
    */
   public static final int OCTOBER = 9;
+
   /**
    * Constant representing November.
    */
   public static final int NOVEMBER = 10;
+
   /**
    * Constant representing December.
    */
   public static final int DECEMBER = 11;
+
   /**
    * Constant representing Undecimber. This is an artificial name useful
    * for lunar calendars.
@@ -282,6 +318,7 @@ public abstract class Calendar
    * Useful constant for 12-hour clock.
    */
   public static final int AM = 0;
+
   /**
    * Useful constant for 12-hour clock.
    */
@@ -293,21 +330,25 @@ public abstract class Calendar
    * @serial
    */
   protected int[] fields = new int[FIELD_COUNT];
+
   /**
    * The flags which tell if the fields above have a value.
    * @serial
    */
   protected boolean[] isSet = new boolean[FIELD_COUNT];
+
   /**
    * The time in milliseconds since the epoch.
    * @serial
    */
   protected long time;
+
   /**
    * Tells if the above field has a valid value.
    * @serial
    */
   protected boolean isTimeSet;
+
   /**
    * Tells if the fields have a valid value.  This superseeds the isSet
    * array.
@@ -333,7 +374,7 @@ public abstract class Calendar
 
   /**
    * Sets what the first day of week is.  This is used for
-   * WEEK_OF_MONTH and WEEK_OF_YEAR fields. 
+   * WEEK_OF_MONTH and WEEK_OF_YEAR fields.
    * @serial
    */
   private int firstDayOfWeek;
@@ -350,12 +391,12 @@ public abstract class Calendar
   /**
    * Is set to true if DST_OFFSET is explicitly set. In that case
    * it's value overrides the value computed from the current
-   * time and the timezone. 
+   * time and the timezone.
    */
   private boolean explicitDSTOffset = false;
 
   /**
-   * The version of the serialized data on the stream. 
+   * The version of the serialized data on the stream.
    * <dl><dt>0 or not present</dt>
    * <dd> JDK 1.1.5 or later.</dd>
    * <dl><dt>1</dt>
@@ -379,14 +420,14 @@ public abstract class Calendar
   private static final String bundleName = "gnu.java.locale.Calendar";
 
   /**
-   * get resource bundle: 
+   * get resource bundle:
    * The resources should be loaded via this method only. Iff an application
-   * uses this method, the resourcebundle is required. 
+   * uses this method, the resourcebundle is required.
    */
-  private static ResourceBundle getBundle(Locale locale) 
+  private static ResourceBundle getBundle(Locale locale)
   {
     return ResourceBundle.getBundle(bundleName, locale,
-      ClassLoader.getSystemClassLoader());
+                                    ClassLoader.getSystemClassLoader());
   }
 
   /**
@@ -412,8 +453,8 @@ public abstract class Calendar
     ResourceBundle rb = getBundle(locale);
 
     firstDayOfWeek = ((Integer) rb.getObject("firstDayOfWeek")).intValue();
-    minimalDaysInFirstWeek =
-      ((Integer) rb.getObject("minimalDaysInFirstWeek")).intValue();
+    minimalDaysInFirstWeek = ((Integer) rb.getObject("minimalDaysInFirstWeek"))
+                             .intValue();
   }
 
   /**
@@ -445,15 +486,17 @@ public abstract class Calendar
     return getInstance(TimeZone.getDefault(), locale);
   }
 
-  /** 
+  /**
    * Cache of locale->calendar-class mappings. This avoids having to do a ResourceBundle
-   * lookup for every getInstance call.  
+   * lookup for every getInstance call.
    */
   private static HashMap cache = new HashMap();
 
   /** Preset argument types for calendar-class constructor lookup.  */
-  private static Class[] ctorArgTypes
-    = new Class[] {TimeZone.class, Locale.class};
+  private static Class[] ctorArgTypes = new Class[]
+                                        {
+                                          TimeZone.class, Locale.class
+                                        };
 
   /**
    * Creates a calendar representing the actual time, using the given
@@ -481,7 +524,7 @@ public abstract class Calendar
 	      }
 	  }
 
-        // GregorianCalendar is by far the most common case. Optimize by 
+	// GregorianCalendar is by far the most common case. Optimize by 
 	// avoiding reflection.
 	if (calendarClass == GregorianCalendar.class)
 	  return new GregorianCalendar(zone, locale);
@@ -489,7 +532,7 @@ public abstract class Calendar
 	if (Calendar.class.isAssignableFrom(calendarClass))
 	  {
 	    Constructor ctor = calendarClass.getConstructor(ctorArgTypes);
-	    return (Calendar) ctor.newInstance(new Object[] {zone, locale});
+	    return (Calendar) ctor.newInstance(new Object[] { zone, locale });
 	  }
       }
     catch (ClassNotFoundException ex)
@@ -512,9 +555,9 @@ public abstract class Calendar
       {
 	exception = ex;
       }
-    
-    throw new RuntimeException("Error instantiating calendar for locale " +
-			       locale, exception);
+
+    throw new RuntimeException("Error instantiating calendar for locale "
+                               + locale, exception);
   }
 
   /**
@@ -538,7 +581,7 @@ public abstract class Calendar
    * Converts the milliseconds since the epoch UTC
    * (<code>time</code>) to time fields
    * (<code>fields</code>). Override this method if you write your
-   * own Calendar.  
+   * own Calendar.
    */
   protected abstract void computeFields();
 
@@ -549,7 +592,7 @@ public abstract class Calendar
    */
   public final Date getTime()
   {
-    if (!isTimeSet)
+    if (! isTimeSet)
       computeTime();
     return new Date(time);
   }
@@ -570,7 +613,7 @@ public abstract class Calendar
    */
   public long getTimeInMillis()
   {
-    if (!isTimeSet)
+    if (! isTimeSet)
       computeTime();
     return time;
   }
@@ -601,14 +644,14 @@ public abstract class Calendar
   public int get(int field)
   {
     // If the requested field is invalid, force all fields to be recomputed.
-    if (!isSet[field])
+    if (! isSet[field])
       areFieldsSet = false;
     complete();
     return fields[field];
   }
 
   /**
-   * Gets the value of the specified field. This method doesn't 
+   * Gets the value of the specified field. This method doesn't
    * recompute the fields, if they are invalid.
    * @param field the time field. One of the time field constants.
    * @return the value of the specified field, undefined if
@@ -659,11 +702,11 @@ public abstract class Calendar
 	isSet[HOUR_OF_DAY] = false;
 	break;
       case DST_OFFSET:
-        explicitDSTOffset = true;
+	explicitDSTOffset = true;
       }
 
     // May have crossed over a DST boundary.
-    if (!explicitDSTOffset && (field != DST_OFFSET && field != ZONE_OFFSET))
+    if (! explicitDSTOffset && (field != DST_OFFSET && field != ZONE_OFFSET))
       isSet[DST_OFFSET] = false;
   }
 
@@ -686,8 +729,8 @@ public abstract class Calendar
     isSet[DAY_OF_WEEK] = false;
     isSet[DAY_OF_WEEK_IN_MONTH] = false;
 
-    if (!explicitDSTOffset)
-      isSet[DST_OFFSET] = false;  // May have crossed a DST boundary.
+    if (! explicitDSTOffset)
+      isSet[DST_OFFSET] = false; // May have crossed a DST boundary.
   }
 
   /**
@@ -717,8 +760,8 @@ public abstract class Calendar
    * @param minute the minute.
    * @param second the second.
    */
-  public final void set(int year, int month, int date,
-			int hour, int minute, int second)
+  public final void set(int year, int month, int date, int hour, int minute,
+                        int second)
   {
     set(year, month, date, hour, minute);
     fields[SECOND] = second;
@@ -768,18 +811,18 @@ public abstract class Calendar
 
   /**
    * Fills any unset fields in the time field list
-   * @return true if the specified field has a value.  
+   * @return true if the specified field has a value.
    */
   protected void complete()
   {
-    if (!isTimeSet)
+    if (! isTimeSet)
       computeTime();
-    if (!areFieldsSet)
+    if (! areFieldsSet)
       computeFields();
   }
 
   /**
-   * Compares the given calendar with this.  
+   * Compares the given calendar with this.
    * @param o the object to that we should compare.
    * @return true, if the given object is a calendar, that represents
    * the same time (but doesn't necessary have the same fields).
@@ -787,12 +830,12 @@ public abstract class Calendar
   public boolean equals(Object o)
   {
     return (o instanceof Calendar)
-      && getTimeInMillis() == ((Calendar) o).getTimeInMillis();
+           && getTimeInMillis() == ((Calendar) o).getTimeInMillis();
   }
 
   /**
    * Returns a hash code for this calendar.
-   * @return a hash code, which fullfits the general contract of 
+   * @return a hash code, which fullfits the general contract of
    * <code>hashCode()</code>
    */
   public int hashCode()
@@ -802,7 +845,7 @@ public abstract class Calendar
   }
 
   /**
-   * Compares the given calendar with this.  
+   * Compares the given calendar with this.
    * @param o the object to that we should compare.
    * @return true, if the given object is a calendar, and this calendar
    * represents a smaller time than the calendar o.
@@ -815,7 +858,7 @@ public abstract class Calendar
   }
 
   /**
-   * Compares the given calendar with this.  
+   * Compares the given calendar with this.
    * @param o the object to that we should compare.
    * @return true, if the given object is a calendar, and this calendar
    * represents a bigger time than the calendar o.
@@ -842,11 +885,11 @@ public abstract class Calendar
   /**
    * Rolls the specified time field up or down.  This means add one
    * to the specified field, but don't change the other fields.  If
-   * the maximum for this field is reached, start over with the 
+   * the maximum for this field is reached, start over with the
    * minimum value.  <br>
    *
    * <strong>Note:</strong> There may be situation, where the other
-   * fields must be changed, e.g rolling the month on May, 31. 
+   * fields must be changed, e.g rolling the month on May, 31.
    * The date June, 31 is automatically converted to July, 1.
    * @param field the time field. One of the time field constants.
    * @param up the direction, true for up, false for down.
@@ -865,7 +908,7 @@ public abstract class Calendar
    *
    * @param field the time field. One of the time field constants.
    * @param amount the amount to roll by, positive for rolling up,
-   * negative for rolling down.  
+   * negative for rolling down.
    * @throws ArrayIndexOutOfBoundsException if the field is outside
    *         the valid range.  The value of field must be >= 0 and
    *         <= <code>FIELD_COUNT</code>.
@@ -884,7 +927,6 @@ public abstract class Calendar
 	amount++;
       }
   }
-
 
   /**
    * Sets the time zone to the specified value.
@@ -929,7 +971,7 @@ public abstract class Calendar
 
   /**
    * Sets what the first day of week is.  This is used for
-   * WEEK_OF_MONTH and WEEK_OF_YEAR fields. 
+   * WEEK_OF_MONTH and WEEK_OF_YEAR fields.
    * @param value the first day of week.  One of SUNDAY to SATURDAY.
    */
   public void setFirstDayOfWeek(int value)
@@ -939,7 +981,7 @@ public abstract class Calendar
 
   /**
    * Gets what the first day of week is.  This is used for
-   * WEEK_OF_MONTH and WEEK_OF_YEAR fields. 
+   * WEEK_OF_MONTH and WEEK_OF_YEAR fields.
    * @return the first day of week.  One of SUNDAY to SATURDAY.
    */
   public int getFirstDayOfWeek()
@@ -983,7 +1025,6 @@ public abstract class Calendar
    */
   public abstract int getMaximum(int field);
 
-
   /**
    * Gets the greatest minimum value that is allowed for the specified field.
    * @param field the time field. One of the time field constants.
@@ -995,7 +1036,7 @@ public abstract class Calendar
    * Gets the smallest maximum value that is allowed for the
    * specified field.  For example this is 28 for DAY_OF_MONTH.
    * @param field the time field. One of the time field constants.
-   * @return the least maximum value.  
+   * @return the least maximum value.
    */
   public abstract int getLeastMaximum(int field);
 
@@ -1011,16 +1052,15 @@ public abstract class Calendar
    */
   public int getActualMinimum(int field)
   {
-    Calendar tmp = (Calendar)clone();	// To avoid restoring state
+    Calendar tmp = (Calendar) clone(); // To avoid restoring state
     int min = tmp.getGreatestMinimum(field);
     int end = tmp.getMinimum(field);
     tmp.set(field, min);
     for (; min > end; min--)
       {
-	tmp.add(field, -1);	// Try to get smaller
+	tmp.add(field, -1); // Try to get smaller
 	if (tmp.get(field) != min - 1)
-	  break;		// Done if not successful
-
+	  break; // Done if not successful
       }
     return min;
   }
@@ -1029,7 +1069,7 @@ public abstract class Calendar
    * Gets the actual maximum value that is allowed for the specified field.
    * This value is dependent on the values of the other fields.
    * @param field the time field. One of the time field constants.
-   * @return the actual maximum value.  
+   * @return the actual maximum value.
    * @throws ArrayIndexOutOfBoundsException if the field is outside
    *         the valid range.  The value of field must be >= 0 and
    *         <= <code>FIELD_COUNT</code>.
@@ -1037,7 +1077,7 @@ public abstract class Calendar
    */
   public int getActualMaximum(int field)
   {
-    Calendar tmp = (Calendar)clone();	// To avoid restoring state
+    Calendar tmp = (Calendar) clone(); // To avoid restoring state
     int max = tmp.getLeastMaximum(field);
     int end = tmp.getMaximum(field);
     tmp.set(field, max);
@@ -1066,7 +1106,7 @@ public abstract class Calendar
       {
 	Calendar cal = (Calendar) super.clone();
 	cal.fields = (int[]) fields.clone();
-	cal.isSet = (boolean[])isSet.clone();
+	cal.isSet = (boolean[]) isSet.clone();
 	return cal;
       }
     catch (CloneNotSupportedException ex)
@@ -1075,16 +1115,19 @@ public abstract class Calendar
       }
   }
 
-  private static final String[] fieldNames = {
-    ",ERA=", ",YEAR=", ",MONTH=",
-    ",WEEK_OF_YEAR=", ",WEEK_OF_MONTH=",
-    ",DAY_OF_MONTH=", ",DAY_OF_YEAR=", ",DAY_OF_WEEK=",
-    ",DAY_OF_WEEK_IN_MONTH=",
-    ",AM_PM=", ",HOUR=", ",HOUR_OF_DAY=",
-    ",MINUTE=", ",SECOND=", ",MILLISECOND=",
-    ",ZONE_OFFSET=", ",DST_OFFSET="
-  };
-
+  private static final String[] fieldNames = 
+                                             {
+                                               ",ERA=", ",YEAR=", ",MONTH=",
+                                               ",WEEK_OF_YEAR=",
+                                               ",WEEK_OF_MONTH=",
+                                               ",DAY_OF_MONTH=",
+                                               ",DAY_OF_YEAR=", ",DAY_OF_WEEK=",
+                                               ",DAY_OF_WEEK_IN_MONTH=",
+                                               ",AM_PM=", ",HOUR=",
+                                               ",HOUR_OF_DAY=", ",MINUTE=",
+                                               ",SECOND=", ",MILLISECOND=",
+                                               ",ZONE_OFFSET=", ",DST_OFFSET="
+                                             };
 
   /**
    * Returns a string representation of this object.  It is mainly
@@ -1127,7 +1170,7 @@ public abstract class Calendar
    * says, that it could be omitted.  */
   private void writeObject(ObjectOutputStream stream) throws IOException
   {
-    if (!isTimeSet)
+    if (! isTimeSet)
       computeTime();
     stream.defaultWriteObject();
   }
@@ -1139,7 +1182,7 @@ public abstract class Calendar
     throws IOException, ClassNotFoundException
   {
     stream.defaultReadObject();
-    if (!isTimeSet)
+    if (! isTimeSet)
       computeTime();
 
     if (serialVersionOnStream > 1)
@@ -1148,7 +1191,6 @@ public abstract class Calendar
 	// Sun wants to remove all fields from the stream someday
 	// and will then increase the serialVersion number again.
 	// We prepare to be compatible.
-
 	fields = new int[FIELD_COUNT];
 	isSet = new boolean[FIELD_COUNT];
 	areFieldsSet = false;
