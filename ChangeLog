@@ -1,5 +1,7 @@
 2005-01-02  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/System.java (getenv): Added @since.
+
 	* java/lang/System.java (getenv(String)): Rewrote.
 	(getenv): New method.
 	* vm/reference/java/lang/VMSystem.java (getenv): New methods.

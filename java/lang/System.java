@@ -634,6 +634,7 @@ public final class System
 
   /**
    * FIXME: document
+   * @since 1.5
    */
   public static Map<String, String> getenv()
   {
