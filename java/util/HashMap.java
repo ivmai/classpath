@@ -154,7 +154,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
   /**
    * The cache for {@link #entrySet()}.
    */
-  private transient Set<HashEntry<K, V>> entries;
+  private transient Set<Map.Entry<K, V>> entries;
 
   /**
    * Class to represent an entry in the hash table. Holds a single key-value
@@ -380,11 +380,11 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    */
   public void putAll(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<? extends K, ? extends V>> itr
-      = m.entrySet().iterator();
-    while (itr.hasNext())
+    Map<K,V> addMap;
+
+    addMap = (Map<K,V>) m;
+    for (Map.Entry<K,V> e : addMap.entrySet())
       {
-        Map.Entry<? extends K, ? extends V> e = itr.next();
         // Optimize in case the Entry is one of our own.
         if (e instanceof AbstractMap.BasicMapEntry)
           {
@@ -710,13 +710,13 @@ public class HashMap<K, V> extends AbstractMap<K, V>
    */
   void putAllInternal(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<? extends K, ? extends V>> itr
-      = m.entrySet().iterator();
+    Map<K,V> addMap;
+
+    addMap = (Map<K,V>) m;
     size = 0;
-    while (itr.hasNext())
+    for (Map.Entry<K,V> e : addMap.entrySet())
       {
         size++;
-	Map.Entry<? extends K, ? extends V> e = itr.next();
 	K key = e.getKey();
 	int idx = hash(key);
 	addEntry(key, e.getValue(), idx, false);

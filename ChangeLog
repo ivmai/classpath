@@ -1,3 +1,40 @@
+2005-01-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/Arrays.java:
+	(sort(T[],int,int,Comparator<? super T>)): Typed
+	Object[] to T[]
+	* java/util/Collections.java;
+	(compare(T,T,<? super T>)): typed generically
+	(binarySearch(List<? extends T>,T,Comparator<? super T>)):
+	re-typed and added casts to List<T>
+	(rotate(List<? super Object>, int)): added (incorrect?)
+	super type to compile
+	(shuffle(List<? super Object>): likewise
+	(shuffle(List<? super Object, Random)): likewise
+	(entrySet()): singleton version changed for accuracy
+	(swap(List<? super Object>,int,int)): added (incorrect?)
+	super type to compile
+	(entrySet()): unmodifiable version removed invalid
+	static typing of K and V
+	* java/util/HashMap.java:
+	(entries): re-typed to Set<Map.Entry<K,V>>
+	(putAll(Map<? extends K, ? extends V>)): cast and foreach
+	statement added
+	(putAllInternal(Map<? extends K, ? extends V>)): likewise
+	* java/util/Hashtable.java:
+	same as for HashMap
+	* java/util/LinkedHashEntry.java:
+	(pred,succ): generically typed
+	(LinkedHashEntry(K,V)): likewise
+	(cleanup()): likewise
+	(get(Object)): likewise
+	(addEntry(K,V,int,boolean)): likewise
+	* java/util/LinkedList.java:
+	changed incorrect cast
+	(LinkedListItr<I>): re-typed to unique I from T
+	* java/util/TreeSet.java:
+	cast set to SortedSet<T> before using
+
 2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/Collections.java

@@ -2237,9 +2237,9 @@ public class Arrays
     if (len <= 6)
       return;
 
-    Object[] src = a;
-    Object[] dest = new Object[len];
-    Object[] t = null; // t is used for swapping src and dest
+    T[] src = a;
+    T[] dest = (T[]) new Object[len];
+    T[] t = null; // t is used for swapping src and dest
 
     // The difference of the fromIndex of the src and dest array.
     int srcDestDiff = -fromIndex;

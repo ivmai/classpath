@@ -132,16 +132,16 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
    * Class to represent an entry in the hash table. Holds a single key-value
    * pair and the doubly-linked insertion order list.
    */
-  class LinkedHashEntry extends HashEntry
+  class LinkedHashEntry<K,V> extends HashEntry<K,V>
   {
     /**
      * The predecessor in the iteration list. If this entry is the root
      * (eldest), pred points to the newest entry.
      */
-    LinkedHashEntry pred;
+    LinkedHashEntry<K,V> pred;
 
     /** The successor in the iteration list, null if this is the newest. */
-    LinkedHashEntry succ;
+    LinkedHashEntry<K,V> succ;
 
     /**
      * Simple constructor.
@@ -149,7 +149,7 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
      * @param key the key
      * @param value the value
      */
-    LinkedHashEntry(Object key, Object value)
+    LinkedHashEntry(K key, V value)
     {
       super(key, value);
       if (root == null)
@@ -198,7 +198,7 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
      *
      * @return the value of this key as it is removed
      */
-    Object cleanup()
+    V cleanup()
     {
       if (this == root)
         {
@@ -339,7 +339,7 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
   public V get(Object key)
   {
     int idx = hash(key);
-    HashEntry e = buckets[idx];
+    HashEntry<K,V> e = buckets[idx];
     while (e != null)
       {
         if (equals(key, e.key))
@@ -408,7 +408,7 @@ public class LinkedHashMap<K,V> extends HashMap<K,V>
    * @see #removeEldestEntry(Map.Entry)
    * @see LinkedHashEntry#LinkedHashEntry(Object, Object)
    */
-  void addEntry(Object key, Object value, int idx, boolean callRemove)
+  void addEntry(K key, V value, int idx, boolean callRemove)
   {
     LinkedHashEntry e = new LinkedHashEntry(key, value);
     e.next = buckets[idx];

@@ -149,8 +149,10 @@ public class TreeSet<T> extends AbstractSet<T>
    */
   public TreeSet(SortedSet<? extends T> sortedSet)
   {
+    Iterator<T> itr;
+
     map = new TreeMap<T, String>(sortedSet.comparator());
-    Iterator<? extends T> itr = sortedSet.iterator();
+    itr = ((SortedSet<T>) sortedSet).iterator();
     ((TreeMap<T, String>) map).putKeysLinear(itr, sortedSet.size());
   }
 

@@ -501,7 +501,7 @@ public class Collections
    * clever, but worth it for removing a duplicate of the search code.
    * Note: This code is also used in Arrays (for sort as well as search).
    */
-  static final int compare(Object o1, Object o2, Comparator<?> c)
+  static final <T> int compare(T o1, T o2, Comparator<? super T> c)
   {
     return c == null ? ((Comparable) o1).compareTo(o2) : c.compare(o1, o2);
   }
@@ -563,7 +563,8 @@ public class Collections
    *         ordering (only possible when c is null)
    * @see #sort(List, Comparator)
    */
-  public static <T> int binarySearch(List<T> l, T key, Comparator<? super T> c)
+  public static <T> int binarySearch(List<? extends T> l, T key,
+				     Comparator<? super T> c)
   {
     int pos = 0;
     int low = 0;
@@ -573,7 +574,7 @@ public class Collections
     // if the list is sequential-access.
     if (isSequential(l))
       {
-	ListIterator<T> itr = l.listIterator();
+	ListIterator<T> itr = ((List<T>) l).listIterator();
         int i = 0;
         while (low <= hi)
           {
@@ -597,7 +598,7 @@ public class Collections
 	while (low <= hi)
 	  {
 	    pos = (low + hi) >> 1;
-	    final int d = compare(key, l.get(pos), c);
+	    final int d = compare(key, ((List<T>) l).get(pos), c);
 	    if (d == 0)
               return pos;
 	    else if (d < 0)
@@ -1112,7 +1113,8 @@ public class Collections
    * @throws UnsupportedOperationException if the list does not support set
    * @since 1.4
    */
-  public static void rotate(List<?> list, int distance)
+  /* FIXME: type should be List<?> but we can't do anything with this */
+  public static void rotate(List<? super Object> list, int distance)
   {
     int size = list.size();
     distance %= size;
@@ -1174,7 +1176,8 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static void shuffle(List<?> l)
+  /* FIXME: type should be List<?> but we can't do anything with this */
+  public static void shuffle(List<? super Object> l)
   {
     if (defaultRandom == null)
       {
@@ -1217,10 +1220,11 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static void shuffle(List<?> l, Random r)
+  /* FIXME: type should be List<?> but we can't do anything with this */
+  public static void shuffle(List<? super Object> l, Random r)
   {
     int lsize = l.size();
-    ListIterator<?> i = l.listIterator(lsize);
+    ListIterator i = ((List) l).listIterator(lsize);
     boolean sequential = isSequential(l);
     Object[] a = null; // stores a copy of the list for the sequential case
 
@@ -1538,7 +1542,7 @@ public class Collections
    * The implementation of {@link #singletonMap(Object)}. This class name
    * is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SingletonMap<K, V> extends AbstractMap<K, V>
     implements Serializable
@@ -1563,7 +1567,7 @@ public class Collections
     /**
      * Cache the entry set.
      */
-    private transient Set<AbstractMap.BasicMapEntry<K, V>> entries;
+    private transient Set<Map.Entry<K, V>> entries;
 
     /**
      * Construct a singleton.
@@ -1582,13 +1586,16 @@ public class Collections
     public Set<Map.Entry<K, V>> entrySet()
     {
       if (entries == null)
-        entries = singleton(new AbstractMap.BasicMapEntry<K, V>(k, v)
-        {
-          public V setValue(V o)
-          {
-            throw new UnsupportedOperationException();
-          }
-        });
+	{
+	  Map.Entry<K,V> entry = new AbstractMap.BasicMapEntry<K, V>(k, v)
+	    {
+	      public V setValue(V o)
+	      {
+		throw new UnsupportedOperationException();
+	      }
+	    };
+	  entries = singleton(entry);
+	}
       return entries;
     }
 
@@ -1724,7 +1731,8 @@ public class Collections
    *         list.size()
    * @since 1.4
    */
-  public static void swap(List<?> l, int i, int j)
+  /* FIXME: type should be List<?> but we can't do anything with this */
+  public static void swap(List<? super Object> l, int i, int j)
   {
     l.set(i, l.set(j, l.get(i)));
   }
@@ -3306,7 +3314,7 @@ public class Collections
    * The implementation of {@link #unmodifiableMap(Map)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class UnmodifiableMap<K, V> implements Map<K, V>, Serializable
   {
@@ -3366,7 +3374,7 @@ public class Collections
     public Set<Map.Entry<K, V>> entrySet()
     {
       if (entries == null)
-        entries = new UnmodifiableEntrySet<Map.Entry<K, V>>(m.entrySet());
+        entries = new UnmodifiableEntrySet<Map.Entry<K,V>>(m.entrySet());
       return entries;
     }
 
@@ -3376,7 +3384,7 @@ public class Collections
      *
      * @author Eric Blake <ebb9@email.byu.edu>
      */
-    private static final class UnmodifiableEntrySet<T extends Map.Entry<K, V>>
+    private static final class UnmodifiableEntrySet<T>
       extends UnmodifiableSet<T>
       implements Serializable
     {
@@ -3401,18 +3409,18 @@ public class Collections
 	{
           public T next()
           {
-            final T e = super.next();
-            return new Map.Entry<K, V>()
+            final Map.Entry e = (Map.Entry) super.next();
+            return (T) new Map.Entry()
 	    {
               public boolean equals(Object o)
               {
                 return e.equals(o);
               }
-              public K getKey()
+              public Object getKey()
               {
                 return e.getKey();
               }
-              public V getValue()
+              public Object getValue()
               {
                 return e.getValue();
               }
@@ -3420,7 +3428,7 @@ public class Collections
               {
                 return e.hashCode();
               }
-              public V setValue(V value)
+              public Object setValue(Object value)
               {
                 throw new UnsupportedOperationException();
               }

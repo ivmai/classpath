@@ -172,7 +172,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
   /**
    * The cache for {@link #entrySet()}.
    */
-  private transient Set<HashEntry<K, V>> entries;
+  private transient Set<Map.Entry<K, V>> entries;
 
   /**
    * Class to represent an entry in the hash table. Holds a single key-value
@@ -511,13 +511,12 @@ public class Hashtable<K, V> extends Dictionary<K, V>
    */
   public synchronized void putAll(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<? extends K, ? extends V>> itr
-      = m.entrySet().iterator();
+    Map<K,V> addMap;
+    
+    addMap = (Map<K,V>) m;
 
-    while (itr.hasNext())
+    for (Map.Entry<K,V> e : addMap.entrySet())
       {
-        Map.Entry<? extends K, ? extends V> e
-	  = (Map.Entry<? extends K, ? extends V>) itr.next();
         // Optimize in case the Entry is one of our own.
         if (e instanceof AbstractMap.BasicMapEntry)
           {
@@ -865,15 +864,14 @@ public class Hashtable<K, V> extends Dictionary<K, V>
    */
   void putAllInternal(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<? extends K, ? extends V>> itr
-      = m.entrySet().iterator();
+    Map<K,V> addMap;
+
+    addMap = (Map<K,V>) m;
     size = 0;
 
-    while (itr.hasNext())
+    for (Map.Entry<K,V> e : addMap.entrySet())
       {
         size++;
-	Map.Entry<? extends K, ? extends V> e
-	  = (Map.Entry<? extends K, ? extends V>) itr.next();
 	K key = e.getKey();
 	int idx = hash(key);
 	HashEntry<K, V> he = new HashEntry<K, V>(key, e.getValue());

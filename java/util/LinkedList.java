@@ -701,7 +701,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
     Entry<T> e = first;
     for (int i = 0; i < size; i++)
       {
-        a[i] = (T) e.data;
+        a[i] = (S) e.data;
         e = e.next;
       }
     return a;
@@ -794,21 +794,22 @@ public class LinkedList<T> extends AbstractSequentialList<T>
    * position in the list and the two list entries it is between.
    *
    * @author Original author unknown
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
-  private final class LinkedListItr implements ListIterator<T>
+  private final class LinkedListItr<I>
+    implements ListIterator<I>
   {
     /** Number of modifications we know about. */
     private int knownMod = modCount;
 
     /** Entry that will be returned by next(). */
-    private Entry<T> next;
+    private Entry<I> next;
 
     /** Entry that will be returned by previous(). */
-    private Entry<T> previous;
+    private Entry<I> previous;
 
     /** Entry that will be affected by remove() or set(). */
-    private Entry<T> lastReturned;
+    private Entry<I> lastReturned;
 
     /** Index of `next'. */
     private int position;
@@ -823,11 +824,11 @@ public class LinkedList<T> extends AbstractSequentialList<T>
       if (index == size)
         {
           next = null;
-          previous = last;
+          previous = (Entry<I>) last;
         }
       else
         {
-          next = getEntry(index);
+          next = (Entry<I>) getEntry(index);
           previous = next.previous;
         }
       position = index;
@@ -899,7 +900,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
      * @throws ConcurrentModificationException if the list was modified
      * @throws NoSuchElementException if there is no next
      */
-    public T next()
+    public I next()
     {
       checkMod();
       if (next == null)
@@ -917,7 +918,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
      * @throws ConcurrentModificationException if the list was modified
      * @throws NoSuchElementException if there is no previous
      */
-    public T previous()
+    public I previous()
     {
       checkMod();
       if (previous == null)
@@ -947,7 +948,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
 
       next = lastReturned.next;
       previous = lastReturned.previous;
-      removeEntry(lastReturned);
+      removeEntry((Entry<T>) lastReturned);
       knownMod++;
 
       lastReturned = null;
@@ -959,26 +960,26 @@ public class LinkedList<T> extends AbstractSequentialList<T>
      * @param o the element to add
      * @throws ConcurrentModificationException if the list was modified
      */
-    public void add(T o)
+    public void add(I o)
     {
       checkMod();
       modCount++;
       knownMod++;
       size++;
       position++;
-      Entry<T> e = new Entry<T>(o);
+      Entry<I> e = new Entry<I>(o);
       e.previous = previous;
       e.next = next;
 
       if (previous != null)
         previous.next = e;
       else
-        first = e;
+        first = (Entry<T>) e;
 
       if (next != null)
         next.previous = e;
       else
-        last = e;
+        last = (Entry<T>) e;
 
       previous = e;
       lastReturned = null;
@@ -991,7 +992,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
      * @throws ConcurrentModificationException if the list was modified
      * @throws IllegalStateException if there was no last element
      */
-    public void set(T o)
+    public void set(I o)
     {
       checkMod();
       if (lastReturned == null)
