@@ -692,7 +692,7 @@ public class LinkedList<T> extends AbstractSequentialList<T>
    *         an element in this list
    * @throws NullPointerException if a is null
    */
-  <S> public S[] toArray(S[] a)
+  public <S> S[] toArray(S[] a)
   {
     if (a.length < size)
       a = (S[]) Array.newInstance(a.getClass().getComponentType(), size);

@@ -52,7 +52,7 @@ public abstract class Enum<T extends Enum<T>>
     this.ordinal = ordinal;
   }
 
-  <S extends Enum<S>> public static Enum valueOf(Class<S> etype, String s)
+  public static <S extends Enum<S>> Enum valueOf(Class<S> etype, String s)
   {
     if (etype == null || s == null)
       throw new NullPointerException();

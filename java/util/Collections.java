@@ -530,8 +530,8 @@ public class Collections
    * @throws NullPointerException if a null element has compareTo called
    * @see #sort(List)
    */
-  <T extends Object & Comparable<? super T>>
-  public static int binarySearch(List<? extends T> l, T key)
+  public static <T extends Object & Comparable<? super T>>
+		int binarySearch(List<? extends T> l, T key)
   {
     return binarySearch(l, key, null);
   }
@@ -563,7 +563,7 @@ public class Collections
    *         ordering (only possible when c is null)
    * @see #sort(List, Comparator)
    */
-  <T> public static int binarySearch(List<T> l, T key, Comparator<? super T> c)
+  public static <T> int binarySearch(List<T> l, T key, Comparator<? super T> c)
   {
     int pos = 0;
     int low = 0;
@@ -624,7 +624,7 @@ public class Collections
    * @throws UnsupportedOperationException if dest.listIterator() does not
    *         support the set operation
    */
-  <T> public static void copy(List<T> dest, List<T> source)
+  public static <T> void copy(List<T> dest, List<T> source)
   {
     int pos = source.size();
     if (dest.size() < pos)
@@ -647,7 +647,7 @@ public class Collections
    * @param c the Collection to iterate over
    * @return an Enumeration backed by an Iterator over c
    */
-  <T> public static Enumeration<T> enumeration(Collection<T> c)
+  public static <T> Enumeration<T> enumeration(Collection<T> c)
   {
     final Iterator<T> i = c.iterator();
     return new Enumeration<T>()
@@ -672,7 +672,7 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation.
    */
-  <T> public static void fill(List<T> l, T val)
+  public static <T> void fill(List<T> l, T val)
   {
     ListIterator<T> itr = l.listIterator();
     for (int i = l.size() - 1; i >= 0; --i)
@@ -736,7 +736,7 @@ public class Collections
    * @see ArrayList
    * @since 1.4
    */
-  <T> public static ArrayList<T> list(Enumeration<T> e)
+  public static <T> ArrayList<T> list(Enumeration<T> e)
   {
     ArrayList<T> l = new ArrayList<T>();
     while (e.hasMoreElements())
@@ -755,8 +755,8 @@ public class Collections
    * @exception ClassCastException if elements in c are not mutually comparable
    * @exception NullPointerException if null.compareTo is called
    */
-  <T extends Object & Comparable<? super T>>
-  public static T max(Collection<? extends T> c)
+  public static <T extends Object & Comparable<? super T>>
+  T max(Collection<? extends T> c)
   {
     return max(c, null);
   }
@@ -775,7 +775,7 @@ public class Collections
    * @throws NullPointerException if null is compared by natural ordering
    *        (only possible when order is null)
    */
-  <T> public static T max(Collection<? extends T> c,
+  public static <T> T max(Collection<? extends T> c,
 			  Comparator<? super T> order)
   {
     Iterator<? extends T> itr = c.iterator();
@@ -801,8 +801,8 @@ public class Collections
    * @throws ClassCastException if elements in c are not mutually comparable
    * @throws NullPointerException if null.compareTo is called
    */
-  <T extends Object & Comparable<? super T>>
-  public static T min(Collection<? extends T> c)
+  public static <T extends Object & Comparable<? super T>>
+  T min(Collection<? extends T> c)
   {
     return min(c, null);
   }
@@ -821,7 +821,7 @@ public class Collections
    * @throws NullPointerException if null is compared by natural ordering
    *        (only possible when order is null)
    */
-  <T> public static T min(Collection<? extends T> c,
+  public static <T> T min(Collection<? extends T> c,
 			  Comparator<? super T> order)
   {
     Iterator<T> itr = c.iterator();
@@ -851,7 +851,7 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  <T> public static List<T> nCopies(final int n, final T o)
+  public static <T> List<T> nCopies(final int n, final T o)
   {
     return new CopiesList<T>(n, o);
   }
@@ -991,7 +991,7 @@ public class Collections
    *         it being added to the list
    * @since 1.4
    */
-  <T> public static boolean replaceAll(List<T> list, T oldval, T newval)
+  public static <T> boolean replaceAll(List<T> list, T oldval, T newval)
   {
     ListIterator<T> itr = list.listIterator();
     boolean replace_occured = false;
@@ -1011,7 +1011,7 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  <T> public static void reverse(List<T> l)
+  public static <T> void reverse(List<T> l)
   {
     ListIterator<T> i1 = l.listIterator();
     int pos1 = 1;
@@ -1038,7 +1038,7 @@ public class Collections
    * @see Comparable
    * @see Serializable
    */
-  <T>public static Comparator<T> reverseOrder<T>()
+  public static <T> Comparator<T> reverseOrder<T>()
   {
     return (Comparator<T>) rcInstance; // fixme?
   }
@@ -1256,7 +1256,7 @@ public class Collections
    * @return an immutable Set containing only o
    * @see Serializable
    */
-  <T> public static Set<T> singleton(T o)
+  public static <T> Set<T> singleton(T o)
   {
     return new SingletonSet<T>(o);
   }
@@ -1389,7 +1389,7 @@ public class Collections
    * @see RandomAccess
    * @since 1.3
    */
-  <T> public static List<T> singletonList(T o)
+  public static <T> List<T> singletonList(T o)
   {
     return new SingletonList<T>(o);
   }
@@ -1529,7 +1529,7 @@ public class Collections
    * @see Serializable
    * @since 1.3
    */
-  <K, V> public static Map<K, V> singletonMap(K key, V value)
+  public static <K, V> Map<K, V> singletonMap(K key, V value)
   {
     return new SingletonMap<K, V>(key, value);
   }
@@ -1678,7 +1678,7 @@ public class Collections
    * @throws NullPointerException if some element is null
    * @see Arrays#sort(Object[])
    */
-  <T extends Comparable<? super T>> public static void sort(List<T> l)
+  public static <T extends Comparable<? super T>> void sort(List<T> l)
   {
     sort(l, null);
   }
@@ -1700,7 +1700,7 @@ public class Collections
    *        (only possible when c is null)
    * @see Arrays#sort(Object[], Comparator)
    */
-  <T> public static void sort(List<T> l, Comparator<? super T> c)
+  public static <T> void sort(List<T> l, Comparator<? super T> c)
   {
     Object[] a = l.toArray();
     Arrays.sort(a, c);
@@ -1757,7 +1757,7 @@ public class Collections
    * @return a synchronized view of the collection
    * @see Serializable
    */
-  <T> public static Collection<T> synchronizedCollection(Collection<T> c)
+  public static <T> Collection<T> synchronizedCollection(Collection<T> c)
   {
     return new SynchronizedCollection<T>(c);
   }
@@ -1913,7 +1913,7 @@ public class Collections
         }
     }
 
-    <T> public T[] toArray(T[] a)
+    public <T> T[] toArray(T[] a)
     {
       synchronized (mutex)
         {
@@ -2011,7 +2011,7 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  <T> public static List<T> synchronizedList(List<T> l)
+  public static <T> List<T> synchronizedList(List<T> l)
   {
     if (l instanceof RandomAccess)
       return new SynchronizedRandomAccessList<T>(l);
@@ -2307,7 +2307,7 @@ public class Collections
    * @return a synchronized view of the map
    * @see Serializable
    */
-  <K, V> public static Map<K, V> synchronizedMap(Map<K, V> m)
+  public static <K, V> Map<K, V> synchronizedMap(Map<K, V> m)
   {
     return new SynchronizedMap<K, V>(m);
   }
@@ -2606,7 +2606,7 @@ public class Collections
    * @return a synchronized view of the set
    * @see Serializable
    */
-  <T> public static Set<T> synchronizedSet(Set<T> s)
+  public static <T> Set<T> synchronizedSet(Set<T> s)
   {
     return new SynchronizedSet<T>(s);
   }
@@ -2694,7 +2694,7 @@ public class Collections
    * @return a synchronized view of the sorted map
    * @see Serializable
    */
-  <K, V> public static SortedMap<K, V> synchronizedSortedMap(SortedMap<K, V> m)
+  public static <K, V> SortedMap<K, V> synchronizedSortedMap(SortedMap<K, V> m)
   {
     return new SynchronizedSortedMap<K, V>(m);
   }
@@ -2936,7 +2936,7 @@ public class Collections
    * @return a read-only view of the collection
    * @see Serializable
    */
-  <T> public static Collection<T> unmodifiableCollection(Collection<T> c)
+  public static <T> Collection<T> unmodifiableCollection(Collection<T> c)
   {
     return new UnmodifiableCollection<T>(c);
   }
@@ -3033,7 +3033,7 @@ public class Collections
       return c.toArray();
     }
 
-    <S> public S[] toArray(S[] a)
+    public <S> S[] toArray(S[] a)
     {
       return c.toArray(a);
     }
@@ -3098,7 +3098,7 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  <T> public static List<T> unmodifiableList(List<T> l)
+  public static <T> List<T> unmodifiableList(List<T> l)
   {
     if (l instanceof RandomAccess)
       return new UnmodifiableRandomAccessList<T>(l);
@@ -3295,7 +3295,7 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  <K, V> public static Map<K, V> unmodifiableMap(Map<K, V> m)
+  public static <K, V> Map<K, V> unmodifiableMap(Map<K, V> m)
   {
     return new UnmodifiableMap<K, V>(m);
   }
@@ -3507,7 +3507,7 @@ public class Collections
    * @return a read-only view of the set
    * @see Serializable
    */
-  <T> public static Set<T> unmodifiableSet(Set<T> s)
+  public static <T> Set<T> unmodifiableSet(Set<T> s)
   {
     return new UnmodifiableSet<T>(s);
   }
@@ -3561,7 +3561,7 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  <K, V> public static SortedMap<K, V> unmodifiableSortedMap(SortedMap<K, V> m)
+  public static <K, V> SortedMap<K, V> unmodifiableSortedMap(SortedMap<K, V> m)
   {
     return new UnmodifiableSortedMap<K, V>(m);
   }
@@ -3644,7 +3644,7 @@ public class Collections
    * @return a read-only view of the set
    * @see Serializable
    */
-  <T> public static SortedSet<T> unmodifiableSortedSet(SortedSet<T> s)
+  public static <T> SortedSet<T> unmodifiableSortedSet(SortedSet<T> s)
   {
     return new UnmodifiableSortedSet<T>(s);
   }

@@ -69,7 +69,8 @@ public class InheritableThreadLocal<T> extends ThreadLocal<T>
    * List can be collected, too. Maps to a list in case the user overrides
    * equals.
    */
-  private static final Map threadMap<Thread, ArrayList<InheritableThreadLocals<T>>>
+  private static final
+  Map<Thread, ArrayList<InheritableThreadLocals<T>>> threadMap
     = Collections.synchronizedMap(new WeakHashMap<Thread, ArrayList<InheritableThreadLocals<T>>>());
 
   /**

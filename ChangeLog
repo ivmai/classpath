@@ -1,3 +1,15 @@
+2004-08-08  Tom Tromey  <tromey@redhat.com>
+
+	* external/jaxp/source/gnu/xml/aelfred2/XmlParser.java: Don't use
+	`enum' keyword.
+
+	* java/lang/Class.java, java/lang/Enum.java,
+	java/lang/InheritableThreadLocal.java,
+	java/util/AbstractCollection.java, java/util/Arrays.java,
+	java/util/Collections.java, java/util/LinkedList.java,
+	java/util/TreeSet.java, java/util/Vector.java: Fixed minor syntax
+	errors.
+
 2004-08-07  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/AbstractQueue.java: New file.

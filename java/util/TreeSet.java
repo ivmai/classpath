@@ -213,7 +213,7 @@ public class TreeSet<T> extends AbstractSet<T>
     TreeSet<T> copy = null;
     try
       {
-        copy = (TreeSet,T>) super.clone();
+        copy = (TreeSet<T>) super.clone();
         // Map may be either TreeMap or TreeMap.SubMap, hence the ugly casts.
         copy.map = (SortedMap<T>) ((AbstractMap<T>) map).clone();
       }

@@ -361,8 +361,7 @@ public class Arrays
    * @throws NullPointerException if a null element is compared with natural
    *         ordering (only possible when c is null)
    */
-  // FIXME why "super"?
-  <T> public static int binarySearch(T[] a, T key, Comparator<? super T> c)
+  public static <T> int binarySearch(T[] a, T key, Comparator<? super T> c)
   {
     int low = 0;
     int hi = a.length - 1;
@@ -2332,7 +2331,7 @@ public class Arrays
    * @see RandomAccess
    * @see Arrays.ArrayList
    */
-  <T> public static List<T> asList(final Object[] a) // fixme `T...'
+  public static <T> List<T> asList(final Object[] a) // fixme `T...'
   {
     return new Arrays.ArrayList(a);
   }

@@ -566,7 +566,7 @@ public class Vector<T> extends AbstractList<T>
    * @throws NullPointerException if <code>a</code> is null
    * @since 1.2
    */
-  <S> public synchronized S[] toArray(S[] a)
+  public synchronized <S> S[] toArray(S[] a)
   {
     if (a.length < elementCount)
       a = (S[]) Array.newInstance(a.getClass().getComponentType(),

@@ -1247,7 +1247,7 @@ public final class Class<K> implements Serializable
    * FIXME
    * @since 1.5
    */
-  <T> public Class<? extends T> asSubclass(Class<T> klass)
+  public <T> Class<? extends T> asSubclass(Class<T> klass)
   {
     if (! klass.isAssignableFrom(this))
       throw new ClassCastException();

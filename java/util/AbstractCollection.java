@@ -395,7 +395,7 @@ public abstract class AbstractCollection<E>
    * @throws ArrayStoreException if the type of the array precludes holding
    *         one of the elements of the Collection
    */
-  <T> public T[] toArray(T[] a)
+  public <T> T[] toArray(T[] a)
   {
     int size = size();
     if (a.length < size)

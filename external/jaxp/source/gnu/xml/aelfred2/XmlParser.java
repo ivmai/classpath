@@ -1500,7 +1500,7 @@ loop:
     {
 	String name;
 	String type;
-	String enum = null;
+	String enum_val = null;
 
 	// Read the attribute name.
 	name = readNmtoken (true);
@@ -1511,11 +1511,11 @@ loop:
 
 	// Get the string of enumerated values if necessary.
 	if ("ENUMERATION" == type || "NOTATION" == type)
-	    enum = dataBufferToString ();
+	    enum_val = dataBufferToString ();
 
 	// Read the default value.
 	requireWhitespace ();
-	parseDefault (elementName, name, type, enum);
+	parseDefault (elementName, name, type, enum_val);
     }
 
 
@@ -1612,7 +1612,7 @@ loop:
 	String elementName,
 	String name,
 	String type,
-	String enum
+	String enum_val
     ) throws Exception
     {
 	int	valueType = ATTRIBUTE_DEFAULT_SPECIFIED;
@@ -1650,11 +1650,11 @@ loop:
 	} else
 	    value = readLiteral (flags);
 	expandPE = saved;
-	setAttribute (elementName, name, type, enum, value, valueType);
+	setAttribute (elementName, name, type, enum_val, value, valueType);
 	if ("ENUMERATION" == type)
-	    type = enum;
+	    type = enum_val;
 	else if ("NOTATION" == type)
-	    type = "NOTATION " + enum;
+	    type = "NOTATION " + enum_val;
 	if (!skippedPE) handler.getDeclHandler ()
 	    .attributeDecl (elementName, name, type, defaultType, value);
     }
