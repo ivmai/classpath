@@ -1,5 +1,5 @@
-/* Deprecated - Annotation to mark elements as deprecated
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* Annotation.java - Base interface for all annotations
+   Copyright (C) 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,9 +35,15 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.lang;
+package java.lang.annotation;
 
-@Documented @Retention(SOURCE)
-public @interface Deprecated
+/**
+ * @since 1.5
+ */
+public interface Annotation
 {
+  Class<? extends Annotation> annotationType();
+  boolean equals(Object o);
+  int hashCode();
+  String toString();
 }

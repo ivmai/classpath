@@ -37,8 +37,7 @@ exception statement from your version. */
 
 package java.lang;
 
-@Retention(SOURCE)
-@Target(METHOD)
+@Retention(SOURCE) @Target(METHOD)
 public @interface Override
 {
 }

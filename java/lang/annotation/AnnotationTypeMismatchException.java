@@ -1,5 +1,5 @@
-/* Deprecated - Annotation to mark elements as deprecated
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* AnnotationTypeMismatchException.java - Thrown when annotation has changed
+   Copyright (C) 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,9 +35,30 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.lang;
+package java.lang.annotation;
 
-@Documented @Retention(SOURCE)
-public @interface Deprecated
+/**
+ * @since 1.5
+ */
+public class AnnotationTypeMismatchException extends RuntimeException
 {
+  public AnnotationTypeMismatchException(Method m, String type)
+  {
+    this.element = m;
+    this.foundType = type;
+  }
+
+  public Method element()
+  {
+    return element;
+  }
+
+  public String foundType()
+  {
+    return foundType;
+  }
+
+  // Names are chosen from serialization spec.
+  private Method element;
+  private String foundType;
 }

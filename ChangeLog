@@ -1,3 +1,20 @@
+2004-08-07  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/annotation/AnnotationFormatError.java: New file.
+	* java/lang/annotation/IncompleteAnnotationException.java: New
+	file.
+	* java/lang/annotation/AnnotationTypeMismatchException.java: New
+	file.
+	* java/lang/annotation/RetentionPolicy.java: New file.
+	* java/lang/annotation/ElementType.java: New file.
+	* java/lang/annotation/Target.java: New file.
+	* java/lang/annotation/Retention.java: New file.
+	* java/lang/annotation/Inherited.java: New file.
+	* java/lang/annotation/Documented.java: New file.
+	* java/lang/annotation/Annotation.java: New file.
+	* java/lang/Override.java: Fixed formatting.
+	* java/lang/Deprecated.java: Now Documented.
+
 2004-08-06  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/Class.java (asSubClass): Cast `this', not argument.
