@@ -1,5 +1,7 @@
 2004-08-06  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/Class.java (asSubClass): Cast `this', not argument.
+
 	* vm/reference/java/lang/VMClass.java (cast): Declare.
 	* java/io/SequenceInputStream.java (SequenceInputStream):
 	Constructor now generic.

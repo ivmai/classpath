@@ -1251,7 +1251,7 @@ public final class Class<K> implements Serializable
   {
     if (! klass.isAssignableFrom(this))
       throw new ClassCastException();
-    return (Class<? extends T>) klass;
+    return (Class<? extends T>) this;
   }
 
   /**
