@@ -78,7 +78,7 @@ public final class Boolean implements Serializable, Comparable<Boolean>
    *
    * @since 1.1
    */
-  public static final Class<Boolean> TYPE = VMClassLoader.getPrimitiveClass('Z');
+  public static final Class<Boolean> TYPE = (Class<Boolean>) VMClassLoader.getPrimitiveClass('Z');
 
   /**
    * The immutable value of this Boolean.

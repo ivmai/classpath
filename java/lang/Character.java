@@ -1030,7 +1030,7 @@ public final class Character implements Serializable, Comparable<Character>
    *
    * @since 1.1
    */
-  public static final Class<Character> TYPE = VMClassLoader.getPrimitiveClass('C');
+  public static final Class<Character> TYPE = (Class<Character>) VMClassLoader.getPrimitiveClass('C');
 
   /**
    * The number of bits needed to represent a <code>char</code>.

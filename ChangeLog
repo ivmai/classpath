@@ -1,3 +1,16 @@
+2004-11-06  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/Void.java (TYPE): Added cast to initializer.
+	* java/lang/Short.java (TYPE): Added cast to initializer.
+	* java/lang/Long.java (TYPE): Added cast to initializer.
+	* java/lang/Integer.java (TYPE): Added cast to initializer.
+	* java/lang/Float.java (TYPE): Added cast to initializer.
+	* java/lang/Double.java (TYPE): Added cast to initializer.
+	* java/lang/Character.java (TYPE): Added cast to initializer.
+	* java/lang/Byte.java (TYPE): Added cast to initializer.
+	* java/lang/Boolean.java (TYPE): Added cast to initializer.
+	* java/util/Hashtable.java (elements): Fixed return type.
+
 2004-11-03  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/Collection.java (iterator): Fixed return type.

@@ -315,7 +315,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
    * @see #keys()
    * @see #values()
    */
-  public Enumeration elements()
+  public Enumeration<V> elements()
   {
     return new Enumerator<V>(VALUES);
   }

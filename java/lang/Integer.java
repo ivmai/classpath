@@ -76,7 +76,7 @@ public final class Integer extends Number implements Comparable<Integer>
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class<Integer> TYPE = VMClassLoader.getPrimitiveClass('I');
+  public static final Class<Integer> TYPE = (Class<Integer>) VMClassLoader.getPrimitiveClass('I');
 
   /**
    * The number of bits needed to represent an <code>int</code>.

@@ -93,7 +93,7 @@ public final class Double extends Number implements Comparable<Double>
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class<Double> TYPE = VMClassLoader.getPrimitiveClass('D');
+  public static final Class<Double> TYPE = (Class<Double>) VMClassLoader.getPrimitiveClass('D');
 
   /**
    * The number of bits needed to represent a <code>double</code>.

@@ -74,7 +74,7 @@ public final class Short extends Number implements Comparable<Short>
    * The primitive type <code>short</code> is represented by this
    * <code>Class</code> object.
    */
-  public static final Class<Short> TYPE = VMClassLoader.getPrimitiveClass('S');
+  public static final Class<Short> TYPE = (Class<Short>) VMClassLoader.getPrimitiveClass('S');
 
   /**
    * The number of bits needed to represent a <code>short</code>.

@@ -91,7 +91,7 @@ public final class Float extends Number implements Comparable<Float>
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class<Float> TYPE = VMClassLoader.getPrimitiveClass('F');
+  public static final Class<Float> TYPE = (Class<Float>) VMClassLoader.getPrimitiveClass('F');
 
   /**
    * The number of bits needed to represent a <code>float</code>.

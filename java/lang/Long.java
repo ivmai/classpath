@@ -76,7 +76,7 @@ public final class Long extends Number implements Comparable<Long>
    * <code>Class</code> object.
    * @since 1.1
    */
-  public static final Class<Long> TYPE = VMClassLoader.getPrimitiveClass ('J');
+  public static final Class<Long> TYPE = (Class<Long>) VMClassLoader.getPrimitiveClass ('J');
 
   /**
    * The number of bits needed to represent a <code>long</code>.
