@@ -14,7 +14,6 @@ JNIEXPORT jboolean JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_isEnabled
 JNIEXPORT jboolean JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_modalHasGrab (JNIEnv *env, jclass);
 JNIEXPORT jintArray JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetGetForeground (JNIEnv *env, jobject);
 JNIEXPORT jintArray JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetGetBackground (JNIEnv *env, jobject);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetSetVisible (JNIEnv *env, jobject, jboolean);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetGetDimensions (JNIEnv *env, jobject, jintArray);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetGetPreferredDimensions (JNIEnv *env, jobject, jintArray);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetGetLocationOnScreen (JNIEnv *env, jobject, jintArray);
@@ -25,8 +24,7 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetSetS
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetSetParent (JNIEnv *env, jobject, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetRequestFocus (JNIEnv *env, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetDispatchKeyEvent (JNIEnv *env, jobject, jint, jlong, jint, jint, jint);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_gtkWidgetRepaintArea (JNIEnv *env, jobject, jint, jint, jint, jint);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_connectJObject (JNIEnv *env, jobject);
+JNIEXPORT jboolean JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_isRealized (JNIEnv *env, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_connectSignals (JNIEnv *env, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_setNativeBounds (JNIEnv *env, jobject, jint, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GtkComponentPeer_hide (JNIEnv *env, jobject);

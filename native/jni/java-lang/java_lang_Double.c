@@ -1,5 +1,5 @@
 /* Double.c - java.lang.Double native functions
-   Copyright (C) 1998, 1999, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -50,17 +50,20 @@ exception statement from your version. */
 static jmethodID isNaNID;
 static jdouble NEGATIVE_INFINITY;
 static jdouble POSITIVE_INFINITY;
+static jdouble NaN;
 
 /*
  * Class:     java_lang_Double
  * Method:    initIDs
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_java_lang_Double_initIDs
+JNIEXPORT void JNICALL
+Java_java_lang_Double_initIDs
   (JNIEnv *env, jclass cls)
 {
   jfieldID negInfID;
   jfieldID posInfID;
+  jfieldID nanID;
 
   isNaNID = (*env)->GetStaticMethodID(env, cls, "isNaN", "(D)Z");
   if (isNaNID == NULL)
@@ -80,12 +83,20 @@ JNIEXPORT void JNICALL Java_java_lang_Double_initIDs
       DBG("unable to determine field id of POSITIVE_INFINITY\n")
       return;
     }
+  nanID = (*env)->GetStaticFieldID(env, cls, "NaN", "D");
+  if (posInfID == NULL)
+    {
+      DBG("unable to determine field id of NaN\n")
+      return;
+    }
   POSITIVE_INFINITY = (*env)->GetStaticDoubleField(env, cls, posInfID);
   NEGATIVE_INFINITY = (*env)->GetStaticDoubleField(env, cls, negInfID);
+  NaN = (*env)->GetStaticDoubleField(env, cls, nanID);
 
 #ifdef DEBUG
   fprintf(stderr, "java.lang.Double.initIDs() POSITIVE_INFINITY = %g\n", POSITIVE_INFINITY);
   fprintf(stderr, "java.lang.Double.initIDs() NEGATIVE_INFINITY = %g\n", NEGATIVE_INFINITY);
+  fprintf(stderr, "java.lang.Double.initIDs() NaN = %g\n", NaN);
 #endif
 } 
 
@@ -94,7 +105,8 @@ JNIEXPORT void JNICALL Java_java_lang_Double_initIDs
  * Method:    toString
  * Signature: (DZ)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_java_lang_Double_toString
+JNIEXPORT jstring JNICALL
+Java_java_lang_Double_toString
   (JNIEnv * env, jclass cls, jdouble value, jboolean isFloat)
 {
   char buffer[50], result[50];
@@ -201,11 +213,13 @@ JNIEXPORT jstring JNICALL Java_java_lang_Double_toString
  * Method:    parseDouble
  * Signature: (Ljava/lang/String;)D
  */
-JNIEXPORT jdouble JNICALL Java_java_lang_Double_parseDouble
-  (JNIEnv * env, jclass cls, jstring str)
+JNIEXPORT jdouble JNICALL
+Java_java_lang_Double_parseDouble
+  (JNIEnv * env, jclass cls __attribute__((__unused__)), jstring str)
 {
   jboolean isCopy;
-  char *buf, *endptr;
+  const char *buf;
+  char *endptr;
   jdouble val = 0.0;
 
   if (str == NULL)
@@ -221,7 +235,7 @@ JNIEXPORT jdouble JNICALL Java_java_lang_Double_parseDouble
     }
   else
     {
-      unsigned char *p = buf, *end, *last_non_ws;
+      const char *p = buf, *end, *last_non_ws, *temp;
       int ok = 1;
  
 #ifdef DEBUG
@@ -252,6 +266,19 @@ JNIEXPORT jdouble JNICALL Java_java_lang_Double_parseDouble
 	  ++last_non_ws;
 	}
 
+      /* Check for infinity and NaN */
+      temp = p;
+      if(temp[0] == '+' || temp[0] == '-')
+	temp++;
+      if(strncmp("Infinity", temp, (size_t) 8) == 0)
+	{
+	  if(p[0] == '-')
+	    return NEGATIVE_INFINITY;
+	  return POSITIVE_INFINITY;
+	}
+      if(strncmp("NaN", temp, (size_t) 3) == 0)
+	return NaN;
+
       /* Skip a trailing `f' or `d'.  */
       if (last_non_ws > p
 	  && (last_non_ws[-1] == 'f'
@@ -266,6 +293,7 @@ JNIEXPORT jdouble JNICALL Java_java_lang_Double_parseDouble
  	  memset (&reent, 0, sizeof reent);
 
 #ifdef KISSME_LINUX_USER
+	  /* FIXME: The libc strtod may not be reliable. */	     
  	  val = strtod (p, &endptr);
 #else
  	  val = _strtod_r (&reent, p, &endptr);
@@ -276,7 +304,7 @@ JNIEXPORT jdouble JNICALL Java_java_lang_Double_parseDouble
 	  fprintf (stderr, "java.lang.Double.parseDouble %i != %i ???\n",
 		   endptr, last_non_ws);
 #endif
- 	  if ((unsigned char *) endptr != last_non_ws)
+ 	  if (endptr != last_non_ws)
  	    ok = 0;
  	}
       else

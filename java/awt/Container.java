@@ -341,8 +341,6 @@ public class Container extends Component
         comp.parent = this;
         if (peer != null)
           {
-            comp.addNotify();
-            
             if (comp.isLightweight ())
 	      {
 		enableEvents (comp.eventMask);
@@ -556,10 +554,19 @@ public class Container extends Component
         cPeer.beginValidate();
       }
 
-    doLayout();
     for (int i = 0; i < ncomponents; ++i)
       {
         Component comp = component[i];
+
+        if (comp.getPeer () == null)
+          comp.addNotify();
+      }
+
+    doLayout ();
+    for (int i = 0; i < ncomponents; ++i)
+      {
+        Component comp = component[i];
+
         if (! comp.isValid())
           {
             if (comp instanceof Container)

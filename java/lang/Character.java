@@ -38,8 +38,9 @@ exception statement from your version. */
 
 package java.lang;
 
-import java.io.Serializable;
 import gnu.java.lang.CharData;
+
+import java.io.Serializable;
 
 /**
  * Wrapper class for the primitive char data type.  In addition, this class
@@ -73,7 +74,7 @@ public final class Character implements Serializable, Comparable<Character>
    * A subset of Unicode blocks.
    *
    * @author Paul N. Fisher
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    * @since 1.2
    */
   public static class Subset
@@ -195,7 +196,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Basic Latin.
      * '\u0000' - '\u007F'.
      */
-    public final static UnicodeBlock BASIC_LATIN
+    public static final UnicodeBlock BASIC_LATIN
       = new UnicodeBlock('\u0000', '\u007F',
                          "BASIC_LATIN");
 
@@ -203,7 +204,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Latin-1 Supplement.
      * '\u0080' - '\u00FF'.
      */
-    public final static UnicodeBlock LATIN_1_SUPPLEMENT
+    public static final UnicodeBlock LATIN_1_SUPPLEMENT
       = new UnicodeBlock('\u0080', '\u00FF',
                          "LATIN_1_SUPPLEMENT");
 
@@ -211,7 +212,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Latin Extended-A.
      * '\u0100' - '\u017F'.
      */
-    public final static UnicodeBlock LATIN_EXTENDED_A
+    public static final UnicodeBlock LATIN_EXTENDED_A
       = new UnicodeBlock('\u0100', '\u017F',
                          "LATIN_EXTENDED_A");
 
@@ -219,7 +220,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Latin Extended-B.
      * '\u0180' - '\u024F'.
      */
-    public final static UnicodeBlock LATIN_EXTENDED_B
+    public static final UnicodeBlock LATIN_EXTENDED_B
       = new UnicodeBlock('\u0180', '\u024F',
                          "LATIN_EXTENDED_B");
 
@@ -227,7 +228,7 @@ public final class Character implements Serializable, Comparable<Character>
      * IPA Extensions.
      * '\u0250' - '\u02AF'.
      */
-    public final static UnicodeBlock IPA_EXTENSIONS
+    public static final UnicodeBlock IPA_EXTENSIONS
       = new UnicodeBlock('\u0250', '\u02AF',
                          "IPA_EXTENSIONS");
 
@@ -235,7 +236,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Spacing Modifier Letters.
      * '\u02B0' - '\u02FF'.
      */
-    public final static UnicodeBlock SPACING_MODIFIER_LETTERS
+    public static final UnicodeBlock SPACING_MODIFIER_LETTERS
       = new UnicodeBlock('\u02B0', '\u02FF',
                          "SPACING_MODIFIER_LETTERS");
 
@@ -243,7 +244,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Combining Diacritical Marks.
      * '\u0300' - '\u036F'.
      */
-    public final static UnicodeBlock COMBINING_DIACRITICAL_MARKS
+    public static final UnicodeBlock COMBINING_DIACRITICAL_MARKS
       = new UnicodeBlock('\u0300', '\u036F',
                          "COMBINING_DIACRITICAL_MARKS");
 
@@ -251,7 +252,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Greek.
      * '\u0370' - '\u03FF'.
      */
-    public final static UnicodeBlock GREEK
+    public static final UnicodeBlock GREEK
       = new UnicodeBlock('\u0370', '\u03FF',
                          "GREEK");
 
@@ -259,7 +260,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Cyrillic.
      * '\u0400' - '\u04FF'.
      */
-    public final static UnicodeBlock CYRILLIC
+    public static final UnicodeBlock CYRILLIC
       = new UnicodeBlock('\u0400', '\u04FF',
                          "CYRILLIC");
 
@@ -267,7 +268,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Armenian.
      * '\u0530' - '\u058F'.
      */
-    public final static UnicodeBlock ARMENIAN
+    public static final UnicodeBlock ARMENIAN
       = new UnicodeBlock('\u0530', '\u058F',
                          "ARMENIAN");
 
@@ -275,7 +276,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Hebrew.
      * '\u0590' - '\u05FF'.
      */
-    public final static UnicodeBlock HEBREW
+    public static final UnicodeBlock HEBREW
       = new UnicodeBlock('\u0590', '\u05FF',
                          "HEBREW");
 
@@ -283,7 +284,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Arabic.
      * '\u0600' - '\u06FF'.
      */
-    public final static UnicodeBlock ARABIC
+    public static final UnicodeBlock ARABIC
       = new UnicodeBlock('\u0600', '\u06FF',
                          "ARABIC");
 
@@ -292,7 +293,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u0700' - '\u074F'.
      * @since 1.4
      */
-    public final static UnicodeBlock SYRIAC
+    public static final UnicodeBlock SYRIAC
       = new UnicodeBlock('\u0700', '\u074F',
                          "SYRIAC");
 
@@ -301,7 +302,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u0780' - '\u07BF'.
      * @since 1.4
      */
-    public final static UnicodeBlock THAANA
+    public static final UnicodeBlock THAANA
       = new UnicodeBlock('\u0780', '\u07BF',
                          "THAANA");
 
@@ -309,7 +310,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Devanagari.
      * '\u0900' - '\u097F'.
      */
-    public final static UnicodeBlock DEVANAGARI
+    public static final UnicodeBlock DEVANAGARI
       = new UnicodeBlock('\u0900', '\u097F',
                          "DEVANAGARI");
 
@@ -317,7 +318,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Bengali.
      * '\u0980' - '\u09FF'.
      */
-    public final static UnicodeBlock BENGALI
+    public static final UnicodeBlock BENGALI
       = new UnicodeBlock('\u0980', '\u09FF',
                          "BENGALI");
 
@@ -325,7 +326,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Gurmukhi.
      * '\u0A00' - '\u0A7F'.
      */
-    public final static UnicodeBlock GURMUKHI
+    public static final UnicodeBlock GURMUKHI
       = new UnicodeBlock('\u0A00', '\u0A7F',
                          "GURMUKHI");
 
@@ -333,7 +334,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Gujarati.
      * '\u0A80' - '\u0AFF'.
      */
-    public final static UnicodeBlock GUJARATI
+    public static final UnicodeBlock GUJARATI
       = new UnicodeBlock('\u0A80', '\u0AFF',
                          "GUJARATI");
 
@@ -341,7 +342,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Oriya.
      * '\u0B00' - '\u0B7F'.
      */
-    public final static UnicodeBlock ORIYA
+    public static final UnicodeBlock ORIYA
       = new UnicodeBlock('\u0B00', '\u0B7F',
                          "ORIYA");
 
@@ -349,7 +350,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Tamil.
      * '\u0B80' - '\u0BFF'.
      */
-    public final static UnicodeBlock TAMIL
+    public static final UnicodeBlock TAMIL
       = new UnicodeBlock('\u0B80', '\u0BFF',
                          "TAMIL");
 
@@ -357,7 +358,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Telugu.
      * '\u0C00' - '\u0C7F'.
      */
-    public final static UnicodeBlock TELUGU
+    public static final UnicodeBlock TELUGU
       = new UnicodeBlock('\u0C00', '\u0C7F',
                          "TELUGU");
 
@@ -365,7 +366,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Kannada.
      * '\u0C80' - '\u0CFF'.
      */
-    public final static UnicodeBlock KANNADA
+    public static final UnicodeBlock KANNADA
       = new UnicodeBlock('\u0C80', '\u0CFF',
                          "KANNADA");
 
@@ -373,7 +374,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Malayalam.
      * '\u0D00' - '\u0D7F'.
      */
-    public final static UnicodeBlock MALAYALAM
+    public static final UnicodeBlock MALAYALAM
       = new UnicodeBlock('\u0D00', '\u0D7F',
                          "MALAYALAM");
 
@@ -382,7 +383,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u0D80' - '\u0DFF'.
      * @since 1.4
      */
-    public final static UnicodeBlock SINHALA
+    public static final UnicodeBlock SINHALA
       = new UnicodeBlock('\u0D80', '\u0DFF',
                          "SINHALA");
 
@@ -390,7 +391,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Thai.
      * '\u0E00' - '\u0E7F'.
      */
-    public final static UnicodeBlock THAI
+    public static final UnicodeBlock THAI
       = new UnicodeBlock('\u0E00', '\u0E7F',
                          "THAI");
 
@@ -398,7 +399,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Lao.
      * '\u0E80' - '\u0EFF'.
      */
-    public final static UnicodeBlock LAO
+    public static final UnicodeBlock LAO
       = new UnicodeBlock('\u0E80', '\u0EFF',
                          "LAO");
 
@@ -406,7 +407,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Tibetan.
      * '\u0F00' - '\u0FFF'.
      */
-    public final static UnicodeBlock TIBETAN
+    public static final UnicodeBlock TIBETAN
       = new UnicodeBlock('\u0F00', '\u0FFF',
                          "TIBETAN");
 
@@ -415,7 +416,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1000' - '\u109F'.
      * @since 1.4
      */
-    public final static UnicodeBlock MYANMAR
+    public static final UnicodeBlock MYANMAR
       = new UnicodeBlock('\u1000', '\u109F',
                          "MYANMAR");
 
@@ -423,7 +424,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Georgian.
      * '\u10A0' - '\u10FF'.
      */
-    public final static UnicodeBlock GEORGIAN
+    public static final UnicodeBlock GEORGIAN
       = new UnicodeBlock('\u10A0', '\u10FF',
                          "GEORGIAN");
 
@@ -431,7 +432,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Hangul Jamo.
      * '\u1100' - '\u11FF'.
      */
-    public final static UnicodeBlock HANGUL_JAMO
+    public static final UnicodeBlock HANGUL_JAMO
       = new UnicodeBlock('\u1100', '\u11FF',
                          "HANGUL_JAMO");
 
@@ -440,7 +441,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1200' - '\u137F'.
      * @since 1.4
      */
-    public final static UnicodeBlock ETHIOPIC
+    public static final UnicodeBlock ETHIOPIC
       = new UnicodeBlock('\u1200', '\u137F',
                          "ETHIOPIC");
 
@@ -449,7 +450,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u13A0' - '\u13FF'.
      * @since 1.4
      */
-    public final static UnicodeBlock CHEROKEE
+    public static final UnicodeBlock CHEROKEE
       = new UnicodeBlock('\u13A0', '\u13FF',
                          "CHEROKEE");
 
@@ -458,7 +459,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1400' - '\u167F'.
      * @since 1.4
      */
-    public final static UnicodeBlock UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS
+    public static final UnicodeBlock UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS
       = new UnicodeBlock('\u1400', '\u167F',
                          "UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS");
 
@@ -467,7 +468,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1680' - '\u169F'.
      * @since 1.4
      */
-    public final static UnicodeBlock OGHAM
+    public static final UnicodeBlock OGHAM
       = new UnicodeBlock('\u1680', '\u169F',
                          "OGHAM");
 
@@ -476,7 +477,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u16A0' - '\u16FF'.
      * @since 1.4
      */
-    public final static UnicodeBlock RUNIC
+    public static final UnicodeBlock RUNIC
       = new UnicodeBlock('\u16A0', '\u16FF',
                          "RUNIC");
 
@@ -485,7 +486,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1780' - '\u17FF'.
      * @since 1.4
      */
-    public final static UnicodeBlock KHMER
+    public static final UnicodeBlock KHMER
       = new UnicodeBlock('\u1780', '\u17FF',
                          "KHMER");
 
@@ -494,7 +495,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u1800' - '\u18AF'.
      * @since 1.4
      */
-    public final static UnicodeBlock MONGOLIAN
+    public static final UnicodeBlock MONGOLIAN
       = new UnicodeBlock('\u1800', '\u18AF',
                          "MONGOLIAN");
 
@@ -502,7 +503,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Latin Extended Additional.
      * '\u1E00' - '\u1EFF'.
      */
-    public final static UnicodeBlock LATIN_EXTENDED_ADDITIONAL
+    public static final UnicodeBlock LATIN_EXTENDED_ADDITIONAL
       = new UnicodeBlock('\u1E00', '\u1EFF',
                          "LATIN_EXTENDED_ADDITIONAL");
 
@@ -510,7 +511,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Greek Extended.
      * '\u1F00' - '\u1FFF'.
      */
-    public final static UnicodeBlock GREEK_EXTENDED
+    public static final UnicodeBlock GREEK_EXTENDED
       = new UnicodeBlock('\u1F00', '\u1FFF',
                          "GREEK_EXTENDED");
 
@@ -518,7 +519,7 @@ public final class Character implements Serializable, Comparable<Character>
      * General Punctuation.
      * '\u2000' - '\u206F'.
      */
-    public final static UnicodeBlock GENERAL_PUNCTUATION
+    public static final UnicodeBlock GENERAL_PUNCTUATION
       = new UnicodeBlock('\u2000', '\u206F',
                          "GENERAL_PUNCTUATION");
 
@@ -526,7 +527,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Superscripts and Subscripts.
      * '\u2070' - '\u209F'.
      */
-    public final static UnicodeBlock SUPERSCRIPTS_AND_SUBSCRIPTS
+    public static final UnicodeBlock SUPERSCRIPTS_AND_SUBSCRIPTS
       = new UnicodeBlock('\u2070', '\u209F',
                          "SUPERSCRIPTS_AND_SUBSCRIPTS");
 
@@ -534,7 +535,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Currency Symbols.
      * '\u20A0' - '\u20CF'.
      */
-    public final static UnicodeBlock CURRENCY_SYMBOLS
+    public static final UnicodeBlock CURRENCY_SYMBOLS
       = new UnicodeBlock('\u20A0', '\u20CF',
                          "CURRENCY_SYMBOLS");
 
@@ -542,7 +543,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Combining Marks for Symbols.
      * '\u20D0' - '\u20FF'.
      */
-    public final static UnicodeBlock COMBINING_MARKS_FOR_SYMBOLS
+    public static final UnicodeBlock COMBINING_MARKS_FOR_SYMBOLS
       = new UnicodeBlock('\u20D0', '\u20FF',
                          "COMBINING_MARKS_FOR_SYMBOLS");
 
@@ -550,7 +551,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Letterlike Symbols.
      * '\u2100' - '\u214F'.
      */
-    public final static UnicodeBlock LETTERLIKE_SYMBOLS
+    public static final UnicodeBlock LETTERLIKE_SYMBOLS
       = new UnicodeBlock('\u2100', '\u214F',
                          "LETTERLIKE_SYMBOLS");
 
@@ -558,7 +559,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Number Forms.
      * '\u2150' - '\u218F'.
      */
-    public final static UnicodeBlock NUMBER_FORMS
+    public static final UnicodeBlock NUMBER_FORMS
       = new UnicodeBlock('\u2150', '\u218F',
                          "NUMBER_FORMS");
 
@@ -566,7 +567,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Arrows.
      * '\u2190' - '\u21FF'.
      */
-    public final static UnicodeBlock ARROWS
+    public static final UnicodeBlock ARROWS
       = new UnicodeBlock('\u2190', '\u21FF',
                          "ARROWS");
 
@@ -574,7 +575,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Mathematical Operators.
      * '\u2200' - '\u22FF'.
      */
-    public final static UnicodeBlock MATHEMATICAL_OPERATORS
+    public static final UnicodeBlock MATHEMATICAL_OPERATORS
       = new UnicodeBlock('\u2200', '\u22FF',
                          "MATHEMATICAL_OPERATORS");
 
@@ -582,7 +583,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Miscellaneous Technical.
      * '\u2300' - '\u23FF'.
      */
-    public final static UnicodeBlock MISCELLANEOUS_TECHNICAL
+    public static final UnicodeBlock MISCELLANEOUS_TECHNICAL
       = new UnicodeBlock('\u2300', '\u23FF',
                          "MISCELLANEOUS_TECHNICAL");
 
@@ -590,7 +591,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Control Pictures.
      * '\u2400' - '\u243F'.
      */
-    public final static UnicodeBlock CONTROL_PICTURES
+    public static final UnicodeBlock CONTROL_PICTURES
       = new UnicodeBlock('\u2400', '\u243F',
                          "CONTROL_PICTURES");
 
@@ -598,7 +599,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Optical Character Recognition.
      * '\u2440' - '\u245F'.
      */
-    public final static UnicodeBlock OPTICAL_CHARACTER_RECOGNITION
+    public static final UnicodeBlock OPTICAL_CHARACTER_RECOGNITION
       = new UnicodeBlock('\u2440', '\u245F',
                          "OPTICAL_CHARACTER_RECOGNITION");
 
@@ -606,7 +607,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Enclosed Alphanumerics.
      * '\u2460' - '\u24FF'.
      */
-    public final static UnicodeBlock ENCLOSED_ALPHANUMERICS
+    public static final UnicodeBlock ENCLOSED_ALPHANUMERICS
       = new UnicodeBlock('\u2460', '\u24FF',
                          "ENCLOSED_ALPHANUMERICS");
 
@@ -614,7 +615,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Box Drawing.
      * '\u2500' - '\u257F'.
      */
-    public final static UnicodeBlock BOX_DRAWING
+    public static final UnicodeBlock BOX_DRAWING
       = new UnicodeBlock('\u2500', '\u257F',
                          "BOX_DRAWING");
 
@@ -622,7 +623,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Block Elements.
      * '\u2580' - '\u259F'.
      */
-    public final static UnicodeBlock BLOCK_ELEMENTS
+    public static final UnicodeBlock BLOCK_ELEMENTS
       = new UnicodeBlock('\u2580', '\u259F',
                          "BLOCK_ELEMENTS");
 
@@ -630,7 +631,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Geometric Shapes.
      * '\u25A0' - '\u25FF'.
      */
-    public final static UnicodeBlock GEOMETRIC_SHAPES
+    public static final UnicodeBlock GEOMETRIC_SHAPES
       = new UnicodeBlock('\u25A0', '\u25FF',
                          "GEOMETRIC_SHAPES");
 
@@ -638,7 +639,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Miscellaneous Symbols.
      * '\u2600' - '\u26FF'.
      */
-    public final static UnicodeBlock MISCELLANEOUS_SYMBOLS
+    public static final UnicodeBlock MISCELLANEOUS_SYMBOLS
       = new UnicodeBlock('\u2600', '\u26FF',
                          "MISCELLANEOUS_SYMBOLS");
 
@@ -646,7 +647,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Dingbats.
      * '\u2700' - '\u27BF'.
      */
-    public final static UnicodeBlock DINGBATS
+    public static final UnicodeBlock DINGBATS
       = new UnicodeBlock('\u2700', '\u27BF',
                          "DINGBATS");
 
@@ -655,7 +656,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u2800' - '\u28FF'.
      * @since 1.4
      */
-    public final static UnicodeBlock BRAILLE_PATTERNS
+    public static final UnicodeBlock BRAILLE_PATTERNS
       = new UnicodeBlock('\u2800', '\u28FF',
                          "BRAILLE_PATTERNS");
 
@@ -664,7 +665,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u2E80' - '\u2EFF'.
      * @since 1.4
      */
-    public final static UnicodeBlock CJK_RADICALS_SUPPLEMENT
+    public static final UnicodeBlock CJK_RADICALS_SUPPLEMENT
       = new UnicodeBlock('\u2E80', '\u2EFF',
                          "CJK_RADICALS_SUPPLEMENT");
 
@@ -673,7 +674,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u2F00' - '\u2FDF'.
      * @since 1.4
      */
-    public final static UnicodeBlock KANGXI_RADICALS
+    public static final UnicodeBlock KANGXI_RADICALS
       = new UnicodeBlock('\u2F00', '\u2FDF',
                          "KANGXI_RADICALS");
 
@@ -682,7 +683,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u2FF0' - '\u2FFF'.
      * @since 1.4
      */
-    public final static UnicodeBlock IDEOGRAPHIC_DESCRIPTION_CHARACTERS
+    public static final UnicodeBlock IDEOGRAPHIC_DESCRIPTION_CHARACTERS
       = new UnicodeBlock('\u2FF0', '\u2FFF',
                          "IDEOGRAPHIC_DESCRIPTION_CHARACTERS");
 
@@ -690,7 +691,7 @@ public final class Character implements Serializable, Comparable<Character>
      * CJK Symbols and Punctuation.
      * '\u3000' - '\u303F'.
      */
-    public final static UnicodeBlock CJK_SYMBOLS_AND_PUNCTUATION
+    public static final UnicodeBlock CJK_SYMBOLS_AND_PUNCTUATION
       = new UnicodeBlock('\u3000', '\u303F',
                          "CJK_SYMBOLS_AND_PUNCTUATION");
 
@@ -698,7 +699,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Hiragana.
      * '\u3040' - '\u309F'.
      */
-    public final static UnicodeBlock HIRAGANA
+    public static final UnicodeBlock HIRAGANA
       = new UnicodeBlock('\u3040', '\u309F',
                          "HIRAGANA");
 
@@ -706,7 +707,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Katakana.
      * '\u30A0' - '\u30FF'.
      */
-    public final static UnicodeBlock KATAKANA
+    public static final UnicodeBlock KATAKANA
       = new UnicodeBlock('\u30A0', '\u30FF',
                          "KATAKANA");
 
@@ -714,7 +715,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Bopomofo.
      * '\u3100' - '\u312F'.
      */
-    public final static UnicodeBlock BOPOMOFO
+    public static final UnicodeBlock BOPOMOFO
       = new UnicodeBlock('\u3100', '\u312F',
                          "BOPOMOFO");
 
@@ -722,7 +723,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Hangul Compatibility Jamo.
      * '\u3130' - '\u318F'.
      */
-    public final static UnicodeBlock HANGUL_COMPATIBILITY_JAMO
+    public static final UnicodeBlock HANGUL_COMPATIBILITY_JAMO
       = new UnicodeBlock('\u3130', '\u318F',
                          "HANGUL_COMPATIBILITY_JAMO");
 
@@ -730,7 +731,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Kanbun.
      * '\u3190' - '\u319F'.
      */
-    public final static UnicodeBlock KANBUN
+    public static final UnicodeBlock KANBUN
       = new UnicodeBlock('\u3190', '\u319F',
                          "KANBUN");
 
@@ -739,7 +740,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u31A0' - '\u31BF'.
      * @since 1.4
      */
-    public final static UnicodeBlock BOPOMOFO_EXTENDED
+    public static final UnicodeBlock BOPOMOFO_EXTENDED
       = new UnicodeBlock('\u31A0', '\u31BF',
                          "BOPOMOFO_EXTENDED");
 
@@ -747,7 +748,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Enclosed CJK Letters and Months.
      * '\u3200' - '\u32FF'.
      */
-    public final static UnicodeBlock ENCLOSED_CJK_LETTERS_AND_MONTHS
+    public static final UnicodeBlock ENCLOSED_CJK_LETTERS_AND_MONTHS
       = new UnicodeBlock('\u3200', '\u32FF',
                          "ENCLOSED_CJK_LETTERS_AND_MONTHS");
 
@@ -755,7 +756,7 @@ public final class Character implements Serializable, Comparable<Character>
      * CJK Compatibility.
      * '\u3300' - '\u33FF'.
      */
-    public final static UnicodeBlock CJK_COMPATIBILITY
+    public static final UnicodeBlock CJK_COMPATIBILITY
       = new UnicodeBlock('\u3300', '\u33FF',
                          "CJK_COMPATIBILITY");
 
@@ -764,7 +765,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\u3400' - '\u4DB5'.
      * @since 1.4
      */
-    public final static UnicodeBlock CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+    public static final UnicodeBlock CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
       = new UnicodeBlock('\u3400', '\u4DB5',
                          "CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A");
 
@@ -772,7 +773,7 @@ public final class Character implements Serializable, Comparable<Character>
      * CJK Unified Ideographs.
      * '\u4E00' - '\u9FFF'.
      */
-    public final static UnicodeBlock CJK_UNIFIED_IDEOGRAPHS
+    public static final UnicodeBlock CJK_UNIFIED_IDEOGRAPHS
       = new UnicodeBlock('\u4E00', '\u9FFF',
                          "CJK_UNIFIED_IDEOGRAPHS");
 
@@ -781,7 +782,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\uA000' - '\uA48F'.
      * @since 1.4
      */
-    public final static UnicodeBlock YI_SYLLABLES
+    public static final UnicodeBlock YI_SYLLABLES
       = new UnicodeBlock('\uA000', '\uA48F',
                          "YI_SYLLABLES");
 
@@ -790,7 +791,7 @@ public final class Character implements Serializable, Comparable<Character>
      * '\uA490' - '\uA4CF'.
      * @since 1.4
      */
-    public final static UnicodeBlock YI_RADICALS
+    public static final UnicodeBlock YI_RADICALS
       = new UnicodeBlock('\uA490', '\uA4CF',
                          "YI_RADICALS");
 
@@ -798,7 +799,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Hangul Syllables.
      * '\uAC00' - '\uD7A3'.
      */
-    public final static UnicodeBlock HANGUL_SYLLABLES
+    public static final UnicodeBlock HANGUL_SYLLABLES
       = new UnicodeBlock('\uAC00', '\uD7A3',
                          "HANGUL_SYLLABLES");
 
@@ -806,7 +807,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Surrogates Area.
      * '\uD800' - '\uDFFF'.
      */
-    public final static UnicodeBlock SURROGATES_AREA
+    public static final UnicodeBlock SURROGATES_AREA
       = new UnicodeBlock('\uD800', '\uDFFF',
                          "SURROGATES_AREA");
 
@@ -814,7 +815,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Private Use Area.
      * '\uE000' - '\uF8FF'.
      */
-    public final static UnicodeBlock PRIVATE_USE_AREA
+    public static final UnicodeBlock PRIVATE_USE_AREA
       = new UnicodeBlock('\uE000', '\uF8FF',
                          "PRIVATE_USE_AREA");
 
@@ -822,7 +823,7 @@ public final class Character implements Serializable, Comparable<Character>
      * CJK Compatibility Ideographs.
      * '\uF900' - '\uFAFF'.
      */
-    public final static UnicodeBlock CJK_COMPATIBILITY_IDEOGRAPHS
+    public static final UnicodeBlock CJK_COMPATIBILITY_IDEOGRAPHS
       = new UnicodeBlock('\uF900', '\uFAFF',
                          "CJK_COMPATIBILITY_IDEOGRAPHS");
 
@@ -830,7 +831,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Alphabetic Presentation Forms.
      * '\uFB00' - '\uFB4F'.
      */
-    public final static UnicodeBlock ALPHABETIC_PRESENTATION_FORMS
+    public static final UnicodeBlock ALPHABETIC_PRESENTATION_FORMS
       = new UnicodeBlock('\uFB00', '\uFB4F',
                          "ALPHABETIC_PRESENTATION_FORMS");
 
@@ -838,7 +839,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Arabic Presentation Forms-A.
      * '\uFB50' - '\uFDFF'.
      */
-    public final static UnicodeBlock ARABIC_PRESENTATION_FORMS_A
+    public static final UnicodeBlock ARABIC_PRESENTATION_FORMS_A
       = new UnicodeBlock('\uFB50', '\uFDFF',
                          "ARABIC_PRESENTATION_FORMS_A");
 
@@ -846,7 +847,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Combining Half Marks.
      * '\uFE20' - '\uFE2F'.
      */
-    public final static UnicodeBlock COMBINING_HALF_MARKS
+    public static final UnicodeBlock COMBINING_HALF_MARKS
       = new UnicodeBlock('\uFE20', '\uFE2F',
                          "COMBINING_HALF_MARKS");
 
@@ -854,7 +855,7 @@ public final class Character implements Serializable, Comparable<Character>
      * CJK Compatibility Forms.
      * '\uFE30' - '\uFE4F'.
      */
-    public final static UnicodeBlock CJK_COMPATIBILITY_FORMS
+    public static final UnicodeBlock CJK_COMPATIBILITY_FORMS
       = new UnicodeBlock('\uFE30', '\uFE4F',
                          "CJK_COMPATIBILITY_FORMS");
 
@@ -862,7 +863,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Small Form Variants.
      * '\uFE50' - '\uFE6F'.
      */
-    public final static UnicodeBlock SMALL_FORM_VARIANTS
+    public static final UnicodeBlock SMALL_FORM_VARIANTS
       = new UnicodeBlock('\uFE50', '\uFE6F',
                          "SMALL_FORM_VARIANTS");
 
@@ -870,7 +871,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Arabic Presentation Forms-B.
      * '\uFE70' - '\uFEFE'.
      */
-    public final static UnicodeBlock ARABIC_PRESENTATION_FORMS_B
+    public static final UnicodeBlock ARABIC_PRESENTATION_FORMS_B
       = new UnicodeBlock('\uFE70', '\uFEFE',
                          "ARABIC_PRESENTATION_FORMS_B");
 
@@ -878,7 +879,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Halfwidth and Fullwidth Forms.
      * '\uFF00' - '\uFFEF'.
      */
-    public final static UnicodeBlock HALFWIDTH_AND_FULLWIDTH_FORMS
+    public static final UnicodeBlock HALFWIDTH_AND_FULLWIDTH_FORMS
       = new UnicodeBlock('\uFF00', '\uFFEF',
                          "HALFWIDTH_AND_FULLWIDTH_FORMS");
 
@@ -886,7 +887,7 @@ public final class Character implements Serializable, Comparable<Character>
      * Specials.
      * '\uFEFF', '\uFFF0' - '\uFFFD'.
      */
-    public final static UnicodeBlock SPECIALS
+    public static final UnicodeBlock SPECIALS
       = new UnicodeBlock('\uFFF0', '\uFFFD',
                          "SPECIALS");
 

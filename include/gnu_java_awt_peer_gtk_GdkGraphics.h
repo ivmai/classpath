@@ -13,6 +13,7 @@ extern "C"
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_initState__Lgnu_java_awt_peer_gtk_GtkComponentPeer_2 (JNIEnv *env, jobject, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_initState__II (JNIEnv *env, jobject, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_copyState (JNIEnv *env, jobject, jobject);
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_connectSignals (JNIEnv *env, jobject, jobject);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_clearRect (JNIEnv *env, jobject, jint, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_copyArea (JNIEnv *env, jobject, jint, jint, jint, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_dispose (JNIEnv *env, jobject);
@@ -28,7 +29,7 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_fillPolygon (JNIEn
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_drawPolyline (JNIEnv *env, jobject, jintArray, jintArray, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_drawRect (JNIEnv *env, jobject, jint, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_fillRect (JNIEnv *env, jobject, jint, jint, jint, jint);
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_drawString (JNIEnv *env, jobject, jstring, jint, jint, jstring, jint, jint);
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_drawString (JNIEnv *env, jobject, jobject, jstring, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_setClipRectangle (JNIEnv *env, jobject, jint, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_setFGColor (JNIEnv *env, jobject, jint, jint, jint);
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkGraphics_setFunction (JNIEnv *env, jobject, jint);

@@ -21,7 +21,7 @@ dnl We will not track/change lib version until we reach version 1.0
 dnl at which time we'll have to be more anal about such things
 dnl -----------------------------------------------------------
 AC_SUBST(LIBVERSION, "0:0:0")
-CLASSPATH_MODULE="-module -version-info ${LIBVERSION}"
+CLASSPATH_MODULE="-module -version-info ${LIBVERSION} -no-undefined"
 AC_SUBST(CLASSPATH_MODULE)
 
 AC_PREREQ(2.59)
@@ -43,23 +43,22 @@ AC_ARG_ENABLE([jni],
 AM_CONDITIONAL(CREATE_JNI_LIBRARIES, test "x${COMPILE_JNI}" = xyes)
 
 dnl -----------------------------------------------------------
-dnl Enable CNI libraries (disabled by default)
+dnl Whether to compile with -Werror or not (enabled by default)
 dnl -----------------------------------------------------------
-AC_ARG_ENABLE([cni],
-              [AS_HELP_STRING(--enable-cni,compile CNI source [default=no])],
-              [case "${enableval}" in 
-                yes) COMPILE_CNI=yes; COMPILE_JAVA=yes ;;
-                no) COMPILE_CNI=no ;;
-                *) COMPILE_CNI=yes; COMPILE_JAVA=yes ;;
+AC_ARG_ENABLE([Werror],
+              [AS_HELP_STRING(--disable-Werror,whether to compile C code with -Werror which turns any compiler warning into a compilation failure [default=yes])],
+              [case "${enableval}" in
+                yes) ENABLE_WERROR=yes ;;
+                no) ENABLE_WERROR=no ;;
+                *) ENABLE_WERROR=yes ;;
               esac],
-              [COMPILE_CNI=no])
-AM_CONDITIONAL(CREATE_CNI_LIBRARIES, test "x${COMPILE_CNI}" = xyes)
+              [ENABLE_WERROR=yes])
 
 dnl -----------------------------------------------------------
 dnl GTK native peer (enabled by default)
 dnl -----------------------------------------------------------
 AC_ARG_ENABLE([gtk-peer],
-              [AS_HELP_STRING(--disable-gtk-peer,compile GTK native peers,disabled by --disable-jni [default=yes])],
+              [AS_HELP_STRING(--disable-gtk-peer,compile GTK native peers (disabled by --disable-jni) [default=yes])],
               [case "${enableval}" in
                 yes) COMPILE_GTK_PEER=yes ;;
                 no) COMPILE_GTK_PEER=no ;;
@@ -119,6 +118,10 @@ if test "x${COMPILE_JNI}" = xyes; then
   dnl Checking sizeof void * is needed for fdlibm to work properly on ppc64, 
   dnl at least. 
   AC_CHECK_SIZEOF(void *)
+
+  dnl Checking for endianess.
+  AC_C_BIGENDIAN
+  
   dnl We check for sys/filio.h because Solaris 2.5 defines FIONREAD there.
   dnl On that system, sys/ioctl.h will not include sys/filio.h unless
   dnl BSD_COMP is defined; just including sys/filio.h is simpler.
@@ -169,14 +172,29 @@ if test "x${COMPILE_JNI}" = xyes; then
   dnl FIXME - does not allow cross compiling
   AC_C_BIGENDIAN
 
-  dnl We want warnings, lots of warnings :-)
-  AM_CFLAGS=
+  dnl When using gcc we want warnings, lots of warnings :-)
   if test "x${GCC}" = xyes; then
     dnl We want ISO C90 pedantic ansi, but with longlong (jlong) support
     dnl and modern POSIX and BSD C library functions/prototypes.
-    AM_CFLAGS='-ansi -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -D_BSD_SOURCE '
+
+    dnl Warning flags for (almost) everybody.
+    dnl Should probably be configurable
+    WARNING_CFLAGS='-pedantic -W -Wall -Wmissing-declarations -Wwrite-strings -Wmissing-prototypes -Wno-long-long'
+    AC_SUBST(WARNING_CFLAGS)
+
+    dnl Strict warning flags which not every module uses.
+    dnl Should probably be configurable.
+    STRICT_WARNING_CFLAGS=-Wstrict-prototypes
+    AC_SUBST(STRICT_WARNING_CFLAGS)
+
+    dnl Whether or not to add -Werror, also not used by all modueles.
+    dnl Can be configured by --disable-Werror
+    ERROR_CFLAGS=
+    if test "x${ENABLE_WERROR}" = xyes; then
+       ERROR_CFLAGS='-Werror'
+    fi
+    AC_SUBST(ERROR_CFLAGS)
   fi
-  AC_SUBST(AM_CFLAGS)
 
   dnl Check for AWT related gthread/gtk/libart_lgpl
   if test "x${COMPILE_GTK_PEER}" = xyes; then
@@ -200,10 +218,10 @@ CLASSPATH_WITH_JAVAH
 
 dnl ----------------------------------------------------------- 
 dnl Add the include files for the native abstraction layer.
+dnl Used by AM_CPPFLAGS in the different modules.
 dnl -----------------------------------------------------------
-AM_CPPFLAGS="-I\$(top_srcdir)/include -I\$(top_srcdir)/native/jni/classpath"
-AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/native/target/Linux -I\$(top_srcdir)/native/target/generic"
-AC_SUBST(AM_CPPFLAGS)
+CLASSPATH_INCLUDES="-I\$(top_srcdir)/include -I\$(top_srcdir)/native/jni/classpath -I\$(top_srcdir)/native/target/Linux -I\$(top_srcdir)/native/target/generic"
+AC_SUBST(CLASSPATH_INCLUDES)
 
 dnl -----------------------------------------------------------
 if test "x${COMPILE_JNI}" = xyes; then
@@ -260,36 +278,14 @@ dnl want to disable this, but some VMs (gcj) don't need or want
 dnl them.
 dnl -----------------------------------------------------------
 AC_ARG_ENABLE([load-library],
-              [AS_HELP_STRING(--enable-load-library,enable to use JNI native methods [default=yes]
-                                        (disabled automatically using --enable-cni))],
+              [AS_HELP_STRING(--enable-load-library,enable to use JNI native methods [default=yes])],
               [case "${enableval}" in 
                 yes) INIT_LOAD_LIBRARY="true" ;;
                 no) INIT_LOAD_LIBRARY="false" ;;
                 *) AC_MSG_ERROR(bad value ${enableval} for --enable-load-library) ;;
               esac],
-              [
-                if test "x${COMPILE_CNI}" = xyes; then
-                  INIT_LOAD_LIBRARY="false"
-                else
-                  INIT_LOAD_LIBRARY="true"
-                fi
-              ])
+              [INIT_LOAD_LIBRARY="true"])
 AC_SUBST(INIT_LOAD_LIBRARY)
-
-dnl -----------------------------------------------------------
-dnl Create a link to the VM specific files we're compiling with
-dnl -----------------------------------------------------------
-if test "x${JVM_REFERENCE}" = x; then
-  JVM_REFERENCE=reference
-fi
-ac_sources="vm/$JVM_REFERENCE"
-ac_dests="vm/current"
-while test -n "$ac_sources"; do
-  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
-  set $ac_sources; ac_source=$1; shift; ac_sources=$*
-  ac_config_links_2="$ac_config_links_2 $ac_dest:$ac_source"
-done
-AC_CONFIG_LINKS([$ac_config_links_2])
 
 dnl -----------------------------------------------------------
 dnl avoiding automake complaints
@@ -349,7 +345,6 @@ gnu/classpath/Configuration.java
 include/Makefile
 native/Makefile
 native/fdlibm/Makefile
-native/cni/Makefile
 native/jni/Makefile
 native/jni/classpath/Makefile
 native/jni/java-io/Makefile

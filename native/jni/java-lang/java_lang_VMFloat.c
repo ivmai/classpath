@@ -1,5 +1,5 @@
 /* VMFloat.c - java.lang.VMFloat native functions
-   Copyright (C) 1998, 1999, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,8 +45,11 @@ exception statement from your version. */
  * Method:    floatToIntBits
  * Signature: (F)I
  */
-JNIEXPORT jint JNICALL Java_java_lang_VMFloat_floatToIntBits
-  (JNIEnv * env, jclass cls, jfloat value)
+JNIEXPORT jint JNICALL
+Java_java_lang_VMFloat_floatToIntBits
+  (JNIEnv * env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jfloat value)
 {
     jvalue u;
     jint e, f;
@@ -65,8 +68,11 @@ JNIEXPORT jint JNICALL Java_java_lang_VMFloat_floatToIntBits
  * Method:    floatToRawIntBits
  * Signature: (F)I
  */
-JNIEXPORT jint JNICALL Java_java_lang_VMFloat_floatToRawIntBits
-  (JNIEnv * env, jclass cls, jfloat value)
+JNIEXPORT jint JNICALL
+Java_java_lang_VMFloat_floatToRawIntBits
+  (JNIEnv * env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jfloat value)
 {
   jvalue u;
   u.f = value;
@@ -78,8 +84,11 @@ JNIEXPORT jint JNICALL Java_java_lang_VMFloat_floatToRawIntBits
  * Method:    intBitsToFloat
  * Signature: (I)F
  */
-JNIEXPORT jfloat JNICALL Java_java_lang_VMFloat_intBitsToFloat
-  (JNIEnv * env, jclass cls, jint bits)
+JNIEXPORT jfloat JNICALL
+Java_java_lang_VMFloat_intBitsToFloat
+  (JNIEnv * env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jint bits)
 {
     jvalue u;
     u.i = bits;

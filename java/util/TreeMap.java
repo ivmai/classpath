@@ -1538,7 +1538,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
      * @param key the key to check
      * @return true if the key is in range
      */
-    final boolean keyInRange(SK key)
+    boolean keyInRange(SK key)
     {
       return ((minKey == nil || compare((K) key, (K) minKey) >= 0)
               && (maxKey == nil || compare((K) key, (K) maxKey) < 0));

@@ -99,14 +99,17 @@ area_updated (GdkPixbufLoader *loader,
   JNIEnv *env;
   union env_union e;
   jint stride_bytes, stride_pixels, n_channels, n_pixels;
-  int i, px;
   jintArray jpixels;  
   jint *java_pixels;
   guchar *gdk_pixels;
 
   GdkPixbuf *pixbuf_no_alpha = NULL;
   GdkPixbuf *pixbuf = NULL;
-  
+
+#ifndef WORDS_BIGENDIAN
+  int i;
+#endif
+
   pixbuf_no_alpha = gdk_pixbuf_loader_get_pixbuf (loader);
   if (pixbuf_no_alpha == NULL)
     return;
@@ -129,21 +132,13 @@ area_updated (GdkPixbufLoader *loader,
 	  gdk_pixels + (y * stride_bytes), 
 	  (height * stride_bytes));
 
+#ifndef WORDS_BIGENDIAN
+  /* convert pixels from 0xBBGGRRAA to 0xAARRGGBB */
   for (i = 0; i < n_pixels; ++i)
     {
-      px = java_pixels[i];
-
-      /* move alpha around (GdkPixbufLoader results are AGBR not GBRA, in
-	 the lsb sense) */
-      /* px = ((px >> 24) & 0xff) | ((px << 8) & 0xffffff00); */
-
-      /* it appears to require a full byte swap, now, not just a shift to
-	 the A channel. why did this change? don't know. */
-      px = ((px >>  8) & 0x00ff00ff) | ((px <<  8) & 0xff00ff00); 
-      px = ((px >> 16) & 0x0000ffff) | ((px << 16) & 0xffff0000); 
-
-      java_pixels[i] = px;
+      java_pixels[i] = SWAPU32 ((unsigned)java_pixels[i]);
     }
+#endif
 
   g_object_unref (pixbuf);
 
@@ -176,7 +171,8 @@ closed (GdkPixbufLoader *loader __attribute__((unused)), jobject *decoder)
 
 
 
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initState
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initState
   (JNIEnv *env, jobject obj)
 {
   GdkPixbufLoader *loader = NULL;
@@ -197,7 +193,8 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initState
   NSA_SET_PB_PTR (env, obj, loader);
 }
 
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initStaticState 
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initStaticState 
   (JNIEnv *env, jclass clazz)
 {
   (*env)->GetJavaVM(env, &vm);
@@ -213,7 +210,8 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initStaticSta
 }
 
 
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_finish
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_finish
   (JNIEnv *env, jobject obj)
 {
   GdkPixbufLoader *loader = NULL;
@@ -229,7 +227,8 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_finish
 }
 
 
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_pumpBytes
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_pumpBytes
   (JNIEnv *env, jobject obj, jbyteArray jarr, jint len)
 {
   GdkPixbufLoader *loader = NULL;

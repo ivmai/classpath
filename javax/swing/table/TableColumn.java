@@ -35,12 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing.table;
 
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-import javax.swing.event.SwingPropertyChangeSupport;
 
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * TableColumn
@@ -129,6 +130,8 @@ public class TableColumn
 
   /**
    * resizedPostingDisableCount
+   *
+   * @deprecated 1.3
    */
   protected transient int resizedPostingDisableCount;
 
@@ -216,7 +219,8 @@ public class TableColumn
   private void firePropertyChange(String property, boolean oldValue,
                                   boolean newValue)
   {
-    firePropertyChange(property, new Boolean(oldValue), new Boolean(newValue));
+    firePropertyChange(property, Boolean.valueOf(oldValue),
+		       Boolean.valueOf(newValue));
   }
 
   /**
@@ -472,6 +476,8 @@ public class TableColumn
 
   /**
    * disableResizedPosting
+   *
+   * @deprecated 1.3
    */
   public void disableResizedPosting()
   {
@@ -480,6 +486,8 @@ public class TableColumn
 
   /**
    * enableResizedPosting
+   *
+   * @deprecated 1.3
    */
   public void enableResizedPosting()
   {

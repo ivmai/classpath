@@ -40,11 +40,6 @@ package java.security.cert;
 
 import java.math.BigInteger;
 import java.security.Principal;
-import java.security.PublicKey;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.util.Date;
 
 /**
@@ -140,7 +135,9 @@ import java.util.Date;
  * @author Mark Benvenuto
  * @author Casey Marshall (rsdio@metastatic.org)
  */
-public abstract class X509Certificate extends Certificate implements X509Extension
+public abstract class X509Certificate
+  extends java.security.cert.Certificate  // XXX workaround for gcj bug #17845
+  implements X509Extension
 {
   private static final long serialVersionUID = -2491127588187038216L;
 

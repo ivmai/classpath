@@ -47,15 +47,16 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.Permissions;
-import java.security.ProtectionDomain;
-import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+
 
 /**
  * A Class represents a Java type.  There will never be multiple Class
@@ -102,7 +103,7 @@ public final class Class<T> implements Serializable
   /* We use an inner class, so that Class doesn't have a static initializer */
   private static final class StaticData
   {
-    final static ProtectionDomain unknownProtectionDomain;
+    static final ProtectionDomain unknownProtectionDomain;
 
     static
     {
@@ -112,7 +113,7 @@ public final class Class<T> implements Serializable
     }
   }
 
-  transient final Object vmdata;
+  final transient Object vmdata;
 
   /** newInstance() caches the default constructor */
   private transient Constructor constructor;

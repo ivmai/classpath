@@ -35,12 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+
 package javax.swing;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.Hashtable;
 import java.util.Vector;
+
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.event.TreeExpansionEvent;
@@ -56,7 +58,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
 
 public class JTree extends JComponent
   implements Scrollable, Accessible
@@ -468,7 +469,7 @@ public class JTree extends JComponent
    * @return <code>true</code> if the root element is visible,
    * <code>false</code> otherwise
    */
-  public boolean isRootVisbile()
+  public boolean isRootVisible()
   {
     return rootVisible;
   }

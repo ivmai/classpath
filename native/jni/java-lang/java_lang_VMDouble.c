@@ -1,5 +1,5 @@
 /* VMDouble.c - java.lang.VMDouble native functions
-   Copyright (C) 1998, 1999, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -46,8 +46,11 @@ exception statement from your version. */
  * Method:    doubleToLongBits
  * Signature: (D)J
  */
-JNIEXPORT jlong JNICALL Java_java_lang_VMDouble_doubleToLongBits
-  (JNIEnv * env, jclass cls, jdouble doubleValue)
+JNIEXPORT jlong JNICALL
+Java_java_lang_VMDouble_doubleToLongBits
+  (JNIEnv *env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jdouble doubleValue)
 {
   jvalue val;
   jlong e, f;
@@ -67,8 +70,11 @@ JNIEXPORT jlong JNICALL Java_java_lang_VMDouble_doubleToLongBits
  * Method:    doubleToRawLongBits
  * Signature: (D)J
  */
-JNIEXPORT jlong JNICALL Java_java_lang_VMDouble_doubleToRawLongBits
-  (JNIEnv * env, jclass cls, jdouble doubleValue)
+JNIEXPORT jlong JNICALL
+Java_java_lang_VMDouble_doubleToRawLongBits
+  (JNIEnv *env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jdouble doubleValue)
 {
   jvalue val;
   val.d = doubleValue;
@@ -80,8 +86,11 @@ JNIEXPORT jlong JNICALL Java_java_lang_VMDouble_doubleToRawLongBits
  * Method:    longBitsToDouble
  * Signature: (J)D
  */
-JNIEXPORT jdouble JNICALL Java_java_lang_VMDouble_longBitsToDouble
-  (JNIEnv * env, jclass cls, jlong longValue)
+JNIEXPORT jdouble JNICALL
+Java_java_lang_VMDouble_longBitsToDouble
+  (JNIEnv *env __attribute__((__unused__)),
+   jclass cls __attribute__((__unused__)),
+   jlong longValue)
 {
   jvalue val;
   val.j = longValue;

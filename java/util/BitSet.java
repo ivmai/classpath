@@ -732,7 +732,7 @@ public class BitSet implements Cloneable, Serializable
    *
    * @param lastElt the size needed for the bits array
    */
-  private final void ensure(int lastElt)
+  private void ensure(int lastElt)
   {
     if (lastElt >= bits.length)
       {

@@ -1,4 +1,4 @@
-/* java.util.Calendar
+/* Calendar.java --
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -576,9 +576,9 @@ public abstract class Calendar
    */
   public void setTimeInMillis(long time)
   {
+    clear();
     this.time = time;
     isTimeSet = true;
-    computeFields();
   }
 
   /**
@@ -652,6 +652,10 @@ public abstract class Calendar
 	isSet[HOUR_OF_DAY] = false;
 	break;
       }
+
+    // May have crossed over a DST boundary.
+    if (field != DST_OFFSET && field != ZONE_OFFSET)
+      isSet[DST_OFFSET] = false;
   }
 
   /**
@@ -672,6 +676,8 @@ public abstract class Calendar
     isSet[WEEK_OF_MONTH] = false;
     isSet[DAY_OF_WEEK] = false;
     isSet[DAY_OF_WEEK_IN_MONTH] = false;
+
+    isSet[DST_OFFSET] = false;  // May have crossed a DST boundary.
   }
 
   /**
@@ -1059,7 +1065,7 @@ public abstract class Calendar
       }
   }
 
-  private final static String[] fieldNames = {
+  private static final String[] fieldNames = {
     ",ERA=", ",YEAR=", ",MONTH=",
     ",WEEK_OF_YEAR=", ",WEEK_OF_MONTH=",
     ",DAY_OF_MONTH=", ",DAY_OF_YEAR=", ",DAY_OF_WEEK=",

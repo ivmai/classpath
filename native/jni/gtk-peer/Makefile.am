@@ -3,8 +3,6 @@ pkglib_LTLIBRARIES = libgtkpeer.la
 # Gtk/Cairo JNI sources.
 if GTK_CAIRO
   gtk_cairo_c_source_files = \
-    gnu_java_awt_peer_gtk_GdkClasspathFontPeer.c \
-    gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.c \
     gnu_java_awt_peer_gtk_GdkGlyphVector.c \
     gnu_java_awt_peer_gtk_GdkGraphics2D.c
 else
@@ -14,8 +12,11 @@ endif
 libgtkpeer_la_SOURCES = $(gtk_cairo_c_source_files) \
 			gnu_java_awt_peer_gtk_GThreadNativeMethodRunner.c \
 			gnu_java_awt_peer_gtk_GdkFontMetrics.c \
+			gnu_java_awt_peer_gtk_GdkFontPeer.c \
 			gnu_java_awt_peer_gtk_GdkGraphics.c \
+			gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.c \
 			gnu_java_awt_peer_gtk_GdkPixbufDecoder.c \
+			gnu_java_awt_peer_gtk_GdkTextLayout.c \
 			gnu_java_awt_peer_gtk_GtkButtonPeer.c \
 			gnu_java_awt_peer_gtk_GtkCanvasPeer.c \
 			gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.c \
@@ -52,8 +53,12 @@ libgtkpeer_la_SOURCES = $(gtk_cairo_c_source_files) \
 			gtkcairopeer.h \
 			gtkpeer.h
 
-libgtkpeer_la_CPPFLAGS = $(AM_CPPFLAGS) @GTK_CFLAGS@ \
-                         @CAIRO_CFLAGS@ @PANGOFT2_CFLAGS@
 libgtkpeer_la_LIBADD = $(top_builddir)/native/jni/classpath/native_state.lo
-libgtkpeer_la_LDFLAGS = @CLASSPATH_MODULE@ @GTK_LIBS@ \
-                        @CAIRO_LIBS@ @PANGOFT2_LIBS@
+
+AM_LDFLAGS = @CLASSPATH_MODULE@ @GTK_LIBS@ @CAIRO_LIBS@ @PANGOFT2_LIBS@
+AM_CPPFLAGS = @CLASSPATH_INCLUDES@
+
+# Just the WARNING_CFLAGS. We cannot use the strict flags since the gtk
+# headers contain broken prototypes (by design, see gtkitemfactory.h).
+AM_CFLAGS = @WARNING_CFLAGS@ @ERROR_CFLAGS@ \
+            @GTK_CFLAGS@ @CAIRO_CFLAGS@ @PANGOFT2_CFLAGS@

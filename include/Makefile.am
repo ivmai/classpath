@@ -5,13 +5,14 @@ ARG_CLASSPATH_JAVAH = -bootclasspath
 JAVAH = $(USER_JAVAH) $(ARG_JNI_JAVAH) $(ARG_CLASSPATH_JAVAH) ../lib:$(USER_CLASSLIB)
 
 H_FILES = \
-$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkClasspathFontPeer.h \
-$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkFontMetrics.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkFontPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGlyphVector.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphics.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphics2D.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkPixbufDecoder.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkTextLayout.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkButtonPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkCanvasPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.h \
@@ -70,20 +71,22 @@ if CREATE_JNI_HEADERS
 
 all-local: $(H_FILES)
 
-$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkClasspathFontPeer.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkClasspathFontPeer.java
-	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkClasspathFontPeer
-$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkClasspathFontPeerMetrics.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkClasspathFontPeerMetrics.java
-	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkClasspathFontPeerMetrics
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkFontMetrics.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkFontMetrics.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkFontMetrics
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkFontPeer.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkFontPeer.java
+	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkFontPeer
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGlyphVector.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkGlyphVector.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkGlyphVector
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphics.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkGraphics.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkGraphics
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphics2D.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkGraphics2D.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkGraphics2D
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java
+	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkGraphicsEnvironment
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkPixbufDecoder.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkPixbufDecoder.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkPixbufDecoder
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkTextLayout.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GdkTextLayout.java
+	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GdkTextLayout
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkButtonPeer.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GtkButtonPeer.java
 	$(JAVAH) -o $@ gnu.java.awt.peer.gtk.GtkButtonPeer
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkCanvasPeer.h: $(top_srcdir)/gnu/java/awt/peer/gtk/GtkCanvasPeer.java
@@ -150,15 +153,15 @@ $(top_srcdir)/include/gnu_java_net_PlainSocketImpl.h: $(top_srcdir)/gnu/java/net
 	$(JAVAH) -o $@ gnu.java.net.PlainSocketImpl
 $(top_srcdir)/include/gnu_java_nio_NIOServerSocket.h: $(top_srcdir)/gnu/java/nio/NIOServerSocket.java
 	$(JAVAH) -o $@ gnu.java.nio.NIOServerSocket
-$(top_srcdir)/include/gnu_java_nio_VMPipe.h: ../vm/current/gnu/java/nio/VMPipe.java
+$(top_srcdir)/include/gnu_java_nio_VMPipe.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMPipe.java
 	$(JAVAH) -o $@ gnu.java.nio.VMPipe
-$(top_srcdir)/include/gnu_java_nio_VMSelector.h: ../vm/current/gnu/java/nio/VMSelector.java
+$(top_srcdir)/include/gnu_java_nio_VMSelector.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMSelector.java
 	$(JAVAH) -o $@ gnu.java.nio.VMSelector
 $(top_srcdir)/include/java_io_ObjectInputStream.h: $(top_srcdir)/java/io/ObjectInputStream.java
 	$(JAVAH) -o $@ java.io.ObjectInputStream
-$(top_srcdir)/include/java_io_VMFile.h: ../vm/current/java/io/VMFile.java
+$(top_srcdir)/include/java_io_VMFile.h: $(top_srcdir)/vm/reference/java/io/VMFile.java
 	$(JAVAH) -o $@ java.io.VMFile
-$(top_srcdir)/include/java_io_VMObjectStreamClass.h: ../vm/current/java/io/VMObjectStreamClass.java
+$(top_srcdir)/include/java_io_VMObjectStreamClass.h: $(top_srcdir)/vm/reference/java/io/VMObjectStreamClass.java
 	$(JAVAH) -o $@ java.io.VMObjectStreamClass
 $(top_srcdir)/include/java_lang_Double.h: $(top_srcdir)/java/lang/Double.java
 	$(JAVAH) -o $@ java.lang.Double

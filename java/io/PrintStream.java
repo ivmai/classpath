@@ -1,5 +1,6 @@
 /* PrintStream.java -- OutputStream for printing output
-   Copyright (C) 1998, 1999, 2001, 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -82,6 +83,39 @@ public class PrintStream extends FilterOutputStream implements Appendable
   private boolean closed;
 
   /**
+   * This class exists to forward the write calls from the PrintWriter back
+   * to us. This is required to make subclassing of PrintStream work
+   * correctly.
+   */
+  private class ForwardStream extends OutputStream
+  {
+    public void close () throws IOException
+    {
+      out.close ();
+    }
+
+    public void flush () throws IOException
+    {
+      out.flush ();
+    }
+
+    public void write (byte[] b) throws IOException
+    {
+	PrintStream.this.write (b);
+    }
+
+    public void write (byte[] b, int off, int len) throws IOException
+    {
+	PrintStream.this.write (b, off, len);
+    }
+
+    public void write (int b) throws IOException
+    {
+	PrintStream.this.write (b);
+    }
+  }
+
+  /**
    * This method intializes a new <code>PrintStream</code> object to write
    * to the specified output sink.
    *
@@ -109,7 +143,10 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     super (out);
 
-    pw = new PrintWriter (out, auto_flush);
+    // FIXME Instead of using PrintWriter and ForwardStream we
+    // should inline the character conversion (see libgcj's version
+    // of this class)
+    pw = new PrintWriter (new ForwardStream (), auto_flush);
     this.auto_flush = auto_flush;
   }
 
@@ -133,7 +170,12 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     super (out);
 
-    pw = new PrintWriter (new OutputStreamWriter (out, encoding), auto_flush);
+    // FIXME Instead of using PrintWriter and ForwardStream we
+    // should inline the character conversion (see libgcj's version
+    // of this class)
+    pw = new PrintWriter (
+	    new OutputStreamWriter (
+		new ForwardStream (), encoding), auto_flush);
     this.auto_flush = auto_flush;
   }
 
@@ -471,6 +513,10 @@ public class PrintStream extends FilterOutputStream implements Appendable
         if (auto_flush && (oneByte == '\n'))
           flush ();
       }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread ().interrupt ();
+      }
     catch (IOException e)
       {
         setError ();
@@ -497,6 +543,10 @@ public class PrintStream extends FilterOutputStream implements Appendable
         
         if (auto_flush)
           flush ();
+      }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread ().interrupt ();
       }
     catch (IOException e)
       {
