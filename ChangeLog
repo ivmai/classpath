@@ -1,5 +1,7 @@
 2004-09-07  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/SuppressWarnings.java: Document.
+
 	* java/lang/StringBuilder.java: New file.
 	* java/lang/String.java (String(StringBuilder)): New constructor.
 	* java/lang/StringBuffer.java: Added comment.

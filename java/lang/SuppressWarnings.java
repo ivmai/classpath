@@ -42,9 +42,28 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 import static java.lang.annotation.ElementType.*;
 
+/**
+ * Tell the compiler that a given warning should be suppressed when it
+ * pertains to the marked program element and its sub-elements.
+ *
+ * Note that warning suppression is additive.  For instance if a
+ * constructor has a warning suppressed, and a local variable in the
+ * constructor has a different warning suppressed, then the resulting
+ * set of suppressed warnings for that variable will be both warnings.
+ *
+ * @since 1.5
+ */
 @Retention(SOURCE)
 @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
 public @interface SuppressWarnings
 {
+  /**
+   * The list of warnings to suppress.
+   *
+   * It is valid to list a name more than once.  Unrecognized names
+   * are not a compile-time error.  At the present there is no
+   * standard for the names to be recognized by compilers; consult
+   * your compiler's documentation for this information.
+   */
   String[] value ();
 }
