@@ -48,7 +48,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  *
  * @since 1.5
  */
-@Documented @Retention(SOURCE)
+@Documented @Retention(RUNTIME)
 public @interface Deprecated
 {
 }
