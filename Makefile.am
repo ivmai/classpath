@@ -1,12 +1,14 @@
 ## Input file for automake to generate the Makefile.in used by configure
 
 # lib first, to compile .class files before native code, last examples
-SUBDIRS = lib doc include native resource scripts $(EXAMPLESDIR)
-DIST_SUBDIRS = lib doc include native resource scripts examples
+SUBDIRS = lib doc external include native resource scripts $(EXAMPLESDIR)
+DIST_SUBDIRS = lib doc external include native resource scripts examples
 
 native: lib
 
-EXTRA_DIST = HACKING BUGS THANKYOU mauve-classpath LICENSE ChangeLog-2003
+EXTRA_DIST = HACKING BUGS THANKYOU mauve-classpath LICENSE \
+             ChangeLog-2003 ChangeLog-2004 \
+             ChangeLog.gnujaxp.1 ChangeLog.gnujaxp.2 ChangeLog.libxmlj
 
 #DISTCHECK_CONFIGURE_FLAGS = --enable-gjdoc
 

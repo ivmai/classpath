@@ -417,7 +417,7 @@ public final class String
         if ((count << 2) < buffer.value.length)
           {
             value = new char[count];
-            System.arraycopy(buffer.value, 0, value, 0, count);
+            VMSystem.arraycopy(buffer.value, 0, value, 0, count);
           }
         else
           {
@@ -461,7 +461,7 @@ public final class String
     else
       {
         value = new char[count];
-        System.arraycopy(data, offset, value, 0, count);
+        VMSystem.arraycopy(data, offset, value, 0, count);
         this.offset = 0;
       }
     this.count = count;
@@ -511,7 +511,7 @@ public final class String
   {
     if (srcBegin < 0 || srcBegin > srcEnd || srcEnd > count)
       throw new StringIndexOutOfBoundsException();
-    System.arraycopy(value, srcBegin + offset,
+    VMSystem.arraycopy(value, srcBegin + offset,
                      dst, dstBegin, srcEnd - srcBegin);
   }
 
@@ -1055,8 +1055,8 @@ public final class String
     if (count == 0)
       return str;
     char[] newStr = new char[count + str.count];
-    System.arraycopy(value, offset, newStr, 0, count);
-    System.arraycopy(str.value, str.offset, newStr, count, str.count);
+    VMSystem.arraycopy(value, offset, newStr, 0, count);
+    VMSystem.arraycopy(str.value, str.offset, newStr, count, str.count);
     // Package constructor avoids an array copy.
     return new String(newStr, 0, newStr.length, true);
   }
@@ -1397,7 +1397,7 @@ public final class String
     // if (count == value.length)
     //   return (char[]) value.clone();
     char[] copy = new char[count];
-    System.arraycopy(value, offset, copy, 0, count);
+    VMSystem.arraycopy(value, offset, copy, 0, count);
     return copy;
   }
 
@@ -1636,7 +1636,7 @@ public final class String
       {
 	int count = s.count;
 	value = new char[count];
-	System.arraycopy(s.value, s.offset, value, 0, count);
+	VMSystem.arraycopy(s.value, s.offset, value, 0, count);
       }
 
     return value;

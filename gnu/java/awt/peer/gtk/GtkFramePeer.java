@@ -89,7 +89,8 @@ public class GtkFramePeer extends GtkWindowPeer
         setMenuBarPeer (menuBar);
         int menuBarWidth =
           awtComponent.getWidth () - insets.left - insets.right;
-        setMenuBarWidth (menuBar, menuBarWidth);
+        if (menuBarWidth > 0)
+          setMenuBarWidth (menuBar, menuBarWidth);
         menuBarHeight = getMenuBarHeight ();
         insets.top += menuBarHeight;
         awtComponent.validate ();
@@ -105,7 +106,8 @@ public class GtkFramePeer extends GtkWindowPeer
           awtComponent.getWidth () - insets.left - insets.right;
         menuBar = (MenuBarPeer) ((MenuBar) bar).getPeer ();
         setMenuBarPeer (menuBar);
-        setMenuBarWidth (menuBar, menuBarWidth);
+        if (menuBarWidth > 0)
+          setMenuBarWidth (menuBar, menuBarWidth);
         menuBarHeight = getMenuBarHeight ();
         if (oldHeight != menuBarHeight)
           {
@@ -118,8 +120,9 @@ public class GtkFramePeer extends GtkWindowPeer
 
   public void setBounds (int x, int y, int width, int height)
   {
-    if (menuBar != null)
-      setMenuBarWidth (menuBar, width - insets.left - insets.right);
+    int menuBarWidth = width - insets.left - insets.right;
+    if (menuBar != null && menuBarWidth > 0)
+      setMenuBarWidth (menuBar, menuBarWidth);
 
     nativeSetBounds (x, y,
 		     width - insets.left - insets.right,
@@ -162,7 +165,7 @@ public class GtkFramePeer extends GtkWindowPeer
     setMenuBar (frame.getMenuBar ());
 
     setTitle (frame.getTitle ());
-    setResizable (frame.isResizable ());
+    gtkWindowSetResizable (frame.isResizable ());
     setIconImage(frame.getIconImage());
   }
 
@@ -225,7 +228,8 @@ public class GtkFramePeer extends GtkWindowPeer
         || frame_width != awtComponent.getWidth()
         || frame_height != awtComponent.getHeight())
       {
-        if (frame_width != awtComponent.getWidth() && menuBar != null)
+        if (frame_width != awtComponent.getWidth() && menuBar != null
+            && width > 0)
           setMenuBarWidth (menuBar, width);
 
         setBoundsCallback ((Window) awtComponent,
@@ -233,9 +237,9 @@ public class GtkFramePeer extends GtkWindowPeer
                            frame_y,
                            frame_width,
                            frame_height);
-      }
 
-    awtComponent.validate();
+        awtComponent.validate();
+      }
   }
 
   protected void postMouseEvent(int id, long when, int mods, int x, int y, 
@@ -249,7 +253,7 @@ public class GtkFramePeer extends GtkWindowPeer
   protected void postExposeEvent (int x, int y, int width, int height)
   {
     if (!isInRepaint)
-      q.postEvent (new PaintEvent (awtComponent, PaintEvent.PAINT,
+      q().postEvent (new PaintEvent (awtComponent, PaintEvent.PAINT,
                                    new Rectangle (x + insets.left, 
                                                   y + insets.top, 
                                                   width, height)));

@@ -1,5 +1,5 @@
 /* PlainSocketImpl.java -- Default socket implementation
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -177,15 +177,21 @@ public final class PlainSocketImpl extends SocketImpl
    */
   public native Object getOption(int optID) throws SocketException;
 
-  public void shutdownInput()
-  {
-    throw new InternalError ("PlainSocketImpl::shutdownInput not implemented");
-  }
+  /**
+   * Flushes the input stream and closes it. If you read from the input stream
+   * after calling this method a <code>IOException</code> will be thrown.
+   * 
+   * @throws IOException if an error occurs
+   */
+  public native void shutdownInput() throws IOException;
 
-  public void shutdownOutput()
-  {
-    throw new InternalError ("PlainSocketImpl::shutdownOutput not implemented");
-  }
+  /**
+   * Flushes the output stream and closes it. If you write to the output stream
+   * after calling this method a <code>IOException</code> will be thrown.
+   * 
+   * @throws IOException if an error occurs
+   */
+  public native void shutdownOutput() throws IOException;
 
   /**
    * Creates a new socket that is not bound to any local address/port and
@@ -195,7 +201,7 @@ public final class PlainSocketImpl extends SocketImpl
    *
    * @param stream true for a stream socket, false for a datagram socket
    */
-  protected native synchronized void create(boolean stream) throws IOException;
+  protected synchronized native void create(boolean stream) throws IOException;
 
   /**
    * Connects to the remote hostname and port specified as arguments.
@@ -264,7 +270,7 @@ public final class PlainSocketImpl extends SocketImpl
    *
    * @exception IOException If an error occurs
    */
-  protected native synchronized void bind(InetAddress addr, int port)
+  protected synchronized native void bind(InetAddress addr, int port)
     throws IOException;
 
   /**
@@ -277,7 +283,7 @@ public final class PlainSocketImpl extends SocketImpl
    * 
    * @exception IOException If an error occurs
    */
-  protected native synchronized void listen(int queuelen)
+  protected synchronized native void listen(int queuelen)
     throws IOException;
 
   /**
@@ -286,7 +292,7 @@ public final class PlainSocketImpl extends SocketImpl
    *
    * @param impl The SocketImpl object to accept this connection.
    */
-  protected native synchronized void accept(SocketImpl impl)
+  protected synchronized native void accept(SocketImpl impl)
     throws IOException;
 
   /**

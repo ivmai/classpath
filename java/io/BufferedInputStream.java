@@ -261,6 +261,9 @@ public class BufferedInputStream extends FilterInputStream
     if (off < 0 || len < 0 || b.length - off < len)
       throw new IndexOutOfBoundsException();
 
+    if (len == 0)
+      return 0;
+
     if (pos >= count && !refill())
       return -1;		// No bytes were read before EOF.
 
@@ -318,17 +321,14 @@ public class BufferedInputStream extends FilterInputStream
   public synchronized long skip(long n) throws IOException
   {
     if (buf == null)
-	throw new IOException("Stream closed.");
+      throw new IOException("Stream closed.");
 
     final long origN = n;
 
     while (n > 0L)
       {
 	if (pos >= count && !refill())
-	  if (n < origN)
-	    break;
-	  else
-	    return -1;	// No bytes were read before EOF.
+          break;
 
 	int numread = (int) Math.min((long) (count - pos), n);
 	pos += numread;
@@ -347,7 +347,7 @@ public class BufferedInputStream extends FilterInputStream
   private boolean refill() throws IOException
   {
     if (buf == null)
-	throw new IOException("Stream closed.");
+      throw new IOException("Stream closed.");
 
     if (markpos == -1 || count - markpos >= marklimit)
       {
@@ -371,7 +371,7 @@ public class BufferedInputStream extends FilterInputStream
     int numread = super.read(buf, count, bufferSize);
 
     if (numread <= 0)	// EOF
-	return false;
+      return false;
 
     count += numread;
     return true;

@@ -59,15 +59,18 @@ import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.peer.*;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
+import javax.imageio.spi.IIORegistry;
 
 /* This class uses a deprecated method java.awt.peer.ComponentPeer.getPeer().
    This merits comment.  We are basically calling Sun's bluff on this one.
@@ -86,9 +89,8 @@ import java.util.Properties;
 public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
   implements EmbeddedWindowSupport
 {
-  GtkMainThread main;
   Hashtable containers = new Hashtable();
-  static EventQueue q = new EventQueue();
+  static EventQueue q;
   static Clipboard systemClipboard;
   static boolean useGraphics2dSet;
   static boolean useGraphics2d;
@@ -103,19 +105,32 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
     return useGraphics2d;
   }
 
+  static native void gtkInit(int portableNativeSync);
+
   static
   {
     if (Configuration.INIT_LOAD_LIBRARY)
       System.loadLibrary("gtkpeer");
+
+    int portableNativeSync;     
+    String portNatSyncProp = 
+      System.getProperty("gnu.classpath.awt.gtk.portable.native.sync");
+    
+    if (portNatSyncProp == null)
+      portableNativeSync = -1;  // unset
+    else if (Boolean.valueOf(portNatSyncProp).booleanValue())
+      portableNativeSync = 1;   // true
+    else
+      portableNativeSync = 0;   // false
+
+    gtkInit(portableNativeSync);
   }
 
   public GtkToolkit ()
   {
-    main = new GtkMainThread ();
     systemClipboard = new GtkClipboard ();
-    GtkGenericPeer.enableQueue (q);
   }
-  
+
   native public void beep ();
   native private void getScreenSizeDimensions (int[] xy);
   
@@ -313,7 +328,7 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
 			   "SansSerif" });
   }
 
-  private class LRUCache extends java.util.LinkedHashMap
+  private class LRUCache extends LinkedHashMap
   {    
     int max_entries;
     public LRUCache(int max)
@@ -594,6 +609,14 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
 
   protected EventQueue getSystemEventQueueImpl() 
   {
+    synchronized (GtkToolkit.class)
+      {
+        if (q == null)
+          {
+            q = new EventQueue();
+            GtkGenericPeer.enableQueue (q);
+          }
+      }    
     return q;
   }
 
@@ -613,15 +636,26 @@ public class GtkToolkit extends gnu.java.awt.ClasspathToolkit
 
   public GraphicsEnvironment getLocalGraphicsEnvironment()
   {
-    GraphicsEnvironment ge;
-    ge = new GdkGraphicsEnvironment ();  
-    return ge;
+    return new GdkGraphicsEnvironment();
   }
 
-  public Font createFont(int format, java.io.InputStream stream)
+  public Font createFont(int format, InputStream stream)
   {
-    throw new java.lang.UnsupportedOperationException ();
+    throw new UnsupportedOperationException();
   }
 
+  public RobotPeer createRobot (GraphicsDevice screen) throws AWTException
+  {
+    return new GdkRobotPeer (screen);
+  }
+
+  public void registerImageIOSpis(IIORegistry reg)
+  {
+    GdkPixbufDecoder.registerSpis(reg);
+  }
+
+  public native boolean nativeQueueEmpty();
+  public native void wakeNativeQueue();  
+  public native void iterateNativeQueue(EventQueue locked);
 
 } // class GtkToolkit

@@ -1080,7 +1080,7 @@ public abstract class Component
    *
    * @return the locale for this component
    * @throws IllegalComponentStateException if it has no locale or parent
-   * @see setLocale(Locale)
+   * @see #setLocale(Locale)
    * @since 1.1
    */
   public Locale getLocale()
@@ -1362,7 +1362,7 @@ public abstract class Component
       peer.setBounds (x, y, width, height);
 
     // Erase old bounds and repaint new bounds for lightweights.
-    if (isLightweight())
+    if (isLightweight() && isShowing ())
       {
         boolean shouldRepaintParent = false;
         boolean shouldRepaintSelf = false;
@@ -1380,19 +1380,22 @@ public abstract class Component
             shouldRepaintSelf = parentBounds.intersects(newBounds);
           }
 
-        if (shouldRepaintParent)
+        if (shouldRepaintParent && parent != null)
           parent.repaint(oldx, oldy, oldwidth, oldheight);
         if (shouldRepaintSelf)
           repaint();
       }
 
-    if (oldx != x || oldy != y)
+    // Only post event if this component is visible and has changed size.
+    if (isShowing ()
+        && (oldx != x || oldy != y))
       {
         ComponentEvent ce = new ComponentEvent(this,
                                                ComponentEvent.COMPONENT_MOVED);
         getToolkit().getSystemEventQueue().postEvent(ce);
       }
-    if (oldwidth != width || oldheight != height)
+    if (isShowing ()
+        && (oldwidth != width || oldheight != height))
       {
         ComponentEvent ce = new ComponentEvent(this,
                                                ComponentEvent.COMPONENT_RESIZED);
@@ -1955,7 +1958,7 @@ public abstract class Component
    * @see Graphics#drawImage(Image, int, int, ImageObserver)
    * @see Graphics#drawImage(Image, int, int, int, int, Color, ImageObserver)
    * @see Graphics#drawImage(Image, int, int, int, int, ImageObserver)
-   * @see ImageObserver#update(Image, int, int, int, int, int)
+   * @see ImageObserver#imageUpdate(Image, int, int, int, int, int)
    */
   public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h)
   {
@@ -2097,7 +2100,7 @@ public abstract class Component
    * @param observer the observer to notify of image loading progress
    * @return the image observer flags indicating the status of the load
    * @see #prepareImage(Image, int, int, ImageObserver)
-   * @see #Toolkit#checkImage(Image, int, int, ImageObserver)
+   * @see Toolkit#checkImage(Image, int, int, ImageObserver)
    * @throws NullPointerException if image is null
    */
   public int checkImage(Image image, ImageObserver observer)
@@ -2115,7 +2118,7 @@ public abstract class Component
    * @param observer the observer to notify of image loading progress
    * @return the image observer flags indicating the status of the load
    * @see #prepareImage(Image, int, int, ImageObserver)
-   * @see #Toolkit#checkImage(Image, int, int, ImageObserver)
+   * @see Toolkit#checkImage(Image, int, int, ImageObserver)
    */
   public int checkImage(Image image, int width, int height,
                         ImageObserver observer)
@@ -2134,7 +2137,7 @@ public abstract class Component
    * @param ignoreRepaint the new setting for ignoring repaint events
    * @see #getIgnoreRepaint()
    * @see BufferStrategy
-   * @see GraphicsDevice.setFullScreenWindow(Window)
+   * @see GraphicsDevice#setFullScreenWindow(Window)
    * @since 1.4
    */
   public void setIgnoreRepaint(boolean ignoreRepaint)
@@ -3178,15 +3181,15 @@ public abstract class Component
    * AWT 1.0 event handler.
    *
    * This method calls one of the event-specific handler methods.  For
-   * example for key events, either {@link #keyDown (Event evt, int
-   * key)} or {@link keyUp (Event evt, int key)} is called.  A derived
+   * example for key events, either {@link #keyDown(Event,int)}
+   * or {@link #keyUp(Event,int)} is called.  A derived
    * component can override one of these event-specific methods if it
    * only needs to handle certain event types.  Otherwise it can
    * override handleEvent itself and handle any event.
    *
    * @param evt the event to handle
    * @return true if the event was handled, false otherwise
-   * @deprecated use {@link #processEvent (AWTEvent)} instead
+   * @deprecated use {@link #processEvent(AWTEvent)} instead
    */
   public boolean handleEvent (Event evt)
   {
@@ -3405,9 +3408,15 @@ public abstract class Component
    */
   public void removeNotify()
   {
-    if (peer != null)
-      peer.dispose();
+    // We null our peer field before disposing of it, such that if we're
+    // not the event dispatch thread and the dispatch thread is awoken by
+    // the dispose call, there will be no race checking the peer's null
+    // status.
+
+    ComponentPeer tmp = peer;
     peer = null;
+    if (tmp != null)
+      tmp.dispose();
   }
 
   /**
@@ -3469,8 +3478,8 @@ public abstract class Component
    * Specify whether this component can receive focus. This method also
    * sets the {@link #isFocusTraversableOverridden} field to 1, which
    * appears to be the undocumented way {@link
-   * DefaultFocusTraversalPolicy#accept()} determines whether to respect
-   * the {@link #isFocusable()} method of the component.
+   * DefaultFocusTraversalPolicy#accept(Component)} determines whether to
+   * respect the {@link #isFocusable()} method of the component.
    *
    * @param focusable the new focusable status
    * @since 1.4
@@ -3484,10 +3493,10 @@ public abstract class Component
 
   /**
    * Sets the focus traversal keys for one of the three focus
-   * traversal directions supported by Components: {@link
-   * #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS}, {@link
-   * #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or {@link
-   * #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
+   * traversal directions supported by Components:
+   * {@link #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS},
+   * {@link #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or
+   * {@link #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
    * default values should match the operating system's native
    * choices. To disable a given traversal, use
    * <code>Collections.EMPTY_SET</code>. The event dispatcher will
@@ -3717,7 +3726,7 @@ public abstract class Component
    * receives a FOCUS_GAINED event.
    *
    * The behaviour of this method is platform-dependent.
-   * {@link #requestFocusInWindow} should be used instead.
+   * {@link #requestFocusInWindow()} should be used instead.
    *
    * @see #requestFocusInWindow ()
    * @see FocusEvent
@@ -3792,7 +3801,7 @@ public abstract class Component
    * receives a FOCUS_GAINED event.
    *
    * The behaviour of this method is platform-dependent.
-   * {@link #requestFocusInWindow} should be used instead.
+   * {@link #requestFocusInWindow()} should be used instead.
    *
    * If the return value is false, the request is guaranteed to fail.
    * If the return value is true, the request will succeed unless it
@@ -4070,8 +4079,8 @@ public abstract class Component
    * However, if this is a Window, the default focus owner in the
    * window in the current focus cycle is focused instead.
    *
-   * @see #requestFocus ()
-   * @see #isFocusCycleRoot ()
+   * @see #requestFocus()
+   * @see #isFocusCycleRoot(Container)
    * @since 1.4
    */
   public void transferFocusUpCycle ()

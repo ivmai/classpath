@@ -1,5 +1,5 @@
 /* ZipEntry.java --
-   Copyright (C) 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -55,12 +55,13 @@ public class ZipEntry implements ZipConstants, Cloneable
   private static final int KNOWN_CSIZE  = 2;
   private static final int KNOWN_CRC    = 4;
   private static final int KNOWN_TIME   = 8;
+  private static final int KNOWN_EXTRA  = 16;
 
   private static Calendar cal;
 
   private String name;
   private int size;
-  private int compressedSize;
+  private long compressedSize = -1;
   private int crc;
   private int dostime;
   private short known = 0;
@@ -102,7 +103,12 @@ public class ZipEntry implements ZipConstants, Cloneable
    */
   public ZipEntry(ZipEntry e)
   {
-    name = e.name;
+    this(e, e.name);
+  }
+
+  ZipEntry(ZipEntry e, String name)
+  {
+    this.name = name;
     known = e.known;
     size = e.size;
     compressedSize = e.compressedSize;
@@ -186,7 +192,10 @@ public class ZipEntry implements ZipConstants, Cloneable
   {
     if ((known & KNOWN_TIME) == 0)
       return -1;
-    
+
+    // The extra bytes might contain the time (posix/unix extension)
+    parseExtra ();
+
     int sec = 2 * (dostime & 0x1f);
     int min = (dostime >> 5) & 0x3f;
     int hrs = (dostime >> 11) & 0x1f;
@@ -242,14 +251,10 @@ public class ZipEntry implements ZipConstants, Cloneable
 
   /**
    * Sets the size of the compressed data.
-   * @exception IllegalArgumentException if size is not in 0..0xffffffffL
    */
   public void setCompressedSize(long csize)
   {
-    if ((csize & 0xffffffff00000000L) != 0)
-	throw new IllegalArgumentException();
-    this.compressedSize = (int) csize;
-    this.known |= KNOWN_CSIZE;
+    this.compressedSize = csize;
   }
 
   /**
@@ -258,7 +263,7 @@ public class ZipEntry implements ZipConstants, Cloneable
    */
   public long getCompressedSize()
   {
-    return (known & KNOWN_CSIZE) != 0 ? compressedSize & 0xffffffffL : -1L;
+    return compressedSize;
   }
 
   /**
@@ -317,10 +322,23 @@ public class ZipEntry implements ZipConstants, Cloneable
 	this.extra = null;
 	return;
       }
-
     if (extra.length > 0xffff)
       throw new IllegalArgumentException();
     this.extra = extra;
+  }
+
+  private void parseExtra()
+  {
+    // Already parsed?
+    if ((known & KNOWN_EXTRA) != 0)
+      return;
+
+    if (extra == null)
+      {
+	known |= KNOWN_EXTRA;
+	return;
+      }
+
     try
       {
 	int pos = 0;
@@ -351,6 +369,8 @@ public class ZipEntry implements ZipConstants, Cloneable
 	/* be lenient */
 	return;
       }
+
+    known |= KNOWN_EXTRA;
   }
 
   /**

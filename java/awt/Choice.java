@@ -45,6 +45,7 @@ import java.io.Serializable;
 import java.util.EventListener;
 import java.util.Vector;
 
+import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleAction;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -54,7 +55,8 @@ import javax.accessibility.AccessibleRole;
   *
   * @author Aaron M. Renn (arenn@urbanophile.com)
   */
-public class Choice extends Component implements ItemSelectable, Serializable
+public class Choice extends Component
+  implements ItemSelectable, Serializable, Accessible
 {
 
 /*
@@ -564,8 +566,17 @@ paramString()
     return (ItemListener[]) getListeners (ItemListener.class);
   }
 
+  /**
+   * Gets the AccessibleContext associated with this <code>Choice</code>.
+   * The context is created, if necessary.
+   *
+   * @return the associated context
+   */
   public AccessibleContext getAccessibleContext()
   {
-    return new AccessibleAWTChoice();
+    /* Create the context if this is the first request */
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleAWTChoice();
+    return accessibleContext;
   }
 } // class Choice 

@@ -1,3 +1,1603 @@
+2004-12-31  Archie Cobbs  <archie@dellroad.org>
+
+	* NEWS: Add documentation about reference implementation.
+	* java/lang/Thread.java (sleep(long,int)): Only do argument
+	checking and push implementation to VMThread.sleep().
+	* vm/reference/java/lang/VMThread.java (join): Prevent ms overflow.
+	(sleep): Provide default implementation using Object.wait() and
+	Thread.yield().
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/LookAndFeel.java
+	(getDesktopPropertyValue): New method.
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTree.java
+	(hasChildren): New instance field.
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JComponent.java
+	(getToolTipText): New method.
+	(getTitledBorderText): Likewise.
+	(getAccessibleKeyBinding): Likewise.
+	(getVerifyInputWhenFocusTarget): Likewise.
+	(setVerifyInputWhenFocusTarget): Likewise.
+	(verifyInputWhenFocusTarget): New instance field.
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/DefaultListSelectionModel.java
+	(fireValueChanged): New method.
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/DefaultBoundedRangeModel.java:
+	Fixed javadocs all over.
+	(fireStateChanged): Simplified.
+	* javax/swing/BoundedRangeModel.java:
+	Reformatted.
+
+2004-12-31  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JRootPane.java
+	(setMenuBar): Added @deprecated tag.
+	(getMenuBar): Likewise.
+	* javax/swing/JTable.java
+	(sizeColumnsToFit): Likewise.
+
+2004-12-30  Paul Jenner  <psj.home@ntlworld.com>
+
+	* javax/swing/ImageIcon.java (setImage): Implemented.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_as.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_dz.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_fa_AF.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_hi.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_mr.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_sr.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_sw.java,
+	gnu/java/locale/LocaleInformation_ta.java,
+	gnu/java/locale/LocaleInformation_uz_AF.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java:
+	Regenerated with new gnu.localegen to get timeZone arrays correct.
+
+2004-12-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/locale/LocaleInformation.java
+	Added EEK -> kr mapping for currency symbols.
+
+2004-12-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/text/DecimalFormatSymbols.java
+	New transient currency variable.
+	(getCurrency()): uses local variable instead
+	(getExponential()): documentation
+	(setExponential(char)): documentation
+	(getInternationalCurrencySymbol()): documentation fix
+	(setInternationalCurrencySymbol(String)): sets currency
+	* java/text/NumberFormat.java
+	(getCurrencyInstance(java.util.Locale)): sets fraction digits
+	from the currency after creation of the format.
+	
+2004-12-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/Locale.java
+	(getDisplayLanguage(java.util.Locale)): more documentation,
+	uses getDisplayString
+	(getDisplayCountry(java.util.Locale)): more documentation,
+	uses getDisplayString
+	(getDIsplayVariant(java.util.Locale)): more documentation,
+	uses getDisplayString
+	(getDisplayString(java.util.Locale,String,String)): returns
+	a possibly localized string, using appropriate information from
+	gnu.java.locale.LocaleInformation
+
+2004-12-30  Olga Rodimina  <rodimina@redhat.com>
+
+	(prepareRenderer): Get column's index in dataModel instead
+	of column's view index.
+	(getColumnCount): return count of the columns in ColumnModel,
+	not in dataModel.
+	(removeColumn): Implemented.
+	(moveColumm): Likewise.
+	(setRowHeight): throw IllegalArgumentException if height is
+	less then 1.
+	* javax/swing/table/DefaultTableColumnModel.java: Add javadocs.
+	(DefaultTableColumnModel):Add call to createSelectionModel().
+	(addColumn): Fire columnAdded event to registered listeners.
+	(removeColumn): Fire columnRemoved event to registered listeners.
+	(moveColumn): Fire columnMoved event to registered listeners.
+	(setColumnMargin): Fire ColumnMarginChanged event to registered listeners.
+	(getColumnIndex): Changed parameter name.
+	(setColumnSelectionAllowed): Likewise.
+	(fireColumnAdded): Implemented.
+	(fireColumnRemoved): Likewise.
+	(fireColumnMoved): Likewise.
+	(fireColumnMarginChanged): Likewise.
+	(getListeners): Changed parameter name.
+	(propertyChange): Implemented.
+	(valueChanged): Changed parameter name.
+	(createSelectionModel): Implemented.
+
+004-12-29  Jerry Quinn  <jlquinn@optonline.net>
+
+	* java/awt/Button.java,
+	java/awt/Canvas.java,
+	java/awt/Checkbox.java,
+	java/awt/CheckboxMenuItem.java,
+	java/awt/Choice.java,
+	java/awt/Dialog.java,
+	java/awt/Frame.java,
+	java/awt/Label.java,
+	java/awt/List.java,
+	java/awt/Menu.java,
+	java/awt/MenuBar.java,
+	java/awt/MenuItem.java,
+	java/awt/PopupMenu.java,
+	java/awt/ScrollPane.java,
+	java/awt/Scrollbar.java,
+	java/awt/TextArea.java,
+	java/awt/Window.java (getAccessibleContext): Clean up comments.
+	Reformat.
+	* java/awt/Button.java,
+	java/awt/Checkbox.java,
+	java/awt/Choice.java,
+	java/awt/Menu.java,
+	java/awt/PopupMenu.java,
+	java/awt/TextArea.java (getAccessibleContext): Only create new
+	accessible once.
+	* java/awt/TextComponent.java (getAccessibleContext): Implement.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* javax/imageio/metadata/IIOInvalidTreeException.java
+	(IIOInvalidTreeException): Reformatted.
+	* javax/imageio/spi/IIORegistry.java
+	(static): Register ImageReaderSpi.class and ImageWriterSpi.class.
+	* javax/imageio/stream/MemoryCacheImageInputStream.java:
+	Reworked import statements.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java:
+	Regenerated with newer gnu.lcoalegen to include localized variant
+	names.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/awt/peer/gtk/GtkToolkit.java:
+	Explicitely import used classes.
+	(getLocalGraphicsEnvironment): Simplify.
+	* java/awt/Window.java (Window):
+	Enable code to get the default GraphicsConfiguration.
+
+2004-12-30  Chris Burdess <dog@gnu.org>
+
+	* GnomeDocument.java,GnomeXPathNSResolver: Fixed XPathNSResolver
+	implementation to resolve relative to node argument.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/plaf/metal/DefaultMetalTheme.java
+	(CONTROL_TEXT_FONT): New static field.
+	(MENU_TEXT_FONT): Likewise.
+	(SUB_TEXT_FONT): Likewise.
+	(SYSTEM_TEXT_FONT): Likewise.
+	(USER_TEXT_FONT): Likewise.
+	(WINDOW_TITLE_FONT): Likewise.
+	(getControlTextFont): New method.
+	(getMenuTextFont): Likewise.
+	(getSubTextFont): Likewise.
+	(getSystemTextFont): Likewise.
+	(getUserTextFont): Likewise.
+	(getWindowTitleFont): Likewise.
+	* javax/swing/plaf/metal/MetalTheme.java
+	(BLACK): Initialize with Color.BLACK.
+	(WHITE): Initialize with Color.WHITE.
+	(getInactiveControlTextColor): Return getControlDisabled().
+	(getMenuDisabledForeground): Return getSecondary3().
+	(getControlTextFont): New abstract method.
+	(getMenuTextFont): Likewise.
+	(getSubTextFont): Likewise.
+	(getSystemTextFont): Likewise.
+	(getUserTextFont): Likewise.
+	(getWindowTitleFont): Likewise.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* java/text/DateFormat.java
+	(getAvailableLocales): Implemented.
+	* java/util/Locale.java
+	(availableLocales): Fix modifier order.
+	(localeMap): Likewise.
+	(getAvailableLocales): Likewise.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_aa.java,
+	gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_ar.java,
+	gnu/java/locale/LocaleInformation_as.java,
+	gnu/java/locale/LocaleInformation_az.java,
+	gnu/java/locale/LocaleInformation_be.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_bn.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_dv.java,
+	gnu/java/locale/LocaleInformation_dz.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fa_AF.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fo.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_gl.java,
+	gnu/java/locale/LocaleInformation_gu.java,
+	gnu/java/locale/LocaleInformation_gv.java,
+	gnu/java/locale/LocaleInformation_he.java,
+	gnu/java/locale/LocaleInformation_hi.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_iu.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_kk.java,
+	gnu/java/locale/LocaleInformation_kl.java,
+	gnu/java/locale/LocaleInformation_km.java,
+	gnu/java/locale/LocaleInformation_kn.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_kw.java,
+	gnu/java/locale/LocaleInformation_ky.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_ml.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_mr.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_om.java,
+	gnu/java/locale/LocaleInformation_or.java,
+	gnu/java/locale/LocaleInformation_pa.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_ps.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_sa.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_so.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sr.java,
+	gnu/java/locale/LocaleInformation_sr_Latn.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_sw.java,
+	gnu/java/locale/LocaleInformation_ta.java,
+	gnu/java/locale/LocaleInformation_te.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_ti.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_tt.java,
+	gnu/java/locale/LocaleInformation_uk.java,
+	gnu/java/locale/LocaleInformation_ur.java,
+	gnu/java/locale/LocaleInformation_uz.java,
+	gnu/java/locale/LocaleInformation_uz_AF.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_SG_Hans.java:
+	Regenerated.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java:
+	Updated to match update CLDR data more.
+
+2004-12-30  Mark Wielaard  <mark@klomp.org>
+
+	* java/lang/Thread.java (sleep): Update documentation. Make sure
+	VMThread.sleep() is never called with zero arguments.
+	* vm/reference/java/lang/VMThread.java (sleep): Update documentation.
+	* NEWS: Mention change in VMThread.sleep() interface.
+
+2004-12-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/locale/LocaleInformation.java
+	Additional currency symbols.
+	* java/text/DecimalFormat.java
+	Correction of authorship < to (.
+	(scanFix): removed currency changes
+	(DecimalFormat()): documentation
+	(DecimalFormat(String)): documentation
+	(DecimalFormat(String, DecimalFormatSymbols): documentation
+	(formatInternal(double,FormatBuffer,FieldPosition)): added currency
+	substitution (apologies for reformatting).
+	(format(long,FormatBuffer,FieldPosition): ditto
+	(parse(String)): corrected compile warning (naming of multiplier)
+	(substituteCurrency(String,double)): new method
+	* java/text/DecimalFormatSymbols.java
+	Correction of authorship < to (.
+	(safeGetString): documentation
+	(DecimalFormatSymbols()): currency uses java.util.Currency
+	(setCurrency(java.util.Currency)): changes currency symbol and intl.
+	currency symbol
+	(setInternationalCurrencySymbol(String)): sets currency symbol
+	on basis of change
+	* java/text/NumberFormat.java
+	Correction of authorship < to (.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation.java
+	Addition of currency code to symbols mapping.
+	* java/util/Currency.java
+	(Currency()): added symbol retrieval
+	(getSymbol()): implemented
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_et.java
+	(contents): Removed localPatternChars entry.
+
+2004-12-30  Ito Kazumitsu  <kaz@maczuka.gcd.org>
+
+	* java/nio/ByteBufferImpl.java (compact):
+	Set position and limit even if no bytes were moved.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* java/nio/CharViewBufferImpl.java (compact): Likewise.
+	* java/nio/DirectByteBufferImpl.java (compact): Likewise.
+	* java/nio/DoubleViewBufferImpl.java (compact): Likewise.
+	* java/nio/FloatViewBufferImpl.java (compact): Likewise.
+	* java/nio/IntViewBufferImpl.java (compact): Likewise.
+	* java/nio/LongViewBufferImpl.java (compact): Likewise.
+	* java/nio/MappedByteBufferImpl.java (compact): Likewise.
+	* java/nio/ShortViewBufferImpl.java (compact): Likewise.
+	* java/nio/FloatBufferImpl.java (compact): Set position.
+	* java/nio/CharBufferImpl.java (compact): Likewise.
+	* java/nio/DoubleBufferImpl.java (compact): Likewise.
+	* java/nio/IntBufferImpl.java (compact): Likewise.
+	* java/nio/LongBufferImpl.java (compact): Likewise.
+	* java/nio/ShortBufferImpl.java (compact): Likewise.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JFormattedTextField.java
+	(getFocusLostBehavior): Fixed typo in method name.
+	(setFocusLostBehavior): Likewise.
+
+2004-12-29  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Add --enable-xmlj option. Check for libxml2 and
+	libxslt libraries when enabled. Add native/jni/xmlj/Makefile.
+	* gnu/xml/libxmlj/*: New files.
+	* include/Makefile.am: Add XMLJ_H_FILES. Group awt gtk peer headers
+	under GTKPEER_H_FILES. Generate new headers.
+	* include/gnu_xml_libxmlj_*.h: New generated files.
+	* native/jni/Makefile.am: Conditionally add xmlj dir.
+	* native/jni/xmlj/*: New files.
+
+2004-12-29  Jerry Quinn  <jlquinn@optonline.net>
+
+	* java/awt/CheckboxMenuItem.java (getAccessibleContext,
+	AccessibleAWTCheckboxMenuItem): Implement.
+	* java/awt/Choice.java: Add implements declaration for Accessible.
+	* java/awt/Dialog.java (AccessibleAWTFrame, getAccessibleContext):
+	Implement.
+	* java/awt/Frame.java (AccessibleAWTFrame, getAccessibleContext):
+	Implement.
+	* java/awt/List.java: Implement AccessibleAWTList, AccessibleAWTListChild.
+	* java/awt/MenuComponent.java (accessibleContext): Make package visible.
+	* java/awt/MenuItem.java (getAccessibleContext): Implement.
+	* java/awt/Scrollbar.java (AccessibleAWTScrollbar, getAccessibleContext):
+	Implement.
+	* java/awt/ScrollPane.java (AccessibleAWTScrollPane, getAccessibleContext):
+	Implement.
+	* java/awt/Window.java (AccessibleAWTWindow): Implement.
+	(isActive, isFocused, getAccessibleContext): Implement.
+
+2004-12-29  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/text/TextAction.java
+	(getTextComponent): Simplified. Added Javadoc.
+	(augmentList): Implemented. Added Javadoc.
+	(getFocusedComponent): Added javadoc.
+
+2004-12-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/text/DecimalFormat.java
+	(format(long,StringBuffer,FieldPosition)): multiply
+	number by multiplier before formatting.
+	
+2004-12-29  Michael Koch  <konqueror@gmx.de>
+
+	* java/nio/DirectByteBufferImpl.java
+	(owner): Reformatted javadoc.
+	(ReadOnly): Reorganized keywords.
+	(ReadWrite): Likewise.
+
+2004-12-29  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/Button.java,
+	java/lang/Runtime.java,
+	java/lang/System.java,
+	java/security/cert/X509CRLSelector.java,
+	java/security/cert/X509CertSelector.java,
+	java/util/ResourceBundle.java,
+	java/util/jar/JarFile.java,
+	javax/swing/JApplet.java,
+	javax/swing/JFormattedTextField.java,
+	javax/swing/JTree.java,
+	javax/swing/JWindow.java,
+	javax/swing/TransferHandler.java,
+	javax/swing/plaf/basic/BasicEditorPaneUI.java,
+	javax/swing/plaf/basic/BasicTextPaneUI.java
+	javax/swing/plaf/basic/BasicTreeUI.java:
+	Imports reworked.
+
+2004-12-28  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/lang/Runtime.java
+	(runShutdownHooks): Rewrote wait for shutdown hooks loop.
+
+2004-12-28  Jeroen Frijters  <jeroen@frijters.net>
+
+	* NEWS: Added entry about new method.
+	* java/lang/Runtime.java
+	(addShutdownHook): Added call to new method.
+	* vm/reference/java/lang/VMRuntime.java
+	(enableShutdownHooks): New method.
+
+2004-12-27  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/nio/ByteBufferImpl.java,
+	java/nio/CharBufferImpl.java,
+	java/nio/DirectByteBufferImpl.java,
+	java/nio/DoubleBufferImpl.java,
+	java/nio/FloatBufferImpl.java,
+	java/nio/IntBufferImpl.java,
+	java/nio/LongBufferImpl.java,
+	java/nio/MappedByteBufferImpl.java,
+	java/nio/ShortBufferImpl.java
+	(compact): Added explicit read-only check and invalidate mark.
+
+2004-12-27  Michael Koch  <konqueror@gmx.de>
+
+	* javax/imageio/IIOParam.java
+	(setSourceBands): New method.
+	(setSourceSubsampling): Likewise.
+	* javax/imageio/ImageReadParam.java
+	(setDestination): Likewise.
+	(setDestinationBands): Likewise.
+	(setSourceProgressivePasses): Likewise.
+
+2004-12-27  Jeroen Frijters  <jeroen@frijters.net>
+
+	* NEWS: Added entry about class change.
+	* java/lang/Class.java
+	(Class(Object,Object)): Added protection domain "inheriting" for
+	array classes.
+
+2004-12-27  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/AbstractAction.java,
+	javax/swing/AbstractCellEditor.java,
+	javax/swing/AbstractListModel.java,
+	javax/swing/DefaultBoundedRangeModel.java,
+	javax/swing/DefaultButtonModel.java,
+	javax/swing/DefaultCellEditor.java,
+	javax/swing/DefaultComboBoxModel.java,
+	javax/swing/DefaultDesktopManager.java,
+	javax/swing/JMenu.java,
+	javax/swing/JSlider.java,
+	javax/swing/KeyStroke.java,
+	javax/swing/OverlayLayout.java,
+	javax/swing/ScrollPaneLayout.java,
+	javax/swing/SizeRequirements.java,
+	javax/swing/ViewportLayout.java:
+	Made serialVersionUID private.
+
+2004-12-27  Michael Koch  <konqueror@gmx.de>
+
+	* javax/imageio/metadata/IIOInvalidTreeException.java:
+	Use org.w3c.dom.Node instead of java.lang.Object.
+	(serialVersionUID): New field.
+
+2004-12-26  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de_AT.java: Reformatted.
+
+2004-12-26  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de_BE.java: Reformatted.
+
+2004-12-26  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_aa.java,
+	gnu/java/locale/LocaleInformation_aa_DJ.java,
+	gnu/java/locale/LocaleInformation_aa_ER.java,
+	gnu/java/locale/LocaleInformation_aa_ER_SAAHO.java,
+	gnu/java/locale/LocaleInformation_aa_ET.java,
+	gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_am_ET.java,
+	gnu/java/locale/LocaleInformation_ar.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_as.java,
+	gnu/java/locale/LocaleInformation_as_IN.java,
+	gnu/java/locale/LocaleInformation_az.java,
+	gnu/java/locale/LocaleInformation_be.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_bg_BG.java,
+	gnu/java/locale/LocaleInformation_bn.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LI.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_dv.java,
+	gnu/java/locale/LocaleInformation_dv_MV.java,
+	gnu/java/locale/LocaleInformation_dz.java,
+	gnu/java/locale/LocaleInformation_dz_BT.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_en_AS.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BE.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_BZ.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_GU.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_MH.java,
+	gnu/java/locale/LocaleInformation_en_MP.java,
+	gnu/java/locale/LocaleInformation_en_MT.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_PK.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_UM.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_US_POSIX.java,
+	gnu/java/locale/LocaleInformation_en_VI.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fa_AF.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gu.java,
+	gnu/java/locale/LocaleInformation_gu_IN.java,
+	gnu/java/locale/LocaleInformation_gv.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_hy_AM.java,
+	gnu/java/locale/LocaleInformation_hy_AM_REVISED.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_is_IS.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_iu.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_kk.java,
+	gnu/java/locale/LocaleInformation_kk_KZ.java,
+	gnu/java/locale/LocaleInformation_kl.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_km.java,
+	gnu/java/locale/LocaleInformation_km_KH.java,
+	gnu/java/locale/LocaleInformation_kn.java,
+	gnu/java/locale/LocaleInformation_kn_IN.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_ky.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lo_LA.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_ml.java,
+	gnu/java/locale/LocaleInformation_ml_IN.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_mr.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_ms_BN.java,
+	gnu/java/locale/LocaleInformation_ms_MY.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nb_NO.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_om.java,
+	gnu/java/locale/LocaleInformation_om_ET.java,
+	gnu/java/locale/LocaleInformation_om_KE.java,
+	gnu/java/locale/LocaleInformation_or.java,
+	gnu/java/locale/LocaleInformation_or_IN.java,
+	gnu/java/locale/LocaleInformation_pa.java,
+	gnu/java/locale/LocaleInformation_pa_IN.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_ps.java,
+	gnu/java/locale/LocaleInformation_ps_AF.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sa.java,
+	gnu/java/locale/LocaleInformation_sa_IN.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_so.java,
+	gnu/java/locale/LocaleInformation_so_DJ.java,
+	gnu/java/locale/LocaleInformation_so_ET.java,
+	gnu/java/locale/LocaleInformation_so_KE.java,
+	gnu/java/locale/LocaleInformation_so_SO.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sr.java,
+	gnu/java/locale/LocaleInformation_sr_Latn.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_sw.java,
+	gnu/java/locale/LocaleInformation_sw_KE.java,
+	gnu/java/locale/LocaleInformation_sw_TZ.java,
+	gnu/java/locale/LocaleInformation_ta.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_th_TH.java,
+	gnu/java/locale/LocaleInformation_ti.java,
+	gnu/java/locale/LocaleInformation_ti_ER.java,
+	gnu/java/locale/LocaleInformation_ti_ET.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_tt.java,
+	gnu/java/locale/LocaleInformation_tt_RU.java,
+	gnu/java/locale/LocaleInformation_uk.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java,
+	gnu/java/locale/LocaleInformation_ur.java,
+	gnu/java/locale/LocaleInformation_uz.java,
+	gnu/java/locale/LocaleInformation_uz_AF.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_CN_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_HK_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_MO_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_SG_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_TW_Hant.java:
+	Regenerated with newer version of gnu.localegen.
+
+2004-12-26  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java
+	(drawImage): Update image observer.
+
+2004-12-26  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_awt_peer_gtk_GdkGraphics2D.h: Regenerated.
+
+2004-12-26  Graydon Hoare  <graydon@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java:
+	Rework painting into BufferedImages
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java:
+	Construct BufferedImage with alpha only when alpha is
+	present in colormodel.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics2D.c:
+	Rework painting into client-side jint arrays.
+	* jni/gtk-peer/gtkcairopeer.h:
+	Likewise.
+
+2004-12-26  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java: Reformatted.
+
+2004-12-25  Tom Tromey  <tromey@redhat.com>
+
+	* lib/Makefile.am (JAVAC): Handle GCJX.
+	(GCJ): Removed.
+	(JIKES): Likewise.
+	(USER_JABBA): Likewise.
+	(USER_JAVAH): Likewise.
+	(FIND): Likewise.
+	(USER_CLASSLIB): Likewise.
+	* examples/Makefile.am (JCOMPILER): Handle gcjx.
+	(GCJ): Removed.
+	(JIKES): Likewise.
+	* acinclude.m4 (CLASSPATH_WITH_GCJX): New macro.
+	(CLASSPATH_CHECK_GCJX): Likewise.
+	(CLASSPATH_FIND_JAVAC): Use it.
+
+2004-12-24  Mark Wielaard  <mark@klomp.org>
+
+	Fixes bug libgcj/18014.
+	* java/util/Locale.java (Locale(String, String, String)):
+	Don't uppercase variant.
+
+2004-12-24  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/text/PasswordView.java
+	(drawEchoCharacter): Added javadoc.
+	(drawSelectedText): Likewise.
+	(drawUnselectedText): Likewise.
+
+2004-12-24  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JRootPane.java
+	(windowDecorationStyle): New field.
+	(setMenuBar): New method.
+	(getMenuBar): Likewise.
+	(getWindowDecorationStyle): Likewise.
+	(setWindowDecorationStyle): Likewise.
+
+2004-12-24  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/DefaultListSelectionModel.java
+	(leadAnchorNotificationEnabled): Made protected.
+
+2004-12-24  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/InternalFrameFocusTraversalPolicy.java: New file.
+
+2004-12-24  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JFormattedTextField.java: Implemented.
+	* javax/swing/JWindow.java
+	(JWindow): New constructors.
+	(initWindow): Renamed from initFrame.
+	* javax/swing/UIDefaults.java
+	(ActiveValue): Made interface static.
+	(LazyValue): Likewise.
+	* javax/swing/plaf/basic/BasicInternalFrameTitlePane.java
+	(TitlePaneLayout.TitlePaneLayout): New constructor.
+	* javax/swing/plaf/basic/BasicSliderUI.java
+	(ChangeHandler): Made public.
+	(FocusHandler): Likewise.
+	(PropertyChangeHandler): Likewise.
+	(ScrollListener): Likewise.
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java
+	(FocusHandler): Likewise.
+	(MouseHandler): Likewise.
+	* javax/swing/plaf/basic/BasicTextPaneUI.java
+	(BasicTextPaneUI): Extend BasicEditorPaneUI.
+	* javax/swing/plaf/basic/BasicToolBarUI.java
+	(BasicToolBarUI): Simplified. Reworked javadoc.
+	(canDock): Simplified. Make public.
+	(DockingListener): Made public.
+	* javax/swing/text/JTextComponent.java
+	(navigationFilter): New field.
+	(getNavigationFilter): New method.
+	(setNavigationFilter): Likewise.
+
+2004-12-23  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/xml/*: Imported from GNU JAXP.
+	* javax/xml/*: Likewise.
+	* external/*: Imported external sax and w3c_dom projects.
+	* LICENSE: Add new copyright and distribution notices.
+	* Makefile.am (SUBDirs): Add external.
+	(DIST_SUBDIRS): Likewise.
+	* configure.ac (AC_CONFIG_FILES): Add external/Makefile,
+	external/sax/Makefile and external/w3c_dom/Makefile.
+	* lib/gen-classlist.sh.in (FIND): Search in external/sax and
+	external/w3c_dom. 
+	(Split): Add new classes.xml for gcj.
+	* lib/Makefile.am (compile_classpath): Add external/sax and
+	external/w3c_dom.
+	(FOUND_GCJ): Compile classes.xml.
+	* lib/.cvsignore: Add classes.xml.
+	* .classpath: Updated exclusion filter and add external projects plus
+	examples.
+
+2004-12-23  Mark Wielaard  <mark@klomp.org>
+
+	* lib/Makefile.am (compile_classpath): New variable.
+	Use when compiling with either jikes or gcj.
+	(LocaleData.java): New rules.
+	(genclasses): Depend on new rule.
+	(CLEANFILES): Add LocaleData.java, classes.locale1 and classes.locale2.
+	(dist-hook): Remove generated LocaleData.java file.
+	* lib/gen-classlist.sh.in: Add extra split files for locales.
+	* lib/.cvsignore: Add classes.locale1 and classes.locale2.
+
+2004-12-23  Mark Wielaard  <mark@klomp.org>
+
+	* include/java_lang_Double.h: Regenerated.
+
+2004-12-23  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/plaf/metal/MetalTheme.java
+	(getControlTextColor): Return getControlInfo().
+	(getHighlightedTextColor): Return getControlTextColor().
+
+2004-12-23  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/plaf/basic/BasicButtonListener.java
+	(BasicButtonListener): New constructor.
+	* javax/swing/plaf/basic/BasicButtonUI.java
+	(createButtonListener): Usw new BasicButtonListener constructor.
+
+2004-12-23  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/image/MemoryImageSource.java: Reformatted.
+
+2004-12-23  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/tree/TreeCellEditor.java: Refomatted.
+
+2004-12-22  Michael Koch  <konqueror@gmx.de>
+	    Olga Rodimina  <rodimina@redhat.com>
+
+	* javax/swing/JTable.java
+	(editorComp): New field.
+	(JTable): Initialize local variables and call updateUI
+	(selectionBackground): Make protected.
+	(selectionForeground): Likewise.
+	(initializeLocalVars): Create default editors and renderers,
+	initialize editingColumn, editingRow variables.
+	(createDefaultEditors): New Method.
+	(createDefaultRenderers): Likewise.
+	(createDefaultListSelectionModel): Removed
+	(createDefaultSelectionModel): New Method.
+	(createDefaultTableHeader): Likewise
+	(removeColumn): Likewise.
+	(getEditingColumn): Likewise.
+	(setEditingColumn): Likewise.
+	(getEditingRow): Likewise.
+	(setEditingRow): Likewise.
+	(getEditorComponent): Likewise.
+	(isEditing): Likewise.
+	(setDefaultEditor): Likewise.
+	(addColumnSelectionInterval): Likewise.
+	(addRowSelectionInterval): Likewise.
+	(setColumnSelectionInterval): Likewise.
+	(setRowSelectionInterval): Likewise.
+	(removeColumnSelectionInterval): Likewise.
+	(removeRowSelectionInterval): Likewise.
+	(isColumnSelected): Likewise.
+	(isRowSelected): Likewise.
+	(isCellSelected): Likewise.
+	(selectAll): Likewise.
+
+2004-12-22  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JFileChooser.java
+	(showDialog): Return CANCEL_OPTION for now.
+	(showOpenDialog): Likewise.
+	(showSaveDialog): Likewise.
+
+2004-12-22  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTextField.java (getPreferredSize):
+	Re-implemented.
+
+2004-12-22  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/plaf/basic/BasicEditorPaneUI.java: New file.
+
+2004-12-22  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/plaf/metal/MetalTheme.java,
+	javax/swing/plaf/metal/DefaultMetalTheme.java:
+	New files.
+	* javax/swing/plaf/metal/MetalLookAndFeel.java:
+	Implemented all color resource getter methods.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JLabel.java (setDisplayedMnemoic):
+	Make text upper case before searching mnemonic character.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JLabel.java
+	(setDisplayedMnemonicIndex): Handle index == -1 and fire
+	PropertyChangeEvent after property got set to the new index.
+	(setDisplayedMnemonic): Use only upper case characters.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* lib/.cvsignore,  scripts/.cvsignore:
+	Added more files to ignore.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JFrame.java
+	(setDefaultLookAndFeelDecorated): Removed wrong code again.
+	* javax/swing/JInternalFrame.java
+	(setDefaultCloseOperation): Fixed typo.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JApplet.java
+	(HIDE_ON_CLOSE): Removed.
+	(EXIT_ON_CLOSE): Likewise.
+	(DISPOSE_ON_CLOSE): Likewise.
+	(DO_NOTHING_ON_CLOSE): Likewise.
+	(close_action): Likewise.
+	(getDefaultCloseOperation): Likewise.
+	(setDefaultCloseOperation): Likewise.
+	(processWindowEvent): Likewise.
+	(getPreferredSize): Simplified.
+	* javax/swing/JDialog.java
+	(setDefaultLookAndFeelDecorated): Throw exception on wrong argument
+	value.
+	* javax/swing/JFrame.java
+	(setDefaultLookAndFeelDecorated): Likewise.
+	* javax/swing/JInternalFrame.java
+	(setDefaultCloseOperation): Fixed throwing exception on wrong argument
+	value.
+	* javax/swing/JWindow.java
+	(HIDE_ON_CLOSE): Removed.
+	(EXIT_ON_CLOSE): Likewise.
+	(DISPOSE_ON_CLOSE): Likewise.
+	(DO_NOTHING_ON_CLOSE): Likewise.
+	(close_action): Likewise.
+	(processKeyEvent): Likewise.
+	(setDefaultCloseOperation): Likewise.
+	(getPreferredSize): Simplified.
+
+2004-12-21  Chris Burdess  <dog@gnu.org>
+
+	* configure.ac: Check for presence of crt_externs.h on Darwin.
+	* native/jni/java-lang/java_lang_VMProcess.c: If HAVE_CRT_EXTERNS_H
+	is defined, define environ as calling _NSGetEnviron(), otherwise
+	define it as an external variable.
+
+2004-12-21  Chris Burdess  <dog@gnu.org>
+
+	* acinclude.m4: Check version of Jikes.
+
+2004-12-21  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/text/DefaultStyledDocument.java:
+	New file.
+
+2004-12-20  Michael Koch  <konqueror@gmx.de>
+
+	* lib/Makefile.am: Generate java/util/LocaleData.java in build tree.
+	* lib/gen-classlist.sh.in: Include classes in java.* packages in build
+	tree.
+	* scripts/Makefile.am: Include generate-locale-list.sh in dist
+	tarball.
+
+2004-12-19  Robert Schuster <thebohemian@gmx.net>
+
+	* javax/swing/JComboBox.java:
+	(JComboBox): Removed selection of the
+	first item in the model.
+
+2004-12-19  Michael Koch  <konqueror@gmx.de>
+
+	* resource/Makfile.am: Don't call make for subdirs.
+	* resource/gnu/.cvsignore,
+	resource/gnu/java/.cvsignore,
+	resource/gnu/java/awt/.cvsignore,
+	resource/gnu/java/awt/peer/.cvsignore,
+	resource/gnu/java/awt/peer/gtk/.cvsignore,
+	resource/gnu/regexp/.cvsignore,
+	resource/java/.cvsignore,
+	resource/java/security/.cvsignore,
+	resource/java/util/.cvsignore,
+	resource/java/util/logging/.cvsignore,
+	resource/org/.cvsignore,
+	resource/org/ietf/.cvsignore,
+	resource/org/ietf/jgss/.cvsignore: Removed.
+
+2004-12-19  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/iso3166-a3.properties,
+	gnu/java/locale/iso3166_de.properties,
+	gnu/java/locale/iso3166.properties,
+	gnu/java/locale/iso639-a2-old.properties,
+	gnu/java/locale/iso639-a3.properties,
+	gnu/java/locale/iso639_de.properties,
+	gnu/java/locale/iso639_fr.properties,
+	gnu/java/locale/iso639_ga.properties,
+	gnu/java/locale/iso639.properties: Removed.
+	* lib/Makefile.am: Install resource files into dist tarball
+	* resource/java/util/iso4217.properties:
+	New file.
+
+2004-12-19  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/Currency.java
+	New implementation of this class so as to
+	use iso4271.properties.
+
+2004-12-19  Michael Koch  <konqueror@gmx.de>
+
+	* java/util/Locale.java: Make sure all locales get only created once.
+	(availableLocales): New static field.
+	(localeMap): Likewise.
+	(getLocale): New private static method.
+	(getAvailableLocales): Re-implemented.
+	(getISOCountries): Fixed typo in javadoc.
+	(getDisplayLanguage): Load iso639.properties from correct package.
+	(getDisplayCountry): Load iso3166.properties from correct package.
+	* scripts/generate-locale-list.sh: New script.
+	* lib/Makefile.am: Call scripts/generate-locale-list.sh to generate
+	java/util/LocaleData.java.
+
+2004-12-19  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_aa.java,
+	gnu/java/locale/LocaleInformation_aa_DJ.java,
+	gnu/java/locale/LocaleInformation_aa_ER.java,
+	gnu/java/locale/LocaleInformation_aa_ER_SAAHO.java,
+	gnu/java/locale/LocaleInformation_aa_ET.java,
+	gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_am_ET.java,
+	gnu/java/locale/LocaleInformation_ar.java,
+	gnu/java/locale/LocaleInformation_ar_SA.java,
+	gnu/java/locale/LocaleInformation_as.java,
+	gnu/java/locale/LocaleInformation_as_IN.java,
+	gnu/java/locale/LocaleInformation_az.java,
+	gnu/java/locale/LocaleInformation_be.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_bg_BG.java,
+	gnu/java/locale/LocaleInformation_bn.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_de_LI.java,
+	gnu/java/locale/LocaleInformation_dv.java,
+	gnu/java/locale/LocaleInformation_dv_MV.java,
+	gnu/java/locale/LocaleInformation_dz.java,
+	gnu/java/locale/LocaleInformation_dz_BT.java,
+	gnu/java/locale/LocaleInformation_en_AS.java,
+	gnu/java/locale/LocaleInformation_en_BE.java,
+	gnu/java/locale/LocaleInformation_en_BZ.java,
+	gnu/java/locale/LocaleInformation_en_GU.java,
+	gnu/java/locale/LocaleInformation_en_MH.java,
+	gnu/java/locale/LocaleInformation_en_MP.java,
+	gnu/java/locale/LocaleInformation_en_MT.java,
+	gnu/java/locale/LocaleInformation_en_PK.java,
+	gnu/java/locale/LocaleInformation_en_UM.java,
+	gnu/java/locale/LocaleInformation_en_US_POSIX.java,
+	gnu/java/locale/LocaleInformation_en_VI.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fa_AF.java,
+	gnu/java/locale/LocaleInformation_fo.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_gl.java,
+	gnu/java/locale/LocaleInformation_gu.java,
+	gnu/java/locale/LocaleInformation_gu_IN.java,
+	gnu/java/locale/LocaleInformation_gv.java,
+	gnu/java/locale/LocaleInformation_he.java,
+	gnu/java/locale/LocaleInformation_hi.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_hy_AM.java,
+	gnu/java/locale/LocaleInformation_hy_AM_REVISED.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_is_IS.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_iu.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_kk.java,
+	gnu/java/locale/LocaleInformation_kk_KZ.java,
+	gnu/java/locale/LocaleInformation_kl.java,
+	gnu/java/locale/LocaleInformation_km.java,
+	gnu/java/locale/LocaleInformation_km_KH.java,
+	gnu/java/locale/LocaleInformation_kn.java,
+	gnu/java/locale/LocaleInformation_kn_IN.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_kw.java,
+	gnu/java/locale/LocaleInformation_ky.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lo_LA.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_ml.java,
+	gnu/java/locale/LocaleInformation_ml_IN.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_mr.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_ms_BN.java,
+	gnu/java/locale/LocaleInformation_ms_MY.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nb_NO.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_om.java,
+	gnu/java/locale/LocaleInformation_om_ET.java,
+	gnu/java/locale/LocaleInformation_om_KE.java,
+	gnu/java/locale/LocaleInformation_or.java,
+	gnu/java/locale/LocaleInformation_or_IN.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_ps.java,
+	gnu/java/locale/LocaleInformation_ps_AF.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_sa.java,
+	gnu/java/locale/LocaleInformation_sa_IN.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_so.java,
+	gnu/java/locale/LocaleInformation_so_DJ.java,
+	gnu/java/locale/LocaleInformation_so_ET.java,
+	gnu/java/locale/LocaleInformation_so_KE.java,
+	gnu/java/locale/LocaleInformation_so_SO.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sr.java,
+	gnu/java/locale/LocaleInformation_sr_Latn.java,
+	gnu/java/locale/LocaleInformation_sw.java,
+	gnu/java/locale/LocaleInformation_sw_KE.java,
+	gnu/java/locale/LocaleInformation_sw_TZ.java,
+	gnu/java/locale/LocaleInformation_ta.java,
+	gnu/java/locale/LocaleInformation_te.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_th_TH.java,
+	gnu/java/locale/LocaleInformation_ti.java,
+	gnu/java/locale/LocaleInformation_ti_ER.java,
+	gnu/java/locale/LocaleInformation_ti_ET.java,
+	gnu/java/locale/LocaleInformation_tt.java,
+	gnu/java/locale/LocaleInformation_tt_RU.java,
+	gnu/java/locale/LocaleInformation_uk.java,
+	gnu/java/locale/LocaleInformation_ur.java,
+	gnu/java/locale/LocaleInformation_uz.java,
+	gnu/java/locale/LocaleInformation_uz_AF.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_CN_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_HK_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_MO_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_SG_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_TW_Hant.java:
+	New locale files.
+	* gnu/java/locale/LocaleInformation_ar_AE.java,
+	gnu/java/locale/LocaleInformation_ar_BH.java,
+	gnu/java/locale/LocaleInformation_ar_EG.java,
+	gnu/java/locale/LocaleInformation_ar_OM.java,
+	gnu/java/locale/LocaleInformation_ar_SD.java,
+	gnu/java/locale/LocaleInformation_fr_FR.java,
+	gnu/java/locale/LocaleInformation_hr_HR.java,
+	gnu/java/locale/LocaleInformation_ka_GE.java,
+	gnu/java/locale/LocaleInformation_mk_MK.java,
+	gnu/java/locale/LocaleInformation_sl_SI.java,
+	gnu/java/locale/LocaleInformation_sr_YU.java,
+	gnu/java/locale/LocaleInformation_ur_PK.java,
+	gnu/java/locale/LocaleInformation_uz_UZ.java,
+	gnu/java/locale/LocaleInformation_vi_VN.java,
+	gnu/java/locale/LocaleInformation_zh_CN.java,
+	gnu/java/locale/LocaleInformation_zh_HK.java,
+	gnu/java/locale/LocaleInformation_zh_SG.java,
+	gnu/java/locale/LocaleInformation_zh_TW.java:
+	Removed.
+
+2004-12-19  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation.java (LocaleInformation):
+	Don't inherit LocaleInformation_en and put all default values into
+	this class.
+	* gnu/java/locale/LocaleInformation_af_ZA.java
+	gnu/java/locale/LocaleInformation_ar_DZ.java
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java:
+	Removed all redundant stuff.
+
+2004-12-18  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_pa.java,
+	gnu/java/locale/LocaleInformation_pa_IN.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java:
+	Updated to latest gnu.localegen and locale date.
+
+2004-12-18  Robert Schuster <thebohemian@gmx.net>
+
+	* javax/swing/JComboBox.java
+	added support for no item being selected
+	(JComboBox): select first or nothing depending on element
+	count
+	(setModel): cleaned up unneeded "this." usage, added more
+	docs, made exception behavior match that of the JDK
+	(setLighWeightPopupEnabled): removed unneeded "this." usage
+	(setEditable): dito
+	(setMaximumRowCount): dito
+	(setRenderer): dito
+	(setPrototypeDisplayValue): dito
+	(getSelectedItem): simplified, added more user doc
+	(setSelectedIndex): corrected exception behavior, added more user
+	doc
+	(getSelectedIndex): fixed hardcoded dependency on DefaultComboBoxModel
+	 (see bug #11255), added performance warning to user doc
+	(addItem): fixed exception behavior, added user doc
+	(insertItemAt): dito
+	(removeItem): dito
+	(removeItemAt): dito
+	(removeAll): fixed exception behavior, added user doc, added support
+	for model not being instance of DefaultComboBoxModel (see bug #11255)
+	(getSelectedItemObjects): simplified
+	(getItemCount): fixed dependency on DefaultComboBoxModel (see bug #11255)
+	(getItemAt): fixed dependency on MutableComboBoxModel (see bug #11255)
+	* javax/swing/DefaultComboBoxModel.java:
+	(setSelectedItem): updates selected item only if new 
+	value is null or known (match JDK behavior)
+	* javax/swing/plaf/basic/BasicComboBoxUI.java:
+	(paintCurrentValue): renders "" if no item is selected
+
 2004-12-18  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/String.java (String(StringBuilder)): Rewrote.
@@ -5,6 +1605,1015 @@
 	(ensureCapacity): Updated.
 	(substrinng): Likewise.
 	(toString): Likewise.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_FR.java,
+	gnu/java/locale/LocaleInformation_oc_FR.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java:
+	Updated.
+	* gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_tr.java:
+	New files.
+
+2004-12-17  Mark Wielaard  <mark@klomp.org>
+
+	* INSTALL: We need jikes 1.19 or higher now.
+	* lib/Makefile.am: Add +Pno-shadow to JIKES compilation.
+
+2004-12-17  Mark Wielaard  <mark@klomp.org>
+
+	* scripts/.cvsignore: New file.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_gd_GB.java:
+	Updated.
+	gnu/java/locale/LocaleInformation_mi_NZ.java
+	gnu/java/locale/LocaleInformation_tl_PH.java
+	gnu/java/locale/LocaleInformation_yi_US.java:
+	Removed.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java:
+	Updated.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_ar_AE.java,
+	gnu/java/locale/LocaleInformation_ar_BH.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_EG.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_OM.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SD.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_br_FR.java,
+	gnu/java/locale/LocaleInformation_bs_BA.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_DK.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_FR.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gd_GB.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hr_HR.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_iw_IL.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_ka_GE.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mi_NZ.java,
+	gnu/java/locale/LocaleInformation_mk_MK.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_no_NO.java,
+	gnu/java/locale/LocaleInformation_oc_FR.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_se_NO.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sl_SI.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sr_YU.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_tg_TJ.java,
+	gnu/java/locale/LocaleInformation_tl_PH.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java,
+	gnu/java/locale/LocaleInformation_ur_PK.java,
+	gnu/java/locale/LocaleInformation_uz_UZ.java,
+	gnu/java/locale/LocaleInformation_vi_VN.java,
+	gnu/java/locale/LocaleInformation_yi_US.java,
+	gnu/java/locale/LocaleInformation_zh_CN.java,
+	gnu/java/locale/LocaleInformation_zh_HK.java,
+	gnu/java/locale/LocaleInformation_zh_SG.java,
+	gnu/java/locale/LocaleInformation_zh_TW.java:
+	Updated.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_DE.java:
+	Updated.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java:
+	Updated.
+
+2004-12-17  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTable.java
+	(addColumn): New method.
+	(getColumnClass): Likewise.
+	(getColumnName): Likewise.
+
+2004-12-17  Paul Jenner  <psj.home@ntlworld.com>
+
+	* javax/swing/TransferHandler.java
+	(createTransferable): Made protected.
+
+2004-12-16  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTable.java,
+	javax/swing/plaf/basic/BasicTableHeaderUI.java,
+	javax/swing/plaf/basic/BasicTableUI.java:
+	Use fixed get/setIntercellSpacing() methods.
+
+2004-12-16  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTable.java
+	(getIntercellSpacing): Fixed typo in method name.
+	(setIntercellSpacing): Likewise.
+
+2004-12-16  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/text/JTextComponent.java
+	(focusAccelerator): New variable.
+	(getFocusAccelerator): New method.
+	(setFocusAccelerator): Likewise.
+
+2004-12-15  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JComponent.java
+	(setTransferHandler): Made public. Fire property change event.
+	* javax/swing/TransferHandler.java: Implemented.
+	* javax/swing/text/JTextComponent.java
+	(DefaultTransferHandler): New inner class.
+	(defaultTransferHandler): New variable.
+	(copy): New method.
+	(cut): Likewise.
+	(paste): Likewise.
+	(doTransferAction): Likewise.
+
+2004-12-14  Michael Koch  <konqueror@gmx.de>
+
+	* java/text/NumberFormat.java (getIntegerInstance):
+	Make sure that doubles get formatted as integers.
+
+2004-12-14  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTree.java
+	(collapsePath): New method.
+	(collapseRow): Likewise.
+	(expandPath): Likewise.
+	(expandRow): Likewise.
+	(checkExpandParents): Likewise.
+	(doExpandParents): Likewise.
+	(setExpandedState): Likewise.
+	(makeVisible): Likewise.
+
+2004-12-13  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JPasswordField.java: Updated javadocs.
+
+2004-12-13  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_awt_peer_gtk_GtkWindowPeer.h:
+	Regenerated.
+
+2004-12-13  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JLayeredPane.java
+	(getLayer): Fixed return type, made public.
+	(getPosition): Use new getLayer().
+	(SetPosition): Likewise.
+	(getIndexOf): Likewise.
+	(remove): Likewise.
+	* javax/swing/JInternalFrame.java
+	(getLayer): Use new JLayeredPane.getLayer().
+
+
+2004-12-13  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/table/TableColumn.java: Added/fixed javadocs over all.
+	(setHeaderValue): Simplified. Do nothing when old value == new value.
+
+2004-12-13  Michael Koch  <konqueror@gmx.de>
+
+	* vm/reference/java/lang/VMClassLoader.java:
+	Reworked import statements.
+
+2004-12-12  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/util/zip/ZipFile.java
+	(getEntry): Fix to find dir entries without slash.
+	* java/util/zip/ZipEntry.java
+	(ZipEntry(ZipEntry,String)): New constructor to copy and change name.
+	(ZipEntry(ZipEntry)): Delegate to new constructor.
+
+2004-12-11  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java (setClip): Protect
+	against null clip region.
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java (create): Call
+	gtkWindowSetResizable.
+	(postConfigureEvent): Only revalidate if frame size has changed.
+	* gnu/java/awt/peer/gtk/GtkWindowPeer.java (postConfigureEvent):
+	Only revalidate if frame size has changed.
+	* java/awt/Component.java (reshape): Only repaint and post
+	component events if component is showing.
+	* java/awt/Container.java (addImpl): Only post container event if
+	container is showing.
+	(remove): Likewise.
+	* java/awt/Window.java (setLocationRelativeTo): Implement.
+	(setBoundsCallback): Only post component events if component is
+	showing.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics.c (clearRect):
+	Protect against null graphics structure.  Flush gdk event queue.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* NEWS: Clarify VMRuntime and String/StringBuffer VMSystem usage.
+
+	* vm/reference/gnu/classpath/VMSystemProperties.java (postInit):
+	Provide empty default implementation.
+
+	* java/lang/String.java: Replace all usage of System.arraycopy() with
+	VMSystem.arraycopy().
+	* java/lang/StringBuffer.java: Likewise.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* LICENSE: Add text about org.ietf.jgss documentation.
+	* org/ietf/jgss/ChannelBinding.java: Merge top two comment blocks.
+	* org/ietf/jgss/GSSCredential.java: Likewise.
+	* org/ietf/jgss/GSSException.java: Likewise.
+	* org/ietf/jgss/GSSManager.java: Likewise.
+	* org/ietf/jgss/GSSName.java: Likewise.
+	* org/ietf/jgss/MessageProp.java: Likewise.
+	* org/ietf/jgss/Oid.java: Likewise.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* java/io/FileDescriptor.java (sync): Add real exception to
+	SyncFailedException.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* java/text/MessageFormat.java (scanFormat): Chain thrown exception.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* java/util/zip/ZipEntry.java (KNOWN_EXTRA): New static field.
+	(setExtra): Don't parse bytes.
+	(parseExtra): New private method.
+	(getTime): Call parseExtra.
+
+2004-12-07  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java: Added support
+	for http.agent, http.keepAlive, and http.maxConnections system
+	properties (and LRU connection pool).
+
+2004-12-07  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_pa.java,
+	gnu/java/locale/LocaleInformation_pa_IN.java:
+	New locale files.
+
+2004-12-07  Michael Koch  <konqueror@gmx.de>
+
+	* javax/imageio/stream/FileImageOutputStream.java:
+	Implemented.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/util/Timer.java
+	(run): Stop the queue if a task throws an exception.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/beans/PropertyDescriptor.java
+	(PropertyDescriptor,setReadMethod): Set propertyType.
+
+2004-12-07  Michael Koch  <konqueror@gmx.de>
+
+	* javax/imageio/stream/FileCacheImageInputStream.java,
+	javax/imageio/stream/FileCacheImageOutputStream.java,
+	javax/imageio/stream/FileImageInputStream.java,
+	javax/imageio/stream/ImageInputStreamImpl.java,
+	javax/imageio/stream/ImageOutputStreamImpl.java,
+	javax/imageio/stream/MemoryCacheImageInputStream.java,
+	javax/imageio/stream/MemoryCacheImageOutputStream.java:
+	Added all missing methods in javax.imageio.stream.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/BufferedInputStream.java
+	(skip): Don't return -1 on EOF.
+
+2004-12-06  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/LineInputStream.java: (read) fixed possible infinite
+	loop (inetlib bug #11200).
+
+2004-12-06  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java:
+	(getHeaderField) return null if there are less than (index+1) fields.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/ObjectInputStream.java
+	(readObject): Fix to consume TC_ENDBLOCKDATA after readExternal.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* vm/reference/gnu/classpath/VMSystemProperties.java:
+	Added import to make it compile.
+
+2004-12-07  Jeroen Frijters  <jeroen@frijters.net>
+
+	* include/java_lang_VMSystem.h:
+	Removed isWordsBigEndian.
+
+2004-12-06  Jeroen Frijters  <jeroen@frijters.net>
+
+	* NEWS: Updated.
+
+2004-12-06  Jeroen Frijters  <jeroen@frijters.net>
+
+	* gnu/classpath/SystemProperties.java: New file.
+	* vm/reference/gnu/classpath/VMSystemProperties.java: New file.
+	* gnu/java/io/EncodingManager.java,
+	gnu/java/net/protocol/file/Connection.java,
+	java/io/File.java,
+	java/lang/Throwable.java,
+	java/security/Security.java,
+	java/security/cert/X509CRLSelector.java,
+	java/security/cert/X509CertSelector.java,
+	java/util/Locale.java,
+	vm/reference/java/lang/VMClassLoader.java:
+	Modified to use SystemProperties.
+	* java/lang/Class.java: Modified to use SecurityManager.current.
+	* java/lang/ClassLoader.java
+	(StaticData.systemClassLoader): New field.
+	(StaticData.static): New static initializer to install default
+	security manager.
+	(ClassLoader()): Modified to use StaticData.systemClassLoader.
+	ClassLoader(ClassLoader)): Modified to use SecurityManager.current.
+	(findSystemClass): Modified to use StaticData.systemClassLoader.
+	(getParent): Modified to use SecurityManager.current.
+	(getSystemResource,getSystemResources): Modified to use
+	StaticData.systemClassLoader.
+	(getSystemClassLoader): Modified to use SecurityManager.current and
+	StaticData.systemClassLoader.
+	(getExtClassLoaderUrls,getSystemClassLoaderUrls): Modified to use
+	SystemProperties.
+	(defaultGetSystemClassLoader): Modified to use SecurityManager.current
+	and SystemProperties.
+	(getSystemProperty): Removed.
+	* java/lang/Runtime.java
+	(securityManager): Removed.
+	(defaultProperties): Removed.
+	(static): Removed.
+	(Runtime): Modified to use SystemProperties.
+	(exit,removeShutdownHook,halt,runFinalizersOnExit,exec,load,loadLib):
+	Modified to use SecurityManager.current.
+	(loadLibrary): Modified to use SecurityManager.current and changed
+	call to System.mapLibraryName to VMRuntime.mapLibraryName.
+	* java/lang/SecurityManager.java
+	(current): New field.
+	* java/lang/System.java
+	(systemClassLoader): Removed.
+	(properties): Removed.
+	(in,out,err): Initialize in-line.
+	(static): Removed.
+	(initLoadLibrary): Removed.
+	(initProperties): Removed.
+	(initSystemClassLoader): Removed.
+	(initSecurityManager): Removed.
+	(setIn,setOut,setErr,setSecurityManager,getSecurityManager,getenv):
+	Modified to use SecurityManager.current.
+	(getProperties,setProperties,getProperty(String),
+	getProperty(String,String),setProperty): Modified to use
+	SecurityManager.current and SystemProperties.
+	(mapLibraryName): Modified to call VMRuntime.mapLibraryName.
+	* java/lang/Thread.java: Modified to use SecurityManager.current.
+	* java/lang/ThreadGroup.java: Modified to use SecurityManager.current.
+	* native/jni/java-lang/java_lang_VMSystem.c
+	(Java_java_lang_VMSystem_isWordsBigEndian): Removed.
+	* vm/reference/java/lang/VMRuntime.java
+	(nativeGetLibname): Removed (renamed to mapLibraryName).
+	(mapLibraryName): New method.
+	(insertSystemProperties): Removed.
+	* vm/reference/java/lang/VMSystem.java
+	(isWordsBigEndian): Removed.
+
+2004-12-06  Michael Koch  <konqueror@gmx.de>
+
+	* include/java_io_ObjectInputStream.h: Regenerated.
+
+2004-12-06  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/DefaultListCellRenderer.java
+	(serialVersionUID): Made private.
+	(getListCellRendererComponent): Set horizontal alignment.
+	* javax/swing/JLabel.java
+	(setVerticalAlignment): Re-implemented.
+	(setHorizontalAlignment): Do nothing if old value = new value.
+	* javax/swing/JList.java
+	(setCellRenderer): Likewise.
+	(setModel): Re-implemented.
+	(setSelectionModel): Likewise.
+
+2004-12-06  David Gilbert <david.gilbert@object-refinery.com>
+
+	* java/awt/Component.java,
+	java/awt/geom/Rectangle2D.java:
+	Javadoc fixes.
+
+2004-12-06  Guilhem Lavaux  <guilhem@kaffe.org>
+	Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/ObjectInputStream.java
+	(newObject): Changed prototype. Get a constructor reflect object
+	directly.
+	(callConstructor): Removed.
+	(allocateObject): Changed prototype.
+	(readClassDescriptor): Build the constructor reflection directly.
+	(readObject): Invoke newObject using the new prototype.
+
+	* java/io/ObjectStreamClass.java
+	(firstNonSerializableParent): Removed.
+	(firstNonSerializableParentConstructor): Added.
+	
+	* include/java_io_ObjectInputStream.h: Regenerated.
+
+	* native/jni/java-io/java_io_ObjectInputStream.c
+	(allocateObject): Allocate an object and call the requested
+	constructor.
+	(callConstructor): Removed.
+	
+2004-12-06  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/BufferedInputStream.java
+	(read(byte,int,int)): Handle case when zero bytes are requested.
+
+2004-12-06  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/awt/color/ICC_Profile.java
+	(finalize): Removed pointless field assignments.
+
+2004-12-05  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPConnection.java,
+	gnu/java/net/protocol/http/HTTPURLConnection.java:
+	HTTPURLConnection now derives from HttpsURLConnection.
+
+2004-12-01  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPConnection.java:
+	HTTPConnection's default User-Agent header set to "classpath/" plus
+	the version of Classpath in use.
+
+2004-12-03  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/net/protocol/ftp/package.html,
+	gnu/java/net/protocol/http/package.html:
+	Add missing files.
+
+2004-12-02  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/awt/EventDispatchThread.java,
+	java/awt/Toolkit.java,
+	java/io/ObjectStreamClass.java,
+	java/lang/reflect/Proxy.java,
+	java/net/URL.java,
+	java/security/SecureRandom.java,
+	java/util/Timer.java,
+	java/util/prefs/AbstractPreferences.java,
+	vm/reference/java/lang/VMProcess.java:
+	Don't catch java.lang.ThreadDeath.
+
+2004-12-02  Jeroen Frijters  <jeroen@frijters.net>
+
+	* gnu/java/net/protocol/file/Connection.java
+	(StaticData): New inner class to contain statics.
+	(connect, getHeaderField): Modified to use StaticData.
+	* java/lang/Class.java
+	(desiredAssertionStatus): Modified to use ClassLoader.StaticData.
+	* java/lang/ClassLoader.java
+	(StaticData): New inner class to contain statics.
+	(defineClass, setPackageAssertionStatus, setClassAssertionStatus):
+	Modified to use StaticData.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/AbstractListModel.java
+	(fireContentsChanged): Simplified.
+	(fireIntervalAdded): Likewise.
+	(fireIntervalRemoved): Likewise.
+	* javax/swing/DefaultSingleSelectionModel.java:
+	Reformatted.
+	(fireStateChanged): Simplified.
+	* javax/swing/JPopupMenu.java
+	(setSelectionModel): Set property.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/nio/SelectorImpl.java
+	(register): Removed redundant code.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/print/Book.java: Reformatted.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/geom/Area.java
+	(QuadSegment.curveArea): Remove unused variables.
+	(CubicSegment.curveArea): Likewise.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_nl.java:
+	Removed unneeded comments.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_de.java:
+	Re-generated with current gnu.localegen.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java:
+	Updated to match by gnu.localegen generated locales more.
+
+2004-12-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java (drawImage variants):
+	Update image observer.
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java (createImage):
+	Start image production.
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java (setMenuBar): Protect
+	against negative menu bar widths.
+	(setBounds): Likewise.
+	(postConfigureEvent): Likewise.
+	* gnu/java/awt/peer/gtk/GtkImage.java (imageComplete): Don't
+	remove consumer unless only a single frame has completed.
+	* gnu/java/awt/peer/gtk/GtkImagePainter.java (GtkImagePainter):
+	Add observer parameter.
+	(setPixels): Update image observer.
+	(imageComplete): Likewise.
+	* java/applet/Applet.java (width): New field.
+	(height): Likewise.
+	(setStub): Set size if width or height field has been set.
+	(resize): If stub is null save width and height values.
+	* java/awt/Component.java (reshape): Protect against null
+	parent.
+	* java/awt/image/MemoryImageSource.java
+	(MemoryImageSource(int,int,ColorModel,byte[],int,int)):
+	Document.
+	(MemoryImageSource(int,int,ColorModel,int[],int,int)):
+	Likewise.
+	(MemoryImageSource(int,int,ColorModel,byte[],int,int,Hashtable)):
+	Reference pixel array directly, rather than creating a local
+	copy.
+	(MemoryImageSource(int,int,ColorModel,int[],int,int,Hashtable)):
+	Likewise.
+	(newPixels(int,int,int,int)): Fix for loop and array copy
+	bounds.
+	(newPixels(int,int,int,int,boolean)): Likewise.
+	(startProduction): If animated call imageComplete with
+	SINGLEFRAME.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics.c: Uncomment
+	gdk_flush lines.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImagePainter.c
+	(drawPixels): Return if g is null or g->drawable is not a gdk
+	drawable.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTree.java
+	(ANCHOR_SELECTION_PATH_PROPERTY): Added @since tag.
+	(LEAD_SELECTION_PATH_PROPERTY): Likewise.
+	(EXPANDS_SELECTED_PATHS_PROPERTY): Likewise.
+	(EXPANDED): New constant.
+	(COLLAPSED): Likewise.
+	(nodeStates): New field.
+	(cellEditor): New method.
+	(cellRenderer): Likewise.
+	(selectionModel): Likewise.
+	(treeModel): Likewise.
+	(scrollPathToVisible): Likewise.
+	(scrollRowToVisible): Likewise.
+	(isCollapsed): Likewise.
+	(isExpanded): Likewise.
+	(clearToggledPaths): Likewise.
+	(getDescendantToggledPaths): Likewise.
+	(hasBeenExpanded): Likewise.
+	(isVisible): Likewise.
+	(isPathEditable): Likewise.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JLayeredPane.java: Reformatted.
+
+2004-12-01  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java:
+	HTTPURLConnection now returns Lists as getHeaderFields() values.
+
+2004-12-01  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/ObjectOutputStream.java
+	(writeObject, callWriteMethod): Replaced reflection with accessing
+	cached info in ObjectStreamClass.
+	(getMethod): Removed.
+	* java/io/ObjectStreamClass.java
+	(findMethod): Added check to make sure the method found has the
+	right modifiers.
+	(cacheMethods): Added writeReplace and writeObject methods.
+	(setFlags): Look at new writeObjectMethod field instead of doing
+	reflection again.
+	(writeReplaceMethod): New field.
+	(writeObjectMethod): New field.
+
+2004-11-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/net/BASE64.java,
+	gnu/java/net/CRLFInputStream.java,
+	gnu/java/net/CRLFOutputStream.java,
+	gnu/java/net/EmptyX509TrustManager.java,
+	gnu/java/net/GetLocalHostAction.java,
+	gnu/java/net/GetSystemPropertyAction.java,
+	gnu/java/net/LineInputStream.java,
+	gnu/java/net/protocol/http/Authenticator.java,
+	gnu/java/net/protocol/http/ByteArrayRequestBodyWriter.java,
+	gnu/java/net/protocol/http/ByteArrayResponseBodyReader.java,
+	gnu/java/net/protocol/http/ChunkedInputStream.java,
+	gnu/java/net/protocol/http/Cookie.java,
+	gnu/java/net/protocol/http/CookieManager.java,
+	gnu/java/net/protocol/http/Credentials.java,
+	gnu/java/net/protocol/http/HTTPConnection.java,
+	gnu/java/net/protocol/http/HTTPDateFormat.java,
+	gnu/java/net/protocol/http/HTTPURLConnection.java,
+	gnu/java/net/protocol/http/Headers.java,
+	gnu/java/net/protocol/http/Request.java,
+	gnu/java/net/protocol/http/RequestBodyWriter.java,
+	gnu/java/net/protocol/http/Response.java,
+	gnu/java/net/protocol/http/ResponseBodyReader.java,
+	gnu/java/net/protocol/http/ResponseHeaderHandler.java,
+	gnu/java/net/protocol/http/SimpleCookieManager.java,
+	gnu/java/net/protocol/http/event/ConnectionEvent.java,
+	gnu/java/net/protocol/http/event/ConnectionListener.java,
+	gnu/java/net/protocol/http/event/RequestEvent.java,
+	gnu/java/net/protocol/http/event/RequestListener.java:
+	New files
+	* gnu/java/net/protocol/http/Connection.java:
+	gnu/java/net/protocol/http/TODO: Removed
+	* gnu/java/net/protocol/http/Handler.java: Updated.
+	Merged HTTP protocol implementation from GNU inetlib.
+
+2004-11-30  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/net/protocol/ftp/ActiveModeDTP.java,
+	gnu/java/net/protocol/ftp/BlockInputStream.java,
+	gnu/java/net/protocol/ftp/BlockOutputStream.java,
+	gnu/java/net/protocol/ftp/CompressedInputStream.java,
+	gnu/java/net/protocol/ftp/CompressedOutputStream.java,
+	gnu/java/net/protocol/ftp/DTP.java,
+	gnu/java/net/protocol/ftp/DTPInputStream.java,
+	gnu/java/net/protocol/ftp/DTPOutputStream.java,
+	gnu/java/net/protocol/ftp/FTPConnection.java,
+	gnu/java/net/protocol/ftp/FTPException.java,
+	gnu/java/net/protocol/ftp/FTPResponse.java,
+	gnu/java/net/protocol/ftp/FTPURLConnection.java,
+	gnu/java/net/protocol/ftp/Handler.java,
+	gnu/java/net/protocol/ftp/PassiveModeDTP.java,
+	gnu/java/net/protocol/ftp/StreamInputStream.java,
+	gnu/java/net/protocol/ftp/StreamOutputStream.java:
+	New files. Merged from GNU inetlib.
+
+2004-11-30  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/tree/DefaultMutableTreeNode.java:
+	Completely Revised.
+	* javax/swing/tree/MutableTreeNode.java:
+	Reformatted.
+
+2004-11-30  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JFormattedTextField.java
+	(setDocument): Call setDocument of super class. Don't fire property
+	change event.
 
 2004-11-28  Michael Koch  <konqueror@gmx.de>
   

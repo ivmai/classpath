@@ -1,7 +1,65 @@
+2005-01-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+	        
+	Final merge of HEAD patches to generics branch
+	All changes are listed in merged Changelog.
+	In addition,
+	* java/lang/System.java:
+	(getenv()): changed Runtime.securityManager to
+	SecurityManager.current
+	(getenv(String)): likewise
+	(remove(String)): pointed to SystemProperties
+	* gnu/classpath/SystemProperties.java:
+	(remove(String)): implemented and documented
+
 2005-01-15  Tom Tromey  <tromey@redhat.com>
 
 	* javax/imageo/metadata: Merged from trunk.
 
+2005-01-15  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+  
+	* java/text/SimpleDateFormat.java:
+	(getDateFormatSymbols()): return a copy
+	(setDateFormatSymbols(java.text.DateFormatSymbols)):
+	throw exception on null input
+	(clone()): implemented to clone internal fields
+  
+2005-01-15  Mark Wielaard  <mark@klomp.org>
+  
+	Reported by Martin Platter <motse@complang.tuwien.ac.at>
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkFileDialogPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkFileDialogPeer_nativeSetFile):
+	Correct method signature of gtkSetFilename.
+
+2005-01-14  Sven de Marothy <sven@physto.se>
+  
+	* java/util/GregorianCalendar.java
+	(GregorianCalendar): Update fields in the constructor
+  
+2005-01-14  Arnaud Vandyck  <avdyk@gnu.org>
+  
+	* javax/swing/text/StringContent.java: New file.
+  
+2005-01-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+  
+	* java/text/SimpleDateFormat.java:
+	(parse): extend try{} block so all illegal arguments
+	are caught and returned as null
+  
+2005-01-13  Sven de Marothy <sven@physto.se>
+  
+	* java/text/SimpleDateFormat.java
+	(parse): comparison should be case-insensitive, ignore null strings.
+  
+2005-01-13  Jeroen Frijters  <jeroen@frijters.net>
+  
+	* vm/reference/java/nio/channels/VMChannels.java: Class shouldn't
+	be public.
+	(newInputStream,newOutputStream): No need to be public.
+  
+2005-01-13  Michael Koch  <konqueror@gmx.de>
+  
+	* scripts/check_jni_methods.sh: Don't use GNU sed specific features.
+  
 2005-01-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/Arrays.java:
@@ -40,6 +98,56 @@
 	cast set to SortedSet<T> before using
 
 2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+  
+	* java/text/DecimalFormatSymbols.java
+	(DecimalFormatSymbols(java.util.Locale)): defaults
+	changed to "?" and "XXX" to match a nuance of Sun's
+	impl. along with documentation
+  
+2005-01-12  Michael Koch  <konqueror@gmx.de>
+  
+	* gnu/java/security/x509/X509Certificate.java
+	(parse): Handle val == null case.
+  
+2005-01-12  Michael Koch  <konqueror@gmx.de>
+  
+	* java/nio/channels/Channels.java
+	(newInputStream(ReadableByteChannel)):
+	Call VMChannels.newInputStream(ReadableByteChannel).
+	(newOutputStream(WritableByteChannel):
+	Call VMChannels.newOutputStream(WritableByteChannel).
+	(newInputStream(FileChannelImpl)): Removed.
+	(newOutputStream(FileChannelImpl)): Likewise.
+	* vm/reference/java/nio/channels/VMChannels.java: Nw file.
+  	* native/jni/java-nio/Makefile.am:
+	* native/jni/java-nio/java_nio_channels_Channels.c,
+	include/java_nio_channels_Channels.h: Removed.
+	* include/Makefile.am: Don't generate java_nio_channels_Channels.h.
+	Removed java_nio_channels_Channels.c.
+  
+2005-01-12  Michael Koch  <konqueror@gmx.de>
+  
+	* gnu/java/net/PlainSocketImpl.java
+	(shutdownInput): Made native. Throws IOException. Added Javadoc.
+	(shutdownOutput): Likewise.
+	* include/gnu_java_net_PlainSocketImpl.h: Regenerated.
+	* native/jni/java-net/gnu_java_net_PlainSocketImpl.c
+	(Java_gnu_java_net_PlainSocketImpl_shutdownInput): New method.
+	(Java_gnu_java_net_PlainSocketImpl_shutdownOutput): Likewise.
+	* native/jni/java-net/javanet.c
+	(_javanet_shutdownInput): Likewise.
+	(_javanet_shutdownOutput): Likewise.
+	* native/jni/java-net/javanet.h
+	(_javanet_shutdownInput): Likewise.
+	(_javanet_shutdownOutput): Likewise.
+  
+2005-01-12  Michael Koch  <konqueror@gmx.de>
+  
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkWindowPeer_nativeSetVisible):
+	Removed setting of gdk_env.
+  
+2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/Collections.java
 	all occurences of
@@ -75,7 +183,6 @@
 	(sucessor(Node<K,V>)): likewise
 	(SubMap): generically typed with SK and SV
 	
-
 2005-01-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/EnumMap.java
@@ -85,6 +192,203 @@
 	* java/util/Hashtable.java
 	Corrected bracketing of author.
 
+2005-01-11  Mark Wielaard  <mark@klomp.org>
+  
+	* acinclude.m4 (CLASSPATH_WITH_GJDOC): Test for gjdoc, not jay.
+  
+2005-01-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
+  
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GdkRobotPeer.c
+	(mouseWheel): Call XFlush.
+	(keyPress): Likewise.
+	(keyRelease): Likewise.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/UIDefaults.java (UIDefaults):
+	Fixed typo in javadoc (Thanks to Thomas Zander for reporting)
+	Fixed HTML entity and removed a redundant comma.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* configure.ac: Check for gdk-pixbuf-2.0.
+  
+2005-01-11  Graydon Hoare  <graydon@redhat.com>
+  
+	* gnu/java/awt/ClasspathToolkit.java
+	(registerImageIOSpis): New method.
+	* gnu/java/awt/image/ImageDecoder.java
+	(imageDecoder): New constructor using InputStream
+	(startProduction): Handle existing InputStream.
+  	* gnu/java/awt/peer/gtk/GdkGraphics2D.java
+	(findSimpleIntegerArray): Make public and static.
+	(updateBufferedImage): Set each pixel, in a loop.
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java:
+	Implement ImageIO SPI classes.
+	(createBufferedImage): Rewrite in terms of SPI classes.
+  	* gnu/java/awt/peer/gtk/GtkToolkit.java
+	(registerImageIOSpis): New method.
+	* java/lang/reflect/natMethod.cc
+	(_Jv_CallAnyMethodA): Borrow a patch from aph, applied to trunk,
+	which lets JNI call interface methods properly.
+	* javax/imageio/ImageIO.java
+	(WriterFormatFilter.filter): Fix copy-and-paste typos.
+	(WriterMIMETypeFilter.filter): Likewise.
+	(ImageReaderIterator): Pass extension argument through to SPI.
+	(getReadersByFilter): Likewise.
+	(getWritersByFilter): Likewise.
+	(getImageReadersByFormatName): Likewise.
+	(getImageReadersByMIMEType): Likewise.
+	(getImageReadersBySuffix): Likewise.
+	(getImageWritersByFormatName): Likewise.
+	(getImageWritersByMIMEType): Likewise.
+	(getImageWritersBySuffix): Likewise.
+	(read): Implement.
+	(write): Implement.
+	* javax/imageio/ImageReader.java
+	(progressListeners): Initialize.
+	(setInput): Implement.
+	* javax/imageio/ImageWriter.java
+	(progressListeners): Initialize.
+	(warningListeners): Likewise.
+	(warningLocales): Likewise.
+	(setOutput): Test "isInstance" rather than class equality.
+	* javax/imageio/spi/IIORegistry.java
+	(static): Add reader and writer SPIs.
+	(IIORegistry): Call ClasspathToolkit.registerImageIOSpis.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GdkPixbufDecoder.c
+	(query_formats): New function.
+	(save_to_stream): Likewise.
+	(Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_streamImage): Likewise.
+
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_awt_peer_gtk_GdkPixbufDecoder.h: Regenerated.
+
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+
+	* java/net/URL.java (URL): Handle specs like
+	"/redir?http://domain2.com/index.html" which start with a slash.
+
+2005-01-11  Steven Augart  <augart@watson.ibm.com>
+
+	* scripts/check_jni_methods.sh: Portable to the OpenBSD
+	"mktemp", as used in Red Hat Linux 7.3.
+	Check whether "mktemp" fails; abort if it does.
+	
+2005-01-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/text/DecimalFormatSymbols.java
+	(DecimalFormatSymbols(java.util.Locale)): check for
+	errors in setting the currency and default to null and
+	empty strings if unavailable
+	(setCurrency(Currency)): moved assignment to ensure
+	currency is not accidentally set to null
+	* java/util/Currency.java
+	(Currency(java.util.Locale)): throw IllegalArgumentException
+	for empty country string and NullPointerException for null
+	locale or country
+  
+2005-01-11  Graydon Hoare  <graydon@redhat.com>
+  
+	* gnu/java/awt/ClasspathToolkit.java
+	(nativeQueueEmpty)
+	(wakeNativeQueue)
+	(iterateNativeQueue): New methods.
+	* gnu/java/awt/peer/gtk/GtkMainThread.java: Remove.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java
+	(gtkInit): Absorb from defunct GtkMainThread class.
+	(static): Run gtkInit in static startup block.
+	(GtkToolkit): Remove construction of GtkMainThread and queue.
+	(getSystemEventQueueImpl): Construct queue when requested.
+	(nativeQueueEmpty)
+	(wakeNativeQueue)
+	(iterateNativeQueue): New methods.
+	* java/awt/Component.java (removeNotify): Remove race.
+	* java/awt/EventDispatchThread.java
+	(EventDispatchThread): Don't start on construction.
+	(run): Remove isInterrupted check.
+	* java/awt/EventQueue.java (shutdown): New flag.
+	(isShutdown): New method checking J2SE shutdown condition.
+	(setShutdown): New method.
+	(getNextEvent): Restructure to use ClasspathToolkit.
+	(postEvent): Activate new thread on posting, wake thread on
+	post of possible shutdown condition event.
+	* java/awt/Frame.java
+	(Frame): Call noteFrame in all constructors.
+	(fireDummyEvent): New helper method.
+	(addNotify): Fire a dummy event to wake up queue.
+	(removeNotify): Fire a dummy event to wake up queue.
+	(noteFrame): New method.
+	(weakFrames): New static field.
+	(getFrames): Implement.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkMainThread.c:
+	Remove.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c:
+	Move everything from GtkMainThread into this file
+	(Java_gnu_java_awt_peer_gtk_GtkToolkit_iterateNativeQueue)
+	(Java_gnu_java_awt_peer_gtk_GtkToolkit_wakeNativeQueue)
+	(Java_gnu_java_awt_peer_gtk_GtkToolkit_nativeQueueEmpty):
+	New functions to implement single-threaded queue semantics.
+
+2005-01-11  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java: Replace direct
+	references to event queue q with method call q().
+	* gnu/java/awt/peer/gtk/GtkDialogPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkScrollbarPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkTextComponentPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkWindowPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkGenericPeer.java: Likewise.
+	(q): New method.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* native/jni/gtk-peer/Makefile.am:
+	Removed gnu_java_awt_peer_gtk_GtkMainThread.c.
+	* include/Makefile.am:
+	Don't generate gnu_java_awt_peer_gtk_GtkMainThread.h
+	* include/gnu_java_awt_peer_gtk_GtkMainThread.h: Removed.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/text/DefaultEditorKit.java
+	(deinstall): Removed.
+	(install): Likewise.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/UIDefaults.java (put): Handle value of null.
+  
+2005-01-11  Chris Burdess  <dog@gnu.org>
+  
+	* gnu/java/net/protocol/http/HTTPConnection.java: Use correct form of
+	Host header when using a non-default port number.
+  
+2005-01-11  Chris Burdess  <dog@gnu.org>
+  
+	* javax/net/ssl/HttpsURLConnection.java: Do not request SSLv3
+	provider during class initialization.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* java/awt/Robot.java,
+	java/awt/Scrollbar.java,
+	java/awt/print/PrinterJob.java,
+	javax/swing/JTable.java,
+	javax/swing/text/AbstractDocument.java:
+	Reworked import statements.
+  
+2005-01-11  Michael Koch  <konqueror@gmx.de>
+  
+	* java/beans/XMLDecoder.java: Reworked imports, fixed class javadoc.
+	* java/io/File.java,
+	java/lang/System.java,
+	java/net/Inet4Address.java,
+	java/util/Currency.java,
+	java/util/ResourceBundle.java: Reworked imports.
+  
 2005-01-11  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/AbstractList.java (set, add): Fixed argument types.
@@ -150,6 +454,39 @@
 	* .settings/org.eclipse.jdt.core.prefs: New file.
 	* .settings/org.eclipse.jdt.ui.prefs: New file.
 
+2005-01-10  Tom Tromey  <tromey@redhat.com>
+  
+	* java/io/BufferedInputStream.java: Fixed indentation.
+  
+2005-01-10  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/JEditorPane.java
+	(read): Implemented.
+	(write): Likewise.
+	* javax/swing/text/DefaultEditorKit.java
+	(page): Renamed from page_url. Made private.
+	(editorKit): Renamed from kit. Made private.
+	(ctype): Removed.
+	(JEditorPane): All constructors reimplemented.
+	(getContentType): Use content type from editor kit.
+	(getEditorKit): Return editorKit.
+	(getEditorKitForContentType):Likewise.
+	(getPage): Return page.
+	(setContentType): Reimplemented.
+	(setEditorKit): Likewise.
+	(setEditorKitForContentType): Removed wrong implementation.
+	(setPage): Implemented.
+  
+2005-01-10  Michael Koch  <konqueror@gmx.de>
+  
+	* scripts/check_jni_methods.sh: Dont ignore
+	Java_gnu_java_awt_peer_gtk_GtkFramePeer_nativeSetIconImageFromData.
+  
+2005-01-10  Thomas Fitzsimmons  <fitzsim@redhat.com>
+  
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkFramePeer.c
+	(nativeSetIconImageFromData): Re-add native implementation.
+  
 2005-01-10  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/AbstractMap.java:
@@ -258,6 +595,196 @@
 	(putAll(Map<? extends K, ? extends V>)): generically typed
 	(values()): returns generic collection
 	
+2005-01-09  Mark Wielaard  <mark@klomp.org>
+  
+	* java/security/AlgorithmParameterGenerator.java (getInstance):
+	Mention provider when throwing NoSuchProviderException.
+	* java/security/AlgorithmParameters.java (getInstance): Likewise.
+	* java/security/KeyFactory.java (getInstance): Likewise.
+	* java/security/KeyStore.java (getInstance): Likewise.
+	* java/security/SecureRandom.java (getInstance): Likewise.
+	* java/security/cert/CertificateFactory.java (getInstance): Likewise.
+  
+2005-01-09  Mark Wielaard  <mark@klomp.org>
+  
+	* native/jni/java-io/java_io_VMFile.c
+	(Java_java_io_VMFile_create): Call JCL_free_cstring() when done with
+	string.
+	* native/jni/java-io/javaio.c
+	(_javaio_open_read): Likewise.
+	(_javaio_open_readwrite): Likewise.
+	* native/jni/java-lang/java_lang_VMSystem.c
+	(Java_java_lang_VMSystem_getenv): Likewise.
+	* native/jni/java-nio/gnu_java_nio_channels_FileChannelImpl.c
+	(Java_gnu_java_nio_channels_FileChannelImpl_open): Likewise.
+  
+2005-01-09  Mark Wielaard  <mark@klomp.org>
+  
+	* configure.ac: Update version to 0.13+cvs.
+  
+2005-01-09  Mark Wielaard  <mark@klomp.org>
+  
+	* acinclude.m4 (CLASSPATH_WITH_GJDOC): Renamed from
+	CLASSPATH_ENABLE_GJDOC. Can now take argument to use as gjdoc program.
+	Doesn't depend on xml tools.
+	* configure.ac: Use CLASSPATH_WITH_GJDOC.
+	* INSTALL: Mention --with-gjdoc option.
+	* NEWS: Add --with-gjdoc addition.
+	* doc/api/Makefile.am (EXTRA_DIST): Removed.
+	(sourcepath): New variable.
+	(htmllist): Removed.
+	(core): Removed.
+	(packages): Removed.
+	(date): Removed.
+	(clean): Also remove create_html file.
+	(create_html): Rewritten.
+	* doc/api/classpath-copyright.xml: Removed.
+  
+2005-01-09  Patrik Reali  <reali@acm.org>
+  
+	* doc/www.gnu.org/newsitems.txt doc/www.gnu.org/announce/20050107.wml 
+	doc/www.gnu.org/downloads/downloads.wml: classpath 0.13 release news
+  
+2005-01-08  Ito Kazumitsu  <kaz@maczuka.gcd.org>
+  
+	* java/nio/charset/Charset.java (providers):
+	New method to make an array of CharsetProviders defined in
+	META-INF/services/java.nio.charset.spi.CharsetProvider.
+	(charsetForName, availableCharsets): Use the
+	new method providers().
+  
+2005-01-08  Michael Koch  <konqueror@gmx.de>
+  
+	* java/util/SimpleTimeZone.java (checkRule):
+	Throw IllegalArgumentException on invalid month values.
+  
+2005-01-08  Michael Koch  <konqueror@gmx.de>
+  
+	* gnu/java/net/protocol/http/HTTPConnection.java
+	(newRequest): Use "/" as path if no path given in URL.
+  
+2005-01-08  Michael Koch  <konqueror@gmx.de>
+  
+	* resource/Makefile.am: Install classpath.security file.
+  
+2005-01-08  Michael Koch  <konqueror@gmx.de>
+  
+	* resource/java/util/iso639_fr.properties,
+	resource/java/util/iso3166.properties,
+	resource/java/util/iso3166_de.properties,
+	resource/java/util/iso639-a3.properties,
+	resource/java/util/iso639_de.properties,
+	resource/java/util/iso639.properties,
+	resource/java/util/iso639-a2-old.properties,
+	resource/java/util/iso3166-a3.properties,
+	resource/java/util/iso639_ga.properties: Removed.
+  
+2005-01-07  Tom Tromey  <tromey@redhat.com>
+  
+	* java/lang/Package.java (getPackages): Use VMClassLoader when
+	appropriate.
+	(getPackage): Likewise.
+  
+2005-01-07  Michael Koch  <konqueror@gmx.de>
+  
+	* java/nio/Buffer.java (address): New field.
+	* java/nio/DirectByteBufferImpl.java (address): Removed.
+	* java/nio/MappedByteBufferImpl.java (address): Likewise..
+	* java/nio/CharViewBufferImpl.java (CharViewBufferImpl): Explicitely
+	initialize Buffer.address if needed.
+	* java/nio/DoubleViewBufferImpl.java (DoubleViewBufferImpl): Likewise.
+	* java/nio/FloatViewBufferImpl.java (FloatViewBufferImpl): Likewise.
+	* java/nio/IntViewBufferImpl.java (IntViewBufferImpl): Likewise.
+	* java/nio/LongViewBufferImpl.java (LongViewBufferImpl): Likewise.
+	* java/nio/ShortViewBufferImpl.java (ShortViewBufferImpl): Likewise.
+  
+2005-01-07  Olga Rodimina  <rodimina@redhat.com>
+  
+	* javax/swing/JTable.java
+	(columnAtPoint): New Method. Implemented.
+	(rowAtPoint): Likewise.
+	(countSelections): Fixed few small count errors.
+	(getSelections): Likewise.
+	(setSelectionMode): Set selection mode for column
+	selection model in addition to row selection model.
+	* javax/swing/plaf/basic/BasicTableUI.java:
+	(getRowForPoint): Removed. Replaced by
+	JTable.rowAtPoint().
+	(getColForPoint): Removed. Replaced by
+	JTable.columnAtPoint().
+	(updateSelection): Updated to call JTable.columnAtPoint
+	and JTable.rowAtPoint.
+	* javax/swing/table/DefaultTableColumnModel.java:
+	(getSelectedColumns): Implemented.
+	(getSelectedColumnCount): Implemented.
+
+2005-01-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/table/DefaultTableModel.java
+	(DefaultTableModel()): Added Javadocs.
+	(DefaultTableModel(int, int)): Fixed implementation.
+	(DefaultTableModel(Vector, int)): Throw IllegalArgumentException
+	for negative rowCount.
+	(DefaultTableModel(Object[], int)): Added Javadocs.
+	(DefaultTableModel(Vector, Vector)): Likewise.
+	(DefaultTableModel(Object[][], Object[])): Likewise.
+	(getDataVector): Likewise.
+	(setDataVector(Vector, Vector)): Likewise.
+	(setDataVector(Object[][], Object[])): Likewise.
+	(newDataAvailable): Likewise.
+	(newRowsAdded): Likewise.
+	(rowsRemoved): Likewise.
+	(setColumnIdentifiers(Vector)): Allow for null argument.
+	(setColumnIdentifiers(Object[])): Added Javadocs.
+	(setNumRows): Likewise.
+	(setRowCount): Adds new rows if necessary, and sends more specific
+	TableModelEvent.
+	(setColumnCount): Allow for null columnIdentifiers.
+	(addColumn(Object)): Added Javadocs.
+	(addColumn(Object, Vector)): Handle null columnData.
+	(addColumn(Object, Object[])): Handle columnData with more or less
+	entries than rows in the table.
+	(addRow(Vector)): Fire appropriate event.
+	(addRow(Object[])): Added Javadocs.
+	(insertRow(int, Vector)): Fire appropriate event.
+	(insertRow(int, Object[])): Added Javadocs.
+	(moveRow): Reimplemented.
+	(removeRow(int)): Fire appropriate event.
+	(getColumnCount): Allow for null columnIdentifiers.
+	(getColumnName): Now returns empty string when column index is too
+	large.
+	(isCellEditable): Added Javadocs.
+	(getValueAt): Likewise.
+	(setValueAt): Fire more specific event.
+	(convertToVector): Added Javadocs.
+	* javax/swing/table/TableModel.java
+	Added Javadocs.
+
+2005-01-07  Archie Cobbs  <archie@dellroad.org>
+
+	* NEWS: Document changes.
+	* java/lang/Class.java (newInstance(), getClassLoader(),
+	forName(String), forName(String, boolean, ClassLoader)):
+	Use new VMStackWalker methods.
+	* java/lang/ClassLoader.java (getParent(), getSystemClassLoader()):
+	Likewise.
+	* java/lang/Package.java (getPackages()): Likewise.
+	* java/lang/SecurityManager.java (getClassContext()): Likewise.
+	* java/util/ResourceBundle.java (getBundle()): Likewise.
+	* java/lang/Runtime.java (load(), loadLibrary()): Load the native
+	library using the calling class' class loader.
+	* java/lang/System.java (load(), loadLibrary()): Likewise.
+	(currentClassLoader()): implement via currentLoadedClass().
+	* vm/reference/gnu/classpath/VMStackWalker.java: New class.
+	* vm/reference/java/lang/VMRuntime.java (nativeLoad()):
+	Add a ClassLoader parameter.
+	* vm/reference/java/lang/VMSecurityManager.java: Removed.
+
+2005-01-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/SimpleTimeZone.java:
+	(getOffset): offset end date with daylight savings
+
 2005-01-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/io/PrintStream.java:
@@ -291,6 +818,527 @@
 	* vm/reference/java/lang/VMClass.java:
 	(cast(Object, Class<K>)): typed method parameterically
 	
+2005-01-06  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/ClassLoader.java (findClass): Fixed documentation.
+
+2005-01-06  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Update version to 0.13.
+	* NEWS: Add news about 0.13.
+	* INSTALL: Mention new dependencies and configure flags.
+  
+2005-01-06  Mark Wielaard  <mark@klomp.org>
+  
+	* configure.ac: Add explicit X and libXtst tests when gtk+ peers are
+	enabled.
+  
+2005-01-06  Michael Koch  <konqueror@gmx.de>
+  
+	* java/util/TimeZone.java
+	(setID): Throw NullPointerException if needed.
+  
+2005-01-05  Mark Wielaard  <mark@klomp.org>
+  
+	* lib/gen-classlist.sh.in: Don't split locales in classes.locale1
+	and classes.locale2.
+	* lib/Makefile.am (JAVAC): Compile only classes.locale.
+	(CLEANFILES): Remove classes.locale1 and classes.locale2,
+	add classes.locale.
+  
+2005-01-05  Tom Tromey  <tromey@redhat.com>
+  
+	* java/util/zip/ZipEntry.java (setCompressedSize): Allow any
+	argument.
+	(compressedSize): Now 'long'.  Default to -1.
+	(getCompressedSize): Rewrote.
+  
+2005-01-05  Ranjit Mathew  <rmathew@hotmail.com>
+  
+	* java/util/IdentityHashMap.java (put): Replace mistaken use
+	of "<<" by "*".
+  
+2005-01-05  Michael Koch  <konqueror@gmx.de>
+  
+	* gnu/java/locale/LocaleInformation_mn_MN.java:
+  	New file.
+	* gnu/java/locale/LocaleInformation_aa.java,
+	gnu/java/locale/LocaleInformation_aa_DJ.java,
+	gnu/java/locale/LocaleInformation_aa_ER.java,
+	gnu/java/locale/LocaleInformation_aa_ER_SAAHO.java,
+	gnu/java/locale/LocaleInformation_aa_ET.java,
+	gnu/java/locale/LocaleInformation_af.java,
+	gnu/java/locale/LocaleInformation_af_ZA.java,
+	gnu/java/locale/LocaleInformation_am.java,
+	gnu/java/locale/LocaleInformation_am_ET.java,
+	gnu/java/locale/LocaleInformation_ar.java,
+	gnu/java/locale/LocaleInformation_ar_DZ.java,
+	gnu/java/locale/LocaleInformation_ar_IN.java,
+	gnu/java/locale/LocaleInformation_ar_IQ.java,
+	gnu/java/locale/LocaleInformation_ar_JO.java,
+	gnu/java/locale/LocaleInformation_ar_KW.java,
+	gnu/java/locale/LocaleInformation_ar_LB.java,
+	gnu/java/locale/LocaleInformation_ar_LY.java,
+	gnu/java/locale/LocaleInformation_ar_MA.java,
+	gnu/java/locale/LocaleInformation_ar_QA.java,
+	gnu/java/locale/LocaleInformation_ar_SA.java,
+	gnu/java/locale/LocaleInformation_ar_SY.java,
+	gnu/java/locale/LocaleInformation_ar_TN.java,
+	gnu/java/locale/LocaleInformation_ar_YE.java,
+	gnu/java/locale/LocaleInformation_as.java,
+	gnu/java/locale/LocaleInformation_as_IN.java,
+	gnu/java/locale/LocaleInformation_az.java,
+	gnu/java/locale/LocaleInformation_be.java,
+	gnu/java/locale/LocaleInformation_be_BY.java,
+	gnu/java/locale/LocaleInformation_bg.java,
+	gnu/java/locale/LocaleInformation_bg_BG.java,
+	gnu/java/locale/LocaleInformation_bn.java,
+	gnu/java/locale/LocaleInformation_bn_IN.java,
+	gnu/java/locale/LocaleInformation_ca.java,
+	gnu/java/locale/LocaleInformation_ca_ES.java,
+	gnu/java/locale/LocaleInformation_cs.java,
+	gnu/java/locale/LocaleInformation_cs_CZ.java,
+	gnu/java/locale/LocaleInformation_cy.java,
+	gnu/java/locale/LocaleInformation_cy_GB.java,
+	gnu/java/locale/LocaleInformation_da.java,
+	gnu/java/locale/LocaleInformation_da_DK.java,
+	gnu/java/locale/LocaleInformation_de.java,
+	gnu/java/locale/LocaleInformation_de_AT.java,
+	gnu/java/locale/LocaleInformation_de_BE.java,
+	gnu/java/locale/LocaleInformation_de_CH.java,
+	gnu/java/locale/LocaleInformation_de_DE.java,
+	gnu/java/locale/LocaleInformation_de_LI.java,
+	gnu/java/locale/LocaleInformation_de_LU.java,
+	gnu/java/locale/LocaleInformation_dv.java,
+	gnu/java/locale/LocaleInformation_dv_MV.java,
+	gnu/java/locale/LocaleInformation_dz.java,
+	gnu/java/locale/LocaleInformation_dz_BT.java,
+	gnu/java/locale/LocaleInformation_el.java,
+	gnu/java/locale/LocaleInformation_el_GR.java,
+	gnu/java/locale/LocaleInformation_en.java,
+	gnu/java/locale/LocaleInformation_en_AS.java,
+	gnu/java/locale/LocaleInformation_en_AU.java,
+	gnu/java/locale/LocaleInformation_en_BE.java,
+	gnu/java/locale/LocaleInformation_en_BW.java,
+	gnu/java/locale/LocaleInformation_en_BZ.java,
+	gnu/java/locale/LocaleInformation_en_CA.java,
+	gnu/java/locale/LocaleInformation_en_GB.java,
+	gnu/java/locale/LocaleInformation_en_GU.java,
+	gnu/java/locale/LocaleInformation_en_HK.java,
+	gnu/java/locale/LocaleInformation_en_IE.java,
+	gnu/java/locale/LocaleInformation_en_IN.java,
+	gnu/java/locale/LocaleInformation_en_MH.java,
+	gnu/java/locale/LocaleInformation_en_MP.java,
+	gnu/java/locale/LocaleInformation_en_MT.java,
+	gnu/java/locale/LocaleInformation_en_NZ.java,
+	gnu/java/locale/LocaleInformation_en_PH.java,
+	gnu/java/locale/LocaleInformation_en_PK.java,
+	gnu/java/locale/LocaleInformation_en_SG.java,
+	gnu/java/locale/LocaleInformation_en_UM.java,
+	gnu/java/locale/LocaleInformation_en_US.java,
+	gnu/java/locale/LocaleInformation_en_US_POSIX.java,
+	gnu/java/locale/LocaleInformation_en_VI.java,
+	gnu/java/locale/LocaleInformation_en_ZA.java,
+	gnu/java/locale/LocaleInformation_en_ZW.java,
+	gnu/java/locale/LocaleInformation_eo.java,
+	gnu/java/locale/LocaleInformation_es.java,
+	gnu/java/locale/LocaleInformation_es_AR.java,
+	gnu/java/locale/LocaleInformation_es_BO.java,
+	gnu/java/locale/LocaleInformation_es_CL.java,
+	gnu/java/locale/LocaleInformation_es_CO.java,
+	gnu/java/locale/LocaleInformation_es_CR.java,
+	gnu/java/locale/LocaleInformation_es_DO.java,
+	gnu/java/locale/LocaleInformation_es_EC.java,
+	gnu/java/locale/LocaleInformation_es_ES.java,
+	gnu/java/locale/LocaleInformation_es_GT.java,
+	gnu/java/locale/LocaleInformation_es_HN.java,
+	gnu/java/locale/LocaleInformation_es_MX.java,
+	gnu/java/locale/LocaleInformation_es_NI.java,
+	gnu/java/locale/LocaleInformation_es_PA.java,
+	gnu/java/locale/LocaleInformation_es_PE.java,
+	gnu/java/locale/LocaleInformation_es_PR.java,
+	gnu/java/locale/LocaleInformation_es_PY.java,
+	gnu/java/locale/LocaleInformation_es_SV.java,
+	gnu/java/locale/LocaleInformation_es_US.java,
+	gnu/java/locale/LocaleInformation_es_UY.java,
+	gnu/java/locale/LocaleInformation_es_VE.java,
+	gnu/java/locale/LocaleInformation_et.java,
+	gnu/java/locale/LocaleInformation_et_EE.java,
+	gnu/java/locale/LocaleInformation_eu.java,
+	gnu/java/locale/LocaleInformation_eu_ES.java,
+	gnu/java/locale/LocaleInformation_fa.java,
+	gnu/java/locale/LocaleInformation_fa_AF.java,
+	gnu/java/locale/LocaleInformation_fa_IR.java,
+	gnu/java/locale/LocaleInformation_fi.java,
+	gnu/java/locale/LocaleInformation_fi_FI.java,
+	gnu/java/locale/LocaleInformation_fo.java,
+	gnu/java/locale/LocaleInformation_fo_FO.java,
+	gnu/java/locale/LocaleInformation_fr.java,
+	gnu/java/locale/LocaleInformation_fr_BE.java,
+	gnu/java/locale/LocaleInformation_fr_CA.java,
+	gnu/java/locale/LocaleInformation_fr_CH.java,
+	gnu/java/locale/LocaleInformation_fr_LU.java,
+	gnu/java/locale/LocaleInformation_ga.java,
+	gnu/java/locale/LocaleInformation_ga_IE.java,
+	gnu/java/locale/LocaleInformation_gl.java,
+	gnu/java/locale/LocaleInformation_gl_ES.java,
+	gnu/java/locale/LocaleInformation_gu.java,
+	gnu/java/locale/LocaleInformation_gu_IN.java,
+	gnu/java/locale/LocaleInformation_gv.java,
+	gnu/java/locale/LocaleInformation_gv_GB.java,
+	gnu/java/locale/LocaleInformation_he.java,
+	gnu/java/locale/LocaleInformation_he_IL.java,
+	gnu/java/locale/LocaleInformation_hi.java,
+	gnu/java/locale/LocaleInformation_hi_IN.java,
+	gnu/java/locale/LocaleInformation_hr.java,
+	gnu/java/locale/LocaleInformation_hu.java,
+	gnu/java/locale/LocaleInformation_hu_HU.java,
+	gnu/java/locale/LocaleInformation_hy.java,
+	gnu/java/locale/LocaleInformation_hy_AM.java,
+	gnu/java/locale/LocaleInformation_hy_AM_REVISED.java,
+	gnu/java/locale/LocaleInformation_id.java,
+	gnu/java/locale/LocaleInformation_id_ID.java,
+	gnu/java/locale/LocaleInformation_is.java,
+	gnu/java/locale/LocaleInformation_is_IS.java,
+	gnu/java/locale/LocaleInformation_it.java,
+	gnu/java/locale/LocaleInformation_it_CH.java,
+	gnu/java/locale/LocaleInformation_it_IT.java,
+	gnu/java/locale/LocaleInformation_iu.java,
+	gnu/java/locale/LocaleInformation_ja.java,
+	gnu/java/locale/LocaleInformation_ja_JP.java,
+	gnu/java/locale/LocaleInformation_ka.java,
+	gnu/java/locale/LocaleInformation_kk.java,
+	gnu/java/locale/LocaleInformation_kk_KZ.java,
+	gnu/java/locale/LocaleInformation_kl.java,
+	gnu/java/locale/LocaleInformation_kl_GL.java,
+	gnu/java/locale/LocaleInformation_km.java,
+	gnu/java/locale/LocaleInformation_km_KH.java,
+	gnu/java/locale/LocaleInformation_kn.java,
+	gnu/java/locale/LocaleInformation_kn_IN.java,
+	gnu/java/locale/LocaleInformation_ko.java,
+	gnu/java/locale/LocaleInformation_ko_KR.java,
+	gnu/java/locale/LocaleInformation_kw.java,
+	gnu/java/locale/LocaleInformation_kw_GB.java,
+	gnu/java/locale/LocaleInformation_ky.java,
+	gnu/java/locale/LocaleInformation_lo.java,
+	gnu/java/locale/LocaleInformation_lo_LA.java,
+	gnu/java/locale/LocaleInformation_lt.java,
+	gnu/java/locale/LocaleInformation_lt_LT.java,
+	gnu/java/locale/LocaleInformation_lv.java,
+	gnu/java/locale/LocaleInformation_lv_LV.java,
+	gnu/java/locale/LocaleInformation_mk.java,
+	gnu/java/locale/LocaleInformation_ml.java,
+	gnu/java/locale/LocaleInformation_ml_IN.java,
+	gnu/java/locale/LocaleInformation_mn.java,
+	gnu/java/locale/LocaleInformation_mr.java,
+	gnu/java/locale/LocaleInformation_mr_IN.java,
+	gnu/java/locale/LocaleInformation_ms.java,
+	gnu/java/locale/LocaleInformation_ms_BN.java,
+	gnu/java/locale/LocaleInformation_ms_MY.java,
+	gnu/java/locale/LocaleInformation_mt.java,
+	gnu/java/locale/LocaleInformation_mt_MT.java,
+	gnu/java/locale/LocaleInformation_nb.java,
+	gnu/java/locale/LocaleInformation_nb_NO.java,
+	gnu/java/locale/LocaleInformation_nl.java,
+	gnu/java/locale/LocaleInformation_nl_BE.java,
+	gnu/java/locale/LocaleInformation_nl_NL.java,
+	gnu/java/locale/LocaleInformation_nn.java,
+	gnu/java/locale/LocaleInformation_nn_NO.java,
+	gnu/java/locale/LocaleInformation_om.java,
+	gnu/java/locale/LocaleInformation_om_ET.java,
+	gnu/java/locale/LocaleInformation_om_KE.java,
+	gnu/java/locale/LocaleInformation_or.java,
+	gnu/java/locale/LocaleInformation_or_IN.java,
+	gnu/java/locale/LocaleInformation_pa.java,
+	gnu/java/locale/LocaleInformation_pa_IN.java,
+	gnu/java/locale/LocaleInformation_pl.java,
+	gnu/java/locale/LocaleInformation_pl_PL.java,
+	gnu/java/locale/LocaleInformation_ps.java,
+	gnu/java/locale/LocaleInformation_ps_AF.java,
+	gnu/java/locale/LocaleInformation_pt.java,
+	gnu/java/locale/LocaleInformation_pt_BR.java,
+	gnu/java/locale/LocaleInformation_pt_PT.java,
+	gnu/java/locale/LocaleInformation_ro.java,
+	gnu/java/locale/LocaleInformation_ro_RO.java,
+	gnu/java/locale/LocaleInformation_ru.java,
+	gnu/java/locale/LocaleInformation_ru_RU.java,
+	gnu/java/locale/LocaleInformation_ru_UA.java,
+	gnu/java/locale/LocaleInformation_sa.java,
+	gnu/java/locale/LocaleInformation_sa_IN.java,
+	gnu/java/locale/LocaleInformation_sk.java,
+	gnu/java/locale/LocaleInformation_sk_SK.java,
+	gnu/java/locale/LocaleInformation_sl.java,
+	gnu/java/locale/LocaleInformation_so.java,
+	gnu/java/locale/LocaleInformation_so_DJ.java,
+	gnu/java/locale/LocaleInformation_so_ET.java,
+	gnu/java/locale/LocaleInformation_so_KE.java,
+	gnu/java/locale/LocaleInformation_so_SO.java,
+	gnu/java/locale/LocaleInformation_sq.java,
+	gnu/java/locale/LocaleInformation_sq_AL.java,
+	gnu/java/locale/LocaleInformation_sr.java,
+	gnu/java/locale/LocaleInformation_sr_Latn.java,
+	gnu/java/locale/LocaleInformation_sv.java,
+	gnu/java/locale/LocaleInformation_sv_FI.java,
+	gnu/java/locale/LocaleInformation_sv_SE.java,
+	gnu/java/locale/LocaleInformation_sw.java,
+	gnu/java/locale/LocaleInformation_sw_KE.java,
+	gnu/java/locale/LocaleInformation_sw_TZ.java,
+	gnu/java/locale/LocaleInformation_ta.java,
+	gnu/java/locale/LocaleInformation_ta_IN.java,
+	gnu/java/locale/LocaleInformation_te.java,
+	gnu/java/locale/LocaleInformation_te_IN.java,
+	gnu/java/locale/LocaleInformation_th.java,
+	gnu/java/locale/LocaleInformation_th_TH.java,
+	gnu/java/locale/LocaleInformation_ti.java,
+	gnu/java/locale/LocaleInformation_ti_ER.java,
+	gnu/java/locale/LocaleInformation_ti_ET.java,
+	gnu/java/locale/LocaleInformation_tr.java,
+	gnu/java/locale/LocaleInformation_tr_TR.java,
+	gnu/java/locale/LocaleInformation_tt.java,
+	gnu/java/locale/LocaleInformation_tt_RU.java,
+	gnu/java/locale/LocaleInformation_uk.java,
+	gnu/java/locale/LocaleInformation_uk_UA.java,
+	gnu/java/locale/LocaleInformation_ur.java,
+	gnu/java/locale/LocaleInformation_uz.java,
+	gnu/java/locale/LocaleInformation_uz_AF.java,
+	gnu/java/locale/LocaleInformation_vi.java,
+	gnu/java/locale/LocaleInformation_zh.java,
+	gnu/java/locale/LocaleInformation_zh_CN_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_HK_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_MO_Hant.java,
+	gnu/java/locale/LocaleInformation_zh_SG_Hans.java,
+	gnu/java/locale/LocaleInformation_zh_TW_Hant.java:
+	Regenerated.
+  
+2005-01-04  Tom Tromey  <tromey@redhat.com>
+  
+	* vm/reference/java/lang/VMProcess.java (VMProcess): Constructor
+	now package-private.
+	(processThread, workList, reapedPid, reapedExitValue, state, cmd,
+	env, dir, exception, pid, stdin, stdout, stderr, exitValue): Now
+	package-private.
+	(nativeSpawn, nativeReap): Likewise.
+	* vm/reference/java/lang/VMThread.java (currentThread): Reordered
+	modifiers.
+	* vm/reference/java/security/VMAccessController.java
+	(DEFAULT_CONTEXT): Reordered modifiers.
+  
+	* gnu/java/nio/SelectorImpl.java: Removed unused import.
+	* gnu/java/security/der/DERWriter.java: Removed unused import.
+	* gnu/java/net/protocol/http/Connection.java: Removed unused
+	import.
+	* gnu/java/nio/PipeImpl.java (read): Reordered modifiers.  Fixed
+	indentation.
+  	(write): Likewise.
+	* gnu/java/rmi/server/ConnectionRunnerPool.java
+	(getConnectionRunner): Reordered modifiers.
+	* gnu/java/text/FormatCharacterIterator.java (debug): Removed
+	useless `final'.
+	(dumpTable): Likewise.
+	* gnu/java/net/PlainDatagramSocketImpl.java (bind): Reordered
+  	modifiers.
+	(create, setOption, getOption, close, join, leave): Likewise.
+	* gnu/java/net/PlainSocketImpl.java (create): Reordered
+	modifiers.
+	(bind, listen, accept): Likewise.
+  
+2005-01-04  Tom Tromey  <tromey@redhat.com>
+  
+	* Makefile.am (EXTRA_DIST): Added ChangeLog-2004.
+  
+2005-01-04  Robert Schuster <thebohemian@gmx.net>
+  
+       * gnu/java/beans/DummyAppletStub.java: Add dummy implementation
+       of AppletStub for java.beans.Beans.instantiate.
+       * gnu/java/beans/DummyAppletContext.java: Add dummy implementation
+       of AppletContext.
+       * java/beans/Beans: Added 1.4 functionality, fixed user documentation
+       to be conformant with Javadoc guidelines.
+       (instantiate): Added two more overloaded variants, reworked user
+       documentation, fixed exception behavior, fixed behavior when
+       deserializing null.
+  
+2005-01-03  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(getControlTextFont): New method.
+	(getMenuTextFont): Likewise.
+	(getSubTextFont): Likewise.
+	(getSystemTextFont): Likewise.
+	(getUserTextFont): Likewise.
+	(getWindowTitleFont): Likewise.
+  
+2005-01-03  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/text/AbstractDocument.java
+	(documentFilter): New field.
+	(getDocumentFilter): New method.
+	(setDocumentFilter): Likewise.
+  	(dump): Likewise.
+  
+2005-01-03  Michael Koch  <konqueror@gmx.de>
+  
+  	* javax/swing/JTree.java
+	(DynamicUtilTreeNode.hasChildren): Clarify javadoc.
+  
+2005-01-03  Thomas Fitzsimmons  <fitzsim@redhat.com>
+  
+	* gnu/java/awt/ClasspathToolkit.java (createRobot): New method.
+	* gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java
+	(getDefaultScreenDevice): Implement.
+	* gnu/java/awt/peer/gtk/GdkRobotPeer.java: New file.
+	* gnu/java/awt/peer/gtk/GdkScreenGraphicsDevice.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java (createRobot): New method.
+	* java/awt/Robot.java: Implement.
+	* java/awt/peer/RobotPeer.java: Rename parameters.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkRobotPeer.c: New file.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkComponentPeer.c
+	(awt_keycode_to_keysym): Make non-static.
+	* native/jni/gtk-peer/gtkpeer.h (AWT_BUTTON1_MASK, AWT_BUTTON2_MASK,
+	AWT_BUTTON3_MASK): Declare constants.
+	(awt_keycode_to_keysym): Declare.
+
+2005-01-03  Michael Koch  <konqueror@gmx.de>
+
+	* configure.ac: Check for X11 stuff when GTK peer is enabled.
+	* include/Makefile.am: Generate gnu_java_awt_peer_gtk_GdkRobotPeer.h.
+	* include/gnu_java_awt_peer_gtk_GdkRobotPeer.h: New files.
+	* native/jni/gtk-peer/Makefile.am: Link libXtst.
+	Added gnu_java_awt_peer_gtk_GdkRobotPeer.c to the build.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkRobotPeer.c:
+	Added "__attribute__((__unused__))" all over.
+
+2005-01-03  Michael Koch  <konqueror@gmx.de>
+
+	* java/net/InetAddress.java: Made all hexadecimal numbers lowercase.
+	Fixed typos in javadocs.
+	(isSiteLocalAddress): Fixed handling of byte values.
+	(isMCLinkLocal): Likewise.
+	* java/net/Inet4Address.java
+	(isMulticastAddress): Call super method.
+	(isLoopbackAddress): Likewise.
+	(isAnyLocalAddress): Likewise.
+	(isLinkLocalAddress): Likewise.
+	(isSiteLocalAddress): Likewise.
+	(isMCGlobal): Likewise.
+	(isMCNodeLocal): Likewise.
+	(isMCLinkLocal): Likewise.
+	(isMCSiteLocal): Likewise.
+	(isMCOrgLocal): Likewise.
+	(getHostAddress): Likewise.
+
+2005-01-02  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/beans/decoder/DummyHandler.java: Add return statements for
+	failing methods.
+	* gnu/java/beans/decoder/DummyContext.java: Likewise.
+
+2005-01-02  Robert Schuster  <theBohemian@gmx.net>
+
+	* gnu/java/beans/decoder/AbstractContext.java,
+	gnu/java/beans/decoder/AbstractCreatableContext.java,
+	gnu/java/beans/decoder/AbstractElementHandler.java,
+	gnu/java/beans/decoder/AbstractObjectContext.java,
+	gnu/java/beans/decoder/ArrayContext.java,
+	gnu/java/beans/decoder/ArrayHandler.java,
+	gnu/java/beans/decoder/BooleanHandler.java,
+	gnu/java/beans/decoder/ByteHandler.java,
+	gnu/java/beans/decoder/CharHandler.java,
+	gnu/java/beans/decoder/ClassHandler.java,
+	gnu/java/beans/decoder/ConstructorContext.java,
+	gnu/java/beans/decoder/Context.java,
+	gnu/java/beans/decoder/DecoderContext.java,
+	gnu/java/beans/decoder/DefaultExceptionListener.java,
+	gnu/java/beans/decoder/DoubleHandler.java,
+	gnu/java/beans/decoder/DummyContext.java,
+	gnu/java/beans/decoder/DummyHandler.java,
+	gnu/java/beans/decoder/ElementHandler.java,
+	gnu/java/beans/decoder/FloatHandler.java,
+	gnu/java/beans/decoder/GrowableArrayContext.java,
+	gnu/java/beans/decoder/IndexContext.java,
+	gnu/java/beans/decoder/IntHandler.java,
+	gnu/java/beans/decoder/JavaHandler.java,
+	gnu/java/beans/decoder/LongHandler.java,
+	gnu/java/beans/decoder/MethodContext.java,
+	gnu/java/beans/decoder/MethodFinder.java,
+	gnu/java/beans/decoder/NullHandler.java,
+	gnu/java/beans/decoder/ObjectContext.java,
+	gnu/java/beans/decoder/ObjectHandler.java,
+	gnu/java/beans/decoder/PersistenceParser.java,
+	gnu/java/beans/decoder/PropertyContext.java,
+	gnu/java/beans/decoder/ShortHandler.java,
+	gnu/java/beans/decoder/SimpleHandler.java,
+	gnu/java/beans/decoder/StaticMethodContext.java,
+	gnu/java/beans/decoder/StringHandler.java,
+	gnu/java/beans/decoder/VoidHandler.java: New class
+	implementing java.beans.XMLDecoder decoding functionality.
+	* java/beans/XMLDecoder.java: New class.
+
+2005-01-02  Mark Wielaard  <mark@klomp.org>
+
+	* acinclude.m4 (REGEN_WITH_JAY): New macro.
+	* configure.ac: Call REGEN_WITH_JAY.
+	* lib/Makefile.am (gen-xpath-parser): New rule, depends on
+	REGEN_PARSER being defined.
+	(genclasses): Depend on gen-xpath-parser.
+
+2005-01-02  Archie Cobbs  <archie@dellroad.org>
+
+	* vm/reference/java/lang/VMThread.java (sleep()): revert behavior
+	of sleep(0,0) to previous, where we check for InterruptedException.
+
+2005-01-02  Mark Wielaard  <mark@klomp.org>
+
+	* ChangeLog.gnujaxp.1: New (historic) ChangeLog file.
+	* ChangeLog.gnujaxp.2: Likewise.
+	* ChangeLog.libxmlj: Likewise.
+	* Makefile.am (EXTRA_DIST): List new ChangeLog files.
+	* INSTALL: Add libxml2 and libxslt requirements for --enable-xmlj.
+	* doc/README.jaxp: New file.
+	* doc/Makefile.am (EXTRA_DIST): List new README.jaxp
+	* native/jni/xmlj/BUGS: New file.
+	* native/jni/xmlj/Makefile.am (EXTRA_DIST): List new BUGS file.
+
+2005-01-02  Mark Wielaard  <mark@klomp.org>
+
+	* lib/gen-classlist.sh.in: Use test -ef and echo top_srcdir and
+	top_builddir locations.
+
+2005-01-02  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Fix pkg checks for libxml-2.0 and libxslt.
+	* native/jni/xmlj/Makefile.am (AM_CFLAGS): Add STRICT_WARNING_CFLAGS
+	but disable ERROR_CFLAGS.
+	* native/jni/xmlj/xmlj_dom.c: Add __attribute__ ((__unused__)) where
+	obvious.
+	* native/jni/xmlj/xmlj_sax.c: Likewise.
+	* native/jni/xmlj/xmlj_transform.c: Likewise.
+	* native/jni/xmlj/xmlj_xpath.c: Likewise.
+  
+2005-01-02  Michael Koch  <konqueror@gmx.de>
+  
+  	* javax/swing/text/AbstractDocument.java
+	(AbstractElement.getLength): Fixed off-by-one error.
+	(AbstractElement.children): Made abstract.
+	(AbstractElement.getAllowsChildren): Likewise.
+	(AbstractElement.getElement): Likewise.
+	(AbstractElement.dumpElement): New private method.
+	(AbstractElement.dump): New method.
+	(BranchElememt.getName): Fixed implementation.
+	(BranchElememt.toString): Likewise.
+	(BranchElememt.getElement): Fixed arguments.
+	(LeafElement.getName): Fixed implementation.
+	(LeafElement.toString): Likewise.
+	* javax/swing/text/GapContent.java
+	(GapContent): Put default content into buffer.
+  	* javax/swing/text/PlainDocument.java
+	(reindex): Use empty attribute sets instead of null.
+	(createDefaultRoot): Reimplemented.
+	(insertUpdate): Call super method.
+	(removeUpdate): Likewise.
+	(getParagraphElement): Implemented.
+  
 2005-01-02  Tom Tromey  <tromey@redhat.com>
 
 	* java/io/PrintStream.java: Implement Appendable.
@@ -305,3 +1353,8 @@
 	* java/lang/System.java (getenv(String)): Rewrote.
 	(getenv): New method.
 	* vm/reference/java/lang/VMSystem.java (getenv): New methods.
+
+2005-01-01  Michael Koch  <konqueror@gmx.de>
+  
+	* javax/swing/DefaultBoundedRangeModel.java
+	(fireValueChanged): Fixed off-by-one error.

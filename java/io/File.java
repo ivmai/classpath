@@ -1,5 +1,5 @@
 /* File.java -- Class representing a file on disk
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -39,6 +39,8 @@ exception statement from your version. */
 
 package java.io;
 
+import gnu.classpath.SystemProperties;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -67,7 +69,7 @@ public class File implements Serializable, Comparable
    * contains the value of the <code>file.separator</code> system property.
    * An example separator string would be "/" on the GNU system.
    */
-  public static final String separator = System.getProperty("file.separator");
+  public static final String separator = SystemProperties.getProperty("file.separator");
   private static final String dupSeparator = separator + separator;
 
   /**
@@ -84,7 +86,7 @@ public class File implements Serializable, Comparable
    * the <code>path.separator</code> system property.
    */
   public static final String pathSeparator
-    = System.getProperty("path.separator");
+    = SystemProperties.getProperty("path.separator");
   
   /**
    * This is the first character of the string used to separate the host name

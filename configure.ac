@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.12+cvs],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.13+cvs],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -53,6 +53,19 @@ AC_ARG_ENABLE([Werror],
                 *) ENABLE_WERROR=yes ;;
               esac],
               [ENABLE_WERROR=no])
+
+dnl -----------------------------------------------------------
+dnl Native libxml/xslt library (disabled by default)
+dnl -----------------------------------------------------------
+AC_ARG_ENABLE([xmlj],
+              [AS_HELP_STRING(--enable-xmlj,compile native libxml/xslt library [default=no])],
+              [case "${enableval}" in
+                yes) COMPILE_XMLJ=yes ;;
+                no) COMPILE_XMLJ=no ;;
+                *) COMPILE_XMLJ=no ;;
+              esac],
+              [COMPILE_XMLJ=no])
+AM_CONDITIONAL(CREATE_XMLJ_LIBRARY, test "x${COMPILE_XMLJ}" = xyes)
 
 dnl -----------------------------------------------------------
 dnl GTK native peer (enabled by default)
@@ -128,6 +141,8 @@ if test "x${COMPILE_JNI}" = xyes; then
   AC_CHECK_HEADERS([unistd.h sys/types.h sys/config.h sys/ioctl.h asm/ioctls.h])
   AC_CHECK_HEADERS([inttypes.h stdint.h utime.h sys/utime.h sys/filio.h])
   AC_CHECK_HEADERS([sys/time.h])
+  dnl Check for crt_externs.h on Darwin.
+  AC_CHECK_HEADERS([crt_externs.h])
 
   AC_EGREP_HEADER(uint32_t, stdint.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(uint32_t, inttypes.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
@@ -196,9 +211,28 @@ if test "x${COMPILE_JNI}" = xyes; then
     AC_SUBST(ERROR_CFLAGS)
   fi
 
+  dnl Check for libxml and libxslt libraries (when xmlj is enabled).
+  if test "x${COMPILE_XMLJ}" = xyes
+  then
+    PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.6.8)
+    PKG_CHECK_MODULES(XSLT, libxslt >= 1.1.11)
+    AC_SUBST(XML_LIBS)
+    AC_SUBST(XML_CFLAGS)
+    AC_SUBST(XSLT_LIBS)
+    AC_SUBST(XSLT_CFLAGS)
+  fi
+
   dnl Check for AWT related gthread/gtk/libart_lgpl
   if test "x${COMPILE_GTK_PEER}" = xyes; then
-     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.4 gthread-2.0 >= 2.2 libart-2.0)
+     AC_PATH_XTRA
+     if test "$no_x" = yes; then
+         AC_MSG_ERROR([GTK+ peers requested but no X library available])
+     fi
+     dnl We explicitly want the XTest Extension for Robot support.
+     AC_CHECK_LIB([Xtst], [XTestQueryExtension], [true],
+		  [AC_MSG_ERROR([libXtst NOT found, required for GdkRobot])],
+		  [${X_LIBS}])
+     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.4 gthread-2.0 >= 2.2 libart-2.0 gdk-pixbuf-2.0)
      AC_SUBST(GTK_CFLAGS)
      AC_SUBST(GTK_LIBS)
   fi
@@ -332,7 +366,12 @@ CLASSPATH_WITH_GLIBJ
 dnl -----------------------------------------------------------
 dnl Enable API documentation generation (disabled by default)
 dnl -----------------------------------------------------------
-CLASSPATH_ENABLE_GJDOC
+CLASSPATH_WITH_GJDOC
+
+dnl -----------------------------------------------------------
+dnl Whether to use jay to regenerate parsers.
+dnl -----------------------------------------------------------
+REGEN_WITH_JAY
 
 dnl -----------------------------------------------------------
 dnl This sets the build-time default, which can now be overridden 
@@ -358,6 +397,9 @@ dnl -----------------------------------------------------------
 AC_CONFIG_FILES([Makefile
 doc/Makefile
 doc/api/Makefile
+external/Makefile
+external/sax/Makefile
+external/w3c_dom/Makefile
 gnu/classpath/Configuration.java
 include/Makefile
 native/Makefile
@@ -370,23 +412,11 @@ native/jni/java-net/Makefile
 native/jni/java-nio/Makefile
 native/jni/java-util/Makefile
 native/jni/gtk-peer/Makefile
+native/jni/xmlj/Makefile
 native/target/Makefile
 native/target/Linux/Makefile
 native/target/generic/Makefile
 resource/Makefile
-resource/gnu/Makefile
-resource/gnu/java/Makefile
-resource/gnu/java/awt/Makefile
-resource/gnu/java/awt/peer/Makefile
-resource/gnu/java/awt/peer/gtk/Makefile
-resource/gnu/regexp/Makefile
-resource/java/Makefile
-resource/java/util/Makefile
-resource/java/util/logging/Makefile
-resource/java/security/Makefile
-resource/org/Makefile
-resource/org/ietf/Makefile
-resource/org/ietf/jgss/Makefile
 scripts/Makefile
 lib/Makefile
 lib/gen-classlist.sh

@@ -118,7 +118,7 @@ public class DefaultListSelectionModel implements Cloneable,
    * @see #isLeadAnchorNotificationEnabled
    * @see #setLeadAnchorNotificationEnabled
    */
-  boolean leadAnchorNotificationEnabled = true;
+  protected boolean leadAnchorNotificationEnabled = true;
 
 
   /**
@@ -514,6 +514,18 @@ public class DefaultListSelectionModel implements Cloneable,
       sel.set(lo + i, tmp.get(i));
   }
 
+  /**
+   * Fires a {@link ListSelectionEvent} to all the listeners of type {@link
+   * ListSelectionListener} registered with this selection model.
+   *
+   * @param firstIndex The low index of the changed range
+   * @param lastIndex The high index of the changed range
+   */
+  protected void fireValueChanged(int firstIndex, int lastIndex)
+  {
+    fireValueChanged(firstIndex, lastIndex, getValueIsAdjusting());
+  }
+  
   /**
    * Fires a {@link ListSelectionEvent} to all the listeners of type {@link
    * ListSelectionListener} registered with this selection model.

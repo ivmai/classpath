@@ -37,7 +37,7 @@ exception statement from your version.  */
 
 package gnu.java.net.protocol.file;
 
-import gnu.java.security.action.GetPropertyAction;
+import gnu.classpath.SystemProperties;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -73,14 +73,19 @@ public class Connection extends URLConnection
    */
   private static final String DEFAULT_PERMISSION = "read";
 
-  /**
-   * HTTP-style DateFormat, used to format the last-modified header.
-   */
-  private static SimpleDateFormat dateFormat
-    = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'",
-                           new Locale ("En", "Us", "Unix"));
+  private static class StaticData
+  {
+    /**
+     * HTTP-style DateFormat, used to format the last-modified header.
+     */
+    static SimpleDateFormat dateFormat
+      = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'",
+                             new Locale ("En", "Us", "Unix"));
 
-  private static String lineSeparator;
+    static String lineSeparator =
+      SystemProperties.getProperty("line.separator");
+  }
+
   
   /**
    * This is a File object for this connection
@@ -136,17 +141,11 @@ public class Connection extends URLConnection
       {
 	if (doInput)
 	  {
-	    if (lineSeparator == null)
-	      {
-		GetPropertyAction getProperty = new GetPropertyAction("line.separator");
-		lineSeparator = (String) AccessController.doPrivileged(getProperty);
-	      }
-	    
 	    StringBuffer sb = new StringBuffer();
 	    String[] files = file.list();
 
 	    for (int index = 0; index < files.length; ++index)
-	       sb.append(files[index]).append(lineSeparator);
+	       sb.append(files[index]).append(StaticData.lineSeparator);
 
 	    inputStream = new ByteArrayInputStream(sb.toString().getBytes());
 	  }
@@ -234,9 +233,10 @@ public class Connection extends URLConnection
           return Long.toString(file.length());
 	else if (field.equals("last-modified"))
 	  {
-	    synchronized (dateFormat)
+	    synchronized (StaticData.dateFormat)
 	      {
-        	return dateFormat.format(new Date(file.lastModified()));
+        	return StaticData.dateFormat.format(
+                        new Date(file.lastModified()));
 	      }
 	  }
       }

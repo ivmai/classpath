@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.lang;
 
+import gnu.classpath.VMStackWalker;
+
 import java.awt.AWTPermission;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -130,6 +132,14 @@ import java.util.StringTokenizer;
 public class SecurityManager
 {
   /**
+   * The current security manager. This is located here instead of in
+   * System, to avoid security problems, as well as bootstrap issues.
+   * Make sure to access it in a thread-safe manner; it is package visible
+   * to avoid overhead in java.lang.
+   */
+  static volatile SecurityManager current;
+
+  /**
    * Tells whether or not the SecurityManager is currently performing a
    * security check.
    * @deprecated Use {@link #checkPermission(Permission)} instead.
@@ -171,7 +181,10 @@ public class SecurityManager
    */
   protected Class[] getClassContext()
   {
-    return VMSecurityManager.getClassContext();
+    Class[] stack1 = VMStackWalker.getClassContext();
+    Class[] stack2 = new Class[stack1.length - 1];
+    System.arraycopy(stack1, 1, stack2, 0, stack1.length - 1);
+    return stack2;
   }
 
   /**
@@ -193,7 +206,8 @@ public class SecurityManager
    */
   protected ClassLoader currentClassLoader()
   {
-    return VMSecurityManager.currentClassLoader();
+    Class cl = currentLoadedClass();
+    return cl != null ? cl.getClassLoader() : null;
   }
 
   /**

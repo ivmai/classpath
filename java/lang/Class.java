@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.lang;
 
+import gnu.classpath.VMStackWalker;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -130,7 +132,14 @@ public final class Class<T> implements Serializable
   Class(Object vmdata, ProtectionDomain pd)
   {
     this.vmdata = vmdata;
-    this.pd = pd;
+    // If the VM didn't supply a protection domain and the class is an array,
+    // we "inherit" the protection domain from the component type class. This
+    // saves the VM from having to worry about protection domains for array
+    // classes.
+    if (pd == null && isArray())
+      this.pd = getComponentType().pd;
+    else
+      this.pd = pd;
   }
 
   /**
@@ -151,7 +160,7 @@ public final class Class<T> implements Serializable
     Class<?> result = VMClass.forName (name);
     if (result == null)
       result = Class.forName(name, true,
-			     VMSecurityManager.getClassContext()[1].getClassLoader());
+	VMStackWalker.getCallingClassLoader());
     return result;
   }
 
@@ -189,12 +198,11 @@ public final class Class<T> implements Serializable
     if (classloader == null)
       {
         // Check if we may access the bootstrap classloader
-        SecurityManager sm = System.getSecurityManager();
+        SecurityManager sm = SecurityManager.current;
         if (sm != null)
           {
-            // Get the calling class and classloader
-            Class<?> c = VMSecurityManager.getClassContext()[1];
-            ClassLoader cl = c.getClassLoader();
+            // Get the calling classloader
+            ClassLoader cl = VMStackWalker.getCallingClassLoader();
             if (cl != null)
               sm.checkPermission(new RuntimePermission("getClassLoader"));
           }
@@ -269,12 +277,11 @@ public final class Class<T> implements Serializable
 
     ClassLoader loader = VMClass.getClassLoader(this);
     // Check if we may get the classloader
-    SecurityManager sm = System.getSecurityManager();
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       {
-        // Get the calling class and classloader
-        Class c = VMSecurityManager.getClassContext()[1];
-        ClassLoader cl = VMClass.getClassLoader(c);
+        // Get the calling classloader
+	ClassLoader cl = VMStackWalker.getCallingClassLoader();
         if (cl != null && !cl.isAncestorOf(loader))
           sm.checkPermission(new RuntimePermission("getClassLoader"));
       }
@@ -1126,8 +1133,9 @@ public final class Class<T> implements Serializable
     int modifiers = constructor.getModifiers();
     if (!Modifier.isPublic(modifiers))
       {
-	Class caller = VMSecurityManager.getClassContext()[1];
-	if (caller != this &&
+	Class caller = VMStackWalker.getCallingClass();
+	if (caller != null &&
+	    caller != this &&
 	    (Modifier.isPrivate(modifiers)
 	     || getClassLoader() != caller.getClassLoader()
 	     || !getPackagePortion(getName())
@@ -1162,7 +1170,7 @@ public final class Class<T> implements Serializable
    */
   public ProtectionDomain getProtectionDomain()
   {
-    SecurityManager sm = System.getSecurityManager();
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       sm.checkPermission(new RuntimePermission("getProtectionDomain"));
 
@@ -1214,7 +1222,8 @@ public final class Class<T> implements Serializable
         }
     else
       {
-        status = ClassLoader.systemClassAssertionStatus.get(getName());
+        status = ClassLoader.StaticData.
+                    systemClassAssertionStatus.get(getName());
         if (status != null)
           return status.equals(Boolean.TRUE);
       }
@@ -1238,11 +1247,13 @@ public final class Class<T> implements Serializable
       {
         String name = getPackagePortion(getName());
         if ("".equals(name))
-          status = ClassLoader.systemPackageAssertionStatus.get(null);
+          status = ClassLoader.StaticData.
+                    systemPackageAssertionStatus.get(null);
         else
           do
             {
-              status = ClassLoader.systemPackageAssertionStatus.get(name);
+              status = ClassLoader.StaticData.
+                        systemPackageAssertionStatus.get(name);
               name = getPackagePortion(name);
             }
           while (! "".equals(name) && status == null);
@@ -1321,7 +1332,7 @@ public final class Class<T> implements Serializable
    */
   private void memberAccessCheck(int which)
   {
-    SecurityManager sm = System.getSecurityManager();
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       {
 	sm.checkMemberAccess(this, which);

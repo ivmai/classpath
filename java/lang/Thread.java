@@ -317,7 +317,7 @@ public class Thread implements Runnable
   public Thread(ThreadGroup group, Runnable target, String name, long size)
   {
     // Bypass System.getSecurityManager, for bootstrap efficiency.
-    SecurityManager sm = Runtime.securityManager;
+    SecurityManager sm = SecurityManager.current;
     Thread current = currentThread();
     if (group == null)
       {
@@ -388,7 +388,7 @@ public class Thread implements Runnable
   public final void checkAccess()
   {
     // Bypass System.getSecurityManager, for bootstrap efficiency.
-    SecurityManager sm = Runtime.securityManager;
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       sm.checkAccess(this);
   }
@@ -703,7 +703,7 @@ public class Thread implements Runnable
   public synchronized ClassLoader getContextClassLoader()
   {
     // Bypass System.getSecurityManager, for bootstrap efficiency.
-    SecurityManager sm = Runtime.securityManager;
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       // XXX Don't check this if the caller's class loader is an ancestor.
       sm.checkPermission(new RuntimePermission("getClassLoader"));
@@ -724,7 +724,7 @@ public class Thread implements Runnable
    */
   public synchronized void setContextClassLoader(ClassLoader classloader)
   {
-    SecurityManager sm = System.getSecurityManager();
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setContextClassLoader"));
     this.contextClassLoader = classloader;
@@ -769,11 +769,11 @@ public class Thread implements Runnable
    * are no guarantees which thread will be next to run, but most VMs will
    * choose the highest priority thread that has been waiting longest.
    *
-   * @param ms the number of milliseconds to sleep, or 0 for forever
-   * @throws InterruptedException if the Thread is interrupted; it's
-   *         <i>interrupted status</i> will be cleared
-   * @see #notify()
-   * @see #wait(long)
+   * @param ms the number of milliseconds to sleep.
+   * @throws InterruptedException if the Thread is (or was) interrupted;
+   *         it's <i>interrupted status</i> will be cleared
+   * @throws IllegalArgumentException if ms is negative
+   * @see #interrupt()
    */
   public static void sleep(long ms) throws InterruptedException
   {
@@ -785,26 +785,30 @@ public class Thread implements Runnable
    * time. The Thread will not lose any locks it has during this time. There
    * are no guarantees which thread will be next to run, but most VMs will
    * choose the highest priority thread that has been waiting longest.
+   * <p>
+   * Note that 1,000,000 nanoseconds == 1 millisecond, but most VMs
+   * do not offer that fine a grain of timing resolution. When ms is
+   * zero and ns is non-zero the Thread will sleep for at least one
+   * milli second. There is no guarantee that this thread can start up
+   * immediately when time expires, because some other thread may be
+   * active.  So don't expect real-time performance.
    *
-   * <p>Note that 1,000,000 nanoseconds == 1 millisecond, but most VMs do
-   * not offer that fine a grain of timing resolution. Besides, there is
-   * no guarantee that this thread can start up immediately when time expires,
-   * because some other thread may be active.  So don't expect real-time
-   * performance.
-   *
-   * @param ms the number of milliseconds to sleep, or 0 for forever
+   * @param ms the number of milliseconds to sleep
    * @param ns the number of extra nanoseconds to sleep (0-999999)
-   * @throws InterruptedException if the Thread is interrupted; it's
-   *         <i>interrupted status</i> will be cleared
-   * @throws IllegalArgumentException if ns is invalid
-   * @see #notify()
-   * @see #wait(long, int)
+   * @throws InterruptedException if the Thread is (or was) interrupted;
+   *         it's <i>interrupted status</i> will be cleared
+   * @throws IllegalArgumentException if ms or ns is negative
+   *         or ns is larger than 999999.
+   * @see #interrupt()
    */
   public static void sleep(long ms, int ns) throws InterruptedException
   {
-    if(ms < 0 || ns < 0 || ns > 999999)
-	throw new IllegalArgumentException();
 
+    // Check parameters
+    if (ms < 0 || ns < 0 || ns > 999999)
+      throw new IllegalArgumentException();
+
+    // Really sleep
     VMThread.sleep(ms, ns);
   }
 
@@ -887,7 +891,7 @@ public class Thread implements Runnable
     if (t == null)
       throw new NullPointerException();
     // Bypass System.getSecurityManager, for bootstrap efficiency.
-    SecurityManager sm = Runtime.securityManager;
+    SecurityManager sm = SecurityManager.current;
     if (sm != null)
       {
         sm.checkAccess(this);

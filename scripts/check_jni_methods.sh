@@ -1,24 +1,24 @@
 #!/bin/sh
 
-TMPFILE=`mktemp`
-TMPFILE2=`mktemp`
-TMPFILE3=`mktemp`
+pattern=/tmp/check-jni-methods.XXXXXX
+TMPFILE=`mktemp $pattern` || { echo >&2 "$0: Unable to make temp file; aborting" ; exit 3; }
+TMPFILE2=`mktemp $pattern` || { echo >&2 "$0: Unable to make temp file; aborting" ; exit 3; }
+TMPFILE3=`mktemp $pattern` || { echo >&2 "$0: Unable to make temp file; aborting" ; exit 3; }
 
 # Find all methods defined in the header files generated
 # from the java source files.
 grep -h '^JNIEXPORT .* Java_' include/*.h | \
-	sed -e 's,^JNIEXPORT .* JNICALL \(Java_\w*\) (.*$,\1,' | \
+        sed -e 's,.*JNICALL \(Java_[a-z_A-Z0-9]*\).*$,\1,' | \
 	sort > $TMPFILE
 
 # Find all methods in the JNI C source files.
 find native/jni -name \*.c | \
 	xargs grep -h '^Java_' | \
-	sed -e 's,^\(Java_\w*\) *(.*$,\1,' \
-	| sort > $TMPFILE2
+        sed -e 's,^\(Java_[a-z_A-Z0-9]*\) *(.*$,\1,' | \
+	sort > $TMPFILE2
 
 # Write temporary ignore file.
 cat > $TMPFILE3 << EOF
--Java_gnu_java_awt_peer_gtk_GtkFramePeer_nativeSetIconImageFromData
 -Java_gnu_java_awt_peer_gtk_GtkMenuComponentPeer_dispose
 -Java_java_lang_VMSystem_arraycopy
 -Java_java_lang_VMSystem_identityHashCode

@@ -286,7 +286,7 @@ public final class StringBuffer
   {
     if (srcOffset < 0 || srcEnd > count || srcEnd < srcOffset)
       throw new StringIndexOutOfBoundsException();
-    System.arraycopy(value, srcOffset, dst, dstOffset, srcEnd - srcOffset);
+    VMSystem.arraycopy(value, srcOffset, dst, dstOffset, srcEnd - srcOffset);
   }
 
   /**
@@ -357,7 +357,7 @@ public final class StringBuffer
       {
         int len = stringBuffer.count;
         ensureCapacity_unsynchronized(count + len);
-        System.arraycopy(stringBuffer.value, 0, value, count, len);
+        VMSystem.arraycopy(stringBuffer.value, 0, value, count, len);
         count += len;
       }
     return this;
@@ -397,7 +397,7 @@ public final class StringBuffer
     if (offset < 0 || count < 0 || offset > data.length - count)
       throw new StringIndexOutOfBoundsException();
     ensureCapacity_unsynchronized(this.count + count);
-    System.arraycopy(data, offset, value, this.count, count);
+    VMSystem.arraycopy(data, offset, value, this.count, count);
     this.count += count;
     return this;
   }
@@ -543,7 +543,7 @@ public final class StringBuffer
     // This will unshare if required.
     ensureCapacity_unsynchronized(count);
     if (count - end != 0)
-      System.arraycopy(value, end, value, start, count - end);
+      VMSystem.arraycopy(value, end, value, start, count - end);
     count -= end - start;
     return this;
   }
@@ -586,7 +586,7 @@ public final class StringBuffer
     ensureCapacity_unsynchronized(count + delta);
 
     if (delta != 0 && end < count)
-      System.arraycopy(value, end, value, end + delta, count - end);
+      VMSystem.arraycopy(value, end, value, end + delta, count - end);
 
     str.getChars(0, len, value, start);
     count += delta;
@@ -673,8 +673,8 @@ public final class StringBuffer
         || str_offset < 0 || str_offset > str.length - len)
       throw new StringIndexOutOfBoundsException();
     ensureCapacity_unsynchronized(count + len);
-    System.arraycopy(value, offset, value, offset + len, count - offset);
-    System.arraycopy(str, str_offset, value, offset, len);
+    VMSystem.arraycopy(value, offset, value, offset + len, count - offset);
+    VMSystem.arraycopy(str, str_offset, value, offset, len);
     count += len;
     return this;
   }
@@ -713,7 +713,7 @@ public final class StringBuffer
       str = "null";
     int len = str.count;
     ensureCapacity_unsynchronized(count + len);
-    System.arraycopy(value, offset, value, offset + len, count - offset);
+    VMSystem.arraycopy(value, offset, value, offset + len, count - offset);
     str.getChars(0, len, value, offset);
     count += len;
     return this;
@@ -764,7 +764,7 @@ public final class StringBuffer
     if (offset < 0 || offset > count)
       throw new StringIndexOutOfBoundsException(offset);
     ensureCapacity_unsynchronized(count + 1);
-    System.arraycopy(value, offset, value, offset + 1, count - offset);
+    VMSystem.arraycopy(value, offset, value, offset + 1, count - offset);
     value[offset] = ch;
     count++;
     return this;
@@ -960,7 +960,7 @@ public final class StringBuffer
                    : value.length);
         minimumCapacity = (minimumCapacity < max ? max : minimumCapacity);
         char[] nb = new char[minimumCapacity];
-        System.arraycopy(value, 0, nb, 0, count);
+        VMSystem.arraycopy(value, 0, nb, 0, count);
         value = nb;
         shared = false;
       }

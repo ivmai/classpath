@@ -388,11 +388,14 @@ public class Container extends Component
               layoutMgr.addLayoutComponent(null, comp);
           }
 
-        // Post event to notify of adding the container.
-        ContainerEvent ce = new ContainerEvent(this,
-                                               ContainerEvent.COMPONENT_ADDED,
-                                               comp);
-        getToolkit().getSystemEventQueue().postEvent(ce);
+        if (isShowing ())
+          {
+            // Post event to notify of adding the component.
+            ContainerEvent ce = new ContainerEvent(this,
+                                                   ContainerEvent.COMPONENT_ADDED,
+                                                   comp);
+            getToolkit().getSystemEventQueue().postEvent(ce);
+          }
       }
   }
 
@@ -420,11 +423,14 @@ public class Container extends Component
 
         r.parent = null;
 
-        // Post event to notify of adding the container.
-        ContainerEvent ce = new ContainerEvent(this,
-                                               ContainerEvent.COMPONENT_REMOVED,
-                                               r);
-        getToolkit().getSystemEventQueue().postEvent(ce);
+        if (isShowing ())
+          {
+            // Post event to notify of removing the component.
+            ContainerEvent ce = new ContainerEvent(this,
+                                                   ContainerEvent.COMPONENT_REMOVED,
+                                                   r);
+            getToolkit().getSystemEventQueue().postEvent(ce);
+          }
       }
   }
 

@@ -78,6 +78,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.CropImageFilter;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
+import java.awt.image.DirectColorModel;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
@@ -99,18 +100,20 @@ public class GdkGraphics2D extends Graphics2D
   //////////////////////////////////////
   ////// State Management Methods //////
   //////////////////////////////////////
-  static
-    {
-      if (Configuration.INIT_LOAD_LIBRARY)
-	System.loadLibrary("gtkpeer");
 
-      if (GtkToolkit.useGraphics2D())
-	initStaticState();
-    }
+  static 
+  {
+    if (Configuration.INIT_LOAD_LIBRARY)
+      System.loadLibrary("gtkpeer");
 
+    if (GtkToolkit.useGraphics2D())
+      initStaticState();
+  }
+  
   static native void initStaticState();
+  
+  private final int native_state = GtkGenericPeer.getUniqueInteger();  
 
-  private final int native_state = GtkGenericPeer.getUniqueInteger();
   private Paint paint;
   private Stroke stroke;
   private Color fg;
@@ -121,21 +124,17 @@ public class GdkGraphics2D extends Graphics2D
   private Font font;
   private RenderingHints hints;
   private BufferedImage bimage;
+  private boolean pixelConversionRequired;
+  private int[] pixelBuffer;
   private Composite comp;
   private Stack stateStack;
 
   private native void initState(GtkComponentPeer component);
-
   private native void initState(int width, int height);
-
+  private native void initState(int[] pixes, int width, int height);
   private native void copyState(GdkGraphics2D g);
-
   public native void dispose();
-
-  private native int[] getImagePixels();
-
   private native void cairoSurfaceSetFilter(int filter);
-
   native void connectSignals(GtkComponentPeer component);
 
   public void finalize()
@@ -238,7 +237,20 @@ public class GdkGraphics2D extends Graphics2D
   GdkGraphics2D(BufferedImage bimage)
   {
     this.bimage = bimage;
-    initState(bimage.getWidth(), bimage.getHeight());
+    this.pixelBuffer = findSimpleIntegerArray(bimage.getColorModel(),
+                                              bimage.getRaster());
+    if (this.pixelBuffer == null)
+      {
+	this.pixelBuffer = new int[bimage.getRaster().getWidth() * bimage.getRaster()
+	                                                                 .getHeight()];
+	this.pixelConversionRequired = true;
+      }
+    else
+      {
+        this.pixelConversionRequired = false;
+      }
+
+    initState(this.pixelBuffer, bimage.getWidth(), bimage.getHeight());
 
     setColor(Color.black);
     setBackground(Color.black);
@@ -251,81 +263,60 @@ public class GdkGraphics2D extends Graphics2D
     stateStack = new Stack();
 
     // draw current buffered image to the pixmap associated 
-    // with it.
-    drawImage(bimage, new AffineTransform(1, 0, 0, 1, 0, 0), bg, null);
+    // with it, if the image is not equal to our paint buffer.
+    if (pixelConversionRequired)
+      drawImage(bimage, new AffineTransform(1, 0, 0, 1, 0, 0), bg, null);
   }
 
   ////////////////////////////////////
   ////// Native Drawing Methods //////
   ////////////////////////////////////
+
   // GDK drawing methods
   private native void gdkDrawDrawable(GdkGraphics2D other, int x, int y);
 
   // drawing utility methods
   private native void drawPixels(int[] pixels, int w, int h, int stride,
                                  double[] i2u);
-
   private native void setTexturePixels(int[] pixels, int w, int h, int stride);
-
   private native void setGradient(double x1, double y1, double x2, double y2,
                                   int r1, int g1, int b1, int a1, int r2,
                                   int g2, int b2, int a2, boolean cyclic);
 
   // simple passthroughs to cairo
   private native void cairoSave();
-
   private native void cairoRestore();
-
   private native void cairoSetMatrix(double[] m);
-
   private native void cairoSetOperator(int cairoOperator);
-
   private native void cairoSetRGBColor(double red, double green, double blue);
-
   private native void cairoSetAlpha(double alpha);
-
   private native void cairoSetFillRule(int cairoFillRule);
-
   private native void cairoSetLineWidth(double width);
-
   private native void cairoSetLineCap(int cairoLineCap);
-
   private native void cairoSetLineJoin(int cairoLineJoin);
-
   private native void cairoSetDash(double[] dashes, int ndash, double offset);
 
   private native void cairoSetMiterLimit(double limit);
-
   private native void cairoNewPath();
-
   private native void cairoMoveTo(double x, double y);
-
   private native void cairoLineTo(double x, double y);
-
   private native void cairoCurveTo(double x1, double y1, double x2, double y2,
                                    double x3, double y3);
-
   private native void cairoRelMoveTo(double dx, double dy);
-
   private native void cairoRelLineTo(double dx, double dy);
-
   private native void cairoRelCurveTo(double dx1, double dy1, double dx2,
                                       double dy2, double dx3, double dy3);
-
   private native void cairoRectangle(double x, double y, double width,
                                      double height);
-
   private native void cairoClosePath();
-
   private native void cairoStroke();
-
   private native void cairoFill();
-
   private native void cairoClip();
 
   /////////////////////////////////////////////
   ////// General Drawing Support Methods //////
   /////////////////////////////////////////////
+
   private class DrawState
   {
     private Paint paint;
@@ -460,41 +451,55 @@ public class GdkGraphics2D extends Graphics2D
     return defaultHints;
   }
 
+  public static final int[] findSimpleIntegerArray (ColorModel cm, Raster raster)
+  {
+    if (cm == null || raster == null)
+      return null;
+
+    if (! cm.getColorSpace().isCS_sRGB())
+      return null;
+
+    if (! (cm instanceof DirectColorModel))
+      return null;
+
+    DirectColorModel dcm = (DirectColorModel) cm;
+
+    if (dcm.getRedMask() != 0x00FF0000 || dcm.getGreenMask() != 0x0000FF00
+        || dcm.getBlueMask() != 0x000000FF)
+      return null;
+
+    if (! (raster instanceof WritableRaster))
+      return null;
+
+    if (raster.getSampleModel().getDataType() != DataBuffer.TYPE_INT)
+      return null;
+
+    if (! (raster.getDataBuffer() instanceof DataBufferInt))
+      return null;
+
+    DataBufferInt db = (DataBufferInt) raster.getDataBuffer();
+
+    if (db.getNumBanks() != 1)
+      return null;
+
+    // Finally, we have determined that this is a single bank, [A]RGB-int
+    // buffer in sRGB space. It's worth checking all this, because it means
+    // that cairo can paint directly into the data buffer, which is very
+    // fast compared to all the normal copying and converting.
+
+    return db.getData();
+  }
+
   private final void updateBufferedImage()
   {
-    int[] pixels = getImagePixels();
-    updateImagePixels(pixels);
-  }
-
-  private final boolean isBufferedImageGraphics()
-  {
-    return bimage != null;
-  }
-
-  private final void updateImagePixels(int[] pixels)
-  {
-    // This function can only be used if 
-    // this graphics object is used to draw into 
-    // buffered image 
-    if (! isBufferedImageGraphics())
-      return;
-
-    WritableRaster raster = bimage.getRaster();
-    DataBuffer db = raster.getDataBuffer();
-
-    // update pixels in the bufferedImage
-    if (raster.getSampleModel().getDataType() == DataBuffer.TYPE_INT
-        && db instanceof DataBufferInt && db.getNumBanks() == 1)
+    if (bimage != null && pixelConversionRequired)
       {
-	// single bank, ARGB-ints buffer in sRGB space
-	DataBufferInt dbi = (DataBufferInt) raster.getDataBuffer();
-
-	for (int i = 0; i < pixels.length; i++)
-	  dbi.setElem(i, pixels[i]);
+        int height = bimage.getHeight();
+        int width = bimage.getWidth();
+        for (int y = 0; y < height; ++y)
+          for (int x = 0; x < width; ++x)
+            bimage.setRGB(x, y, pixelBuffer[y*width+height]);
       }
-    else
-      bimage.getRaster().setPixels(0, 0, raster.getWidth(),
-                                   raster.getHeight(), pixels);
   }
 
   private final boolean drawImage(Image img, AffineTransform xform,
@@ -513,8 +518,7 @@ public class GdkGraphics2D extends Graphics2D
 	gdkDrawDrawable(g2, (int) xform.getTranslateX(),
 	                (int) xform.getTranslateY());
 
-	if (isBufferedImageGraphics())
-	  updateBufferedImage();
+	updateBufferedImage();
 
 	return true;
       }
@@ -556,6 +560,7 @@ public class GdkGraphics2D extends Graphics2D
   //////////////////////////////////////////////////
   ////// Implementation of Graphics2D Methods //////
   //////////////////////////////////////////////////
+
   public void draw(Shape s)
   {
     if (stroke != null && ! (stroke instanceof BasicStroke))
@@ -577,8 +582,7 @@ public class GdkGraphics2D extends Graphics2D
       walkPath(s.getPathIterator(null), shiftDrawCalls);
     cairoStroke();
 
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void fill(Shape s)
@@ -591,10 +595,10 @@ public class GdkGraphics2D extends Graphics2D
       }
     else
       walkPath(s.getPathIterator(null), false);
+
     cairoFill();
 
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void clip(Shape s)
@@ -645,7 +649,9 @@ public class GdkGraphics2D extends Graphics2D
 
     paint = p;
     if (paint instanceof Color)
-      setColor((Color) paint);
+      {
+        setColor((Color) paint);
+      }
     else if (paint instanceof TexturePaint)
       {
 	TexturePaint tp = (TexturePaint) paint;
@@ -780,6 +786,7 @@ public class GdkGraphics2D extends Graphics2D
   ////////////////////////////////////////////////
   ////// Implementation of Graphics Methods //////
   ////////////////////////////////////////////////
+
   public void setPaintMode()
   {
     setComposite(java.awt.AlphaComposite.SrcOver);
@@ -814,7 +821,7 @@ public class GdkGraphics2D extends Graphics2D
 
   public Shape getClip()
   {
-    return getClipInDevSpace();
+    return clip.getBounds2D(); //getClipInDevSpace();
   }
 
   public Rectangle getClipBounds()
@@ -878,8 +885,7 @@ public class GdkGraphics2D extends Graphics2D
     setStroke(draw3DRectStroke);
     super.draw3DRect(x, y, width, height, raised);
     setStroke(tmp);
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void fill3DRect(int x, int y, int width, int height, boolean raised)
@@ -888,8 +894,7 @@ public class GdkGraphics2D extends Graphics2D
     setStroke(draw3DRectStroke);
     super.fill3DRect(x, y, width, height, raised);
     setStroke(tmp);
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void drawRect(int x, int y, int width, int height)
@@ -914,8 +919,7 @@ public class GdkGraphics2D extends Graphics2D
     cairoFill();
     setColor(fg);
 
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void setBackground(Color c)
@@ -1010,16 +1014,9 @@ public class GdkGraphics2D extends Graphics2D
 	i2u[5] = 0;
       }
 
-    int[] pixels = null;
+    int[] pixels = findSimpleIntegerArray(cm, r);
 
-    if (sm.getDataType() == DataBuffer.TYPE_INT && db instanceof DataBufferInt
-        && db.getNumBanks() == 1)
-      {
-	// single bank, ARGB-ints buffer in sRGB space
-	DataBufferInt dbi = (DataBufferInt) db;
-	pixels = dbi.getData();
-      }
-    else
+    if (pixels == null)
       {
 	// FIXME: I don't think this code will work correctly with a non-RGB
 	// MultiPixelPackedSampleModel. Although this entire method should 
@@ -1039,8 +1036,9 @@ public class GdkGraphics2D extends Graphics2D
 	  }
       }
 
-    // change all transparent pixels in the image to the 
-    // specified bgcolor            
+    // Change all transparent pixels in the image to the specified bgcolor,
+    // or (if there's no alpha) fill in an alpha channel so that it paints
+    // correctly.
     if (cm.hasAlpha())
       {
 	if (bgcolor != null && cm.hasAlpha())
@@ -1056,8 +1054,7 @@ public class GdkGraphics2D extends Graphics2D
 
     drawPixels(pixels, r.getWidth(), r.getHeight(), r.getWidth(), i2u);
 
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
 
     return true;
   }
@@ -1092,6 +1089,7 @@ public class GdkGraphics2D extends Graphics2D
   ///////////////////////////////////////////////
   ////// Unimplemented Stubs and Overloads //////
   ///////////////////////////////////////////////
+
   public boolean hit(Rectangle rect, Shape text, boolean onStroke)
   {
     throw new java.lang.UnsupportedOperationException();
@@ -1259,6 +1257,7 @@ public class GdkGraphics2D extends Graphics2D
 
     // Get the subimage of the source enclosed in the 
     // rectangle specified by sx1, sy1, sx2, sy2
+	
     if (img instanceof BufferedImage)
       {
 	BufferedImage b = (BufferedImage) img;
@@ -1339,22 +1338,19 @@ public class GdkGraphics2D extends Graphics2D
   public void drawGdkGlyphVector(GdkGlyphVector gv, float x, float y)
   {
     cairoDrawGdkGlyphVector(getFontPeer(), gv, x, y);
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void drawGdkTextLayout(GdkTextLayout gl, float x, float y)
   {
     cairoDrawGdkTextLayout(getFontPeer(), gl, x, y);
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void drawString(String str, float x, float y)
   {
     cairoDrawString(getFontPeer(), str, x, y);
-    if (isBufferedImageGraphics())
-      updateBufferedImage();
+    updateBufferedImage();
   }
 
   public void drawString(String str, int x, int y)
@@ -1422,6 +1418,7 @@ public class GdkGraphics2D extends Graphics2D
   // Until such time as pango is happy to talk directly to cairo, we
   // actually need to redirect some calls from the GtkFontPeer and
   // GtkFontMetrics into the drawing kit and ask cairo ourselves.
+
   static native void releasePeerGraphicsResource(GdkFontPeer f);
 
   static native void getPeerTextMetrics(GdkFontPeer f, String str,
@@ -1448,15 +1445,16 @@ public class GdkGraphics2D extends Graphics2D
     if (f.getPeer() instanceof GdkFontPeer)
       font = f;
     else
-      font = ((ClasspathToolkit) (Toolkit.getDefaultToolkit())).getFont(f
-                                                                        .getName(),
-                                                                        f
-                                                                        .getAttributes());
+      font = 
+        ((ClasspathToolkit)(Toolkit.getDefaultToolkit()))
+        .getFont(f.getName(), f.getAttributes());    
   }
 
   public String toString()
   {
-    return getClass().getName() + "[font=" + font.toString() + ",color="
-           + fg.toString() + "]";
+    return  (getClass().getName()
+             + "[font=" + font.toString()
+             + ",color=" + fg.toString()
+	     + "]");
   }
 }

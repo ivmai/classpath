@@ -6,6 +6,12 @@ java
 javax
 kaffe
 classes
+classes.awt
+classes.locale1
+classes.locale2
+classes.standard
+classes.standardx
+classes.xml
 glibj.zip
 deps.sh
 gen-classlist.sh

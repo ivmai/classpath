@@ -53,10 +53,10 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.TreeUI;
-import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -70,14 +70,11 @@ public class JTree extends JComponent
 {
   private static final long serialVersionUID = 7559816092864483649L;
 
-  public static final String ANCHOR_SELECTION_PATH_PROPERTY = "anchorSelectionPath";
   public static final String CELL_EDITOR_PROPERTY = "cellEditor";
   public static final String CELL_RENDERER_PROPERTY = "cellRenderer";
   public static final String EDITABLE_PROPERTY = "editable";
-  public static final String EXPANDS_SELECTED_PATHS_PROPERTY = "expandsSelectedPaths";
   public static final String INVOKES_STOP_CELL_EDITING_PROPERTY = "invokesStopCellEditing";
   public static final String LARGE_MODEL_PROPERTY = "largeModel";
-  public static final String LEAD_SELECTION_PATH_PROPERTY = "leadSelectionPath";
   public static final String ROOT_VISIBLE_PROPERTY = "rootVisible";
   public static final String ROW_HEIGHT_PROPERTY = "rowHeight";
   public static final String SCROLLS_ON_EXPAND_PROPERTY = "scrollsOnExpand";
@@ -87,23 +84,40 @@ public class JTree extends JComponent
   public static final String TREE_MODEL_PROPERTY = "model";
   public static final String VISIBLE_ROW_COUNT_PROPERTY = "visibleRowCount";
 
+  /** @since 1.3 */
+  public static final String ANCHOR_SELECTION_PATH_PROPERTY = "anchorSelectionPath";
+  /** @since 1.3 */
+  public static final String LEAD_SELECTION_PATH_PROPERTY = "leadSelectionPath";
+  /** @since 1.3 */
+  public static final String EXPANDS_SELECTED_PATHS_PROPERTY = "expandsSelectedPaths";
+
+  private static final Object EXPANDED = new Object();
+  private static final Object COLLAPSED = new Object();
+  
   private boolean dragEnabled;
   private boolean expandsSelectedPaths;
   private TreePath anchorSelectionPath;
   private TreePath leadSelectionPath;
 
-  protected TreeCellEditor cellEditor;
-  protected TreeCellRenderer cellRenderer;
+  /*
+   * This contains the state of all nodes in the tree. Al/ entries map the
+   * TreePath of a note to to its state. Valid states are EXPANDED and
+   * COLLAPSED.  Nodes not in this Hashtable are assumed state COLLAPSED.
+   */
+  private Hashtable nodeStates;
+
+  protected transient TreeCellEditor cellEditor;
+  protected transient TreeCellRenderer cellRenderer;
   protected boolean editable;
   protected boolean invokesStopCellEditing;
   protected boolean largeModel;
   protected boolean rootVisible;
   protected int rowHeight;
   protected boolean scrollsOnExpand;
-  protected TreeSelectionModel selectionModel;
+  protected transient TreeSelectionModel selectionModel;
   protected boolean showsRootHandles;
   protected int toggleClickCount;
-  protected TreeModel treeModel;
+  protected transient TreeModel treeModel;
   protected int visibleRowCount;
 
   /**
@@ -183,6 +197,13 @@ public class JTree extends JComponent
   {
     protected Object childValue;
     protected boolean loadedChildren;
+
+    /**
+     * Currently not set or used by this class.
+     * It might be set and used in later versions of this class.
+     */
+    protected boolean hasChildren;
+    
     public DynamicUtilTreeNode(Object value,
                                Object children) 
     {
@@ -757,6 +778,24 @@ public class JTree extends JComponent
     firePropertyChange(TOGGLE_CLICK_COUNT_PROPERTY, oldValue, count);
   }
 
+  public void scrollPathToVisible(TreePath path)
+  {
+    if (path == null)
+      return;
+
+    Rectangle rect = getPathBounds(path);
+
+    if (rect == null)
+      return;
+
+    scrollRectToVisible(rect);
+  }
+
+  public void scrollRowToVisible(int row)
+  {
+    scrollPathToVisible(getPathForRow(row));
+  }
+  
   public boolean getScrollsOnExpand()
   {
     return scrollsOnExpand;
@@ -1019,6 +1058,92 @@ public class JTree extends JComponent
     
     return 0;
   }
+  
+  public void collapsePath(TreePath path)
+  {
+    setExpandedState(path, false);
+  }
+  
+  public void collapseRow(int row)
+  {
+    if (row < 0 || row >= getRowCount())
+      return;
+
+    TreePath path = getPathForRow(row);
+
+    if (path != null)
+      collapsePath(path);
+  }
+
+  public void expandPath(TreePath path)
+  {
+    // Don't expand if last path component is a leaf node.
+    if ((path == null)
+        || (treeModel.isLeaf(path.getLastPathComponent())))
+      return;
+
+    setExpandedState(path, true);
+  }
+  
+  public void expandRow(int row)
+  {
+    if (row < 0 || row >= getRowCount())
+      return;
+
+    TreePath path = getPathForRow(row);
+
+    if (path != null)
+      expandPath(path);
+  }
+
+  public boolean isCollapsed(TreePath path)
+  {
+    return ! isExpanded(path);
+  }
+
+  public boolean isCollapsed(int row)
+  {
+    if (row < 0 || row >= getRowCount())
+      return false;
+
+    TreePath path = getPathForRow(row);
+
+    if (path != null)
+      return isCollapsed(path);
+
+    return false;
+  }
+
+  public boolean isExpanded(TreePath path)
+  {
+    if (path == null)
+      return false;
+
+    Object state = nodeStates.get(path);
+
+    if ((state == null) || (state != EXPANDED))
+      return false;
+
+    TreePath parent = path.getParentPath();
+
+    if (parent != null)
+      return isExpanded(parent);
+    
+    return true;
+  }
+  
+  public boolean isExpanded(int row)
+  {
+    if (row < 0 || row >= getRowCount())
+      return false;
+
+    TreePath path = getPathForRow(row);
+
+    if (path != null)
+      return isExpanded(path);
+
+    return false;
+  }
 
   /**
    * @since 1.3
@@ -1160,5 +1285,108 @@ public class JTree extends JComponent
       return path.getLastPathComponent();
 
     return null;
+  }
+
+  private void checkExpandParents(TreePath path)
+    throws ExpandVetoException
+  {
+    TreePath parent = path.getParentPath();
+
+    if (parent != null)
+      checkExpandParents(parent);
+
+    fireTreeWillExpand(path);
+  }
+
+  private void doExpandParents(TreePath path, boolean state)
+  {
+    TreePath parent = path.getParentPath();
+
+    if (isExpanded(parent))
+      return;
+    
+    if (parent != null)
+      doExpandParents(parent, false);
+
+    nodeStates.put(path, state ? EXPANDED : COLLAPSED);
+  }
+  
+  protected void setExpandedState(TreePath path, boolean state)
+  {
+    if (path == null)
+      return;
+
+    TreePath parent = path.getParentPath();
+
+    try
+      {
+	while (parent != null)
+	  checkExpandParents(parent);
+      }
+    catch (ExpandVetoException e)
+      {
+	// Expansion vetoed.
+	return;
+      }
+
+    doExpandParents(path, state);
+  }
+
+  protected void clearToggledPaths()
+  {
+    nodeStates.clear();
+  }
+
+  protected Enumeration getDescendantToggledPaths(TreePath parent)
+  {
+    if (parent == null)
+      return null;
+
+    Enumeration nodes = nodeStates.keys();
+    Vector result = new Vector();
+
+    while (nodes.hasMoreElements())
+      {
+        TreePath path = (TreePath) nodes.nextElement();
+
+        if (path.isDescendant(parent))
+          result.addElement(path);
+      }
+    
+    return result.elements();
+  }
+
+  public boolean hasBeenExpanded(TreePath path)
+  {
+    if (path == null)
+      return false;
+
+    return nodeStates.get(path) != null;
+  }
+
+  public boolean isVisible(TreePath path)
+  {
+    if (path == null)
+      return false;
+
+    TreePath parent = path.getParentPath();
+
+    if (parent == null)
+      return true; // Is root node.
+
+    return isExpanded(parent);
+  }
+
+  public void makeVisible(TreePath path)
+  {
+    if (path == null)
+      return;
+
+    expandPath(path.getParentPath());
+  }
+
+  public boolean isPathEditable(TreePath path)
+  {    
+    return isEditable();
   }
 }
