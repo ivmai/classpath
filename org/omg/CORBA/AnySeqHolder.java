@@ -1,4 +1,4 @@
-/* StringSeqHolder.java --
+/* AnySeqHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -45,60 +45,56 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.Streamable;
 
 /**
- * A sequence holder for CORBA <code>string[]</code> that is mapped into
- * java <code>String[]</code>.
+ * A sequence holder for CORBA <code>AnySeq</code> that is mapped into
+ * java <code>Any[]</code>.
  *
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
-public final class StringSeqHolder
+public final class AnySeqHolder
   implements Streamable
 {
   /**
-   * The <code>String[]</code> (CORBA <code>string[]</code>) value,
-   * held by this StringSeqHolder.
+   * The <code>Any[]</code> (CORBA <code>AnySeq</code>) value,
+   * held by this AnySeqHolder.
    */
-  public String[] value;
+  public Any[] value;
 
   /**
    * The type code for this holder. Each holder has a different instance.
    */
   private final primitiveArrayTypeCode typecode =
-    new primitiveArrayTypeCode(TCKind.tk_char);
+    new primitiveArrayTypeCode(TCKind.tk_any);
 
   /**
-   * Constructs an instance of StringSeqHolder,
+   * Constructs an instance of AnySeqHolder,
    * initializing {@link #value} to <code>null</code>.
    */
-  public StringSeqHolder()
+  public AnySeqHolder()
   {
   }
 
   /**
-   * Constructs an instance of StringSeqHolder,
-   * initializing {@link #value} to the given <code>String</code>.
-   *
-   * @param initial_value a value that will be assigned to the
-   * {@link #value} field.
+   * Constructs an instance of AnySeqHolder,  
+   * initializing {@link #value} to the given array
    */
-  public StringSeqHolder(String[] initial_value)
+  public AnySeqHolder(Any [] a_value)
   {
-    value = initial_value;
-    typecode.setLength(value.length);
+    value = a_value;
   }
 
   /**
    * Fill in the {@link value } field by reading the required data
    * from the given stream. This method first reads the array size
-   * (as CORBA <code>long</code>and then all strings.
+   * (as CORBA <code>long</code>and then all Any's.
    *
    * @param input the input stream to read from.
    */
   public void _read(InputStream input)
   {
-    value = new String[ input.read_long() ];
+    value = new Any[ input.read_long() ];
     for (int i = 0; i < value.length; i++)
       {
-        value [ i ] = input.read_wstring();
+        value [ i ] = input.read_any();
       }
     typecode.setLength(value.length);
   }
@@ -115,7 +111,7 @@ public final class StringSeqHolder
   /**
    * Write the {@link value } field to the given stream.
    * This method first writes the array size
-   * (as CORBA <code>long</code> and then all strings.
+   * (as CORBA <code>long</code> and then all Any's.
    *
    * @param output the output stream to write into.
    */
@@ -125,7 +121,8 @@ public final class StringSeqHolder
 
     for (int i = 0; i < value.length; i++)
       {
-        output.write_wstring(value [ i ]);
+        output.write_any(value [ i ]);
       }
   }
+
 }

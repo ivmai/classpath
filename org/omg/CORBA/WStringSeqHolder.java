@@ -1,4 +1,4 @@
-/* WStringSeqHolder.java -- 
+/* WStringSeqHolder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,7 +38,7 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
-import gnu.CORBA.*;
+import gnu.CORBA.primitiveArrayTypeCode;
 
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;

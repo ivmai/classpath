@@ -1,3 +1,29 @@
+2005-03-23  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/xml/dom/html2/DomHTMLParser.java
+	Changed 'enum' references to become 'enumeration'.
+
+2005-03-22  Archie Cobbs  <archie@dellroad.org>
+
+	* configure.ac: Generate scripts/classpath.spec.
+	* scripts/classpath.spec.in: New file.
+
+2005-03-21  Audrius Meskauskas  <audriusa@bluewin.ch>
+	
+	* gnu/xml/dom/html2/DomHTMLParser.java: New file.
+	* gnu/classpath/examples/html/Demo.java: New example.
+
+2005-03-21  Sven de Marothy  <sven@physto.se>
+
+	* gnu/classpath/SystemProperties.java,
+	Add missing aliases for "UnicodeBigUnmarked" and
+	UnicodeLittleUnmarked".
+	
+2005-03-21  Mark Wielaard  <mark@klomp.org>
+
+	* doc/www.gnu.org/events/escape_fosdem05.wml: Add link to kaffe
+	presentation.
+
 2005-03-21  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/Class.java:
@@ -10,6 +36,18 @@
 	(destroy()): Deprecated.
 	(Thread.State): Added serialization UID.
 	
+2005-03-19  Archie Cobbs  <archie@dellroad.org>
+
+	* vm/reference/java/lang/VMClassLoader.java: handle ZIP files
+	on the boot loader class path in getResources()
+
+2005-03-19  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* org/omg/CORBA/AnySeqHolder.java,
+	org/omg/CORBA/AnySeqHelper.java,
+	org/omg/CORBA/CompletionStatusHelper.java:
+	New files.
+
 2005-03-19  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/IllegalArgumentException:
@@ -25,6 +63,196 @@
 	(UnsupportedOperationException(String, Throwable)):
 	Implemented.
 	(UnsupportedOperationException(Throwable)): Likewise.
+
+2005-03-18  Mark Wielaard  <mark@klomp.org>
+
+	* doc/www/downloads/downloads.wml: Add 0.14.
+	* doc/www/announce/20050226.wml: New file.
+
+2005-03-18  Sven de Marothy  <sven@physto.se>
+
+	* java/util/zip/GZIPInputStream.java:
+	(GZIPInputStream): Read header in constructor.
+	
+2005-03-18  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* ChangeLog.usermap: New file (replacing).
+
+2005-03-18  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* javax/swing/text/html/parser/Entity.java (getType): New method.
+	* javax/swing/text/html/parser/DocumentParser.java:
+	Inherit from javax.swing.text.html.parser.Parser.
+	
+2005-03-18  Robert Schuster  <thebohemian@gmx>
+
+	* native/jni/java-nio/gnu_java_nio_VMSelector.c: Added important
+	return statement after throwing exception.
+
+2005-03-18  Robert Schuster  <thebohemian@gmx>
+
+	* native/jni/java-nio/gnu_java_nio_VMSelector.c: Implemented
+    Java_gnu_java_nio_VMSelector_select.
+	* configure.ac: Added check for sys/select.h and strerro_r().
+
+2005-03-17  Mark Wielaard  <mark@klomp.org>
+
+	* doc/www.gnu.org/newsitems.txt: Add 0.14 release announcement
+	and link for the dead of the gui branch.
+
+2005-03-17  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/dom/html2/DomHTMLDocument.java: Fixed element creation and
+	check for HTML/XHTML namespace.
+
+2005-03-16  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/lang/MainThread.java (MainThread): Load main class
+	using system class loader.
+
+2005-03-16  Archie Cobbs  <archie@dellroad.org>
+
+	* native/jni/java-nio/java_nio_VMDirectByteBuffer.c: use
+	global native reference to wrap persistent jclass variable.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkPixbufDecoder.c:
+	use DeleteLocalRef() to avoid exhausting local native references.
+
+2005-03-16  Mark Wielaard  <mark@klomp.org>
+
+	* doc/vmintegration.texinfo: Change input start to \input.
+
+2005-03-16  Robert Schuster  <thebohemian@gmx.net>
+
+	* doc/vmintegration.texinfo: Added explanation
+	of gnu.classpath.boot.library.path property.
+
+2005-03-16  Robert Schuster  <thebohemian@gmx.net>
+
+	* java/lang/Runtime.java: Added support for
+	gnu.classpath.boot.library.path system property.
+
+2005-03-14  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/dom/DomImpl.java,
+	gnu/xml/dom/html2/DomHTMLAnchorElement.java,
+	gnu/xml/dom/html2/DomHTMLDocument.java,
+	gnu/xml/dom/html2/DomHTMLElement.java,
+	gnu/xml/dom/html2/DomHTMLFormElement.java,
+	gnu/xml/dom/html2/DomHTMLFrameElement.java,
+	gnu/xml/dom/html2/DomHTMLIFrameElement.java,
+	gnu/xml/dom/html2/DomHTMLImpl.java,
+	gnu/xml/dom/html2/DomHTMLInputElement.java,
+	gnu/xml/dom/html2/DomHTMLObjectElement.java,
+	gnu/xml/dom/html2/DomHTMLOptionElement.java,
+	gnu/xml/dom/html2/DomHTMLSelectElement.java,
+	gnu/xml/dom/html2/DomHTMLTableCellElement.java,
+	gnu/xml/dom/html2/DomHTMLTableElement.java,
+	gnu/xml/dom/html2/DomHTMLTableRowElement.java,
+	gnu/xml/dom/html2/DomHTMLTableSectionElement.java,
+	gnu/xml/dom/html2/DomHTMLTextAreaElement.java: JAXP integration,
+	UI events, and tree utility functions.
+
+2005-03-14  Patrik Reali  <reali@acm.org>
+
+	* doc/www.gnu.org/newsitems.txt: news on gui branch and calientra
+	* doc/www.gnu.org/docs/docs.wml: link to the wiki added
+	* doc/www.gnu.org/faq/faq.wml: entry on tainted developers
+
+2005-03-14  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* javax/swing/text/html/parser/Parser.java,
+	javax/swing/text/html/parser/Entity.java:
+	Inheriting from DTDConstants.
+	* javax/swing/text/html/parser/AttributeList.java
+	(getValues): Changed return type.
+	* javax/swing/text/html/parser/DocumentParser
+	(parse): Adding the callback parameter that receives
+	the parsing events.
+
+2005-03-13  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Set version to 0.14+cvs.
+
+2005-03-13  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* org/omg/CORBA/BAD_CONTEXT.java,
+	org/omg/CORBA/BAD_INV_ORDER.java,
+	org/omg/CORBA/BAD_OPERATION.java,
+	org/omg/CORBA/BAD_TYPECODE.java,
+	org/omg/CORBA/COMM_FAILURE.java,
+	org/omg/CORBA/DATA_CONVERSION.java,
+	org/omg/CORBA/FREE_MEM.java,
+	org/omg/CORBA/IMP_LIMIT.java,
+	org/omg/CORBA/INITIALIZE.java,
+	org/omg/CORBA/INTERNAL.java,
+	org/omg/CORBA/INTF_REPOS.java,
+	org/omg/CORBA/INVALID_TRANSACTION.java,
+	org/omg/CORBA/INV_FLAG.java,
+	org/omg/CORBA/INV_IDENT.java,
+	org/omg/CORBA/INV_OBJREF.java,
+	org/omg/CORBA/INV_POLICY.java,
+	org/omg/CORBA/NO_IMPLEMENT.java,
+	org/omg/CORBA/NO_MEMORY.java,
+	org/omg/CORBA/NO_PERMISSION.java,
+	org/omg/CORBA/NO_RESPONSE.java,
+	org/omg/CORBA/OBJECT_NOT_EXIST.java,
+	org/omg/CORBA/OBJ_ADAPTER.java,
+	org/omg/CORBA/PERSIST_STORE.java,
+	org/omg/CORBA/TRANSACTION_REQUIRED.java,
+	org/omg/CORBA/TRANSACTION_ROLLEDBACK.java,
+	org/omg/CORBA/TRANSIENT.java: making constructors
+	public.
+
+2005-03-13  Audrius Meskauskas  <audriusa@bluewin.ch>
+
+	* org/omg/CORBA/StringSeqHolder.java,
+	org/omg/CORBA/WStringSeqHolder.java:
+	replacing replacing CR CR LF by CR LF.
+	* org/omg/CORBA/BAD_PARAM.java: making constructors
+	public.
+
+2005-03-13  Michael Koch  <konqueror@gmx.de>
+
+	* org/omg/CORBA/ARG_IN.java: Removed redundant modifiers.
+	* org/omg/CORBA/ARG_INOUT.java: Likewise.
+	* org/omg/CORBA/ARG_OUT.java: Likewise.
+	* org/omg/CORBA/Any.java: Fixed HTML tags.
+	* org/omg/CORBA/Principal.java: Likewise.
+	* org/omg/CORBA/BAD_PARAM.java: Reordered modifiers.
+	* org/omg/CORBA/FixedHolder.java: Reworked imports.
+	* org/omg/CORBA/StringSeqHolder.java: Likewise.
+	* org/omg/CORBA/TypeCode.java: Likewise.
+	* org/omg/CORBA/TypeCodePackage/BadKind.java: Likewise.
+	* org/omg/CORBA/TypeCodePackage/Bounds.java: Likewise.
+	* org/omg/CORBA/WStringSeqHolder.java: Likewise.
+	* org/omg/CORBA/portable/OutputStream.java: Likewise.
+
+2005-03-13  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/net/protocol/https/Handler.java:
+	Reworked import statements.
+
+2005-03-13  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/javax/swing/text/html/parser/HTML_401F.java,
+	gnu/javax/swing/text/html/parser/gnuDTD.java,
+	gnu/javax/swing/text/html/parser/models/node.java:
+	Reworked import statements.
+
+2005-03-13  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/xml/aelfred2/XmlParser.java: Fixed typo.
+
+2005-03-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/javax/swing/text/html/parser/htmlAttributeSet.java:
+	(getAttributeNames()): Replaced 'enum' with 'enumeration'.
+	* gnu/javax/swing/text/html/parser/htmlValidator.java:
+	(validateParameters(TagElement,htmlAttributeSet)):
+	Replaced 'enum' with 'enumeration'.
+	(validateAttribute(TagElement,htmlAttributeSet,
+	                   Enumeration,Enumeration)):
+	Likewise.
 
 2005-03-12  Audrius Meskauskas  <audriusa@bluewin.ch>
 

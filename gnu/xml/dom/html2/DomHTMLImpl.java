@@ -1,4 +1,4 @@
-/* BadKind.java --
+/* DomHTMLImpl.java -- 
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,42 +35,33 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.xml.dom.html2;
 
-package org.omg.CORBA.TypeCodePackage;
-
-import java.io.Serializable;
-
-import org.omg.CORBA.IDLEntity;
-import org.omg.CORBA.UserException;
+import gnu.xml.dom.DomImpl;
+import org.w3c.dom.Document;
 
 /**
- * This exception is thrown when an inappropriate operation is invoked on
- * a {@link org.omg.CORBA.TypeCode} object.
+ * Specialised DOMImplementation for creating HTML documents.
  *
- * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class BadKind
-  extends UserException
-  implements IDLEntity, Serializable
+public class DomHTMLImpl
+  extends DomImpl
 {
-  /** 
-   * Use serialVersionUID for interoperability. 
-   */
-  private static final long serialVersionUID = 1030443154456771956L;
   
-  /**
-   * Constructs a the exception.
-   */
-  public BadKind()
+  protected Document createDocument()
   {
+    return new DomHTMLDocument(this);
   }
 
-  /**
-   * Constructs the exception, explaining the reason of throwing it.
-   * @param reason a string, explaining, why the exception has been thrown.
-   */
-  public BadKind(String reason)
+  public Object getFeature(String feature, String version)
   {
-    super(reason);
+    if (hasFeature(feature, version))
+      {
+        return this;
+      }
+    return null;
   }
+
 }
+

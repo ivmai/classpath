@@ -80,8 +80,7 @@ public class DomHTMLOptionElement
 
   public int getIndex()
   {
-    // TODO
-    return -1;
+    return super.getIndex();
   }
   
   public boolean getDisabled()

@@ -54,7 +54,7 @@ import java.io.Serializable;
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public final class Entity
-  implements Serializable
+  implements DTDConstants, Serializable
 {
   /**
    * Package level mapper between type names and they string values.
@@ -172,4 +172,14 @@ public final class Entity
 
     return sdata;
   }
+  
+  /**
+   * Get the entity type.
+   * @return the value of the {@link #type}.
+   */
+  public int getType() 
+  {
+    return type;
+  }  
+          
 }

@@ -1,4 +1,4 @@
-/* StringSeqHolder.java --
+/* CompletionStatusHelper.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -40,92 +40,77 @@ package org.omg.CORBA;
 
 import gnu.CORBA.primitiveArrayTypeCode;
 
+import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA.portable.Streamable;
 
 /**
- * A sequence holder for CORBA <code>string[]</code> that is mapped into
- * java <code>String[]</code>.
+ * Provides static helper methods for working with
+ * {@link CompletionStatus}.
  *
  * @author Audrius Meskauskas (AudriusA@Bioinformatics.org)
  */
-public final class StringSeqHolder
-  implements Streamable
+public abstract class CompletionStatusHelper
 {
   /**
-   * The <code>String[]</code> (CORBA <code>string[]</code>) value,
-   * held by this StringSeqHolder.
-   */
-  public String[] value;
-
-  /**
-   * The type code for this holder. Each holder has a different instance.
-   */
-  private final primitiveArrayTypeCode typecode =
-    new primitiveArrayTypeCode(TCKind.tk_char);
-
-  /**
-   * Constructs an instance of StringSeqHolder,
-   * initializing {@link #value} to <code>null</code>.
-   */
-  public StringSeqHolder()
-  {
-  }
-
-  /**
-   * Constructs an instance of StringSeqHolder,
-   * initializing {@link #value} to the given <code>String</code>.
+   * Extract the {@link CompletionStatus} from the
+   * given {@link Any}. This implementation expects
+   * the integer (Corba long) value, stating the completion
+   * status.
    *
-   * @param initial_value a value that will be assigned to the
-   * {@link #value} field.
-   */
-  public StringSeqHolder(String[] initial_value)
-  {
-    value = initial_value;
-    typecode.setLength(value.length);
-  }
-
-  /**
-   * Fill in the {@link value } field by reading the required data
-   * from the given stream. This method first reads the array size
-   * (as CORBA <code>long</code>and then all strings.
+   * @param a an Any to extract the completion status from.
    *
-   * @param input the input stream to read from.
+   * @return completion status
    */
-  public void _read(InputStream input)
+  public static CompletionStatus extract(Any a)
   {
-    value = new String[ input.read_long() ];
-    for (int i = 0; i < value.length; i++)
-      {
-        value [ i ] = input.read_wstring();
-      }
-    typecode.setLength(value.length);
+    return CompletionStatus.from_int(a.extract_long());
   }
 
   /**
-   * Returns the TypeCode, corresponding the CORBA type that is stored
-   * using this holder.
+   * Returns the agreed Id. 
+   * @return <code>IDL:omg.org/CORBA/CompletionStatus:1.0</code>, always.
    */
-  public TypeCode _type()
+  public static String id()
   {
-    return typecode;
+    return "IDL:omg.org/CORBA/CompletionStatus:1.0";
   }
 
   /**
-   * Write the {@link value } field to the given stream.
-   * This method first writes the array size
-   * (as CORBA <code>long</code> and then all strings.
+  * Insert into the given {@link CompletionStatus} into the
+  * given {@link Any}. This implementation inserts it as an
+  * integer (CORBA long).
+  *
+  * @param into the target Any.
+  * @param that the {@link CompletionStatus} to insert.
+  */
+  public static void insert(Any into, CompletionStatus that)
+  {
+    into.insert_long(that.value());
+  }
+
+  /**
+   * Reads the {@link CompletionStatus} from the CORBA input stream.
+   * This implementation reads an an integer (CORBA long).
    *
-   * @param output the output stream to write into.
+   * @param input the CORBA (not java.io) stream to read from.
+   * @return the value from the stream.
    */
-  public void _write(OutputStream output)
+  public static CompletionStatus read(InputStream input)
   {
-    output.write_long(value.length);
+    return CompletionStatus.from_int(input.read_long());
+  }
 
-    for (int i = 0; i < value.length; i++)
-      {
-        output.write_wstring(value [ i ]);
-      }
+  /**
+   * Writes the {@link CompletionStatus} into the given stream.
+   * This implementation writes an int (CORBA long), corresponding
+   * the status of completion.
+   *
+   * @param output the CORBA (not java.io) output stream to write.
+   * @param status the value that must be written.
+   */
+  public static void write(OutputStream output, CompletionStatus status)
+  {
+    output.write_long(status.value());
   }
 }
