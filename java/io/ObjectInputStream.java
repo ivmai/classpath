@@ -1,5 +1,5 @@
 /* ObjectInputStream.java -- Class used to read serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,6 +52,13 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 
+/**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Jeroen Frijters (jeroen@frijters.net)
+ * @author Guilhem Lavaux (guilhem@kaffe.org)
+ * @author Michael Koch (konqueror@gmx.de)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ */
 public class ObjectInputStream extends InputStream
   implements ObjectInput, ObjectStreamConstants
 {
@@ -95,9 +102,9 @@ public class ObjectInputStream extends InputStream
     this.blockDataInput = new DataInputStream(this);
     this.realInputStream = new DataInputStream(in);
     this.nextOID = baseWireHandle;
-    this.objectLookupTable = new Hashtable();
-    this.validators = new Vector();
-    this.classLookupTable = new Hashtable();
+    this.objectLookupTable = new Hashtable<Integer,ObjectIdentityWrapper>();
+    this.validators = new Vector<ValidatorAndPriority>();
+    this.classLookupTable = new Hashtable<Class,ObjectStreamClass>();
     setBlockDataMode(true);
     readStreamHeader();
   }
@@ -756,7 +763,7 @@ public class ObjectInputStream extends InputStream
       return new ObjectStreamClass[0];
     else
       {
-        Vector oscs = new Vector();
+        Vector<ObjectStreamClass> oscs = new Vector<ObjectStreamClass>();
 
         while (osc != null)
           {
@@ -793,7 +800,7 @@ public class ObjectInputStream extends InputStream
   }
 
 
-  protected Class resolveProxyClass(String[] intfs)
+  protected Class<?> resolveProxyClass(String[] intfs)
     throws IOException, ClassNotFoundException
   {
     SecurityManager sm = System.getSecurityManager();
@@ -803,7 +810,7 @@ public class ObjectInputStream extends InputStream
     
     ClassLoader cl = currentClassLoader(sm);
     
-    Class[] clss = new Class[intfs.length];
+    Class<?>[] clss = new Class<?>[intfs.length];
     if(cl == null)
       {
 	for (int i = 0; i < intfs.length; i++)
@@ -1832,14 +1839,14 @@ public class ObjectInputStream extends InputStream
   private boolean useSubclassMethod;
   private int nextOID;
   private boolean resolveEnabled;
-  private Hashtable objectLookupTable;
+  private Hashtable<Integer,ObjectIdentityWrapper> objectLookupTable;
   private Object currentObject;
   private ObjectStreamClass currentObjectStreamClass;
   private boolean readDataFromBlock;
   private boolean isDeserializing;
   private boolean fieldsAlreadyRead;
-  private Vector validators;
-  private Hashtable classLookupTable;
+  private Vector<ValidatorAndPriority> validators;
+  private Hashtable<Class,ObjectStreamClass> classLookupTable;
   private GetField prereadFields;
 
   private static boolean dump = false && Configuration.DEBUG;

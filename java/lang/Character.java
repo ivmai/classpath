@@ -1,5 +1,5 @@
 /* java.lang.Character -- Wrapper class for char, and Unicode subsets
-   Copyright (C) 1998, 1999, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -58,10 +58,11 @@ import gnu.java.lang.CharData;
  * <p>See <a href="http://www.unicode.org">http://www.unicode.org</a>
  * for more information on the Unicode Standard.
  *
- * @author Tom Tromey <tromey@cygnus.com>
+ * @author Tom Tromey (tromey@cygnus.com)
  * @author Paul N. Fisher
  * @author Jochen Hoenicke
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see CharData
  * @since 1.0
  * @status partly updated to 1.5; some things still missing
@@ -2243,23 +2244,6 @@ public final class Character implements Serializable, Comparable<Character>
   public int compareTo(Character anotherCharacter)
   {
     return value - anotherCharacter.value;
-  }
-
-  /**
-   * Compares an object to this Character.  Assuming the object is a
-   * Character object, this method performs the same comparison as
-   * compareTo(Character).
-   *
-   * @param o object to compare
-   * @return the comparison value
-   * @throws ClassCastException if o is not a Character object
-   * @throws NullPointerException if o is null
-   * @see #compareTo(Character)
-   * @since 1.2
-   */
-  public int compareTo(Object o)
-  {
-    return compareTo((Character) o);
   }
 
   /**

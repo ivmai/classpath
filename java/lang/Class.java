@@ -1,5 +1,5 @@
 /* Class.java -- Representation of a Java class.
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005
    Free Software Foundation
 
 This file is part of GNU Classpath.
@@ -83,10 +83,11 @@ import java.util.HashSet;
  * @author John Keiser
  * @author Eric Blake (ebb9@email.byu.edu)
  * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  * @see ClassLoader
  */
-public final class Class<K> implements Serializable
+public final class Class<T> implements Serializable
 {
   /**
    * Compatible with JDK 1.0+.
@@ -308,7 +309,7 @@ public final class Class<K> implements Serializable
    * @see #getConstructors()
    * @since 1.1
    */
-  public Constructor<K> getConstructor(Class... types)
+  public Constructor<T> getConstructor(Class... types)
     throws NoSuchMethodException
   {
     memberAccessCheck(Member.PUBLIC);
@@ -354,7 +355,7 @@ public final class Class<K> implements Serializable
    * @see #getDeclaredConstructors()
    * @since 1.1
    */
-  public Constructor<K> getDeclaredConstructor(Class... types)
+  public Constructor<T> getDeclaredConstructor(Class... types)
     throws NoSuchMethodException
   {
     memberAccessCheck(Member.DECLARED);
@@ -1261,7 +1262,7 @@ public final class Class<K> implements Serializable
    * @throws ClassCastException  if obj is not an instance of this class
    * @since 1.5
    */
-  public K cast(Object obj)
+  public T cast(Object obj)
   {
     return VMClass.cast(obj, this);
   }
@@ -1321,4 +1322,53 @@ public final class Class<K> implements Serializable
 	  sm.checkPackageAccess(pkg.getName());
       }
   }
+
+  /**
+   * Returns the enumeration constants of this class, or
+   * null if this class is not an <code>Enum</code>.
+   *
+   * @return an array of <code>Enum</code> constants
+   *         associated with this class, or null if this
+   *         class is not an <code>enum</code>.
+   */
+  public T[] getEnumConstants()
+  {
+    if (isEnum())
+      {
+	try
+	  {
+	    return (T[])
+	      getMethod("values", null).invoke(null,null);
+	  }
+	catch (NoSuchMethodException exception)
+	  {
+	    throw new Error("Enum lacks values() method");
+	  }
+	catch (IllegalAccessException exception)
+	  {
+	    throw new Error("Unable to access Enum class");
+	  }
+	catch (InvocationTargetException exception)
+	  {
+	    throw new
+	      RuntimeException("The values method threw an exception",
+			       exception);
+	  }
+      }
+    else
+      {
+	return null;
+      }
+  }
+
+  /**
+   * Returns true if this class is an <code>Enum</code>.
+   *
+   * @return true if this is an enumeration class.
+   */
+  public boolean isEnum()
+  {
+    return getSuperclass() == Enum.class;
+  }
+
 }

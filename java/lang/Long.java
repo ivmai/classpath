@@ -1,5 +1,5 @@
 /* Long.java -- object wrapper for long
-   Copyright (C) 1998, 1999, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -49,6 +49,8 @@ package java.lang;
  * @author John Keiser
  * @author Warren Levy
  * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  * @status updated to 1.5
  */
@@ -513,23 +515,6 @@ public final class Long extends Number implements Comparable<Long>
     // Returns just -1 or 1 on inequality; doing math might overflow the long.
     return value > l.value ? 1 : -1;
   }
-
-  /**
-   * Behaves like <code>compareTo(Long)</code> unless the Object
-   * is not a <code>Long</code>.
-   *
-   * @param o the object to compare
-   * @return the comparison
-   * @throws ClassCastException if the argument is not a <code>Long</code>
-   * @see #compareTo(Long)
-   * @see Comparable
-   * @since 1.2
-   */
-  public int compareTo(Object o)
-  {
-    return compareTo((Long) o);
-  }
-
 
   /**
    * Return the number of bits set in x.

@@ -1,6 +1,6 @@
 /* WeakHashMap -- a hashtable that keeps only weak references
    to its keys, allowing the virtual machine to reclaim them
-   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -77,14 +77,16 @@ import java.lang.ref.WeakReference;
  *
  * @author Jochen Hoenicke
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  *
  * @see HashMap
  * @see WeakReference
  * @see LinkedHashMap
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.4 (partial 1.5)
  */
-public class WeakHashMap extends AbstractMap implements Map
+public class WeakHashMap<K,V> extends AbstractMap<K,V> 
 {
   // WARNING: WeakHashMap is a CORE class in the bootstrap cycle. See the
   // comments in vm/reference/java/lang/Runtime for implications of this fact.
@@ -561,7 +563,7 @@ public class WeakHashMap extends AbstractMap implements Map
    * @throws NullPointerException if m is null
    * @since 1.3
    */
-  public WeakHashMap(Map m)
+  public WeakHashMap(Map<? extends K, ? extends V> m)
   {
     this(m.size(), DEFAULT_LOAD_FACTOR);
     putAll(m);
@@ -757,7 +759,7 @@ public class WeakHashMap extends AbstractMap implements Map
    *         the key wasn't in this map, or if the mapped value was
    *         explicitly set to null.
    */
-  public Object get(Object key)
+  public V get(Object key)
   {
     cleanQueue();
     WeakBucket.WeakEntry entry = internalGet(key);
@@ -772,7 +774,7 @@ public class WeakHashMap extends AbstractMap implements Map
    *         null if the key wasn't in this map, or if the mapped value
    *         was explicitly set to null.
    */
-  public Object put(Object key, Object value)
+  public Object put(K key, V value)
   {
     cleanQueue();
     WeakBucket.WeakEntry entry = internalGet(key);
@@ -794,7 +796,7 @@ public class WeakHashMap extends AbstractMap implements Map
    *         null if the key wasn't in this map, or if the mapped value was
    *         explicitly set to null.
    */
-  public Object remove(Object key)
+  public V remove(Object key)
   {
     cleanQueue();
     WeakBucket.WeakEntry entry = internalGet(key);
@@ -814,7 +816,7 @@ public class WeakHashMap extends AbstractMap implements Map
    * this weak hash map.
    * @return a set representation of the entries.
    */
-  public Set entrySet()
+  public Set<Map.Entry<K,V>> entrySet()
   {
     cleanQueue();
     return theEntrySet;
@@ -849,7 +851,7 @@ public class WeakHashMap extends AbstractMap implements Map
    * this weak hash map.
    * @return a set representation of the keys.
    */
-  public Set keySet()
+  public Set<K> keySet()
   {
     cleanQueue();
     return super.keySet();
@@ -860,7 +862,7 @@ public class WeakHashMap extends AbstractMap implements Map
    * key already exists in this map, its value is replaced.
    * @param m the map to copy in
    */
-  public void putAll(Map m)
+  public void putAll(Map<? extends K, ? extends V> m)
   {
     super.putAll(m);
   }
@@ -873,7 +875,7 @@ public class WeakHashMap extends AbstractMap implements Map
    * this weak hash map.
    * @return a collection representation of the values.
    */
-  public Collection values()
+  public Collection<V> values()
   {
     cleanQueue();
     return super.values();

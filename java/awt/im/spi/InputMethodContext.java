@@ -1,5 +1,5 @@
 /* InputMethodContext.java -- communication between an input method and client
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package java.awt.im.spi;
 
-import java.awt.HeadlessException;
 import java.awt.Window;
 import java.awt.font.TextHitInfo;
 import java.awt.im.InputMethodRequests;
@@ -49,7 +48,8 @@ import javax.swing.JFrame;
  * and the client component. This should be passed to
  * {@link InputMethod#setInputMethodContext(InputMethodContext)}.
  *
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.3
  * @status updated to 1.4
  */

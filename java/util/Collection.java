@@ -1,5 +1,5 @@
 /* Collection.java -- Interface that represents a collection of objects
-   Copyright (C) 1998, 2001, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -67,6 +67,8 @@ package java.util;
  *
  * @author Original author unknown
  * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see List
  * @see Set
  * @see Map
@@ -152,7 +154,7 @@ public interface Collection<E> extends Iterable<E>
    *   collection does not support null values.
    * @throws NullPointerException if c itself is null.
    */
-  boolean containsAll(Collection c);
+  boolean containsAll(Collection<?> c);
 
   /**
    * Test whether this collection is equal to some object. The Collection

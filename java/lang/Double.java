@@ -1,5 +1,5 @@
 /* Double.java -- object wrapper for double
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -48,8 +48,10 @@ import gnu.classpath.Configuration;
  * related to doubles.
  *
  * @author Paul Fisher
- * @author Andrew Haley <aph@cygnus.com>
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Andrew Haley (aph@cygnus.com)
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  * @status partly updated to 1.5
  */
@@ -505,22 +507,6 @@ public final class Double extends Number implements Comparable<Double>
   public int compareTo(Double d)
   {
     return compare(value, d.value);
-  }
-
-  /**
-   * Behaves like <code>compareTo(Double)</code> unless the Object
-   * is not an <code>Double</code>.
-   *
-   * @param o the object to compare
-   * @return the comparison
-   * @throws ClassCastException if the argument is not a <code>Double</code>
-   * @see #compareTo(Double)
-   * @see Comparable
-   * @since 1.2
-   */
-  public int compareTo(Object o)
-  {
-    return compare(value, ((Double) o).value);
   }
 
   /**

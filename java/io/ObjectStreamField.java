@@ -1,5 +1,5 @@
 /* ObjectStreamField.java -- Class used to store name and class of fields
-   Copyright (C) 1998, 1999, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -48,11 +48,17 @@ import java.security.PrivilegedAction;
  * This class intends to describe the field of a class for the serialization
  * subsystem. Serializable fields in a serializable class can be explicitly
  * exported using an array of ObjectStreamFields.
+ *
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Jeroen Frijters (jeroen@frijters.net)
+ * @author Guilhem Lavaux (guilhem@kaffe.org)
+ * @author Michael Koch (konqueror@gmx.de)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class ObjectStreamField implements Comparable
 {
   private String name;
-  private Class type;
+  private Class<?> type;
   private String typename;
   private int offset = -1; // XXX make sure this is correct
   private boolean unshared;
@@ -159,7 +165,7 @@ public class ObjectStreamField implements Comparable
    *
    * @return A class representing the type of the field.
    */
-  public Class getType ()
+  public Class<?> getType ()
   {
     return type;
   }
@@ -347,7 +353,7 @@ public class ObjectStreamField implements Comparable
    */
   void checkFieldType() throws InvalidClassException
   {
-    Class ftype = field.getType();
+    Class<?> ftype = field.getType();
 
     if (!ftype.isAssignableFrom(type))
       throw new InvalidClassException

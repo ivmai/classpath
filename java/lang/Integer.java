@@ -1,5 +1,5 @@
 /* Integer.java -- object wrapper for int
-   Copyright (C) 1998, 1999, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -49,6 +49,8 @@ package java.lang;
  * @author John Keiser
  * @author Warren Levy
  * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  * @status updated to 1.5
  */
@@ -521,22 +523,6 @@ public final class Integer extends Number implements Comparable<Integer>
       return 0;
     // Returns just -1 or 1 on inequality; doing math might overflow.
     return value > i.value ? 1 : -1;
-  }
-
-  /**
-   * Behaves like <code>compareTo(Integer)</code> unless the Object
-   * is not an <code>Integer</code>.
-   *
-   * @param o the object to compare
-   * @return the comparison
-   * @throws ClassCastException if the argument is not an <code>Integer</code>
-   * @see #compareTo(Integer)
-   * @see Comparable
-   * @since 1.2
-   */
-  public int compareTo(Object o)
-  {
-    return compareTo((Integer) o);
   }
 
   /**

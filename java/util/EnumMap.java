@@ -63,7 +63,7 @@ public class EnumMap<K extends Enum<K>, V>
 
   public EnumMap(Class<K> keyType)
   {
-    store = new V[keyType.getEnumConstants().length];
+    store = (V[]) new Object[keyType.getEnumConstants().length];
     Arrays.fill(store, emptySlot);
     cardinality = 0;
     enumClass = keyType;

@@ -1,3 +1,99 @@
+2005-01-10  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/awt/AWTKeyStroke.java:
+	Typed static cache and vktable generically
+	(removeEldestEntry(Map.Entry<AWTKeyStroke,AWTKeyStroke>)):
+	typed generically
+	(registerSubclass(Class<?>)): typed generically
+	(readResolve()): removed unnecessary cast
+	(setFocusTraversalKeys(int, Set<? extends AWTKeyStroke>)):
+	typed generically
+	* java/awt/Container.java:
+	(setFocusTraversalKeys(int, Set<? extends AWTKeyStroke>)):
+	typed generically
+	(getFocusTraversalKeys(int)): typed generically
+	* java/awt/GridBagLayout.java:
+	comptable, internalcomptable now generically typed
+	(GridBagLayout()): generic typing
+	(sortBySpan(Component,int,ArrayList<Component>,boolean)):
+	typed generically
+	* java/awt/KeyboardFocusManager.java:
+	(getDefaultFocusTraversalKeys(int)): typed generically
+	* java/awt/dnd/DragGestureRecognizer.java:
+	typed events generically
+	* java/awt/dnd/DropTargetContext.java:
+	removed unnecessary import and added serialization UID
+	* java/awt/im/InputContext.java:
+	typed descriptors and recent generically
+	* java/awt/im/spi/InputMethodContext.java:
+	removed unnecessary import
+	* java/io/DeleteFileHelper.java:
+	filesToDelete typed generically
+	(add(java.io.File)): typed generically
+	(deleteFiles()): iteration changed to foreach
+	* java/io/ObjectInputStream.java:
+	typed objectLookupTable, validators, classLookupTable, oscs
+	generically
+	(resolveProxyClass(String[]): typed generically
+	* java/io/ObjectOutputStream.java:
+	removed unnecessary import
+	typed OIDLookupTable generically
+	* java/io/ObjectStreamClass.java:
+	typed oscs and classLookupTable generically
+	* java/io/ObjectStreamField.java:
+	type typed generically
+	(getType()): typed generically
+	(checkFieldType()): typed generically
+	* java/lang/Byte.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/Character.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/Class.java:
+	Typing changed from K to T in accordance with docs
+	and semantics (is a type, not a key)
+	(getEnumConstants()): implemented using reflection
+	(isEnum()): implemented using reflection
+	* java/lang/Double.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/Float.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/InheritableThreadLocal.java:
+	removed invalid static generic typing
+	* java/lang/Integer.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/Long.java:
+	(compareTo(Object)): removed as unneeded
+	* java/lang/Short.java:
+	(compareTo(Object)): removed as unneeded
+	* java/util/AbstractQueue.java:
+	Typing changed from T to E in accordance with docs
+	and semantics (is primarily a element)
+	* java/util/Collection.java:
+	(containsAll(Collection<?> c)): typed generically
+	* java/util/EnumMap.java:
+	(EnumMap(Class<K>)): removed invalid array creation
+	* java/util/LinkedHashMap.java:
+	Added generic typing
+	(LinkedHashMap(Map<? extends K, ? extends V>)): added
+	generics
+	(get(Object)): returns V instead of Object
+	(removeEldestEntry(Map.Entry<K,V>)): typed generically
+	* java/util/PriorityQueue.java:
+	removed invalid generic instanceof and generic array
+	creation
+	(iterator().remove()): added reference to outer class
+	* java/util/WeakHashMap.java
+	Added generic typing
+	(WeakHashMap(Map<? extends K, ? extends V>)): added
+	generics
+	(get(Object)): returns V instead of Object
+	(put(K,V)): generically typed
+	(remove(Object)): returns V instead of Object
+	(entrySet()): returns generic set
+	(keySet()): returns generic set
+	(putAll(Map<? extends K, ? extends V>)): generically typed
+	(values()): returns generic collection
+	
 2005-01-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/io/PrintStream.java:

@@ -1,5 +1,5 @@
 /* ObjectOutputStream.java -- Class used to write serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,7 +42,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-import java.security.PrivilegedAction;
 import java.security.AccessController;
 import java.util.Hashtable;
 
@@ -116,6 +115,11 @@ import gnu.classpath.Configuration;
  * @see java.io.Externalizable
  * @see java.io.ObjectInputStream
  * @see java.io.Serializable
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Jeroen Frijters (jeroen@frijters.net)
+ * @author Guilhem Lavaux (guilhem@kaffe.org)
+ * @author Michael Koch (konqueror@gmx.de)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class ObjectOutputStream extends OutputStream
   implements ObjectOutput, ObjectStreamConstants
@@ -141,7 +145,7 @@ public class ObjectOutputStream extends OutputStream
     replacementEnabled = false;
     isSerializing = false;
     nextOID = baseWireHandle;
-    OIDLookupTable = new Hashtable();
+    OIDLookupTable = new Hashtable<ObjectIdentityWrapper,Integer>();
     protocolVersion = defaultProtocolVersion;
     useSubclassMethod = false;
     writeStreamHeader();
@@ -1567,7 +1571,7 @@ public class ObjectOutputStream extends OutputStream
   private boolean replacementEnabled;
   private boolean isSerializing;
   private int nextOID;
-  private Hashtable OIDLookupTable;
+  private Hashtable<ObjectIdentityWrapper,Integer> OIDLookupTable;
   private int protocolVersion;
   private boolean useSubclassMethod;
   private SetAccessibleAction setAccessible = new SetAccessibleAction();

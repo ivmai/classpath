@@ -1,5 +1,5 @@
 /* AbstractQueue.java -- Implementation of some Queue methods
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,27 +39,30 @@ exception statement from your version. */
 package java.util;
 
 /**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
-public class AbstractQueue<T> extends AbstractCollection<T> implements Queue<T>
+public abstract class AbstractQueue<E> extends AbstractCollection<E> 
+  implements Queue<E>
 {
   protected AbstractQueue()
   {
   }
 
-  public boolean add(T value)
+  public boolean add(E value)
   {
     if (offer(value))
       return true;
     throw new IllegalStateException();
   }
 
-  public boolean addAll(Collection<? extends T> c)
+  public boolean addAll(Collection<? extends E> c)
   {
     if (c == this)
       throw new IllegalArgumentException();
     boolean result = false;
-    for (T val : c)
+    for (E val : c)
       {
 	if (add(val))
 	  result = true;
@@ -73,17 +76,17 @@ public class AbstractQueue<T> extends AbstractCollection<T> implements Queue<T>
       ;
   }
 
-  public T element()
+  public E element()
   {
-    T result = peek();
+    E result = peek();
     if (result == null)
       throw new NoSuchElementException();
     return result;
   }
 
-  public T remove()
+  public E remove()
   {
-    T result = poll();
+    E result = poll();
     if (result == null)
       throw new NoSuchElementException();
     return result;

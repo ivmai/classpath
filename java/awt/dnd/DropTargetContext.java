@@ -1,5 +1,5 @@
 /* DropTargetContext.java --
-   Copyright (C) 2002, 2003 Free Software Foundation
+   Copyright (C) 2002, 2003, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package java.awt.dnd;
 
-import java.awt.dnd.peer.DropTargetContextPeer;
 import java.io.Serializable;
 import java.io.IOException;
 import java.awt.Component;
@@ -49,6 +48,7 @@ import java.util.List;
 
 /**
  * @author Michael Koch <konqueror@gmx.de>
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.2
  */
 public class DropTargetContext implements Serializable

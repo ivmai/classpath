@@ -1,5 +1,5 @@
 /* AWTKeyStroke.java -- an immutable key stroke
-   Copyright (C) 2002 Free Software Foundation
+   Copyright (C) 2002, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -63,7 +63,8 @@ import java.util.StringTokenizer;
  * instances of a subclass, using reflection, provided the subclass has a
  * no-arg constructor (of any accessibility).
  *
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see #getAWTKeyStroke(char)
  * @since 1.4
  * @status updated to 1.4
@@ -84,13 +85,15 @@ public class AWTKeyStroke implements Serializable
    * under the assumption that garbage collection of a new keystroke is
    * easy when we find the old one that it matches in the cache.
    */
-  private static final LinkedHashMap cache = new LinkedHashMap(11, 0.75f, true)
+  private static final LinkedHashMap<AWTKeyStroke,AWTKeyStroke> cache =
+    new LinkedHashMap<AWTKeyStroke,AWTKeyStroke>(11, 0.75f, true)
   {
     /** The largest the keystroke cache can grow. */
     private static final int MAX_CACHE_SIZE = 2048;
 
     /** Prune stale entries. */
-    protected boolean removeEldestEntry(Map.Entry eldest)
+    protected boolean removeEldestEntry(Map.Entry<AWTKeyStroke,AWTKeyStroke>
+					eldest)
     {	// XXX - FIXME Use Map.Entry, not just Entry  as gcj 3.1 workaround.
       return size() > MAX_CACHE_SIZE;
     }
@@ -112,7 +115,7 @@ public class AWTKeyStroke implements Serializable
    *
    * @see #getAWTKeyStroke(String)
    */
-  private static final HashMap vktable = new HashMap();
+  private static final HashMap<String,Object> vktable = new HashMap<String,Object>();
   static
   {
     // Using reflection saves the hassle of keeping this in sync with KeyEvent,
@@ -227,7 +230,7 @@ public class AWTKeyStroke implements Serializable
    * @throws IllegalArgumentException subclass doesn't have no-arg constructor
    * @throws ClassCastException subclass doesn't extend AWTKeyStroke
    */
-  protected static void registerSubclass(final Class subclass)
+  protected static void registerSubclass(final Class<?> subclass)
   {
     if (subclass == null)
       throw new IllegalArgumentException();
@@ -250,7 +253,8 @@ public class AWTKeyStroke implements Serializable
                 throws NoSuchMethodException, InstantiationException,
                        IllegalAccessException, InvocationTargetException
               {
-                Constructor c = subclass.getDeclaredConstructor(null);
+                Constructor<?> c =
+		  subclass.getDeclaredConstructor((Class<?>[])null);
                 c.setAccessible(true);
                 // Create a new instance, to make sure that we can, and
                 // to cause any ClassCastException.
@@ -576,7 +580,7 @@ public class AWTKeyStroke implements Serializable
    */
   protected Object readResolve() throws ObjectStreamException
   {
-    AWTKeyStroke s = (AWTKeyStroke) cache.get(this);
+    AWTKeyStroke s = cache.get(this);
     if (s != null)
       return s;
     cache.put(this, this);

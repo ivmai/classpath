@@ -3496,7 +3496,8 @@ public abstract class Component
    * @see KeyboardFocusManager#UP_CYCLE_TRAVERSAL_KEYS
    * @since 1.4
    */
-  public void setFocusTraversalKeys(int id, Set keystrokes)
+  public void setFocusTraversalKeys(int id,
+				    Set<? extends AWTKeyStroke> keystrokes)
   {
     if (keystrokes == null)
       {

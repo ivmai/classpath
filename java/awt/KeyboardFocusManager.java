@@ -1,5 +1,5 @@
 /* KeyboardFocusManager.java -- manage component focusing via the keyboard
-   Copyright (C) 2002 Free Software Foundation
+   Copyright (C) 2002, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -67,6 +67,7 @@ import java.util.Set;
  *
  * @author Eric Blake <ebb9@email.byu.edu>
  * @author Thomas Fitzsimmons <fitzsim@redhat.com>
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.4
  * @status partially updated to 1.4, needs documentation.
  */
@@ -575,7 +576,7 @@ public abstract class KeyboardFocusManager
    * @see #UP_CYCLE_TRAVERSAL_KEYS
    * @see #DOWN_CYCLE_TRAVERSAL_KEYS
    */
-  public Set getDefaultFocusTraversalKeys (int id)
+  public Set<AWTKeyStroke> getDefaultFocusTraversalKeys (int id)
   {
     if (id < FORWARD_TRAVERSAL_KEYS || id > DOWN_CYCLE_TRAVERSAL_KEYS)
       throw new IllegalArgumentException ();

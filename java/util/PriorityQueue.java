@@ -1,5 +1,5 @@
 /* PriorityQueue.java -- Unbounded priority queue
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -39,6 +39,8 @@ exception statement from your version. */
 package java.util;
 
 /**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public class PriorityQueue<E> extends AbstractQueue<E>
@@ -71,7 +73,7 @@ public class PriorityQueue<E> extends AbstractQueue<E>
     this(Math.max(1, (int) (1.1 * c.size())), null);
 
     // Special case where we can find the comparator to use.
-    if (c instanceof SortedSet<? extends E>)
+    if (c instanceof SortedSet)
       {
 	SortedSet<? extends E> ss = (SortedSet<? extends E>) c;
 	this.comparator = ss.comparator();
@@ -84,7 +86,7 @@ public class PriorityQueue<E> extends AbstractQueue<E>
 	    storage[i++] = val;
 	  }
       }
-    else if (c instanceof PriorityQueue<? extends E>)
+    else if (c instanceof PriorityQueue)
       {
 	PriorityQueue<? extends E> pq = (PriorityQueue<? extends E>) c;
 	this.comparator = pq.comparator();
@@ -103,7 +105,7 @@ public class PriorityQueue<E> extends AbstractQueue<E>
   public PriorityQueue(int cap, Comparator<? super E> comp)
   {
     this.used = 0;
-    this.storage = new E[cap];
+    this.storage = (E[]) new Object[cap];
     this.comparator = comp;
   }
 
@@ -158,9 +160,9 @@ public class PriorityQueue<E> extends AbstractQueue<E>
 	return storage[index];
       }
 
-      void remove()
+      public void remove()
       {
-	remove(index);
+	PriorityQueue.this.remove(index);
       }
     };
   }
@@ -317,7 +319,7 @@ public class PriorityQueue<E> extends AbstractQueue<E>
 
   void resize()
   {
-    E[] new_data = new E[2 * storage.length];
+    E[] new_data = (E[]) new Object[2 * storage.length];
     System.arraycopy(storage, 0, new_data, 0, storage.length);
     storage = new_data;
   }

@@ -1,6 +1,6 @@
 /* ObjectStreamClass.java -- Class used to write class information
    about serialized objects.
-   Copyright (C) 1998, 1999, 2000, 2001, 2003  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005  Free Software Foundation, Inc.
 
    This file is part of GNU Classpath.
 
@@ -61,6 +61,13 @@ import gnu.java.security.action.SetAccessibleAction;
 import gnu.java.security.provider.Gnu;
 
 
+/**
+ * @author Tom Tromey (tromey@redhat.com)
+ * @author Jeroen Frijters (jeroen@frijters.net)
+ * @author Guilhem Lavaux (guilhem@kaffe.org)
+ * @author Michael Koch (konqueror@gmx.de)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ */
 public class ObjectStreamClass implements Serializable
 {
   /**
@@ -233,7 +240,7 @@ public class ObjectStreamClass implements Serializable
       return new ObjectStreamClass[0];
     else
       {
-	Vector oscs = new Vector();
+	Vector<ObjectStreamClass> oscs = new Vector<ObjectStreamClass>();
 
 	while (osc != null)
 	  {
@@ -861,7 +868,8 @@ outer:
 
   public static final ObjectStreamField[] NO_FIELDS = {};
 
-  private static Hashtable classLookupTable = new Hashtable();
+  private static Hashtable<Class,ObjectStreamClass> classLookupTable
+    = new Hashtable<Class,ObjectStreamClass>();
   private static final NullOutputStream nullOutputStream = new NullOutputStream();
   private static final Comparator interfaceComparator = new InterfaceComparator();
   private static final Comparator memberComparator = new MemberComparator();

@@ -1,5 +1,5 @@
 /* Container.java -- parent container class in AWT
-   Copyright (C) 1999, 2000, 2002, 2003, 2004 Free Software Foundation
+   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -37,7 +37,6 @@ exception statement from your version. */
 
 package java.awt;
 
-import java.awt.event.AWTEventListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.awt.event.MouseEvent;
@@ -66,11 +65,12 @@ import javax.swing.SwingUtilities;
  * list or bottom of the stacking order.
  *
  * @author original author unknown
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  *
  * @since 1.0
  *
- * @status still missing 1.4 support
+ * @status still missing 1.4 support, some generics from 1.5
  */
 public class Container extends Component
 {
@@ -1092,7 +1092,8 @@ public class Container extends Component
    *
    * @since 1.4
    */
-  public void setFocusTraversalKeys(int id, Set keystrokes)
+  public void setFocusTraversalKeys(int id,
+				    Set<? extends AWTKeyStroke> keystrokes)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
@@ -1180,7 +1181,8 @@ public class Container extends Component
     if (focusTraversalKeys == null)
       focusTraversalKeys = new Set[3];
 
-    keystrokes = Collections.unmodifiableSet (new HashSet (keystrokes));
+    keystrokes =
+      Collections.unmodifiableSet(new HashSet<AWTKeyStroke>(keystrokes));
     firePropertyChange (name, focusTraversalKeys[id], keystrokes);
 
     focusTraversalKeys[id] = keystrokes;
@@ -1198,7 +1200,7 @@ public class Container extends Component
    *
    * @since 1.4
    */
-  public Set getFocusTraversalKeys (int id)
+  public Set<AWTKeyStroke> getFocusTraversalKeys (int id)
   {
     if (id != KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS &&
         id != KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS &&
