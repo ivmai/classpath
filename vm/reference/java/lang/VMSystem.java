@@ -37,16 +37,24 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 /**
  * VMSystem is a package-private helper class for System that the
  * VM must implement.
  *
  * @author John Keiser
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 final class VMSystem
 {
@@ -132,9 +140,12 @@ final class VMSystem
    public static native long currentTimeMillis();
 
   /**
-   * Return an unmodifiable Map representing the current environment.
+   * Returns a list of 'name=value' pairs representing the current environment
+   * variables.
+   *
+   * @return a list of 'name=value' pairs.
    */
-  static native Map<String, String> getenv();
+  static native List<String> environ();
 
   /**
    * Gets the value of an environment variable from the current
@@ -145,12 +156,7 @@ final class VMSystem
    * @return The string value of the variable or null when the
    *         environment variable is not defined.
    */
-  static String getenv(String k)
-  {
-    // Inefficient but portable default implementation.
-    Map<String, String> m = getenv();
-    return m.get(k);
-  }
+  static native String getenv(String k);
 
   /**
    * Helper method which creates the standard input stream.

@@ -44,7 +44,12 @@ import gnu.classpath.VMStackWalker;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Properties;
 import java.util.PropertyPermission;
 
@@ -99,6 +104,11 @@ public final class System
   public static final PrintStream err = VMSystem.makeStandardErrorStream();
 
   /**
+   * A cached copy of the environment variable map.
+   */
+  private static Map<String,String> environmentMap;
+
+  /**
    * This class is uninstantiable.
    */
   private System()
@@ -135,8 +145,7 @@ public final class System
   {
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
-      sm.checkPermission(new RuntimePermission("setIO"));
-    
+      sm.checkPermission(new RuntimePermission("setIO"));    
     VMSystem.setOut(out);
   }
 
@@ -448,7 +457,35 @@ public final class System
   }
 
   /**
-   * FIXME: document
+   * <p>
+   * Returns an unmodifiable view of the system environment variables.
+   * If the underlying system does not support environment variables,
+   * an empty map is returned.
+   * </p>
+   * <p>
+   * The returned map is read-only and does not accept queries using
+   * null keys or values, or those of a type other than <code>String</code>.
+   * Attempts to modify the map will throw an
+   * <code>UnsupportedOperationException</code>, while attempts
+   * to pass in a null value will throw a
+   * <code>NullPointerException</code>.  Types other than <code>String</code>
+   * throw a <code>ClassCastException</code>.
+   * </p>
+   * <p>
+   * As the returned map is generated using data from the underlying
+   * platform, it may not comply with the <code>equals()</code>
+   * and <code>hashCode()</code> contracts.  It is also likely that
+   * the keys of this map will be case-sensitive.
+   * </p>
+   * <p>
+   * Use of this method may require a security check for the
+   * RuntimePermission "getenv.*".
+   * </p>
+   *
+   * @return a map of the system environment variables.
+   * @throws SecurityException if the checkPermission method of
+   *         an installed security manager prevents access to
+   *         the system environment variables.
    * @since 1.5
    */
   public static Map<String, String> getenv()
@@ -456,7 +493,180 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("getenv.*"));
-    return VMSystem.getenv();
+    if (environmentMap == null)
+      {
+	List<String> environ = VMSystem.environ();
+	Map<String,String> variables = new HashMap();
+	for (String pair : environ)
+	  {
+	    String[] parts;
+
+	    parts = pair.split("=");
+	    variables.put(parts[0], parts[1]);
+	  }
+	environmentMap = new HashMap<String,String>(variables) 
+	  {
+	    /**
+	     * Blocks the removal of all mappings from the map.
+	     *
+	     * @throws UnsupportedOperationException as mappings
+	     *         cannot be removed from this map.
+	     */
+	    public void clear()
+	    {
+	      throw new
+	      UnsupportedOperationException("This map does not " +
+					    "allow the removal of mappings.");
+	    }
+	    
+	    /**
+	     * Blocks queries containing a null key or one which is not
+	     * of type <code>String</code>.  All other queries
+	     * are forwarded to the superclass.
+	     *
+	     * @param key the key to look for in the map.
+	     * @return true if the key exists in the map.
+	     * @throws NullPointerException if the specified key is null.
+	     * @throws ClassCastException if the specified key is not a String.
+	     */
+	    public boolean containsKey(Object key)
+	    {
+	      if (key == null)
+	      {
+		throw new
+		NullPointerException("This map does not support null keys.");
+	      }
+	      if (!(key instanceof String))
+	      {
+		throw new
+		ClassCastException("This map only supports Strings.");
+	      }
+	      return super.containsKey(key);
+	    }
+	    
+	    /**
+	     * Blocks queries using a null or non-<code>String</code> value.
+	     * All other queries are forwarded to the superclass.
+	     *
+	     * @param value the value to look for in the map.
+	     * @return true if the value exists in the map.
+	     * @throws NullPointerException if the specified value is null.
+	     * @throws ClassCastException if the specified value is not a String.
+	     */
+	    public boolean containsValue(Object value)
+	    {
+	      if (value == null)
+	      {
+		throw new
+		NullPointerException("This map does not support null values.");
+	      }
+	      if (!(value instanceof String))
+	      {
+		throw new
+		ClassCastException("This map only supports Strings.");
+	      }
+	      return super.containsValue(value);
+	    }
+
+	    /**
+	     * Returns a set view of the map entries, with the same
+	     * provisions as for the underlying map.
+	     *
+	     * @return a set containing the map entries.
+	     */
+	    public Set<Map.Entry<String,String>> entrySet()
+	    {
+	      return new EnvironmentSet<Map.Entry<String,String>>(super.entrySet());
+	    }
+
+	    /**
+	     * Blocks queries containing a null key.  All other
+	     * queries are passed on to the superclass.
+	     *
+	     * @param key the key to retrieve the value for.
+	     * @return the value associated with the given key.
+	     * @throws NullPointerException if the specified key is null.
+	     * @throws ClassCastException if the specified key is not a String.
+	     */
+	    public String get(Object key)
+	    {
+	      if (key == null)
+	      {
+		throw new
+		NullPointerException("This map does not support null keys.");
+	      }
+	      return super.get(key);
+	    }
+
+	    /**
+	     * Returns a set view of the keys, with the same
+	     * provisions as for the underlying map.
+	     *
+	     * @return a set containing the keys.
+	     */
+	    public Set<String> keySet()
+	    {
+	      return new EnvironmentSet<String>(super.keySet());
+	    }
+
+	    /**
+	     * Blocks the addition of mappings to the map.
+	     *
+	     * @param key the key to add.
+	     * @param value the value to add.
+	     * @return the previous value of the specified key, or
+	     *         null if there was no previous value.
+	     * @throws UnsupportedOperationException as this map can't
+	     *         be extended.
+	     */
+	    public String put(String key, String value)
+	    {
+	      throw new
+	      UnsupportedOperationException("This map can not be extended.");
+	    }
+
+	    /**
+	     * Blocks the addition of mappings to the map.
+	     *
+	     * @param m the map from which to take the new entries.
+	     * @throws UnsupportedOperationException as this map can't
+	     *         be extended.
+	     */
+	    public void putAll(Map<? extends String, ? extends String> m)
+	    {
+	      throw new
+	      UnsupportedOperationException("This map can not be extended.");
+	    }
+	    
+	    /**
+	     * Blocks the removal of entries from the map.
+	     *
+	     * @param key the key of the entry to remove.
+	     * @return the removed value.
+	     * @throws UnsupportedOperationException as entries can't
+	     *         be removed from this map.
+	     */
+	    public String remove(Object key)
+	    {
+	      throw new
+	      UnsupportedOperationException("Entries can not be removed " +
+					    "from this map.");
+	    }
+
+	    /**
+	     * Returns a collection view of the values, with the same
+	     * provisions as for the underlying map.
+	     *
+	     * @return a collection containing the values.
+	     */
+	    public Collection<String> values()
+	    {
+	      return new EnvironmentCollection<String>(super.values());
+	    }
+
+	  };
+      }
+    return environmentMap;
   }
 
   /**
@@ -570,5 +780,344 @@ public final class System
   {
     return VMRuntime.mapLibraryName(libname);
   }
+
+
+  /**
+   * This is an specialised <code>Collection</code>, providing
+   * the necessary provisions for the collections used by the
+   * environment variable map.  Namely, it prevents
+   * modifications and the use of queries with null
+   * or non-<code>String</code> values.
+   *
+   * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+   */
+  private static class EnvironmentCollection<E>
+    implements Collection<E>
+  {
+
+    /**
+     * The wrapped collection.
+     */
+    protected Collection<E> c;
+
+    /**
+     * Constructs a new environment collection, which
+     * wraps the elements of the supplied collection.
+     *
+     * @param coll the collection to use as a base for
+     *             this collection.
+     */
+    public EnvironmentCollection(Collection<? extends E> coll)
+    {
+      c = (Collection<E>) coll;
+    }
+    
+    /**
+     * Blocks the addition of elements to the collection.
+     *
+     * @param entry the new entry.
+     * @throws UnsupportedOperationException as the underlying
+     *         map does not support new elements.
+		 */
+    public boolean add(E entry)
+    {
+      throw new
+	UnsupportedOperationException("The addition of elements is " +
+				      "not supported.");
+    }
+    
+    /**
+     * Blocks the addition of a collection of elements to
+     * the collection.
+     * 
+     * @param c the collection of elements to add.
+     * @throws UnsupportedOperationException as the underlying
+     *         map does not support new elements.
+     */
+    public boolean addAll(Collection<? extends E> c)
+    {
+      throw new
+	UnsupportedOperationException("The addition of elements is " +
+				      "not supported.");
+    }
+
+    /**
+     * Blocks the removal of all elements.
+     *
+     * @throws UnsupportedOperationException as elements
+     *         cannot be removed from this map.
+     */
+    public void clear()
+    {
+      throw new
+	UnsupportedOperationException("This map does not " +
+				      "allow the removal of elements.");
+    }
+    
+    /**
+     * Blocks queries containing a null object or an object which
+     * isn't of type <code>String</code>.  All other queries
+     * are forwarded to the underlying collection.
+     *
+     * @param obj the object to look for.
+     * @return true if the object exists in the collection.
+     * @throws NullPointerException if the specified object is null.
+     * @throws ClassCastException if the specified object is not a String.
+     */
+    public boolean contains(Object obj)
+    {
+      if (obj == null)
+	{
+	  throw new
+	    NullPointerException("This collection does not support null values.");
+	}
+      if (!(obj instanceof String))
+	{
+	  throw new
+	    ClassCastException("This collection only supports Strings.");
+	}
+      return c.contains(obj);
+    }
+    
+    /**
+     * Blocks queries where the collection contains a null object or
+     * an object which isn't of type <code>String</code>.  All other
+     * queries are forwarded to the underlying collection.
+     *
+     * @param coll the collection of objects to look for.
+     * @return true if the collection contains all elements in the collection.
+     * @throws NullPointerException if the collection is null.
+     * @throws NullPointerException if any collection entry is null.
+     * @throws ClassCastException if any collection entry is not a String.
+     */
+    public boolean containsAll(Collection<?> coll)
+    {
+      for (Object o: coll)
+	{
+	  if (o == null)
+	    {
+	      throw new
+		NullPointerException("This collection does not support null values.");
+	    }
+	  if (!(o instanceof String))
+	    {
+	      throw new
+		ClassCastException("This collection only supports Strings.");
+	    }
+	}
+      return c.containsAll(coll);
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @return true if the collection is empty.
+     */
+    public boolean isEmpty()
+    {
+      return c.isEmpty();
+    }
+
+    /**
+     * This returns an iterator over the map elements, with the
+     * same provisions as for the collection and underlying map.
+     *
+     * @return an iterator over the map elements.
+     */
+    public Iterator<E> iterator()
+    {
+      return new
+	EnvironmentIterator<E>(c.iterator());
+    }
+    
+    /**
+     * Blocks the removal of elements from the collection.
+     *
+     * @return true if the removal was sucessful.
+     * @throws UnsupportedOperationException as elements can't
+     *         be removed from this collection.
+     */
+    public boolean remove(Object key)
+    {
+      throw new
+	UnsupportedOperationException("Elements can not be removed " +
+				      "from this collection.");
+    }	
+        
+    /**
+     * Blocks the removal of all elements in the specified
+     * collection from the collection.
+     *
+     * @param c the collection of elements to remove.
+     * @return true if the elements were removed.
+     * @throws UnsupportedOperationException as elements can't
+     *         be removed from this collection.
+     */
+    public boolean removeAll(Collection<?> c)
+    {
+      throw new
+	UnsupportedOperationException("Elements can not be removed " +
+				      "from this collection.");
+    }
+    
+    /**
+     * Blocks the retention of all elements in the specified
+     * collection from the collection.
+     *
+     * @param c the collection of elements to retain.
+     * @return true if the other elements were removed.
+     * @throws UnsupportedOperationException as elements can't
+     *         be removed from this collection.
+     */
+    public boolean retainAll(Collection<?> c)
+    {
+      throw new
+		  UnsupportedOperationException("Elements can not be removed " +
+						"from this collection.");
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @return the size of the underlying collection.
+     */
+    public int size()
+    {
+      return c.size();
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @return the collection in array form.
+     */
+    public Object[] toArray()
+    {
+      return c.toArray();
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @param a the array to use to type the result.
+     * @return the collection in appropriately-typed
+     *         array form.
+     */
+    public <T> T[] toArray(T[] a)
+    {
+      return c.toArray(a);
+    }
+
+  } // class EnvironmentCollection<E>
+
+  private static class EnvironmentSet<S>
+    extends EnvironmentCollection<S>
+    implements Set<S>
+  {
+
+    /**
+     * Constructs a new environment set, which
+     * wraps the elements of the supplied set.
+     *
+     * @param set the set to use as a base for
+     *             this set.
+     */
+    public EnvironmentSet(Set<? extends S> set)
+    {
+      super(set);
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @param obj the object to compare with.
+     * @return true if the two objects are equal.
+     */
+    public boolean equals(Object obj)
+    {
+      return c.equals(obj);
+    }
+
+    /**
+     * This simply calls the same method on the wrapped
+     * collection.
+     *
+     * @return the hashcode of the collection.
+     */
+    public int hashCode()
+    {
+      return c.hashCode();
+    }
+
+  } // class EnvironmentSet<S>
+
+  /* The class below is a clone of UnmodifiableIterator
+   * from java.util.Collections. Please keep it in sync */
+  /**
+   * The implementation of the various iterator methods in the
+   * unmodifiable classes.
+   *
+   * @author Eric Blake (ebb9@email.byu.edu)
+   */
+  private static class EnvironmentIterator<T>
+    implements Iterator<T>
+  {
+    /**
+     * The wrapped iterator.
+     */
+    private final Iterator<T> i;
+
+    /**
+     * Only trusted code creates a wrapper.
+     * @param i the wrapped iterator
+     */
+    EnvironmentIterator(Iterator<T> i)
+    {
+      this.i = i;
+    }
+
+    /**
+     * Obtains the next element in the underlying collection.
+     *
+     * @return the next element in the collection.
+     * @throws NoSuchElementException if there are no more elements.
+     */
+    public T next()
+    {
+      return i.next();
+    }
+
+    /**
+     * Tests whether there are still elements to be retrieved from the
+     * underlying collection by <code>next()</code>.  When this method
+     * returns <code>true</code>, an exception will not be thrown on calling
+     * <code>next()</code>.
+     *
+     * @return <code>true</code> if there is at least one more element in the underlying
+     *         collection.
+     */
+    public boolean hasNext()
+    {
+      return i.hasNext();
+    }
+
+    /**
+     * Blocks the removal of elements from the underlying collection by the
+     * iterator.
+     *
+     * @throws UnsupportedOperationException as an unmodifiable collection
+     *         does not support the removal of elements by its iterator.
+     */
+    public void remove()
+    {
+      throw new UnsupportedOperationException("The removal of elements is " +
+					      "not supported.");
+    }
+  } // class EnvironmentIterator<I>
 
 } // class System
