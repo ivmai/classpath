@@ -1,3 +1,78 @@
+2005-01-18  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/Externalizable.java,
+	java/io/Serializable.java
+	(serialVersionUID): Removed.
+	* java/rmi/server/RemoteObject.java,
+	java/rmi/server/UID.java
+	(serialVersionUID): Made private.
+	* java/rmi/server/RemoteRef.java,
+	java/rmi/server/ServerRef.java
+	(serialVersionUID): Set proper value.
+	* java/security/interfaces/DSAPrivateKey.java,
+	java/security/interfaces/DSAPublicKey.java,
+	java/security/interfaces/RSAMultiPrimePrivateCrtKey.java,
+	java/security/interfaces/RSAPrivateCrtKey.java,
+	java/security/interfaces/RSAPrivateKey.java,
+	java/security/interfaces/RSAPublicKey.java,
+	javax/crypto/SecretKey.java
+	(serialVersionUID): Added.
+
+2005-01-18  Graydon Hoare  <graydon@redhat.com>
+
+	* gnu/java/awt/ClasspathToolkit.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java: Likewise.
+	* java/awt/EventQueue.java (getNextEvent):
+	Adjust event loop to switch to native mode after 100ms.
+	* javax/swing/Timer.java (drainEvents): Reuse Runnable.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkGenericPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkGenericPeer_dispose):
+	Wake up event thread.
+	* jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c
+	(Java_gnu_java_awt_peer_gtk_GtkToolkit_iterateNativeQueue):
+	Adjust event loop to switch to java mode after 100ms.
+
+2005-01-18  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_awt_peer_gtk_GtkToolkit.h: Regenerated.
+
+2005-01-17  Tom Tromey  <tromey@redhat.com>
+
+	* java/text/MessageFormat.java (scanString): Changed how quoting
+	is handled.
+	(scanFormatElement): Likewise.
+
+2005-01-17  Mark Wielaard  <mark@klomp.org>
+
+	* scripts/check_jni_methods.sh: Don't use mktemp for TMPFILEs.
+
+2005-01-17  Michael Koch  <konqueror@gmx.de>
+
+	PR libgcj/19444
+	* java/net/URI.java
+	(AUTHORITY_REGEXP): New regexp constant.
+	(AUTHORITY_USERINFO_GROUP): New constant.
+	(AUTHORITY_HOST_GROUP): Likewise.
+	(AUTHORITY_PORT_GROUP): Likewise.
+	(port): Changed default value to -1.
+	(parseURI): Parse authority part and initialize host,
+	port and userInfo.
+
+2005-01-17  Michael Koch  <konqueror@gmx.de>
+
+	* javax/print/attribute/standard/Chromaticity.java,
+	javax/print/attribute/standard/Destination.java:
+	New files.
+
+2005-01-17  Jerry Quinn  <jlquinn@optonline.net>
+
+	* javax/imageio/metadata/IIOMetadataNode.java:
+	Implemented.
+	* javax/imageio/metadata/IIOAttr.java,
+	javax/imageio/metadata/IIONamedNodeMap.java,
+	javax/imageio/metadata/IIONodeList.java:
+	New files
+	
 2005-01-17  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/IdentityHashMap.java:

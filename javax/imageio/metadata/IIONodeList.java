@@ -1,5 +1,5 @@
-/* RSAPrivateCrtKey.java -- An RSA private key in CRT format
-   Copyright (C) 1998 Free Software Foundation, Inc.
+/* IIOAttr.java --
+   Copyright (C) 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,61 +35,38 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.security.interfaces;
+package javax.imageio.metadata;
 
-import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This interface provides access to information about an RSA private
- * key in Chinese Remainder Theorem (CRT) format.
+ * Simple NodeList implementation for IIOMetadataNode.
  *
- * @version 0.0
+ * @author jlquinn
  *
- * @author Aaron M. Renn (arenn@urbanophile.com)
  */
-public interface RSAPrivateCrtKey extends RSAPrivateKey
+class IIONodeList implements NodeList
 {
-  long serialVersionUID = -5682214253527700368L;
-
-  /**
-   * Returns the public exponent for this key
-   *
-   * @return The public exponent for this key
+  List children = new ArrayList();
+  
+  /* (non-Javadoc)
+   * @see org.w3c.dom.NodeList#item(int)
    */
-  BigInteger getPublicExponent();
+  public Node item(int index)
+  {
+    return (index < children.size()) ? (Node)children.get(index) : null;
+  }
 
-  /**
-   * Returns the primeP value
-   *
-   * @return The primeP value
+  /* (non-Javadoc)
+   * @see org.w3c.dom.NodeList#getLength()
    */
-  BigInteger getPrimeP();
+  public int getLength()
+  {
+    return children.size();
+  }
 
-  /**
-   * Returns the primeQ value
-   *
-   * @return The primeQ value
-   */
-  BigInteger getPrimeQ();
-
-  /**
-   * Returns the primeExponentP
-   *
-   * @return The primeExponentP
-   */
-  BigInteger getPrimeExponentP();
-
-  /**
-   * Returns the primeExponentQ
-   *
-   * @return The primeExponentQ
-   */
-  BigInteger getPrimeExponentQ();
-
-  /**
-   * Returns the CRT coefficient
-   *
-   * @return The CRT coefficient
-   */
-  BigInteger getCrtCoefficient();
 }
