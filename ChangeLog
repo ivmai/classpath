@@ -1,3 +1,51 @@
+2005-03-28  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/io/decode/DecoderUnicodeBig.java,
+	* gnu/java/io/decode/DecoderUnicodeLittle.java,
+	* gnu/java/io/encode/EncoderUnicodeBig.java,
+	* gnu/java/io/encode/EncoderUnicodeLittle.java:
+        New files.
+
+2005-03-26  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* doc/hacking.texinfo:
+	Added note on reserved word usage.
+	
+2005-03-26  Dalibor Topic  <robilad@kaffe.org>
+
+	* native/jni/java-nio/gnu_java_nio_VMSelector.c:
+        Moved include statement for config.h to the top to
+        fix the build on Darwin6.
+
+        Reported by:  Riccardo Mottola <zuse@libero.it>
+
+2005-03-26  Dalibor Topic  <robilad@kaffe.org>
+
+        * native/jni/java-nio/gnu_java_nio_VMSelector.c:
+        Include <sys/types.h> to fix build on OS X.
+
+        Reported by: Michael Franz <mvfranz@gmail.com>
+
+2005-03-26  Ito Kazumitsu  <kaz@maczuka.gcd.org>
+
+        * java/text/DecimalFormat.java (parse):
+        Check whether the positive suffix matches the pattern.
+
+2005-03-26  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/dom/DomNode.java (notifyNode): grow listener array as
+	required.
+
+2005-03-26  Jeroen Frijters  <jeroen@frijters.net>
+
+	* javax/imageio/spi/IIORegistry.java (IIORegistry):
+	Don't assume that awt Toolkit is always ClasspathToolkit.
+
+2005-03-26  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/awt/image/PixelGrabber.java (setPixels(int,int,int,int,
+	ColorModel,byte[],int,int): Fixed byte to int conversion.
+
 2005-03-23  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* gnu/xml/dom/html2/DomHTMLParser.java
