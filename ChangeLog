@@ -1,3 +1,9 @@
+2004-08-16  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/AbstractQueue.java (addAll): Return a result.
+	(element): Fixed typo.
+	* java/util/PriorityQueue.java: New file.
+
 2004-08-15  Matthias Pfisterer  <Matthias.Pfisterer@web.de>
 	    Tom Tromey  <tromey@redhat.com>
 

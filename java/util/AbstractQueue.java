@@ -58,8 +58,13 @@ public class AbstractQueue<T> extends AbstractCollection<T> implements Queue<T>
   {
     if (c == this)
       throw new IllegalArgumentException();
+    boolean result = false;
     for (T val : c)
-      add(val);
+      {
+	if (add(val))
+	  result = true;
+      }
+    return result;
   }
 
   public void clear()
@@ -68,7 +73,7 @@ public class AbstractQueue<T> extends AbstractCollection<T> implements Queue<T>
       ;
   }
 
-  public t element()
+  public T element()
   {
     T result = peek();
     if (result == null)
