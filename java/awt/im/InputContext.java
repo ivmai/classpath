@@ -74,7 +74,7 @@ import java.util.Locale;
  * one entry per line in UTF-8 encoding, each class in the jar that implements
  * java.awt.im.spi.InputMethodDescriptor.
  *
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @see Component#getInputContext()
  * @see Component#enableInputMethods(boolean)

@@ -1,6 +1,6 @@
 /* IdentityHashMap.java -- a class providing a hashtable data structure,
    mapping Object --> Object, which uses object identity for hashing.
-   Copyright (C) 2001, 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -769,7 +769,7 @@ public class IdentityHashMap<K,V> extends AbstractMap<K,V>
    * the general contract of Map.Entry, and is probably unsuitable for
    * comparison to normal maps; but it works among other IdentityHashMaps.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private final class IdentityEntry<EK,EV> implements Map.Entry<EK,EV>
   {

@@ -112,7 +112,7 @@ public class Collections
    * The implementation of {@link #EMPTY_SET}. This class name is required
    * for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class EmptySet<T> extends AbstractSet<T>
     implements Serializable
@@ -266,7 +266,7 @@ public class Collections
    * The implementation of {@link #EMPTY_LIST}. This class name is required
    * for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class EmptyList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
@@ -444,7 +444,7 @@ public class Collections
    * The implementation of {@link #EMPTY_MAP}. This class name is required
    * for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class EmptyMap<K, V> extends AbstractMap<K, V>
     implements Serializable
@@ -964,7 +964,7 @@ public class Collections
    * The implementation of {@link #nCopies(int, Object)}. This class name
    * is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class CopiesList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
@@ -1175,7 +1175,7 @@ public class Collections
    * The implementation of {@link #reverseOrder()}. This class name
    * is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class ReverseComparator<T>
     implements Comparator<T>, Serializable
@@ -1393,7 +1393,7 @@ public class Collections
    * The implementation of {@link #singleton(Object)}. This class name
    * is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SingletonSet<T> extends AbstractSet<T>
     implements Serializable
@@ -1567,7 +1567,7 @@ public class Collections
    * The implementation of {@link #singletonList(Object)}. This class name
    * is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SingletonList<T> extends AbstractList<T>
     implements Serializable, RandomAccess
@@ -2012,7 +2012,7 @@ public class Collections
    * Package visible, so that collections such as the one for
    * Hashtable.values() can specify which object to synchronize on.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   static class SynchronizedCollection<T>
     implements Collection<T>, Serializable
@@ -2345,7 +2345,7 @@ public class Collections
    * synchronized classes. These iterators must "sync" on the same object
    * as the collection they iterate over.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class SynchronizedIterator<T> implements Iterator<T>
   {
@@ -2464,7 +2464,7 @@ public class Collections
    * serializability. Package visible, so that lists such as Vector.subList()
    * can specify which object to synchronize on.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   static class SynchronizedList<T> extends SynchronizedCollection<T>
     implements List<T>
@@ -2772,7 +2772,7 @@ public class Collections
    * lists. This class name is required for compatibility with Sun's JDK
    * serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SynchronizedRandomAccessList<T>
     extends SynchronizedList<T> implements RandomAccess
@@ -2837,7 +2837,7 @@ public class Collections
    * The implementation of {@link SynchronizedList#listIterator()}. This
    * iterator must "sync" on the same object as the list it iterates over.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SynchronizedListIterator<T>
     extends SynchronizedIterator<T> implements ListIterator<T>
@@ -3012,7 +3012,7 @@ public class Collections
    * The implementation of {@link #synchronizedMap(Map)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class SynchronizedMap<K, V> implements Map<K, V>, Serializable
   {
@@ -3543,7 +3543,7 @@ public class Collections
    * Package visible, so that sets such as Hashtable.keySet()
    * can specify which object to synchronize on.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   static class SynchronizedSet<T> extends SynchronizedCollection<T>
     implements Set<T>
@@ -3647,7 +3647,7 @@ public class Collections
    * The implementation of {@link #synchronizedSortedMap(SortedMap)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SynchronizedSortedMap<K, V>
     extends SynchronizedMap<K, V>
@@ -3845,7 +3845,7 @@ public class Collections
    * The implementation of {@link #synchronizedSortedSet(SortedSet)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class SynchronizedSortedSet<T>
     extends SynchronizedSet<T>
@@ -4575,7 +4575,7 @@ public class Collections
    * lists. This class name is required for compatibility with Sun's JDK
    * serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class UnmodifiableRandomAccessList<T>
     extends UnmodifiableList<T> implements RandomAccess
@@ -4599,7 +4599,7 @@ public class Collections
   /**
    * The implementation of {@link UnmodifiableList#listIterator()}.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class UnmodifiableListIterator<T>
     extends UnmodifiableIterator<T> implements ListIterator<T>
@@ -5122,7 +5122,7 @@ public class Collections
    * The implementation of {@link #unmodifiableSet(Set)}. This class
    * name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class UnmodifiableSet<T> extends UnmodifiableCollection<T>
     implements Set<T>
@@ -5191,7 +5191,7 @@ public class Collections
    * The implementation of {@link #unmodifiableSortedMap(SortedMap)}. This
    * class name is required for compatibility with Sun's JDK serializability.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class UnmodifiableSortedMap<K, V>
     extends UnmodifiableMap<K, V>

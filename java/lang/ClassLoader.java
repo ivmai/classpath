@@ -117,7 +117,7 @@ import java.util.StringTokenizer;
  *
  * @author John Keiser
  * @author Mark Wielaard
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see Class
  * @since 1.0
  */
@@ -1062,8 +1062,13 @@ public abstract class ClassLoader
 
   static ClassLoader defaultGetSystemClassLoader()
   {
-    ClassLoader extClassLoader =
-	new URLClassLoader(getExtClassLoaderUrls(), null);
+    URL[] extURLs = getExtClassLoaderUrls();
+    ClassLoader extClassLoader;
+    if (extURLs.length > 0)
+      extClassLoader = new URLClassLoader(getExtClassLoaderUrls(), null);
+    else
+      extClassLoader = null;
+
     ClassLoader systemClassLoader =
 	new URLClassLoader(getSystemClassLoaderUrls(), extClassLoader)
 	{

@@ -47,7 +47,7 @@ package java.lang;
  *
  * @author Paul Fisher
  * @author John Keiser
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @author Tom Tromey (tromey@redhat.com)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.1

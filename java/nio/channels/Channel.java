@@ -1,5 +1,5 @@
 /* Channel.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -47,7 +47,7 @@ public interface Channel extends Closeable
    * Tells whether this channel is open or not
    *
    * @return <code>true</code>if channel is open,
-   * </code>false</code> otherwise
+   * <code>false</code> otherwise
    */
   boolean isOpen();
 

@@ -44,8 +44,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 /**
- * @author Michael Koch <konqueror@gmx.de>
- * @author Jeroen Frijters <jeroen@frijters.net>
+ * @author Michael Koch (konqueror@gmx.de)
+ * @author Jeroen Frijters (jeroen@frijters.net)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
 public class GridBagLayout

@@ -47,7 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Michael Koch <konqueror@gmx.de>
+ * @author Michael Koch (konqueror@gmx.de)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.2
  */

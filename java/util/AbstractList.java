@@ -1,5 +1,6 @@
 /* AbstractList.java -- Abstract implementation of most of List
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -59,7 +60,7 @@ package java.util;
  *
  * @author Original author unknown
  * @author Bryce McKinlay
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see Collection
  * @see List
  * @see AbstractSequentialList
@@ -759,7 +760,7 @@ while (i.hasNext())
    * by using a non-public top-level class in the same package.
    *
    * @author Original author unknown
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static class SubList<E> extends AbstractList<E>
   {
@@ -1207,7 +1208,7 @@ while (i.hasNext())
    * This class is a RandomAccess version of SubList, as required by
    * {@link AbstractList#subList(int, int)}.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class RandomAccessSubList<E> extends SubList<E>
     implements RandomAccess

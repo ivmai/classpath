@@ -47,8 +47,8 @@ package java.lang;
  * related to floats.
  *
  * @author Paul Fisher
- * @author Andrew Haley <aph@cygnus.com>
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Andrew Haley (aph@cygnus.com)
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @author Tom Tromey (tromey@redhat.com)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0

@@ -109,8 +109,8 @@ import java.util.Set;
  * applies recursively to any child components of such a window,
  * which define no traversal keys of their own.
  *
- * @author Eric Blake <ebb9@email.byu.edu>
- * @author Thomas Fitzsimmons <fitzsim@redhat.com>
+ * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Thomas Fitzsimmons (fitzsim@redhat.com)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.4
  */

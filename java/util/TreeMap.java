@@ -1,6 +1,6 @@
 /* TreeMap.java -- a class providing a basic Red-Black Tree data structure,
    mapping Object --> Object
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -78,7 +78,7 @@ import java.io.Serializable;
  *
  * @author Jon Zeppieri
  * @author Bryce McKinlay
- * @author Eric Blake <ebb9@email.byu.edu>
+ * @author Eric Blake (ebb9@email.byu.edu)
  * @see Map
  * @see HashMap
  * @see Hashtable
@@ -160,7 +160,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * Class to represent an entry in the tree. Holds a single key-value pair,
    * plus pointers to parent and child nodes.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private static final class Node<K, V> extends AbstractMap.BasicMapEntry<K, V>
   {
@@ -1382,7 +1382,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * Iterate over TreeMap's entries. This implementation is parameterized
    * to give a sequential view of keys, values, or entries.
    *
-   * @author Eric Blake <ebb9@email.byu.edu>
+   * @author Eric Blake (ebb9@email.byu.edu)
    */
   private final class TreeIterator implements Iterator
   {
