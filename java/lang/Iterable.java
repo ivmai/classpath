@@ -45,12 +45,15 @@ import java.util.Iterator;
  * iterated over.  The compiler uses this interface to determine which
  * classes are suitable targets of the <code>foreach</code> construct.
  *
+ * @author Tom Tromey <tromey@redhat.com>
  * @since 1.5
  */
 public interface Iterable<E>
 {
   /**
    * Returns an iterator for the collection.
+   *
+   * @return an iterator.
    */
   Iterator<E> iterator ();
 }

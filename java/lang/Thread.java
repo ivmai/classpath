@@ -970,8 +970,61 @@ public class Thread implements Runnable
     vmThread = null;
   }
 
-  interface UncaughtExceptionHandler
+  /**
+   * <p>
+   * This interface is used to handle uncaught exceptions
+   * which cause a <code>Thread</code> to terminate.  When
+   * a thread, t, is about to terminate due to an uncaught
+   * exception, the virtual machine looks for a class which
+   * implements this interface, in order to supply it with
+   * the dying thread and its uncaught exception.
+   * </p>
+   * <p>
+   * The virtual machine makes two attempts to find an
+   * appropriate handler for the uncaught exception, in
+   * the following order:
+   * </p>
+   * <ol>
+   * <li>
+   * <code>t.getUncaughtExceptionHandler()</code> --
+   * the dying thread is queried first for a handler
+   * specific to that thread.
+   * </li>
+   * <li>
+   * <code>t.getThreadGroup()</code> --
+   * the thread group of the dying thread is used to
+   * handle the exception.  If the thread group has
+   * no special requirements for handling the exception,
+   * it may simply forward it on to
+   * <code>Thread.getDefaultUncaughtExceptionHandler()</code>,
+   * the default handler, which is used as a last resort.
+   * </li>
+   * </ol>
+   * <p>
+   * The first handler found is the one used to handle
+   * the uncaught exception.
+   * </p>
+   *
+   * @author Tom Tromey <tromey@redhat.com>
+   * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
+   * @since 1.5
+   * @see Thread#getUncaughtExceptionHandler()
+   * @see Thread#setUncaughtExceptionHander(java.lang.Thread.UncaughtExceptionHandler)
+   * @see Thread#getDefaultUncaughtExceptionHandler()
+   * @see
+   * Thread#setDefaultUncaughtExceptionHandler(java.lang.Thread.UncaughtExceptionHandler)
+   */
+  public static interface UncaughtExceptionHandler
   {
+    /**
+     * Invoked by the virtual machine with the dying thread
+     * and the uncaught exception.  Any exceptions thrown
+     * by this method are simply ignored by the virtual
+     * machine.
+     *
+     * @param thr the dying thread.
+     * @param exc the uncaught exception.
+     */
     void uncaughtException(Thread thr, Throwable exc);
   }
 

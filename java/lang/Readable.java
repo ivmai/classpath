@@ -40,7 +40,31 @@ package java.lang;
 import java.io.IOException;
 import java.nio.CharBuffer;
 
+/**
+ * A <code>Readable</code> object is simply a source for Unicode character
+ * data.  On request, a <code>Readable</code> will provide its data in
+ * a supplied <code>CharBuffer</code>.
+ *
+ * @author Tom Tromey <tromey@redhat.com>
+ * @author Andrew John Hughes <gnu_andrew@member.fsf.org>
+ * @since 1.5
+ */
 public interface Readable
 {
+
+  /**
+   * Adds the character data supplied by this <code>Readable</code>
+   * to the specified character buffer.  This method simply places
+   * each character into the buffer as supplied, using <code>put()</code>,
+   * without flipping or rewinding.
+   *
+   * @param buf the buffer to place the character data in.
+   * @return the number of <code>char</code> values placed in the buffer,
+   *         or -1 if no more characters are available.
+   * @throws IOException if an I/O error occurs.
+   * @throws NullPointerException if buf is null.
+   * @throws ReadOnlyBufferException if buf is read only.
+   */
   int read(CharBuffer buf) throws IOException;
+
 }

@@ -65,7 +65,7 @@ package java.lang;
  * @see TreeSet
  * @see TreeMap
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public interface Comparable<T>
 {
