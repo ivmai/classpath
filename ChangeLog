@@ -1,3 +1,19 @@
+2005-03-19  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/IllegalArgumentException:
+	(IllegalArgumentException(String, Throwable)):
+	Implemented.
+	(IllegalArgumentException(Throwable)): Likewise.
+	(IllegalStateException(String, Throwable)):
+	Implemented.
+	(IllegalStateException(Throwable)): Likewise.
+	(SecurityException(String, Throwable)):
+	Implemented.
+	(SecurityException(Throwable)): Likewise.
+	(UnsupportedOperationException(String, Throwable)):
+	Implemented.
+	(UnsupportedOperationException(Throwable)): Likewise.
+
 2005-03-12  Audrius Meskauskas  <audriusa@bluewin.ch>
 
 	* org/omg/CORBA/StringSeqHelper.java,
