@@ -1,3 +1,9 @@
+2004-09-04  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/SuppressWarnings.java: Added imports.
+	* java/lang/Override.java: Added imports.
+	* java/lang/Deprecated.java: Added imports.
+
 2004-09-03  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/EnumMap.java: New file.

@@ -37,6 +37,11 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.ElementType.*;
+
 @Retention(SOURCE)
 @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
 public @interface SuppressWarnings
