@@ -326,7 +326,7 @@ public class Object
    *
    * @return the class of this Object
    */
-  public final native Class getClass();
+  public final native Class<? extends Object> getClass();
 
   /**
    * Wakes up one of the {@link Thread}s that has called

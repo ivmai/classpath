@@ -1,5 +1,8 @@
 2004-08-07  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/Enum.java: New file.
+	* java/lang/Object.java (getClass): Now generic.
+
 	* java/lang/StringBuffer.java (StringBuffer(CharSequence)): New
 	constructor.
 	(append(CharSequence)): New method
