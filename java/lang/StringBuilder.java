@@ -1,4 +1,4 @@
-/* StringBuffer.java -- Growable strings
+/* StringBuilder.java -- Unsynchronized growable strings
    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
@@ -41,27 +41,28 @@ package java.lang;
 import java.io.Serializable;
 
 /**
- * <code>StringBuffer</code> represents a changeable <code>String</code>.
+ * <code>StringBuilder</code> represents a changeable <code>String</code>.
  * It provides the operations required to modify the
- * <code>StringBuffer</code>, including insert, replace, delete, append,
- * and reverse. It is thread-safe; meaning that all modifications to a buffer
- * are in synchronized methods.
+ * <code>StringBuilder</code>, including insert, replace, delete, append,
+ * and reverse. It like <code>StringBuffer</code>, but is not
+ * synchronized.  It is ideal for use when it is known that the
+ * object will only be used from a single thread.
  *
- * <p><code>StringBuffer</code>s are variable-length in nature, so even if
+ * <p><code>StringBuilder</code>s are variable-length in nature, so even if
  * you initialize them to a certain size, they can still grow larger than
  * that. <em>Capacity</em> indicates the number of characters the
- * <code>StringBuffer</code> can have in it before it has to grow (growing
+ * <code>StringBuilder</code> can have in it before it has to grow (growing
  * the char array is an expensive operation involving <code>new</code>).
  *
  * <p>Incidentally, compilers often implement the String operator "+"
- * by using a <code>StringBuffer</code> operation:<br>
+ * by using a <code>StringBuilder</code> operation:<br>
  * <code>a + b</code><br>
  * is the same as<br>
- * <code>new StringBuffer().append(a).append(b).toString()</code>.
+ * <code>new StringBuilder().append(a).append(b).toString()</code>.
  *
- * <p>Classpath's StringBuffer is capable of sharing memory with Strings for
- * efficiency.  This will help when a StringBuffer is converted to a String
- * and the StringBuffer is not changed after that (quite common when performing
+ * <p>Classpath's StringBuilder is capable of sharing memory with Strings for
+ * efficiency.  This will help when a StringBuilder is converted to a String
+ * and the StringBuilder is not changed after that (quite common when performing
  * string concatenation).
  *
  * @author Paul Fisher
@@ -72,11 +73,11 @@ import java.io.Serializable;
  * @since 1.0
  * @status updated to 1.4
  */
-public final class StringBuffer
+public final class StringBuilder
   implements Serializable, CharSequence, Appendable
 {
   // Implementation note: if you change this class, you usually will
-  // want to change StringBuilder as well.
+  // want to change StringBuffer as well.
 
   /**
    * Compatible with JDK 1.0+.
@@ -101,7 +102,7 @@ public final class StringBuffer
   char[] value;
 
   /**
-   * True if the buffer is shared with another object (StringBuffer or
+   * True if the buffer is shared with another object (StringBuilder or
    * String); this means the buffer must be copied before writing to it again.
    * Note that this has permissions set this way so that String can get the
    * value.
@@ -116,34 +117,34 @@ public final class StringBuffer
   private final static int DEFAULT_CAPACITY = 16;
 
   /**
-   * Create a new StringBuffer with default capacity 16.
+   * Create a new StringBuilder with default capacity 16.
    */
-  public StringBuffer()
+  public StringBuilder()
   {
     this(DEFAULT_CAPACITY);
   }
 
   /**
-   * Create an empty <code>StringBuffer</code> with the specified initial
+   * Create an empty <code>StringBuilder</code> with the specified initial
    * capacity.
    *
    * @param capacity the initial capacity
    * @throws NegativeArraySizeException if capacity is negative
    */
-  public StringBuffer(int capacity)
+  public StringBuilder(int capacity)
   {
     value = new char[capacity];
   }
 
   /**
-   * Create a new <code>StringBuffer</code> with the characters in the
+   * Create a new <code>StringBuilder</code> with the characters in the
    * specified <code>String</code>. Initial capacity will be the size of the
    * String plus 16.
    *
    * @param str the <code>String</code> to convert
    * @throws NullPointerException if str is null
    */
-  public StringBuffer(String str)
+  public StringBuilder(String str)
   {
     // Unfortunately, because the size is 16 larger, we cannot share.
     count = str.count;
@@ -152,7 +153,7 @@ public final class StringBuffer
   }
 
   /**
-   * Create a new <code>StringBuffer</code> with the characters in the
+   * Create a new <code>StringBuilder</code> with the characters in the
    * specified <code>CharSequence</code>. Initial capacity will be the
    * length of the sequence plus 16; if the sequence reports a length
    * less than or equal to 0, then the initial capacity will be 16.
@@ -161,7 +162,7 @@ public final class StringBuffer
    * @throws NullPointerException if str is null
    * @since 1.5
    */
-  public StringBuffer(CharSequence seq)
+  public StringBuilder(CharSequence seq)
   {
     int len = seq.length();
     count = len <= 0 ? 0 : len;
@@ -171,34 +172,34 @@ public final class StringBuffer
   }
 
   /**
-   * Get the length of the <code>String</code> this <code>StringBuffer</code>
+   * Get the length of the <code>String</code> this <code>StringBuilder</code>
    * would create. Not to be confused with the <em>capacity</em> of the
-   * <code>StringBuffer</code>.
+   * <code>StringBuilder</code>.
    *
-   * @return the length of this <code>StringBuffer</code>
+   * @return the length of this <code>StringBuilder</code>
    * @see #capacity()
    * @see #setLength(int)
    */
-  public synchronized int length()
+  public int length()
   {
     return count;
   }
 
   /**
-   * Get the total number of characters this <code>StringBuffer</code> can
+   * Get the total number of characters this <code>StringBuilder</code> can
    * support before it must be grown.  Not to be confused with <em>length</em>.
    *
-   * @return the capacity of this <code>StringBuffer</code>
+   * @return the capacity of this <code>StringBuilder</code>
    * @see #length()
    * @see #ensureCapacity(int)
    */
-  public synchronized int capacity()
+  public int capacity()
   {
     return value.length;
   }
 
   /**
-   * Increase the capacity of this <code>StringBuffer</code>. This will
+   * Increase the capacity of this <code>StringBuilder</code>. This will
    * ensure that an expensive growing operation will not occur until
    * <code>minimumCapacity</code> is reached. The buffer is grown to the
    * larger of <code>minimumCapacity</code> and
@@ -207,13 +208,26 @@ public final class StringBuffer
    * @param minimumCapacity the new capacity
    * @see #capacity()
    */
-  public synchronized void ensureCapacity(int minimumCapacity)
+  public void ensureCapacity(int minimumCapacity)
   {
-    ensureCapacity_unsynchronized(minimumCapacity);
+    if (shared || minimumCapacity > value.length)
+      {
+        // We don't want to make a larger vector when `shared' is
+        // set.  If we do, then setLength becomes very inefficient
+        // when repeatedly reusing a StringBuilder in a loop.
+        int max = (minimumCapacity > value.length
+                   ? value.length * 2 + 2
+                   : value.length);
+        minimumCapacity = (minimumCapacity < max ? max : minimumCapacity);
+        char[] nb = new char[minimumCapacity];
+        System.arraycopy(value, 0, nb, 0, count);
+        value = nb;
+        shared = false;
+      }
   }
 
   /**
-   * Set the length of this StringBuffer. If the new length is greater than
+   * Set the length of this StringBuilder. If the new length is greater than
    * the current length, all the new characters are set to '\0'. If the new
    * length is less than the current length, the first <code>newLength</code>
    * characters of the old array will be preserved, and the remaining
@@ -224,27 +238,27 @@ public final class StringBuffer
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    * @see #length()
    */
-  public synchronized void setLength(int newLength)
+  public void setLength(int newLength)
   {
     if (newLength < 0)
       throw new StringIndexOutOfBoundsException(newLength);
 
     int valueLength = value.length;
 
-    /* Always call ensureCapacity_unsynchronized in order to preserve
-       copy-on-write semantics.  */
-    ensureCapacity_unsynchronized(newLength);
+    /* Always call ensureCapacity in order to preserve copy-on-write
+       semantics.  */
+    ensureCapacity(newLength);
 
     if (newLength < valueLength)
       {
-        /* If the StringBuffer's value just grew, then we know that
+        /* If the StringBuilder's value just grew, then we know that
            value is newly allocated and the region between count and
            newLength is filled with '\0'.  */
 	count = newLength;
       }
     else
       {
-	/* The StringBuffer's value doesn't need to grow.  However,
+	/* The StringBuilder's value doesn't need to grow.  However,
 	   we should clear out any cruft that may exist.  */
 	while (count < newLength)
           value[count++] = '\0';
@@ -259,7 +273,7 @@ public final class StringBuffer
    * @throws IndexOutOfBoundsException if index is negative or &gt;= length()
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    */
-  public synchronized char charAt(int index)
+  public char charAt(int index)
   {
     if (index < 0 || index >= count)
       throw new StringIndexOutOfBoundsException(index);
@@ -281,8 +295,8 @@ public final class StringBuffer
    *         ArrayIndexOutOfBoundsException)
    * @see System#arraycopy(Object, int, Object, int, int)
    */
-  public synchronized void getChars(int srcOffset, int srcEnd,
-                                    char[] dst, int dstOffset)
+  public void getChars(int srcOffset, int srcEnd,
+		       char[] dst, int dstOffset)
   {
     if (srcOffset < 0 || srcEnd > count || srcEnd < srcOffset)
       throw new StringIndexOutOfBoundsException();
@@ -297,106 +311,106 @@ public final class StringBuffer
    * @throws IndexOutOfBoundsException if index is negative or &gt;= length()
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    */
-  public synchronized void setCharAt(int index, char ch)
+  public void setCharAt(int index, char ch)
   {
     if (index < 0 || index >= count)
       throw new StringIndexOutOfBoundsException(index);
     // Call ensureCapacity to enforce copy-on-write.
-    ensureCapacity_unsynchronized(count);
+    ensureCapacity(count);
     value[index] = ch;
   }
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param obj the <code>Object</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(Object)
    * @see #append(String)
    */
-  public StringBuffer append(Object obj)
+  public StringBuilder append(Object obj)
   {
     return append(obj == null ? "null" : obj.toString());
   }
 
   /**
-   * Append the <code>String</code> to this <code>StringBuffer</code>. If
+   * Append the <code>String</code> to this <code>StringBuilder</code>. If
    * str is null, the String "null" is appended.
    *
    * @param str the <code>String</code> to append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    */
-  public synchronized StringBuffer append(String str)
+  public StringBuilder append(String str)
   {
     if (str == null)
       str = "null";
     int len = str.count;
-    ensureCapacity_unsynchronized(count + len);
+    ensureCapacity(count + len);
     str.getChars(0, len, value, count);
     count += len;
     return this;
   }
 
   /**
-   * Append the <code>StringBuffer</code> value of the argument to this
-   * <code>StringBuffer</code>. This behaves the same as
+   * Append the <code>StringBuilder</code> value of the argument to this
+   * <code>StringBuilder</code>. This behaves the same as
    * <code>append((Object) stringBuffer)</code>, except it is more efficient.
    *
-   * @param stringBuffer the <code>StringBuffer</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @param stringBuffer the <code>StringBuilder</code> to convert and append
+   * @return this <code>StringBuilder</code>
    * @see #append(Object)
    * @since 1.4
    */
-  public synchronized StringBuffer append(StringBuffer stringBuffer)
+  public StringBuilder append(StringBuffer stringBuffer)
   {
     if (stringBuffer == null)
       return append("null");
-    synchronized (stringBuffer)
-      {
-        int len = stringBuffer.count;
-        ensureCapacity_unsynchronized(count + len);
-        System.arraycopy(stringBuffer.value, 0, value, count, len);
-        count += len;
-      }
+    synchronizedZZZ (stringBuffer)
+    {
+      int len = stringBuffer.count;
+      ensureCapacity(count + len);
+      System.arraycopy(stringBuffer.value, 0, value, count, len);
+      count += len;
+    }
     return this;
   }
 
   /**
-   * Append the <code>char</code> array to this <code>StringBuffer</code>.
+   * Append the <code>char</code> array to this <code>StringBuilder</code>.
    * This is similar (but more efficient) than
    * <code>append(new String(data))</code>, except in the case of null.
    *
    * @param data the <code>char[]</code> to append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws NullPointerException if <code>str</code> is <code>null</code>
    * @see #append(char[], int, int)
    */
-  public StringBuffer append(char[] data)
+  public StringBuilder append(char[] data)
   {
     return append(data, 0, data.length);
   }
 
   /**
    * Append part of the <code>char</code> array to this
-   * <code>StringBuffer</code>. This is similar (but more efficient) than
+   * <code>StringBuilder</code>. This is similar (but more efficient) than
    * <code>append(new String(data, offset, count))</code>, except in the case
    * of null.
    *
    * @param data the <code>char[]</code> to append
    * @param offset the start location in <code>str</code>
    * @param count the number of characters to get from <code>str</code>
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws NullPointerException if <code>str</code> is <code>null</code>
    * @throws IndexOutOfBoundsException if offset or count is out of range
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    */
-  public synchronized StringBuffer append(char[] data, int offset, int count)
+  public StringBuilder append(char[] data, int offset, int count)
   {
     if (offset < 0 || count < 0 || offset > data.length - count)
       throw new StringIndexOutOfBoundsException();
-    ensureCapacity_unsynchronized(this.count + count);
+    ensureCapacity(this.count + count);
     System.arraycopy(data, offset, value, this.count, count);
     this.count += count;
     return this;
@@ -404,27 +418,27 @@ public final class StringBuffer
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param bool the <code>boolean</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(boolean)
    */
-  public StringBuffer append(boolean bool)
+  public StringBuilder append(boolean bool)
   {
     return append(bool ? "true" : "false");
   }
 
   /**
-   * Append the <code>char</code> to this <code>StringBuffer</code>.
+   * Append the <code>char</code> to this <code>StringBuilder</code>.
    *
    * @param ch the <code>char</code> to append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    */
-  public synchronized StringBuffer append(char ch)
+  public StringBuilder append(char ch)
   {
-    ensureCapacity_unsynchronized(count + 1);
+    ensureCapacity(count + 1);
     value[count++] = ch;
     return this;
   }
@@ -434,10 +448,10 @@ public final class StringBuffer
    * buffer.
    *
    * @param seq the <code>CharSequence</code> providing the characters
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @since 1.5
    */
-  public synchronized StringBuffer append(CharSequence seq)
+  public StringBuilder append(CharSequence seq)
   {
     return append(seq, 0, seq.length());
   }
@@ -450,16 +464,17 @@ public final class StringBuffer
    * @param seq the <code>CharSequence</code> providing the characters
    * @param start the starting index
    * @param end one past the final index
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @since 1.5
    */
-  public synchronized StringBuffer append(CharSequence seq, int start, int end)
+  public StringBuilder append(CharSequence seq, int start,
+			      int end)
   {
     if (seq == null)
       return append("null");
     if (end - start > 0)
       {
-	ensureCapacity_unsynchronized(count + end - start);
+	ensureCapacity(count + end - start);
 	for (; start < end; ++start)
 	  value[count++] = seq.charAt(start);
       }
@@ -468,80 +483,80 @@ public final class StringBuffer
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param inum the <code>int</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(int)
    */
   // This is native in libgcj, for efficiency.
-  public StringBuffer append(int inum)
+  public StringBuilder append(int inum)
   {
     return append(String.valueOf(inum));
   }
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param lnum the <code>long</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(long)
    */
-  public StringBuffer append(long lnum)
+  public StringBuilder append(long lnum)
   {
     return append(Long.toString(lnum, 10));
   }
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param fnum the <code>float</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(float)
    */
-  public StringBuffer append(float fnum)
+  public StringBuilder append(float fnum)
   {
     return append(Float.toString(fnum));
   }
 
   /**
    * Append the <code>String</code> value of the argument to this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param dnum the <code>double</code> to convert and append
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @see String#valueOf(double)
    */
-  public StringBuffer append(double dnum)
+  public StringBuilder append(double dnum)
   {
     return append(Double.toString(dnum));
   }
 
   /**
-   * Delete characters from this <code>StringBuffer</code>.
+   * Delete characters from this <code>StringBuilder</code>.
    * <code>delete(10, 12)</code> will delete 10 and 11, but not 12. It is
    * harmless for end to be larger than length().
    *
    * @param start the first character to delete
    * @param end the index after the last character to delete
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if start or end are out of bounds
    * @since 1.2
    */
-  public synchronized StringBuffer delete(int start, int end)
+  public StringBuilder delete(int start, int end)
   {
     if (start < 0 || start > count || start > end)
       throw new StringIndexOutOfBoundsException(start);
     if (end > count)
       end = count;
     // This will unshare if required.
-    ensureCapacity_unsynchronized(count);
+    ensureCapacity(count);
     if (count - end != 0)
       System.arraycopy(value, end, value, start, count - end);
     count -= end - start;
@@ -549,14 +564,14 @@ public final class StringBuffer
   }
 
   /**
-   * Delete a character from this <code>StringBuffer</code>.
+   * Delete a character from this <code>StringBuilder</code>.
    *
    * @param index the index of the character to delete
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if index is out of bounds
    * @since 1.2
    */
-  public StringBuffer deleteCharAt(int index)
+  public StringBuilder deleteCharAt(int index)
   {
     return delete(index, index + 1);
   }
@@ -564,18 +579,18 @@ public final class StringBuffer
   /**
    * Replace characters between index <code>start</code> (inclusive) and
    * <code>end</code> (exclusive) with <code>str</code>. If <code>end</code>
-   * is larger than the size of this StringBuffer, all characters after
+   * is larger than the size of this StringBuilder, all characters after
    * <code>start</code> are replaced.
    *
    * @param start the beginning index of characters to delete (inclusive)
    * @param end the ending index of characters to delete (exclusive)
    * @param str the new <code>String</code> to insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if start or end are out of bounds
    * @throws NullPointerException if str is null
    * @since 1.2
    */
-  public synchronized StringBuffer replace(int start, int end, String str)
+  public StringBuilder replace(int start, int end, String str)
   {
     if (start < 0 || start > count || start > end)
       throw new StringIndexOutOfBoundsException(start);
@@ -583,7 +598,7 @@ public final class StringBuffer
     int len = str.count;
     // Calculate the difference in 'count' after the replace.
     int delta = len - (end > count ? count : end) + start;
-    ensureCapacity_unsynchronized(count + delta);
+    ensureCapacity(count + delta);
 
     if (delta != 0 && end < count)
       System.arraycopy(value, end, value, end + delta, count - end);
@@ -594,11 +609,11 @@ public final class StringBuffer
   }
 
   /**
-   * Creates a substring of this StringBuffer, starting at a specified index
-   * and ending at the end of this StringBuffer.
+   * Creates a substring of this StringBuilder, starting at a specified index
+   * and ending at the end of this StringBuilder.
    *
    * @param beginIndex index to start substring (base 0)
-   * @return new String which is a substring of this StringBuffer
+   * @return new String which is a substring of this StringBuilder
    * @throws StringIndexOutOfBoundsException if beginIndex is out of bounds
    * @see #substring(int, int)
    * @since 1.2
@@ -609,14 +624,14 @@ public final class StringBuffer
   }
 
   /**
-   * Creates a substring of this StringBuffer, starting at a specified index
+   * Creates a substring of this StringBuilder, starting at a specified index
    * and ending at one character before a specified index. This is implemented
    * the same as <code>substring(beginIndex, endIndex)</code>, to satisfy
    * the CharSequence interface.
    *
    * @param beginIndex index to start at (inclusive, base 0)
    * @param endIndex index to end at (exclusive)
-   * @return new String which is a substring of this StringBuffer
+   * @return new String which is a substring of this StringBuilder
    * @throws IndexOutOfBoundsException if beginIndex or endIndex is out of
    *         bounds
    * @see #substring(int, int)
@@ -628,17 +643,17 @@ public final class StringBuffer
   }
 
   /**
-   * Creates a substring of this StringBuffer, starting at a specified index
+   * Creates a substring of this StringBuilder, starting at a specified index
    * and ending at one character before a specified index.
    *
    * @param beginIndex index to start at (inclusive, base 0)
    * @param endIndex index to end at (exclusive)
-   * @return new String which is a substring of this StringBuffer
+   * @return new String which is a substring of this StringBuilder
    * @throws StringIndexOutOfBoundsException if beginIndex or endIndex is out
    *         of bounds
    * @since 1.2
    */
-  public synchronized String substring(int beginIndex, int endIndex)
+  public String substring(int beginIndex, int endIndex)
   {
     int len = endIndex - beginIndex;
     if (beginIndex < 0 || endIndex > count || endIndex < beginIndex)
@@ -655,24 +670,24 @@ public final class StringBuffer
 
   /**
    * Insert a subarray of the <code>char[]</code> argument into this
-   * <code>StringBuffer</code>.
+   * <code>StringBuilder</code>.
    *
    * @param offset the place to insert in this buffer
    * @param str the <code>char[]</code> to insert
    * @param str_offset the index in <code>str</code> to start inserting from
    * @param len the number of characters to insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws NullPointerException if <code>str</code> is <code>null</code>
    * @throws StringIndexOutOfBoundsException if any index is out of bounds
    * @since 1.2
    */
-  public synchronized StringBuffer insert(int offset,
-                                          char[] str, int str_offset, int len)
+  public StringBuilder insert(int offset,
+			      char[] str, int str_offset, int len)
   {
     if (offset < 0 || offset > count || len < 0
         || str_offset < 0 || str_offset > str.length - len)
       throw new StringIndexOutOfBoundsException();
-    ensureCapacity_unsynchronized(count + len);
+    ensureCapacity(count + len);
     System.arraycopy(value, offset, value, offset + len, count - offset);
     System.arraycopy(str, str_offset, value, offset, len);
     count += len;
@@ -681,38 +696,38 @@ public final class StringBuffer
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param obj the <code>Object</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @exception StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(Object)
    */
-  public StringBuffer insert(int offset, Object obj)
+  public StringBuilder insert(int offset, Object obj)
   {
     return insert(offset, obj == null ? "null" : obj.toString());
   }
 
   /**
    * Insert the <code>String</code> argument into this
-   * <code>StringBuffer</code>. If str is null, the String "null" is used
+   * <code>StringBuilder</code>. If str is null, the String "null" is used
    * instead.
    *
    * @param offset the place to insert in this buffer
    * @param str the <code>String</code> to insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    */
-  public synchronized StringBuffer insert(int offset, String str)
+  public StringBuilder insert(int offset, String str)
   {
     if (offset < 0 || offset > count)
       throw new StringIndexOutOfBoundsException(offset);
     if (str == null)
       str = "null";
     int len = str.count;
-    ensureCapacity_unsynchronized(count + len);
+    ensureCapacity(count + len);
     System.arraycopy(value, offset, value, offset + len, count - offset);
     str.getChars(0, len, value, offset);
     count += len;
@@ -721,49 +736,49 @@ public final class StringBuffer
 
   /**
    * Insert the <code>char[]</code> argument into this
-   * <code>StringBuffer</code>.
+   * <code>StringBuilder</code>.
    *
    * @param offset the place to insert in this buffer
    * @param data the <code>char[]</code> to insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws NullPointerException if <code>data</code> is <code>null</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see #insert(int, char[], int, int)
    */
-  public StringBuffer insert(int offset, char[] data)
+  public StringBuilder insert(int offset, char[] data)
   {
     return insert(offset, data, 0, data.length);
   }
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param bool the <code>boolean</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(boolean)
    */
-  public StringBuffer insert(int offset, boolean bool)
+  public StringBuilder insert(int offset, boolean bool)
   {
     return insert(offset, bool ? "true" : "false");
   }
 
   /**
-   * Insert the <code>char</code> argument into this <code>StringBuffer</code>.
+   * Insert the <code>char</code> argument into this <code>StringBuilder</code>.
    *
    * @param offset the place to insert in this buffer
    * @param ch the <code>char</code> to insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    */
-  public synchronized StringBuffer insert(int offset, char ch)
+  public StringBuilder insert(int offset, char ch)
   {
     if (offset < 0 || offset > count)
       throw new StringIndexOutOfBoundsException(offset);
-    ensureCapacity_unsynchronized(count + 1);
+    ensureCapacity(count + 1);
     System.arraycopy(value, offset, value, offset + 1, count - offset);
     value[offset] = ch;
     count++;
@@ -772,70 +787,70 @@ public final class StringBuffer
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param inum the <code>int</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(int)
    */
-  public StringBuffer insert(int offset, int inum)
+  public StringBuilder insert(int offset, int inum)
   {
     return insert(offset, String.valueOf(inum));
   }
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param lnum the <code>long</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(long)
    */
-  public StringBuffer insert(int offset, long lnum)
+  public StringBuilder insert(int offset, long lnum)
   {
     return insert(offset, Long.toString(lnum, 10));
   }
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param fnum the <code>float</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(float)
    */
-  public StringBuffer insert(int offset, float fnum)
+  public StringBuilder insert(int offset, float fnum)
   {
     return insert(offset, Float.toString(fnum));
   }
 
   /**
    * Insert the <code>String</code> value of the argument into this
-   * <code>StringBuffer</code>. Uses <code>String.valueOf()</code> to convert
+   * <code>StringBuilder</code>. Uses <code>String.valueOf()</code> to convert
    * to <code>String</code>.
    *
    * @param offset the place to insert in this buffer
    * @param dnum the <code>double</code> to convert and insert
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    * @throws StringIndexOutOfBoundsException if offset is out of bounds
    * @see String#valueOf(double)
    */
-  public StringBuffer insert(int offset, double dnum)
+  public StringBuilder insert(int offset, double dnum)
   {
     return insert(offset, Double.toString(dnum));
   }
 
   /**
-   * Finds the first instance of a substring in this StringBuffer.
+   * Finds the first instance of a substring in this StringBuilder.
    *
    * @param str String to find
    * @return location (base 0) of the String, or -1 if not found
@@ -849,7 +864,7 @@ public final class StringBuffer
   }
 
   /**
-   * Finds the first instance of a String in this StringBuffer, starting at
+   * Finds the first instance of a String in this StringBuilder, starting at
    * a given index.  If starting index is less than 0, the search starts at
    * the beginning of this String.  If the starting index is greater than the
    * length of this String, or the substring is not found, -1 is returned.
@@ -860,7 +875,7 @@ public final class StringBuffer
    * @throws NullPointerException if str is null
    * @since 1.4
    */
-  public synchronized int indexOf(String str, int fromIndex)
+  public int indexOf(String str, int fromIndex)
   {
     if (fromIndex < 0)
       fromIndex = 0;
@@ -872,7 +887,7 @@ public final class StringBuffer
   }
 
   /**
-   * Finds the last instance of a substring in this StringBuffer.
+   * Finds the last instance of a substring in this StringBuilder.
    *
    * @param str String to find
    * @return location (base 0) of the String, or -1 if not found
@@ -886,7 +901,7 @@ public final class StringBuffer
   }
 
   /**
-   * Finds the last instance of a String in this StringBuffer, starting at a
+   * Finds the last instance of a String in this StringBuilder, starting at a
    * given index.  If starting index is greater than the maximum valid index,
    * then the search begins at the end of this String.  If the starting index
    * is less than zero, or the substring is not found, -1 is returned.
@@ -897,7 +912,7 @@ public final class StringBuffer
    * @throws NullPointerException if str is null
    * @since 1.4
    */
-  public synchronized int lastIndexOf(String str, int fromIndex)
+  public int lastIndexOf(String str, int fromIndex)
   {
     fromIndex = Math.min(fromIndex, count - str.count);
     for ( ; fromIndex >= 0; fromIndex--)
@@ -907,15 +922,15 @@ public final class StringBuffer
   }
 
   /**
-   * Reverse the characters in this StringBuffer. The same sequence of
+   * Reverse the characters in this StringBuilder. The same sequence of
    * characters exists, but in the reverse index ordering.
    *
-   * @return this <code>StringBuffer</code>
+   * @return this <code>StringBuilder</code>
    */
-  public synchronized StringBuffer reverse()
+  public StringBuilder reverse()
   {
     // Call ensureCapacity to enforce copy-on-write.
-    ensureCapacity_unsynchronized(count);
+    ensureCapacity(count);
     for (int i = count >> 1, j = count - i; --i >= 0; ++j)
       {
         char c = value[i];
@@ -926,44 +941,17 @@ public final class StringBuffer
   }
 
   /**
-   * Convert this <code>StringBuffer</code> to a <code>String</code>. The
-   * String is composed of the characters currently in this StringBuffer. Note
+   * Convert this <code>StringBuilder</code> to a <code>String</code>. The
+   * String is composed of the characters currently in this StringBuilder. Note
    * that the result is a copy, and that future modifications to this buffer
    * do not affect the String.
    *
-   * @return the characters in this StringBuffer
+   * @return the characters in this StringBuilder
    */
   public String toString()
   {
     // The string will set this.shared = true.
     return new String(this);
-  }
-
-  /**
-   * An unsynchronized version of ensureCapacity, used internally to avoid
-   * the cost of a second lock on the same object. This also has the side
-   * effect of duplicating the array, if it was shared (to form copy-on-write
-   * semantics).
-   *
-   * @param minimumCapacity the minimum capacity
-   * @see #ensureCapacity(int)
-   */
-  private void ensureCapacity_unsynchronized(int minimumCapacity)
-  {
-    if (shared || minimumCapacity > value.length)
-      {
-        // We don't want to make a larger vector when `shared' is
-        // set.  If we do, then setLength becomes very inefficient
-        // when repeatedly reusing a StringBuffer in a loop.
-        int max = (minimumCapacity > value.length
-                   ? value.length * 2 + 2
-                   : value.length);
-        minimumCapacity = (minimumCapacity < max ? max : minimumCapacity);
-        char[] nb = new char[minimumCapacity];
-        System.arraycopy(value, 0, nb, 0, count);
-        value = nb;
-        shared = false;
-      }
   }
 
   /**
