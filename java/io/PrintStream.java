@@ -60,6 +60,19 @@ package java.io;
  */
 public class PrintStream extends FilterOutputStream implements Appendable
 {
+  /* Notice the implementation is quite similar to OutputStreamWriter.
+   * This leads to some minor duplication, because neither inherits
+   * from the other, and we want to maximize performance. */
+
+  // Line separator string.
+  private static final char[] line_separator
+    = System.getProperty("line.separator").toCharArray();
+
+  /**
+   *  Encoding name
+   */
+  private String encoding;
+
   /**
    * This boolean indicates whether or not an error has ever occurred
    * on this stream.
@@ -71,54 +84,6 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * <code>false</code> otherwise
    */
   private boolean auto_flush;
-
-  /**
-   * The PrintWriter instance this object writes to
-   */
-  private PrintWriter pw;
-
-  /**
-   * Lets us know if the stream is closed
-   */
-  private boolean closed;
-
-  /**
-   * This class exists to forward the write calls from the PrintWriter back
-   * to us. This is required to make subclassing of PrintStream work
-   * correctly.
-   */
-  private class ForwardStream extends OutputStream
-  {
-    // This is package-private to avoid a trampoline constructor.
-    ForwardStream ()
-    {
-    }
-
-    public void close () throws IOException
-    {
-      out.close ();
-    }
-
-    public void flush () throws IOException
-    {
-      out.flush ();
-    }
-
-    public void write (byte[] b) throws IOException
-    {
-	PrintStream.this.write (b);
-    }
-
-    public void write (byte[] b, int off, int len) throws IOException
-    {
-	PrintStream.this.write (b, off, len);
-    }
-
-    public void write (int b) throws IOException
-    {
-	PrintStream.this.write (b);
-    }
-  }
 
   /**
    * This method intializes a new <code>PrintStream</code> object to write
@@ -148,10 +113,15 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     super (out);
 
-    // FIXME Instead of using PrintWriter and ForwardStream we
-    // should inline the character conversion (see libgcj's version
-    // of this class)
-    pw = new PrintWriter (new ForwardStream (), auto_flush);
+    try {
+	this.encoding = System.getProperty("file.encoding");
+    } catch (SecurityException e){
+	this.encoding = "ISO8859_1";
+    } catch (IllegalArgumentException e){
+	this.encoding = "ISO8859_1";
+    } catch (NullPointerException e){
+	this.encoding = "ISO8859_1";
+    }
     this.auto_flush = auto_flush;
   }
 
@@ -175,12 +145,8 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     super (out);
 
-    // FIXME Instead of using PrintWriter and ForwardStream we
-    // should inline the character conversion (see libgcj's version
-    // of this class)
-    pw = new PrintWriter (
-	    new OutputStreamWriter (
-		new ForwardStream (), encoding), auto_flush);
+    new String(new byte[]{0}, encoding);    // check if encoding is supported
+    this.encoding = encoding;
     this.auto_flush = auto_flush;
   }
 
@@ -188,35 +154,27 @@ public class PrintStream extends FilterOutputStream implements Appendable
   public PrintStream (String filename)
     throws FileNotFoundException
   {
-    super (new FileOutputStream (filename));
-    pw = new PrintWriter (new OutputStreamWriter (out), false);
-    auto_flush = false;
+    this(new FileOutputStream (filename));
   }
 
   /** @since 1.5 */
   public PrintStream (String filename, String encoding)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    super (new FileOutputStream (filename));
-    pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);
-    auto_flush = false;
+    this(new FileOutputStream (filename),false,encoding);
   }
 
   /** @since 1.5 */
   public PrintStream (File file) throws FileNotFoundException
   {
-    super (new FileOutputStream (file));
-    pw = new PrintWriter (new OutputStreamWriter (out), false);
-    auto_flush = false;
+    this(new FileOutputStream (file));
   }
 
   /** @since 1.5 */
   public PrintStream (File file, String encoding)
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    super (new FileOutputStream (file));
-    pw = new PrintWriter (new OutputStreamWriter (out, encoding), false);
-    auto_flush = false;
+    this(new FileOutputStream (file),false,encoding);
   }
 
   /**
@@ -230,10 +188,8 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public boolean checkError ()
   {
-    if (!closed)
-      flush ();
-
-    return error_occurred | pw.checkError ();
+    flush ();
+    return error_occurred;
   }
 
   /**
@@ -250,8 +206,19 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void close ()
   {
-    pw.close ();
-    closed = true;
+    try
+      {
+	flush();
+	out.close();
+      }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread().interrupt();
+      }
+    catch (IOException e)
+      {
+	setError ();
+      }
   }
 
   /**
@@ -260,7 +227,73 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void flush ()
   {
-    pw.flush();
+    try
+      {
+	out.flush();
+      }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread().interrupt();
+      }
+    catch (IOException e)
+      {
+	setError ();
+      }
+  }
+
+  private synchronized void print (String str, boolean println)
+  {
+    try
+      {
+        writeChars(str, 0, str.length());
+	if (println)
+	  writeChars(line_separator, 0, line_separator.length);
+	if (auto_flush)
+	  flush();
+      }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread().interrupt();
+      }
+    catch (IOException e)
+      {
+	setError ();
+      }
+  }
+
+  private synchronized void print (char[] chars, int pos, int len,
+				   boolean println)
+  {
+    try
+      {
+        writeChars(chars, pos, len);
+	if (println)
+	  writeChars(line_separator, 0, line_separator.length);
+	if (auto_flush)
+	  flush();
+      }
+    catch (InterruptedIOException iioe)
+      {
+	Thread.currentThread().interrupt();
+      }
+    catch (IOException e)
+      {
+	setError ();
+      }
+  }
+
+  private void writeChars(char[] buf, int offset, int count)
+    throws IOException
+  {
+      byte[] bytes = (new String(buf, offset, count)).getBytes(encoding);
+      out.write(bytes, 0, bytes.length);
+  }
+
+  private void writeChars(String str, int offset, int count)
+    throws IOException
+  {
+      byte[] bytes = str.substring(offset, offset+count).getBytes(encoding);
+      out.write(bytes, 0, bytes.length);
   }
 
   /**
@@ -272,7 +305,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (boolean bool)
   {
-    print (String.valueOf (bool));
+    print(String.valueOf(bool), false);
   }
 
   /**
@@ -283,7 +316,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (int inum)
   {
-    print (String.valueOf (inum));
+    print(String.valueOf(inum), false);
   }
 
   /**
@@ -294,7 +327,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (long lnum)
   {
-    print (String.valueOf (lnum));
+    print(String.valueOf(lnum), false);
   }
 
   /**
@@ -305,7 +338,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (float fnum)
   {
-    print (String.valueOf (fnum));
+    print(String.valueOf(fnum), false);
   }
 
   /**
@@ -316,7 +349,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (double dnum)
   {
-    print (String.valueOf (dnum));
+    print(String.valueOf(dnum), false);
   }
 
   /**
@@ -328,9 +361,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (Object obj)
   {
-    // Don't call pw directly.  Convert to String so we scan for newline
-    // characters on auto-flush;
-    print (String.valueOf (obj));
+    print(obj == null ? "null" : obj.toString(), false);
   }
 
   /**
@@ -341,10 +372,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (String str)
   {
-    pw.print (str);
-
-    if (auto_flush)
-      flush ();
+    print(str == null ? "null" : str, false);
   }
 
   /**
@@ -353,9 +381,9 @@ public class PrintStream extends FilterOutputStream implements Appendable
    *
    * @param ch The <code>char</code> value to be printed
    */
-  public void print (char ch)
+  public synchronized void print (char ch)
   {
-    print (String.valueOf (ch));
+    print(new char[]{ch}, 0, 1, false);
   }
 
   /**
@@ -366,7 +394,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (char[] charArray)
   {
-    pw.print (charArray);
+    print(charArray, 0, charArray.length, false);
   }
 
   /**
@@ -376,7 +404,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println ()
   {
-    pw.println();
+    print(line_separator, 0, line_separator.length, false);
   }
 
   /**
@@ -390,7 +418,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (boolean bool)
   {
-    println (String.valueOf (bool));
+    print(String.valueOf(bool), true);
   }
 
   /**
@@ -403,7 +431,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (int inum)
   {
-    println (String.valueOf (inum));
+    print(String.valueOf(inum), true);
   }
 
   /**
@@ -416,7 +444,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (long lnum)
   {
-    println (String.valueOf (lnum));
+    print(String.valueOf(lnum), true);
   }
 
   /**
@@ -429,7 +457,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (float fnum)
   {
-    println (String.valueOf (fnum));
+    print(String.valueOf(fnum), true);
   }
 
   /**
@@ -442,7 +470,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (double dnum)
   {
-    println (String.valueOf (dnum));
+    print(String.valueOf(dnum), true);
   }
 
   /**
@@ -456,7 +484,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (Object obj)
   {
-    println (String.valueOf (obj));
+    print(obj == null ? "null" : obj.toString(), true);
   }
 
   /**
@@ -469,7 +497,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (String str)
   {
-    pw.println (str);
+    print (str == null ? "null" : str, true);
   }
 
   /**
@@ -480,9 +508,9 @@ public class PrintStream extends FilterOutputStream implements Appendable
    *
    * @param ch The <code>char</code> value to be printed
    */
-  public void println (char ch)
+  public synchronized void println (char ch)
   {
-    println (String.valueOf (ch));
+    print(new char[]{ch}, 0, 1, true);
   }
 
   /**
@@ -495,7 +523,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (char[] charArray)
   {
-    pw.println (charArray);
+    print(charArray, 0, charArray.length, true);
   }
 
   /**
@@ -507,10 +535,6 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void write (int oneByte)
   {
-    // We actually have to implement this method. Flush first so that
-    // things get written in the right order.
-    flush();
-
     try
       {
         out.write (oneByte & 0xff);
@@ -538,10 +562,6 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void write (byte[] buffer, int offset, int len)
   {
-    // We actually have to implement this method too. Flush first so that
-    // things get written in the right order.
-    flush();
-
     try
       {
         out.write (buffer, offset, len);
@@ -581,4 +601,3 @@ public class PrintStream extends FilterOutputStream implements Appendable
     return this;
   }
 } // class PrintStream
-

@@ -78,6 +78,6 @@ final class UTF_16LE extends Charset
 
   public CharsetEncoder newEncoder ()
   {
-    return new UTF_16Encoder (this, UTF_16Encoder.LITTLE_ENDIAN, true);
+    return new UTF_16Encoder (this, UTF_16Encoder.LITTLE_ENDIAN, false);
   }
 }

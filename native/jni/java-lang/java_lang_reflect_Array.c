@@ -54,8 +54,8 @@ exception statement from your version. */
 JNIEXPORT jobject JNICALL
 Java_java_lang_reflect_Array_createObjectArray
   (JNIEnv * env,
-   jclass thisClass __attribute__((__unused__)),
+   jclass thisClass __attribute__ ((__unused__)),
    jclass arrayType, jint arrayLength)
 {
-  return (jobject)(*env)->NewObjectArray(env, arrayLength, arrayType, NULL);
+  return (jobject) (*env)->NewObjectArray (env, arrayLength, arrayType, NULL);
 }

@@ -79,7 +79,7 @@ public class MARSHAL
    * @param minor additional error code.
    * @param completed the method completion status.
    */
-  MARSHAL(int minor, CompletionStatus completed)
+  public MARSHAL(int minor, CompletionStatus completed)
   {
     super("", minor, completed);
   }
@@ -90,7 +90,7 @@ public class MARSHAL
    * @param minor additional error code (the "minor").
    * @param completed the method completion status.
    */
-  MARSHAL(String reason, int minor, CompletionStatus completed)
+  public MARSHAL(String reason, int minor, CompletionStatus completed)
   {
     super(reason, minor, completed);
   }

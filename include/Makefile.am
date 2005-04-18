@@ -72,19 +72,17 @@ $(top_srcdir)/include/gnu_java_net_PlainSocketImpl.h \
 $(top_srcdir)/include/gnu_java_nio_VMPipe.h \
 $(top_srcdir)/include/gnu_java_nio_VMSelector.h \
 $(top_srcdir)/include/gnu_java_nio_channels_FileChannelImpl.h \
-$(top_srcdir)/include/java_io_ObjectInputStream.h \
 $(top_srcdir)/include/java_io_VMFile.h \
+$(top_srcdir)/include/java_io_VMObjectInputStream.h \
 $(top_srcdir)/include/java_io_VMObjectStreamClass.h \
-$(top_srcdir)/include/java_lang_Double.h \
 $(top_srcdir)/include/java_lang_Math.h \
-$(top_srcdir)/include/java_lang_Object.h \
 $(top_srcdir)/include/java_lang_VMDouble.h \
 $(top_srcdir)/include/java_lang_VMFloat.h \
 $(top_srcdir)/include/java_lang_VMProcess.h \
 $(top_srcdir)/include/java_lang_VMSystem.h \
 $(top_srcdir)/include/java_lang_reflect_Array.h \
-$(top_srcdir)/include/java_net_InetAddress.h \
-$(top_srcdir)/include/java_net_NetworkInterface.h \
+$(top_srcdir)/include/java_net_VMInetAddress.h \
+$(top_srcdir)/include/java_net_VMNetworkInterface.h \
 $(top_srcdir)/include/java_nio_VMDirectByteBuffer.h \
 $(top_srcdir)/include/java_nio_MappedByteBufferImpl.h \
 $(top_srcdir)/include/java_util_VMTimeZone.h
@@ -113,18 +111,14 @@ $(top_srcdir)/include/gnu_java_nio_VMPipe.h: $(top_srcdir)/vm/reference/gnu/java
 	$(JAVAH) -o $@ gnu.java.nio.VMPipe
 $(top_srcdir)/include/gnu_java_nio_VMSelector.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMSelector.java
 	$(JAVAH) -o $@ gnu.java.nio.VMSelector
-$(top_srcdir)/include/java_io_ObjectInputStream.h: $(top_srcdir)/java/io/ObjectInputStream.java
-	$(JAVAH) -o $@ java.io.ObjectInputStream
 $(top_srcdir)/include/java_io_VMFile.h: $(top_srcdir)/vm/reference/java/io/VMFile.java
 	$(JAVAH) -o $@ java.io.VMFile
+$(top_srcdir)/include/java_io_VMObjectInputStream.h: $(top_srcdir)/vm/reference/java/io/VMObjectInputStream.java
+	$(JAVAH) -o $@ java.io.VMObjectInputStream
 $(top_srcdir)/include/java_io_VMObjectStreamClass.h: $(top_srcdir)/vm/reference/java/io/VMObjectStreamClass.java
 	$(JAVAH) -o $@ java.io.VMObjectStreamClass
-$(top_srcdir)/include/java_lang_Double.h: $(top_srcdir)/java/lang/Double.java
-	$(JAVAH) -o $@ java.lang.Double
 $(top_srcdir)/include/java_lang_Math.h: $(top_srcdir)/java/lang/Math.java
 	$(JAVAH) -o $@ java.lang.Math
-$(top_srcdir)/include/java_lang_Object.h: $(top_srcdir)/java/lang/Object.java
-	$(JAVAH) -o $@ java.lang.Object
 $(top_srcdir)/include/java_lang_VMDouble.h: $(top_srcdir)/vm/reference/java/lang/VMDouble.java
 	$(JAVAH) -o $@ java.lang.VMDouble
 $(top_srcdir)/include/java_lang_VMFloat.h: $(top_srcdir)/vm/reference/java/lang/VMFloat.java
@@ -135,10 +129,10 @@ $(top_srcdir)/include/java_lang_VMSystem.h: $(top_srcdir)/vm/reference/java/lang
 	$(JAVAH) -o $@ java.lang.VMSystem
 $(top_srcdir)/include/java_lang_reflect_Array.h: $(top_srcdir)/java/lang/reflect/Array.java
 	$(JAVAH) -o $@ java.lang.reflect.Array
-$(top_srcdir)/include/java_net_InetAddress.h: $(top_srcdir)/java/net/InetAddress.java
-	$(JAVAH) -o $@ java.net.InetAddress
-$(top_srcdir)/include/java_net_NetworkInterface.h: $(top_srcdir)/java/net/NetworkInterface.java
-	$(JAVAH) -o $@ java.net.NetworkInterface
+$(top_srcdir)/include/java_net_VMInetAddress.h: $(top_srcdir)/vm/reference/java/net/VMInetAddress.java
+	$(JAVAH) -o $@ java.net.VMInetAddress
+$(top_srcdir)/include/java_net_VMNetworkInterface.h: $(top_srcdir)/vm/reference/java/net/VMNetworkInterface.java
+	$(JAVAH) -o $@ java.net.VMNetworkInterface
 $(top_srcdir)/include/java_nio_VMDirectByteBuffer.h: $(top_srcdir)/vm/reference/java/nio/VMDirectByteBuffer.java
 	$(JAVAH) -o $@ java.nio.VMDirectByteBuffer
 $(top_srcdir)/include/java_nio_MappedByteBufferImpl.h: $(top_srcdir)/java/nio/MappedByteBufferImpl.java
