@@ -1,5 +1,10 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/reflect/MalformedParameterizedTypeException.java: New
+	file.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/PriorityQueue.java (PriorityQueue): Implements
 	Serializable.
 	(serialVersionUID): New field.
