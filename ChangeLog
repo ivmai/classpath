@@ -1,5 +1,9 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/ThreadLocal.java (remove): New method.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/DuplicateFormatFlagsException.java: New file.
 	* java/util/FormatFlagsConversionMismatchException.java: New
 	file.

@@ -1,5 +1,5 @@
 /* ThreadLocal -- a variable with a unique value per thread
-   Copyright (C) 2000, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -85,7 +85,7 @@ import java.util.WeakHashMap;
  * @author Mark Wielaard (mark@klomp.org)
  * @author Eric Blake (ebb9@email.byu.edu)
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public class ThreadLocal<T>
 {
@@ -168,5 +168,16 @@ public class ThreadLocal<T>
     // Note that we don't have to synchronize, as only this thread will
     // ever modify the map.
     map.put(key, value == null ? NULL : value);
+  }
+
+  /**
+   * Removes the value associated with the ThreadLocal object for the
+   * currently executing Thread.
+   * @since 1.5
+   */
+  public void remove()
+  {
+    Map map = Thread.getThreadLocals();
+    map.remove(key);
   }
 }
