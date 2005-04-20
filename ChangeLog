@@ -1,5 +1,21 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/nio/charset/Charset.java (compareTo): Changed argument
+	type.
+	* java/nio/ShortBuffer.java (compareTo): Changed argument type.
+	* java/nio/LongBuffer.java (compareTo): Changed argument type.
+	* java/nio/IntBuffer.java (compareTo): Changed argument type.
+	* java/nio/FloatBuffer.java (compareTo): Changed argument type.
+	* java/nio/DoubleBuffer.java (compareTo): Changed argument type.
+	* java/nio/ByteBuffer.java (compareTo): Changed argument type.
+	* java/nio/CharBuffer.java (CharBuffer): Implements Readable,
+	Appendable.
+	(append): New methods.
+	(compareTo): Changed argument type.
+	(read): New method.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/io/PrintStream.java (append): Don't throw IOException.
 	* java/io/StringWriter.java (append): New overloads.
 	* java/io/PrintWriter.java (append): New overloads.

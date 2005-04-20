@@ -60,7 +60,7 @@ import java.util.TreeMap;
  * @author Jesse Rosenstock
  * @since 1.4
  */
-public abstract class Charset implements Comparable
+public abstract class Charset implements Comparable<Charset>
 {
   private CharsetEncoder cachedEncoder;
   private CharsetDecoder cachedDecoder;
@@ -332,9 +332,9 @@ public abstract class Charset implements Comparable
       }
   }
 
-  public final int compareTo (Object ob)
+  public final int compareTo (Charset other)
   {
-    return canonicalName.compareToIgnoreCase (((Charset) ob).canonicalName);
+    return canonicalName.compareToIgnoreCase (other.canonicalName);
   }
 
   public final int hashCode ()
