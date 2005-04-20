@@ -1,5 +1,13 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/Arrays.java (hashCode): New methods.
+	(deepHashCode): New method.
+	(deepEquals): Likewise.
+	(toString): New methods.
+	(deepToString): New method.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/zip/Inflater.java (getTotalIn): Deprecated.
 	(getBytesRead): New method
 	(getTotalOut): Deprecated.
