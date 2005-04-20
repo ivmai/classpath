@@ -82,16 +82,20 @@ public class BigInteger extends Number implements Comparable
   private static final int numFixNum = maxFixNum-minFixNum+1;
   private static final BigInteger[] smallFixNums = new BigInteger[numFixNum];
 
-  static {
+  static
+  {
     for (int i = numFixNum;  --i >= 0; )
       smallFixNums[i] = new BigInteger(i + minFixNum);
   }
 
-  // JDK1.2
-  public static final BigInteger ZERO = smallFixNums[-minFixNum];
+  /** @since 1.2 */
+  public static final BigInteger ZERO = smallFixNums[0 - minFixNum];
 
-  // JDK1.2
+  /** @since 1.2 */
   public static final BigInteger ONE = smallFixNums[1 - minFixNum];
+
+  /** @since 1.5 */
+  public static final BigInteger TEN = smallFixNums[10 - minFixNum];
 
   /* Rounding modes: */
   private static final int FLOOR = 1;

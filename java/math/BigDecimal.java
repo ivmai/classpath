@@ -1,5 +1,5 @@
 /* java.math.BigDecimal -- Arbitrary precision decimals.
-   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -43,11 +43,17 @@ public class BigDecimal extends Number implements Comparable
   private int scale;
   private static final long serialVersionUID = 6108874887143696463L;
 
-  private static final BigDecimal ZERO = 
+  /** @since 1.5 */
+  public static final BigDecimal ZERO = 
     new BigDecimal (BigInteger.valueOf (0), 0);
 
-  private static final BigDecimal ONE = 
+  /** @since 1.5 */
+  public static final BigDecimal ONE = 
     new BigDecimal (BigInteger.valueOf (1), 0);
+
+  /** @since 1.5 */
+  public static final BigDecimal TEN = 
+    new BigDecimal (BigInteger.valueOf (10), 0);
 
   public static final int ROUND_UP = 0;
   public static final int ROUND_DOWN = 1;
