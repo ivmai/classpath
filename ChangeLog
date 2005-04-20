@@ -1,5 +1,9 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/Short.java (reverseBytes): Argument is 'short'.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/ThreadLocal.java (remove): New method.
 
 2005-04-20  Tom Tromey  <tromey@redhat.com>
