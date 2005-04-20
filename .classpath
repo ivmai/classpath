@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/SliderTest.java|**/Test.java|**/TestAWT.java|compat/|examples/|external/jaxp/source/|external/jaxp/tests/|gnu/javax/swing/|test/|testsuite/|vm/reference/|external/sax/|external/w3c_dom/" kind="src" path=""/>
-	<classpathentry kind="src" path="external/sax"/>
-	<classpathentry kind="src" path="external/w3c_dom"/>
-	<classpathentry kind="src" path="vm/reference"/>
+	<classpathentry excluding="**/SliderTest.java|**/TestAWT.java|compat/|examples/|external/jaxp/source/|external/jaxp/tests/|external/sax/|external/w3c_dom/|gnu/javax/swing/plaf/|gnu/test/|test/|testsuite/|vm/reference/" kind="src" path="">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="external/sax">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="external/w3c_dom">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="vm/reference">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

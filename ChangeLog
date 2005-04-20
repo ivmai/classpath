@@ -1,5 +1,9 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* .classpath: Updated.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* vm/reference/java/lang/VMThread.java (run): Use thread's
 	uncaught handler.
 	* java/lang/Thread.java (defaultHandler): New field.
