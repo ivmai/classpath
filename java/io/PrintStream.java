@@ -580,14 +580,14 @@ public class PrintStream extends FilterOutputStream implements Appendable
   }
 
   /** @since 1.5 */
-  public PrintStream append(char c) throws IOException
+  public PrintStream append(char c)
   {
     print(c);
     return this;
   }
 
   /** @since 1.5 */
-  public PrintStream append(CharSequence cs) throws IOException
+  public PrintStream append(CharSequence cs)
   {
     print(cs == null ? "null" : cs.toString());
     return this;
@@ -595,7 +595,6 @@ public class PrintStream extends FilterOutputStream implements Appendable
 
   /** @since 1.5 */
   public PrintStream append(CharSequence cs, int start, int end)
-    throws IOException
   {
     print(cs == null ? "null" : cs.subSequence(start, end).toString());
     return this;

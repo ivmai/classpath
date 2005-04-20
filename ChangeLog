@@ -1,5 +1,17 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/io/PrintStream.java (append): Don't throw IOException.
+	* java/io/StringWriter.java (append): New overloads.
+	* java/io/PrintWriter.java (append): New overloads.
+	(PrintWriter): New constructors.
+	* java/io/CharArrayWriter.java (append): New overloads.
+	* java/io/RandomAccessFile.java (RandomAccessFile): Implements
+	Closeable.
+	* java/io/Reader.java (Reader): Implements Readable.
+	(read): New method.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/math/BigInteger.java (TEN): New constant.
 	* java/math/BigDecimal.java (ZERO, ONE): Now public.
 	(TEN): New constant.

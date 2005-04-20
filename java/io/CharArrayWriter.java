@@ -242,6 +242,41 @@ public class CharArrayWriter extends Writer
       }
   }
 
+  /** @since 1.5 */
+  public CharArrayWriter append(char c)
+  {
+    write(c);
+    return this;
+  }
+
+  /** @since 1.5 */
+  public CharArrayWriter append(CharSequence cs)
+  {
+    try
+      {
+	write(cs == null ? "null" : cs.toString());
+      }
+    catch (IOException _)
+      {
+	// Can't happen.
+      }
+    return this;
+  }
+
+  /** @since 1.5 */
+  public CharArrayWriter append(CharSequence cs, int start, int end)
+  {
+    try
+      {
+	write(cs == null ? "null" : cs.subSequence(start, end).toString());
+      }
+    catch (IOException _)
+      {
+	// Can't happen.
+      }
+    return this;
+  }
+
   /**
    * This private method makes the buffer bigger when we run out of room
    * by allocating a larger buffer and copying the valid chars from the

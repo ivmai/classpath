@@ -1,5 +1,5 @@
 /* PrintWriter.java -- prints primitive values and objects to a stream as text
-   Copyright (C) 1998, 1999, 2000, 2001  Free Software Foundation
+   Copyright (C) 1998, 1999, 2000, 2001, 2005  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -136,6 +136,34 @@ public class PrintWriter extends Writer
   {
     this(out);
     this.autoflush = autoflush;
+  }
+
+  /** @since 1.5 */
+  public PrintWriter(String path)
+    throws FileNotFoundException
+  {
+    this(new OutputStreamWriter(new FileOutputStream(path)));
+  }
+
+  /** @since 1.5 */
+  public PrintWriter(String path, String encoding)
+    throws FileNotFoundException, UnsupportedEncodingException
+  {
+    this(new OutputStreamWriter(new FileOutputStream(path), encoding));
+  }
+
+  /** @since 1.5 */
+  public PrintWriter(File path)
+    throws FileNotFoundException
+  {
+    this(new OutputStreamWriter(new FileOutputStream(path)));
+  }
+
+  /** @since 1.5 */
+  public PrintWriter(File path, String encoding)
+    throws FileNotFoundException, UnsupportedEncodingException
+  {
+    this(new OutputStreamWriter(new FileOutputStream(path), encoding));
   }
 
   /**
@@ -567,5 +595,26 @@ public class PrintWriter extends Writer
   {
     write(str, 0, str.length());
   }  
+
+  /** @since 1.5 */
+  public PrintWriter append(char c)
+  {
+    write(c);
+    return this;
+  }
+
+  /** @since 1.5 */
+  public PrintWriter append(CharSequence cs)
+  {
+    write(cs == null ? "null" : cs.toString());
+    return this;
+  }
+
+  /** @since 1.5 */
+  public PrintWriter append(CharSequence cs, int start, int end)
+  {
+    write(cs == null ? "null" : cs.subSequence(start, end).toString());
+    return this;
+  }
 }
 
