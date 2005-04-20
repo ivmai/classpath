@@ -1,5 +1,13 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/PriorityQueue.java (PriorityQueue): Implements
+	Serializable.
+	(serialVersionUID): New field.
+	* java/util/EnumMap.java (serialVersionUID): New field.
+	* java/util/EnumSet.java (serialVersionUID): New field.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/Arrays.java (hashCode): New methods.
 	(deepHashCode): New method.
 	(deepEquals): Likewise.
