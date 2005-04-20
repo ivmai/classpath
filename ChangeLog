@@ -1,3 +1,21 @@
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/DuplicateFormatFlagsException.java: New file.
+	* java/util/FormatFlagsConversionMismatchException.java: New
+	file.
+	* java/util/FormatterClosedException.java: New file.
+	* java/util/IllegalFormatCodePointException.java: New file.
+	* java/util/IllegalFormatConversionException.java: New file.
+	* java/util/UnknownFormatFlagsException.java: New file.
+	* java/util/UnknownFormatConversionException.java: New file.
+	* java/util/MissingFormatWidthException.java: New file.
+	* java/util/MissingFormatArgumentException.java: New file.
+	* java/util/InputMismatchException.java: New file.
+	* java/util/IllegalFormatWidthException.java: New file.
+	* java/util/IllegalFormatPrecisionException.java: New file.
+	* java/util/IllegalFormatFlagsException.java: New file.
+	* java/util/IllegalFormatException.java: New file.
+
 2005-04-19  Sven de Marothy  <sven@physto.se>
 
 	* java/util/Calendar.java:
