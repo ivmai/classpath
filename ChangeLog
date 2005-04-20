@@ -1,5 +1,17 @@
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
+	* vm/reference/java/lang/VMThread.java (run): Use thread's
+	uncaught handler.
+	* java/lang/Thread.java (defaultHandler): New field.
+	(setDefaultUncaughtExceptionHandler,
+	getDefaultUncaughtExceptionHandler, setUncaughtExceptionHandler,
+	getUncaughtExceptionHandler): New methods.
+	* java/lang/ThreadGroup.java (ThreadGroup): Implements
+	UncaughtExceptionHandler.
+	(uncaughtException): Use getDefaultUncaughtExceptionHandler.
+
+2005-04-20  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/reflect/MalformedParameterizedTypeException.java: New
 	file.
 
