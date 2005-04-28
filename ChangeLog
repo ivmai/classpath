@@ -1,3 +1,438 @@
+2005-04-28  Robert Schuster  <thebohemian@gmx.net>
+
+	* java/beans/Introspector: Fixed bug #12624, BeanDescriptors
+	will now be set correctly.
+	(flushCaches): Now flushes all cached intermediate data.
+
+2005-04-28  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/JTextArea.java
+	(replaceRange): Removed error throwing.
+
+2005-04-28  Michael Koch  <konqueror@gmx.de>
+
+	* java/security/AccessControlContext.java:
+	Reformatted.
+
+2005-04-28  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* java/security/Security.java (Security): Silence the warning about no
+	providers found in the no debug case.
+
+2005-04-28  Michael Koch  <konqueror@gmx.de>
+
+	* java/nio/charset/Charset.java
+	(providers2): Renamed from 'providers'.
+
+2005-04-27  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI
+	(getThumbBounds): Do not make thumb smaller than
+	minimumThumbSize.
+	* javax/swing/plaf/metal/MetalLookAndFeel
+	(initComponentDefaults): Added color defaults for ScrollBar.
+	* javax/swing/plaf/metal/MetalScrollBarUI
+	(paintThumb): Added.
+	(getMinimumThumbSize): Added.
+
+2005-04-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* java/net/URL.java: Remove org.metastatic.jessie from default
+	protocol search path.
+
+2005-04-27  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalLookAndFeel
+	(initComponentDefaults): Added some default colors.
+
+2005-04-27  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(configureScrollBarColors: Changed key 'ScrollBar.thumbLightShadow'
+	to 'ScrollBar.thumbShadow'. The formes does not exist.
+	(paintThumb): Use BasicGraphicsUtils for painting the thumb.
+
+2005-04-27  Chris Burdess  <dog@gnu.org>
+
+	* java/net/protocol/http/HTTPURLConnection.java (connect): Accept
+	absolute and relative paths in Location header.
+
+2005-04-27  Roman Kennke  <roman@kennke.org>
+
+	* java/awt/MediaTracker.java: Added 2005 to copyright statement.
+	* javax/swing/BoxLayout.java: Likewise.
+	* javax/swing/UIManager.java: Likewise.
+	* javax/swing/plaf/basic/BasicButtonListener.java: Likewise.
+	* javax/swing/plaf/basic/BasicGraphicsUtils.java: Likewise.
+	* javax/swing/plaf/basic/BasicLookAndFeel.java: Likewise.
+	* javax/swing/plaf/basic/BasicMenuItemUI.java: Likewise.
+	* javax/swing/plaf/basic/BasicScrollPaneUI.java: Likewise.
+	* javax/swing/plaf/metal/MetalLookAndFeel.java: Likewise.
+	* javax/swing/text/Document.java: Likewise.
+	* javax/swing/text/GapContent.java: Likewise.
+	* javax/swing/text/SimpleAttributeSet.java: Likewise.
+	* javax/swing/tree/DefaultTreeSelectionModel.java: Likewise.
+
+2005-04-26  Tom Tromey  <tromey@redhat.com>
+
+	* autogen.sh: Use '-I m4'.
+	* m4/lib-ld.m4, m4/lib-link.m4, m4/lib-prefix.m4: New files.
+	* m4/pkg.m4, m4/accross.m4, m4/iconv.m4, m4/acinclude.m4: Moved
+	from...
+	* pkg.m4, accross.m4, iconv.m4, acinclude.m4: ... here.  Removed.
+
+2005-04-26  Luca Barbieri  <luca.barbieri@gmail.com>
+
+	* gnu/java/nio/channels/FileChannelImpl.java (tryLock): Pass
+	'false' to native lock().
+	(lock): Pass 'true' to native lock().
+
+2005-04-26  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/nio/charset/iconv/IconvCharset.java (name):
+	Removed unused field.
+	(IconvCharset): Updated.
+
+2005-04-26  Chris Burdess  <dog@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java: Throw
+	FileNotFoundException and implement getErrorStream on 404.
+
+2005-04-26  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/text/html/parser/ParserDelegator.java (callBack,
+	gnu): Now package-private.
+	* javax/swing/text/html/parser/DocumentParser.java (parser,
+	callBack, gnu): Now package-private.
+	* javax/swing/text/StringContent.java (content, setOffset,
+	checkLocation): Now package-private.
+	* javax/swing/text/JTextComponent.java (doc): Now
+	package-private.
+	* javax/swing/plaf/basic/BasicToolBarUI.java (owner,
+	lastGoodOrientation, origParent, borders, cachedBounds,
+	cachedOrientation, DragWindow): Now package-private.
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java (incrButton,
+	decrButton, viewport, panel, currentScrollLocation, layoutManager,
+	tabAreaRect, contentRect, createIncreaseButton,
+	createDecreaseButton, findPointForIndex): Now package-private.
+	* javax/swing/plaf/basic/BasicSplitPaneDivider.java
+	(currentDividerLocation, moveDividerTo): Now package-private.
+	* javax/swing/plaf/basic/BasicSliderUI.java (findClosestTick): Now
+	package-private.
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(calculatePreferredSize, valueForYPosition, valueForXPosition):
+	Now package-private.
+	* javax/swing/plaf/basic/BasicPopupMenuUI.java
+	(topWindowListener): Now package-private.
+	* javax/swing/plaf/basic/BasicOptionPaneUI.java (iconSize,
+	OK_STRING, YES_STRING, NO_STRING, CANCEL_STRING): Now constants.
+	(messageAreaContainer, buttonContainer, resetSelectedValue): Now
+	package-private.
+	* javax/swing/plaf/basic/BasicListUI.java (damageLayout): Now
+	package-private.
+	* javax/swing/plaf/basic/BasicInternalFrameTitlePane.java (title):
+	Now package-private.
+	* javax/swing/plaf/basic/BasicDesktopIconUI.java (button): Now
+	package-private.
+	* javax/swing/plaf/basic/BasicComboBoxUI.java (largestItemSize,
+	borderInsets): Now package-private.
+	(arrowButtonWidth): Likewise.  Now a constant.
+	* javax/swing/plaf/basic/BasicColorChooserUI.java (chooser, pane,
+	makeTabs, updatePreviewPanel): Now package-private.
+	* javax/swing/plaf/basic/BasicArrowButton.java (shadow,
+	darkShadow, highlight): Now package-private.
+	* javax/swing/colorchooser/DefaultSwatchChooserPanel.java
+	(addColorToQueue): Now package-private.
+	* javax/swing/colorchooser/DefaultRGBChooserPanel.java
+	(spinnerChange, sliderChange, updateChange, R, G, B, RSpinner,
+	GSpinner, BSpinner): Now package-private.
+	* javax/swing/colorchooser/DefaultHSBChooserPanel.java
+	(gradientImage, trackImage, slider, hRadio, sRadio, bRadio,
+	hSpinner, sSpinner, bSpinner, gradientPoint, internalChange,
+	spinnerTrigger, locked, handlingMouse, updateImage, updateSlider,
+	updateTrack): Now package-private.
+	* javax/swing/TransferHandler.java (clipboard): Now
+	package-private.
+	* javax/swing/ToolTipManager.java (showTip, hideTip): Now
+	package-private.
+	* javax/swing/Timer.java (drainEvents, queueEvent): Now
+	package-private.
+	* javax/swing/RepaintManager.java (globalManager): Now
+	package-private.
+	* javax/swing/JFormattedTextField.java (editValid): Now
+	package-private.
+	* javax/swing/JColorChooser.java (makeModal): Now
+	package-private.
+	* java/awt/geom/GeneralPath.java (rule, types, xpoints, ypoints,
+	index, path): Now package-private.
+	* java/awt/geom/Area.java (solids, holes, cubicCubicIntersect,
+	lineQuadIntersect, lineCubicIntersect, linesIntersect,
+	pointEquals): Now package-private.
+	* java/awt/geom/Arc2D.java (type): Now package-private.
+	* java/awt/Window.java (windowFocusOwner): Now package-private.
+	* java/awt/TextComponent.java (editable, selectionStart,
+	selectionEnd, text, getIndexAtPoint, getCharacterBounds): Now
+	package-private.
+	* java/awt/MenuItem.java (actionCommand, enabled, label): Now
+	package-private.
+	* java/awt/MenuComponent.java (focusListener): Now
+	package-private.
+	* java/awt/Frame.java (state): Now package-private.
+	* java/awt/Choice.java (pItems): Now package-private.
+	* java/awt/Checkbox.java (state): Now package-private.
+	* java/awt/Button.java (actionCommand, label): Now
+	package-private.
+	* gnu/javax/swing/text/html/parser/support/Parser.java
+	(attributes, _handleEndTag_remaining, _handleStartTag): Now
+	package-private.
+	* gnu/java/beans/decoder/PersistenceParser.java (javaHandler): Now
+	package-private.
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java (paint, stroke, fg, bg,
+	clip, transform, font, comp): Now package-private.
+
+2005-04-26  Tom Tromey  <tromey@redhat.com>
+
+	* java/awt/Robot.java (waitForIdle): Call invokeAndWait in a
+	static way.
+
+2005-04-26  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicToggleButtonUI.java:
+	(getPropertyPrefix): Added.
+
+2005-04-26  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicButtonUI.java
+	(getPropertyPrefix): Added.
+	(installDefaults): Use getPropertyPrefix instead of hard-coded
+	prefix.
+
+2005-04-26  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JToggleButton.java
+	(JToggleButton): Removed horizontalAlignment setting, this
+	was wrong. Added setting of an actionCommand, ToggleButtons
+	have "" as default actionCommand.
+
+2005-04-26  David Daney  <ddaney@avtrex.com>
+
+	* java/net/InetAddress.java (InetAddress): Make a private copy of
+	the address.
+	* java/net/Inet4Address.java (getAddress): Return a copy of the
+	address.
+	* java/net/Inet6Address.java (Inet6Address): Use private copy of
+	the address
+	(getAddress): Return a copy of the address.
+	(equals): Rewrote.
+
+2005-04-26  Michael Koch  <konqueror@gmx.de>
+
+	* javax/swing/ImageIcon.java: 
+	Merged copyright with GCJ.
+
+2005-04-25  Tom Tromey  <tromey@redhat.com>
+
+	* java/awt/AWTKeyStroke.java (vktable): Now package-private.
+
+2005-04-25  Mark Wielaard  <mark@klomp.org>
+
+	* iconv.m4: New file.
+	* configure.ac: Use AM_ICONV.
+	* native/jni/java-nio/Makefile.am (libjavanio_la_LIBADD):
+	Add LTLIBICONV.
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvDecoder.c:
+	Include config.h and jcl.h, use if defined(HAVE_ICONV), add new
+	static variables infid and outfid, add char_union.
+	(Java_gnu_java_nio_charset_iconv_IconvDecoder_openIconv):
+	Guard with if defined(HAVE_ICONV), use JCL_jstring_to_cstring,
+	JCL_free_cstring and JCL_ThrowException, cache inremaining and
+	outremaining fieldIDs.
+	(Java_gnu_java_nio_charset_iconv_IconvDecoder_decode):
+	Guard with if defined(HAVE_ICONV), use ICONV_CONST for iconv
+	argument, used cached fieldIDs, use char_union.
+	(Java_gnu_java_nio_charset_iconv_IconvDecoder_closeIconv):
+	Guard with if defined(HAVE_ICONV).
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvEncoder.c:
+	Include config.h and jcl.h, use if defined(HAVE_ICONV), add new
+	static variables infid and outfid, add char_union.
+	(Java_gnu_java_nio_charset_iconv_IconvEncoder_openIconv):
+	Guard with if defined(HAVE_ICONV), use JCL_jstring_to_cstring,
+	JCL_free_cstring and JCL_ThrowException, cache inremaining and
+	outremaining fieldIDs.
+	(Java_gnu_java_nio_charset_iconv_IconvEncoder_encode):
+	Guard with if defined(HAVE_ICONV), use ICONV_CONST for iconv
+	argument, used cached fieldIDs, use char_union.
+	(Java_gnu_java_nio_charset_iconv_IconvEncoder_closeIconv):
+	Guard with if defined(HAVE_ICONV).
+	* gnu/java/nio/charset/iconv/IconvDecoder.java (dispose): Renamed.
+	(finalize): Renamed from dispose.
+	* gnu/java/nio/charset/iconv/IconvEncoder.java (dispose): Renamed.
+	(finalize): Renamed from dispose.
+	
+2005-04-25  Sven de Marothy  <sven@physto.se>
+
+	* java/io/InputStreamReader.java:
+	(InputStreamReader): Always replace invalid chars.
+	(read): Return -1 if zero bytes are read.
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvDecoder.c,
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvEncoder.c:
+	Correct C pointer arithmetic.
+
+2005-04-25  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/Transparency.java
+	(getTransparency): fixed API docs.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(initDefaults): Initialize thumb*Color fields correctly.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/GapContent.java:
+	Added API comments.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalBorders.java:
+	Added inner class ScrollPaneBorder.
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(initComponentDefaults): Added default for "ScrollPane.border"
+	to use the new ScrollPaneBorder.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/AbstractDocument.java:
+	Added FIXME comments. This class still has to be
+	implemented thread-safe.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java
+	(DefaultTreeSelectionModel): Initialize listenerList here.
+
+2005-04-25  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalTextFieldUI.java
+	(createUI): Return one instance per Component instead of a
+	shared instance.
+
+2005-04-24  Tom Tromey  <tromey@redhat.com>
+
+	* native/jni/Makefile.am (JNIDIRS): New macro.
+	(SUBDIRS): Use it.
+	* configure.ac (--enable-core-jni): New option.
+	* NEWS: Document new option.
+
+2005-04-24  Tom Tromey  <tromey@redhat.com>
+
+	* include/jni_md-x86-linux-gnu.h (JNIIMPORT): New define.
+	(jsize): New typedef.
+	* include/jni.h: Re-merged with libgcj.
+	* doc/vmintegration.texinfo (JNI Implementation): New node.
+	* NEWS: Document the change.
+
+2005-04-24  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/classpath/Configuration.java.in (default_awt_peer_toolkit):
+	Now set by configure.
+	* configure.ac (--enable-default-toolkit): New option.
+	* NEWS: Document new option.
+
+2005-04-24  Tom Tromey  <tromey@redhat.com>
+
+	* configure.ac: Formatting fixes.
+
+2005-03-22  Mike Stump  <mrs@apple.com>
+
+	* native/fdlibm/ieeefp.h: ppc64 is also __IEEE_BIG_ENDIAN.
+
+2005-04-23  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/text/StyleConstants.java (StyleConstants): Now
+	package-private.
+
+2005-04-23  Mark Wielaard  <mark@klomp.org>
+
+	* java/net/URL.java (URL(URL,String,URLStreamHandler)): Add spec
+	to MalformedURLException.
+
+2005-04-23  Michael Koch  <konqueror@gmx.de>
+
+	* java/net/ServerSocket.java
+	(getChannel): Improved javadoc comment.
+
+2005-04-23  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/Document.java:
+	Added API documentation comments.
+
+2005-04-23  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/AbstractDocument.java
+	(getDocumentProperties): Implemented.
+	(setDocumentProperties): Implemented.
+	(getProperty): Implemented.
+	(putProperty): Implemented.
+
+2005-04-22  Tom Tromey  <tromey@redhat.com>
+
+	* accross.m4: New file, from gcc.
+	* configure.ac: Only call AC_C_BIGENDIAN once.  Use a single
+	AC_CHECK_HEADERS call for most headers.  Likewise for
+	AC_CHECK_FUNCS.  Use AC_COMPILE_CHECK_SIZEOF.  Don't look for
+	function named 'sizeof'.
+
+2005-04-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c
+	(connectSignals): Realize the window widget after connecting
+	signals.
+
+2005-04-22  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/BoxLayout
+	(preferredLayoutSize): Fixed computation so that it correctly
+	adds the top and bottom insets of the container.
+
+2005-04-22  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicMenuItemUI.java
+	(paintText): Make use of the 'selectionForeground' UI default
+	for text painting.
+
+2005-04-22  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	(initSystemColorDefaults): Modified colors to match the
+	BasicLookAndFeel in the reference implementation.
+	(initComponentDefaults): Likewise.
+
+2005-04-22  Tom Tromey  <tromey@redhat.com>
+
+	* doc/vmintegration.texinfo (Introduction): Typo fix.
+	(Initialization): Removed redundant 'current'.
+
+2005-04-22  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/classpath/SystemProperties.java:
+	Reformatted.
+
+2005-04-21  Casey Marshall <csm@gnu.org>
+
+	* gnu/java/security/der/DERValue.java
+	(getValueAs): new method.
+	* gnu/java/security/x509/ext/PrivateKeyUsagePeriod.java
+	(<init>): read both dates with 'DERValue.getValueAs', with
+	'GENERALIZED_TIME' as the argument.
+
+2005-04-21  Michael Koch  <konqueror@gmx.de>
+
+	* include/gnu_java_nio_charset_iconv_IconvDecoder.h,
+	include/gnu_java_nio_charset_iconv_IconvEncoder.h:
+	Regenerated with gcjh from gcc 4.0 branch.
+
 2005-04-20  Tom Tromey  <tromey@redhat.com>
 
 	* .classpath: Updated.
@@ -110,12 +545,340 @@
 	* java/util/IllegalFormatFlagsException.java: New file.
 	* java/util/IllegalFormatException.java: New file.
 
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	(initComponentDefaults): Changed Button.border to be
+	BasicBorders.getButtonBorder as it should be.
+
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java:
+	(getMaximumSize): Return (Short.MAX_VALUE, Short.MAX_VALUE) as it
+	should according to a mauve testcase, instead of the preferred
+	size.
+
+2005-04-20  Sven de Marothy  <sven@physto.se>
+
+	* java/io/OutputStreamWriter.java:
+	(close): Do nothing on multiple closes.
+
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JMenu.java
+	(add): add(Component) now calls PopupMenu.insert(..) instead of
+	PopupMenu.add(..). add(..) is not implemented for Component,
+	so JComponent.add(..) is called instead, adding the component
+	in the wrong place.
+
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicButtonListener.java
+	(mousePressed): replaced query to getModifiersEx with getModifiers.
+	This method relied on faulty behaviour in getModifierEx.
+	(mouseReleased): replaced query to getModifiersEx with getModifiers.
+	This method relied on faulty behaviour in getModifierEx.
+
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(getDefaults): Call addCustomEntriesToTable on the theme.
+
+2005-04-20  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java
+	(constructor): Added implementation.
+	(getRowMapper): Added implementation.
+	(setSelectionMode): Added implementation.
+	(getSelectionMode): Added implementation.
+	(getSelectionPath): Added implementation.
+	(getSelectionPaths): Added implementation.
+	(getSelectionCount): Added implementation.
+	(isSelectionEmpty): Added implementation.
+	(getSelectionRows): Added implementation.
+	(getMinSelectionRow): Added implementation.
+	(getMaxSelectionRow): Added implementation.
+	(getLeadSelectionRow): Added implementation.
+	(getLeadSelectionPath): Added implementation.
+
+2005-04-20  Sven de Marothy  <sven@physto.se>
+
+	* java/nio/charset/Charset.java:
+	(defaultCharset()): New method.
+	Status updated to 1.5
+
+2005-04-20  Sven de Marothy  <sven@physto.se>
+	
+	* gnu/java/io/EncodingManager.java: Removed charset alias properties.
+	* gnu/java/io/decode/Decoder.java,
+	* gnu/java/io/decode/Decoder8859_1.java,
+	* gnu/java/io/decode/Decoder8859_13.java,
+	* gnu/java/io/decode/Decoder8859_15.java,
+	* gnu/java/io/decode/Decoder8859_2.java,
+	* gnu/java/io/decode/Decoder8859_3.java,
+	* gnu/java/io/decode/Decoder8859_4.java,
+	* gnu/java/io/decode/Decoder8859_5.java,
+	* gnu/java/io/decode/Decoder8859_6.java,
+	* gnu/java/io/decode/Decoder8859_7.java,
+	* gnu/java/io/decode/Decoder8859_8.java,
+	* gnu/java/io/decode/Decoder8859_9.java,
+	* gnu/java/io/decode/DecoderASCII.java,
+	* gnu/java/io/decode/DecoderCp1047.java,
+	* gnu/java/io/decode/DecoderEBCDIC_XML_US.java,
+	* gnu/java/io/decode/DecoderEightBitLookup.java,
+	* gnu/java/io/decode/DecoderUTF16BE.java,
+	* gnu/java/io/decode/DecoderUTF16LE.java,
+	* gnu/java/io/decode/DecoderUTF32BE.java,
+	* gnu/java/io/decode/DecoderUTF32LE.java,
+	* gnu/java/io/decode/DecoderUTF8.java,
+	* gnu/java/io/decode/DecoderUnicodeBig.java,
+	* gnu/java/io/decode/DecoderUnicodeLittle.java,
+	* gnu/java/io/decode/DecoderWindows1250.java,
+	* gnu/java/io/decode/DecoderWindows1252.java,
+	* gnu/java/io/decode/package.html
+	* gnu/java/io/encode/Encoder.java,
+	* gnu/java/io/encode/Encoder8859_1.java,
+	* gnu/java/io/encode/Encoder8859_13.java,
+	* gnu/java/io/encode/Encoder8859_15.java,
+	* gnu/java/io/encode/Encoder8859_2.java,
+	* gnu/java/io/encode/Encoder8859_3.java,
+	* gnu/java/io/encode/Encoder8859_4.java,
+	* gnu/java/io/encode/Encoder8859_5.java,
+	* gnu/java/io/encode/Encoder8859_6.java,
+	* gnu/java/io/encode/Encoder8859_7.java,
+	* gnu/java/io/encode/Encoder8859_8.java,
+	* gnu/java/io/encode/Encoder8859_9.java,
+	* gnu/java/io/encode/EncoderASCII.java,
+	* gnu/java/io/encode/EncoderCp1047.java,
+	* gnu/java/io/encode/EncoderEBCDIC_XML_US.java,
+	* gnu/java/io/encode/EncoderEightBitLookup.java,
+	* gnu/java/io/encode/EncoderUTF16BE.java,
+	* gnu/java/io/encode/EncoderUTF16LE.java,
+	* gnu/java/io/encode/EncoderUTF32BE.java,
+	* gnu/java/io/encode/EncoderUTF32LE.java,
+	* gnu/java/io/encode/EncoderUTF8.java,
+	* gnu/java/io/encode/EncoderUnicodeBig.java,
+	* gnu/java/io/encode/EncoderUnicodeLittle.java,
+	* gnu/java/io/encode/EncoderWindows1250.java,
+	* gnu/java/io/encode/EncoderWindows1252.java,
+	* gnu/java/io/encode/package.html:
+	Removed
+	
 2005-04-19  Sven de Marothy  <sven@physto.se>
 
 	* java/util/Calendar.java:
 	(compareTo(java.util.Calendar)): Handle instability
 	in obtaining the milliseconds value.
 	
+2005-04-19  Michael Koch  <konqueror@gmx.de>
+
+	* java/awt/geom/QuadCurve2D.java:
+	Fixed Brian Gough's name for real.
+
+2005-04-19  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicButtonUI.java
+	(paint): This should not care about margin and insets
+	at the same time, as insets already include the margin
+	through the border.
+	* javax/swing/plaf/basic/BasicGraphicsUtils.java
+	(getPreferredButtonSize): Likewise.
+	* javax/swing/plaf/metal/MetalBorders.java
+	(getBorderInsets): Likewise.
+
+2005-04-19  Roman Kennke  <roman@kennke.org>
+
+	* examples/gnu/classpath/examples/swing/Demo.java:
+	Pulled out GNULookAndFeel so that it can be accessed.
+	On startup, if the property swing.defaultlaf is not set,
+	display a message on how to set the L&F for the demo.
+	Changed font for bottom buttons to normal.
+	* examples/gnu/classpath/examples/swing/GNULookAndFeel.java:
+	Pulled out of Demo.java.
+
+2005-04-19  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicOptionPaneUI.java
+	(createMessageArea): The JPanel that holds the message area
+	doesn't need to override getPreferredSize. This prevents some
+	message components from rendering nicely.
+
+2005-04-19  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/net/URL.java:
+	(toURI()): Implemented.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalInternalFrameUI.java
+	(createUI): Do not share instances between components.
+	* javax/swing/plaf/metal/MetalSliderUI.java
+	(createUI): Do not share instances between components.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalBorders:
+	(PopupMenuBorder): Added.
+	* javax/swing/plaf/metal/MetalLookAndFeel
+	(initComponentDefaults): Added PopupMenuBorder.
+
+2005-04-18  Sven de Marothy  <sven@physto.se>
+	
+	* java/io/InputStreamReader.java:
+	(read): Fix several bugs leading to incorrect length being returned.
+
+2005-04-18  Sven de Marothy  <sven@physto.se>
+
+	* java/nio/ByteBufferImpl.java:
+	(putChar): Inlined for speed.
+	(put, get): Bulk methods can use arraycopy.
+	* java/nio/CharBufferImpl.java:
+	(put, get): Bulk methods can use arraycopy.
+	
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java:
+	Added API documentation all over the class.
+
+2005-04-18  Sven de Marothy  <sven@physto.se>
+	
+	* include/Makefile.am,
+	* native/jni/java-nio/Makefile.am: Added new files.
+	* gnu/java/nio/charset/iconv/IconvCharset.java,
+	* gnu/java/nio/charset/iconv/IconvDecoder.java,
+	* gnu/java/nio/charset/iconv/IconvEncoder.java,
+	* gnu/java/nio/charset/iconv/IconvMetaData.java, 
+	* gnu/java/nio/charset/iconv/IconvProvider.java,
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvDecoder.c,
+	* native/jni/java-nio/gnu_java_nio_charset_iconv_IconvEncoder.c,
+	* include/gnu_java_nio_charset_iconv_IconvDecoder.h,
+	* include/gnu_java_nio_charset_iconv_IconvEncoder.h,
+	New files.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* java/lang/String.java:
+	Make value, offset and count fields package private instead
+	of private.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollPaneUI.java
+	(installDefaults): Link managed JScrollPane in instance field.
+	(uninstallDefaults): Unlink managed JScrollPane in instance field.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(PropertyChangeHandler.propertyChange): Add default
+	to switch statement to avoid errors with unusual values
+	for orientation.
+	(installComponents): Likewise.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalScrollBarUI.java:
+	(createUI): Instances cannot be shared among JScrollPanes.
+
+2005-04-18  Sven de Marothy  <sven@physto.se>
+
+	* java/lang/String.java: Value, offset and count should be private.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(initComponentDefaults): Added defaults for Menu, MenuBar
+	MenuEntry fonts.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(installUI): Install listeners after everything all, otherwise
+	we get strange NPEs in some situations, especially with
+	custom L&Fs.
+	(createIncreaseButton): Orientation is expected to be
+	SwingConstants.NORTH, ..SOUTH, ..WEST or ..EAST and not
+	HORIZONTAL or VERTICAL.
+	(createDecreaseButton): Orientation is expected to be
+	SwingConstants.NORTH, ..SOUTH, ..WEST or ..EAST and not
+	HORIZONTAL or VERTICAL.
+	(installComponents): Orientation for buttons is expected to be
+	SwingConstants.NORTH, ..SOUTH, ..WEST or ..EAST and not
+	HORIZONTAL or VERTICAL.
+
+2005-04-18  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/nio/ByteBufferImpl.java (get(), put(byte)): Inlined checks
+	and field updates.
+	* java/nio/CharBufferImpl.java
+	(CharBufferImpl(CharBufferImpl)): Copy array_offset field.
+	(get(), put(char)): Inlined checks and field updates. Fixed to
+	take array_offset into account.
+	(get(int), put(int, char)): Fixed to take array_offset into account.
+
+2005-04-18  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/lang/Class.java (getModifiers, newInstance): Changed
+	call to VMClass.getModifiers().
+	* vm/reference/java/lang/VMClass.java
+	(getModifiers(Class, boolean)): New method.
+
+2005-04-18  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/awt/GraphicsEnvironment.java
+	(localGraphicsEnvironment): New field.
+	(getLocalGraphicsEnvironment): Added support for java.awt.graphicsenv
+	property.
+	(isHeadless): Added support for java.awt.headless property.
+	(isHeadlessInstance): Call headless().
+
+2005-04-18  Jeroen Frijters  <jeroen@frijters.net>
+
+	* gnu/java/beans/IntrospectionIncubator.java
+	(addToPropertyHash, addToListenerHash): Don't confuse get(),
+	set(), is(), add() and remove() with properties or events.
+
+2005-04-18  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JToolBar.java
+	(addImpl): Adjust added AbstractButtons to look and feel like
+	toolbar buttons.
+	* javax/swing/plaf/metal/MetalBorders.java:
+	Adjusted insets of ButtonBorder.
+	(RolloverMarginBorder): Added class for toolbar buttons.
+	(getButtonBorder): Adjusted factory method to return a shared
+	instance of button border.
+	(getToolbarButtonBorder): Added factory method to return a shared
+	instance of toolbar button border.
+	(getMarginBorder): Added factory method to return a shared
+	instance of margin border.
+	* javax/swing/plaf/metal/MetalButtonUI.java
+	(installDefauls): If button is child of a JToolBar then set
+	special border on this button.
+
+2005-04-17  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/SimpleAttributeSet.java
+	(addAttribute): Removed null pointer check.
+	* javax/swing/text/StyleContext.java
+	(NamedStyle.setResolveParent): Added null pointer check.
+
+2005-04-17  Roman Kennke  <roman@kennke.org>
+
+	* examples/gnu/classpath/exammples/swing/Demo.java:
+	Print a short summary for available values for the property
+	swing.defaultlaf.
+	Set MetalLookAndFeel as default.
+	Pulled out GNULookAndFeel so that it is accessible.
+	* examples/gnu/classpath/exammples/swing/GNULookAndFeel.java:
+	Pulled out this class from Demo.java.
+
+2005-04-17  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/UIManager.java:
+	Make the UIManager respect the swing.defaultlaf system
+	property.
+
 2005-04-17  Roman Kennke  <roman@kennke.org>
 
 	* javax/swing/text/SimpleAttributeSet.java
@@ -630,57 +1393,57 @@
 	* gnu/java/nio/charset/UTF_8.java,
 	(Decoder): Correct values of maximum chars per byte.
 	(decodeLoop): Handle 4-byte surrogates.
-	* gnu/java/nio/charset/ByteCharset.java
-	* gnu/java/nio/charset/Cp424.java
-	* gnu/java/nio/charset/Cp437.java
-	* gnu/java/nio/charset/Cp737.java
-	* gnu/java/nio/charset/Cp775.java
-	* gnu/java/nio/charset/Cp850.java
-	* gnu/java/nio/charset/Cp852.java
-	* gnu/java/nio/charset/Cp855.java
-	* gnu/java/nio/charset/Cp857.java
-	* gnu/java/nio/charset/Cp860.java
-	* gnu/java/nio/charset/Cp861.java
-	* gnu/java/nio/charset/Cp862.java
-	* gnu/java/nio/charset/Cp863.java
-	* gnu/java/nio/charset/Cp864.java
-	* gnu/java/nio/charset/Cp865.java
-	* gnu/java/nio/charset/Cp866.java
-	* gnu/java/nio/charset/Cp869.java
-	* gnu/java/nio/charset/Cp874.java
-	* gnu/java/nio/charset/EncodingHelper.java
-	* gnu/java/nio/charset/ISO_8859_13.java
-	* gnu/java/nio/charset/ISO_8859_15.java
-	* gnu/java/nio/charset/ISO_8859_2.java
-	* gnu/java/nio/charset/ISO_8859_3.java
-	* gnu/java/nio/charset/ISO_8859_4.java
-	* gnu/java/nio/charset/ISO_8859_5.java
-	* gnu/java/nio/charset/ISO_8859_6.java
-	* gnu/java/nio/charset/ISO_8859_7.java
-	* gnu/java/nio/charset/ISO_8859_8.java
-	* gnu/java/nio/charset/ISO_8859_9.java
-	* gnu/java/nio/charset/KOI_8.java
-	* gnu/java/nio/charset/MS874.java
-	* gnu/java/nio/charset/MacCentralEurope.java
-	* gnu/java/nio/charset/MacCroatian.java
-	* gnu/java/nio/charset/MacCyrillic.java
-	* gnu/java/nio/charset/MacDingbat.java
-	* gnu/java/nio/charset/MacGreek.java
-	* gnu/java/nio/charset/MacIceland.java
-	* gnu/java/nio/charset/MacRoman.java
-	* gnu/java/nio/charset/MacRomania.java
-	* gnu/java/nio/charset/MacSymbol.java
-	* gnu/java/nio/charset/MacThai.java
-	* gnu/java/nio/charset/MacTurkish.java
-	* gnu/java/nio/charset/Windows1250.java
-	* gnu/java/nio/charset/Windows1251.java
-	* gnu/java/nio/charset/Windows1252.java
-	* gnu/java/nio/charset/Windows1253.java
-	* gnu/java/nio/charset/Windows1254.java
-	* gnu/java/nio/charset/Windows1255.java
-	* gnu/java/nio/charset/Windows1256.java
-	* gnu/java/nio/charset/Windows1257.java
-	* gnu/java/nio/charset/Windows1258.java
+	* gnu/java/nio/charset/ByteCharset.java,
+	gnu/java/nio/charset/Cp424.java,
+	gnu/java/nio/charset/Cp437.java,
+	gnu/java/nio/charset/Cp737.java,
+	gnu/java/nio/charset/Cp775.java,
+	gnu/java/nio/charset/Cp850.java,
+	gnu/java/nio/charset/Cp852.java,
+	gnu/java/nio/charset/Cp855.java,
+	gnu/java/nio/charset/Cp857.java,
+	gnu/java/nio/charset/Cp860.java,
+	gnu/java/nio/charset/Cp861.java,
+	gnu/java/nio/charset/Cp862.java,
+	gnu/java/nio/charset/Cp863.java,
+	gnu/java/nio/charset/Cp864.java,
+	gnu/java/nio/charset/Cp865.java,
+	gnu/java/nio/charset/Cp866.java,
+	gnu/java/nio/charset/Cp869.java,
+	gnu/java/nio/charset/Cp874.java,
+	gnu/java/nio/charset/EncodingHelper.java,
+	gnu/java/nio/charset/ISO_8859_13.java,
+	gnu/java/nio/charset/ISO_8859_15.java,
+	gnu/java/nio/charset/ISO_8859_2.java,
+	gnu/java/nio/charset/ISO_8859_3.java,
+	gnu/java/nio/charset/ISO_8859_4.java,
+	gnu/java/nio/charset/ISO_8859_5.java,
+	gnu/java/nio/charset/ISO_8859_6.java,
+	gnu/java/nio/charset/ISO_8859_7.java,
+	gnu/java/nio/charset/ISO_8859_8.java,
+	gnu/java/nio/charset/ISO_8859_9.java,
+	gnu/java/nio/charset/KOI_8.java,
+	gnu/java/nio/charset/MS874.java,
+	gnu/java/nio/charset/MacCentralEurope.java,
+	gnu/java/nio/charset/MacCroatian.java,
+	gnu/java/nio/charset/MacCyrillic.java,
+	gnu/java/nio/charset/MacDingbat.java,
+	gnu/java/nio/charset/MacGreek.java,
+	gnu/java/nio/charset/MacIceland.java,
+	gnu/java/nio/charset/MacRoman.java,
+	gnu/java/nio/charset/MacRomania.java,
+	gnu/java/nio/charset/MacSymbol.java,
+	gnu/java/nio/charset/MacThai.java,
+	gnu/java/nio/charset/MacTurkish.java,
+	gnu/java/nio/charset/Windows1250.java,
+	gnu/java/nio/charset/Windows1251.java,
+	gnu/java/nio/charset/Windows1252.java,
+	gnu/java/nio/charset/Windows1253.java,
+	gnu/java/nio/charset/Windows1254.java,
+	gnu/java/nio/charset/Windows1255.java,
+	gnu/java/nio/charset/Windows1256.java,
+	gnu/java/nio/charset/Windows1257.java,
+	gnu/java/nio/charset/Windows1258.java:
 	New files.
 	
 2005-04-08  Roman Kennke  <roman@kennke.org>
@@ -706,7 +1469,7 @@
 
 2005-04-08  Guilhem Lavaux  <guilhem@kaffe.org>
 
-        * native/jni/classpath/jcl.h, 
+	* native/jni/classpath/jcl.h,
 	native/jni/java-io/java_io_ObjectInputStream.c,
 	native/jni/java-io/java_io_VMFile.c,
 	native/jni/java-io/java_io_VMObjectStreamClass.c,
@@ -936,7 +1699,7 @@
 	* gnu/java/io/decode/DecoderUnicodeLittle.java,
 	* gnu/java/io/encode/EncoderUnicodeBig.java,
 	* gnu/java/io/encode/EncoderUnicodeLittle.java:
-        New files.
+	New files.
 
 2005-03-26  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
@@ -946,22 +1709,22 @@
 2005-03-26  Dalibor Topic  <robilad@kaffe.org>
 
 	* native/jni/java-nio/gnu_java_nio_VMSelector.c:
-        Moved include statement for config.h to the top to
-        fix the build on Darwin6.
+	Moved include statement for config.h to the top to
+	fix the build on Darwin6.
 
-        Reported by:  Riccardo Mottola <zuse@libero.it>
+	Reported by:  Riccardo Mottola <zuse@libero.it>
 
 2005-03-26  Dalibor Topic  <robilad@kaffe.org>
 
-        * native/jni/java-nio/gnu_java_nio_VMSelector.c:
-        Include <sys/types.h> to fix build on OS X.
+	* native/jni/java-nio/gnu_java_nio_VMSelector.c:
+	Include <sys/types.h> to fix build on OS X.
 
-        Reported by: Michael Franz <mvfranz@gmail.com>
+	Reported by: Michael Franz <mvfranz@gmail.com>
 
 2005-03-26  Ito Kazumitsu  <kaz@maczuka.gcd.org>
 
-        * java/text/DecimalFormat.java (parse):
-        Check whether the positive suffix matches the pattern.
+	* java/text/DecimalFormat.java (parse):
+	Check whether the positive suffix matches the pattern.
 
 2005-03-26  Chris Burdess  <dog@gnu.org>
 
@@ -980,7 +1743,7 @@
 
 2005-03-23  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
-	* gnu/xml/dom/html2/DomHTMLParser.java
+	* gnu/xml/dom/html2/DomHTMLParser.java:
 	Changed 'enum' references to become 'enumeration'.
 
 2005-03-22  Archie Cobbs  <archie@dellroad.org>
@@ -995,7 +1758,7 @@
 
 2005-03-21  Sven de Marothy  <sven@physto.se>
 
-	* gnu/classpath/SystemProperties.java,
+	* gnu/classpath/SystemProperties.java:
 	Add missing aliases for "UnicodeBigUnmarked" and
 	UnicodeLittleUnmarked".
 	
@@ -2372,9 +3135,9 @@
 2005-02-27  Chris Burdess  <dog@gnu.org>
 
 	* gnu/xml/aelfred2/JAXPFactory.java,
-	  gnu/xml/aelfred2/SAXDriver.java,
-	  gnu/xml/aelfred2/XmlParser.java,
-	  gnu/xml/aelfred2/XmlReader.java: Applied GNU Classpath source code
+	gnu/xml/aelfred2/SAXDriver.java,
+	gnu/xml/aelfred2/XmlParser.java,
+	gnu/xml/aelfred2/XmlReader.java: Applied GNU Classpath source code
 	formatting conventions. Replaced arrays of Object with struct-like
 	classes for easier maintainability. Made SAXDriver.stringInterning
 	package private to allow access from XmlParser inside the loop without
@@ -2389,12 +3152,12 @@
 2005-02-26  Audrius Meskauskas  <audriusa@bluewin.ch>
 
 	* javax/swing/Timer.java: documenting and some
-          formatting.	
-        
+	formatting.	
+
 2005-02-26  Audrius Meskauskas  <audriusa@bluewin.ch>
 
 	* javax/swing/JTextArea.java (replaceRange): 
-        Fixing doc.remove(start, length) misinterpretation.
+	Fixing doc.remove(start, length) misinterpretation.
 	
 2005-02-26  Roman Kennke  <roman@ontographics.com>
 
@@ -2849,9 +3612,8 @@
 	
 2005-02-16  Sven de Marothy  <sven@physto.se>
 
-	* java/util/logging/LogManager.java 
-	Reformatted.
-        (readConfiguration): If a logger for a key is not found, create one.
+	* java/util/logging/LogManager.java: Reformatted.
+	(readConfiguration): If a logger for a key is not found, create one.
 
 2005-02-16  Michael Koch  <konqueror@gmx.de>
 

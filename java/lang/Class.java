@@ -857,7 +857,7 @@ public final class Class<T>
    */
   public int getModifiers()
   {
-    return VMClass.getModifiers (this);
+    return VMClass.getModifiers (this, false);
   }
   
   /**
@@ -1117,7 +1117,7 @@ public final class Class<T>
 	if (constructor == null)
 	  throw new InstantiationException(getName());
 	if (!Modifier.isPublic(constructor.getModifiers())
-            || !Modifier.isPublic(getModifiers()))
+            || !Modifier.isPublic(VMClass.getModifiers(this, true)))
 	  {
 	    final Constructor finalConstructor = constructor;
 	    AccessController.doPrivileged(new PrivilegedAction()
@@ -1137,7 +1137,7 @@ public final class Class<T>
       }
     int modifiers = constructor.getModifiers();
     if (!Modifier.isPublic(modifiers)
-        || !Modifier.isPublic(getModifiers()))
+        || !Modifier.isPublic(VMClass.getModifiers(this, true)))
       {
 	Class caller = VMStackWalker.getCallingClass();
 	if (caller != null &&

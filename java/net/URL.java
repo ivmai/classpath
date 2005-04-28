@@ -125,7 +125,7 @@ import java.util.StringTokenizer;
 public final class URL implements Serializable
 {
   private static final String DEFAULT_SEARCH_PATH =
-    "org.metastatic.jessie|gnu.java.net.protocol|gnu.inet";
+    "gnu.java.net.protocol|gnu.inet";
 
   // Cached System ClassLoader
   private static ClassLoader systemClassLoader;
@@ -430,7 +430,8 @@ public final class URL implements Serializable
 	authority = context.authority;
       }
     else // Protocol NOT specified in spec. and no context available.
-      throw new MalformedURLException("Absolute URL required with null context");
+      throw new MalformedURLException("Absolute URL required with null"
+				      + " context: " + spec);
 
     protocol = protocol.trim();
 
@@ -935,4 +936,21 @@ public final class URL implements Serializable
   {
     oos.defaultWriteObject();
   }
+
+  /**
+   * Returns the equivalent <code>URI</code> object for this <code>URL</code>.
+   * This is the same as calling <code>new URI(this.toString())</code>.
+   * RFC2396-compliant URLs are guaranteed a successful conversion to
+   * a <code>URI</code> instance.  However, there are some values which
+   * form valid URLs, but which do not also form RFC2396-compliant URIs.
+   *
+   * @throws URISyntaxException if this URL is not RFC2396-compliant,
+   *         and thus can not be successfully converted to a URI.
+   */
+  public URI toURI()
+    throws URISyntaxException
+  {
+    return new URI(toString());
+  }
+
 }

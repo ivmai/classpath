@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<!-- package.html - describes classes in gnu.java.io.encode package.
+/* IconvCharset.java -- Wrapper for iconv charsets.
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -34,13 +33,53 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. -->
+exception statement from your version. */
 
-<html>
-<head><title>GNU Classpath - gnu.java.io.encode</title></head>
 
-<body>
-<p></p>
+package gnu.java.nio.charset.iconv;
 
-</body>
-</html>
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+
+public final class IconvCharset extends Charset
+{
+  private IconvMetaData info;
+
+  public IconvCharset(IconvMetaData info)
+  {
+    super(info.nioCanonical(), info.aliases());
+    this.info = info;
+    if (newEncoder() == null || newDecoder() == null)
+      throw new IllegalArgumentException();
+  }
+
+  public boolean contains(Charset cs)
+  {
+    return false;
+  }
+
+  public CharsetDecoder newDecoder()
+  {
+    try
+      {
+	return new IconvDecoder(this, info);
+      }
+    catch (IllegalArgumentException e)
+      {
+	return null;
+      }
+  }
+
+  public CharsetEncoder newEncoder()
+  {
+    try
+      {
+	return new IconvEncoder(this, info);
+      }
+    catch (IllegalArgumentException e)
+      {
+	return null;
+      }
+  }
+}

@@ -59,6 +59,7 @@ import java.util.TreeMap;
 /**
  * @author Jesse Rosenstock
  * @since 1.4
+ * @status updated to 1.5
  */
 public abstract class Charset implements Comparable<Charset>
 {
@@ -116,6 +117,34 @@ public abstract class Charset implements Comparable<Charset>
       }
   }
 
+  /**
+   * Returns the system default charset.
+   *
+   * This may be set by the user or VM with the file.encoding
+   * property.
+   */
+  public static Charset defaultCharset()
+  {
+    String encoding;
+    try 
+      {
+	encoding = System.getProperty("file.encoding");
+      } catch(SecurityException e) {
+	encoding = "ISO-8859-1";
+      } catch(IllegalArgumentException e) {
+	encoding = "ISO-8859-1";
+      }
+
+    try
+      {
+	return forName(encoding);
+      } catch(UnsupportedCharsetException e) {
+      } catch(IllegalCharsetNameException e) {
+      } catch(IllegalArgumentException e) {
+      }
+    throw new IllegalStateException("Can't get default charset!");
+  }
+
   public static boolean isSupported (String charsetName)
   {
     return charsetForName (charsetName) != null;
@@ -156,7 +185,7 @@ public abstract class Charset implements Comparable<Charset>
   {
     checkName (charsetName);
     Charset cs = null;
-    CharsetProvider[] providers = providers();
+    CharsetProvider[] providers = providers2();
     for (int i = 0; i < providers.length; i++)
       {
         cs = providers[i].charsetForName(charsetName);
@@ -170,7 +199,7 @@ public abstract class Charset implements Comparable<Charset>
   {
     TreeMap charsets = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 
-    CharsetProvider[] providers = providers();
+    CharsetProvider[] providers = providers2();
     for (int j = 0; j < providers.length; j++)
       {
         for (Iterator i = providers[j].charsets(); i.hasNext(); )
@@ -193,7 +222,7 @@ public abstract class Charset implements Comparable<Charset>
    * java.nio.charset.spi.CharsetProvider in the resource directory
    * META-INF/services.
    */
-  private static CharsetProvider[] providers()
+  private static CharsetProvider[] providers2()
   {
     if (providers == null)
       {

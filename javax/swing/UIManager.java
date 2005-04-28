@@ -1,5 +1,5 @@
 /* UIManager.java -- 
-   Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -98,7 +98,7 @@ public class UIManager implements Serializable
     catch (Exception ex)
       {
         System.err.println("cannot initialize Look and Feel: " + defaultlaf);
-        System.err.println("errot: " + ex.getMessage());
+        System.err.println("error: " + ex.getMessage());
         System.err.println("falling back to Metal Look and Feel");
       }
   }

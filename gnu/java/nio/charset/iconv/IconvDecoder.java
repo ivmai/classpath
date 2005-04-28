@@ -1,4 +1,4 @@
-/* EncoderUTF16BE.java -- Encoder for the UTF-16 Big Endian character encoding.
+/* IconvDecoder.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,73 +36,78 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.io.encode;
+package gnu.java.nio.charset.iconv;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigInteger;
+import gnu.classpath.RawData;
 
-/**
- * This class implements character encoding in the UCS Transformation Format 16
- * Big Endian (UTF-16BE) encoding scheme.
- * 
- * @version 0.0
- * @author Quentin Anciaux (quentin.anciaux@advalvas.be)
- */
-public class EncoderUTF16BE extends Encoder
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+
+final class IconvDecoder extends CharsetDecoder
 {
-
-  public EncoderUTF16BE(OutputStream out)
+  IconvDecoder(Charset cs, IconvMetaData info)
   {
-    super(out, "UTF16BE");
+    super(cs, info.averageCharsPerByte(), info.maxCharsPerByte());
+    openIconv(info.iconvName());
   }
 
-  /**
-   * Returns the number of bytes the specified char array will be encoded
-   * into
-   */
-  public int bytesInCharArray(char[] buf, int offset, int len)
-  {
-    int num_bytes = 0;
-    for (int i = offset; i < offset + len; i++)
-      num_bytes += 2;
+  private RawData data;
+  private int inremaining;
+  private int outremaining;
 
-    return num_bytes;
+  private native void openIconv(String name);
+
+  private native int decode(byte[] in, char[] out, int posIn, int remIn,
+                            int posOut, int remOut);
+
+  private native void closeIconv();
+
+  protected CoderResult decodeLoop(ByteBuffer in, CharBuffer out)
+  {
+    int remIn = in.remaining();
+    int inPos = in.position();
+    int outPos = out.position();
+    int remOut = out.remaining();
+    byte[] inArr;
+    int ret;
+
+    if (in.hasArray())
+      inArr = in.array();
+    else
+      {
+	inArr = new byte[remIn];
+	in.get(inArr);
+      }
+
+    if (out.hasArray())
+      {
+	ret = decode(inArr, out.array(), inPos, remIn, outPos, remOut);
+	out.position(outPos + (remOut - outremaining));
+      }
+    else
+      {
+	char[] outArr = new char[remOut];
+	ret = decode(inArr, outArr, inPos, remIn, outPos, remOut);
+	out.put(outArr, 0, (remOut - outremaining));
+      }
+    in.position(inPos + (remIn - inremaining));
+
+    if (ret == 1)
+      return CoderResult.malformedForLength(1);
+
+    if (in.remaining() == 0)
+      return CoderResult.UNDERFLOW;
+    return CoderResult.OVERFLOW;
   }
 
-  /**
-   * This method converts a char array to bytes
-   */
-  public byte[] convertToBytes(char[] buf, int buf_offset, int len,
-			       byte[] bbuf, int bbuf_offset)
+  protected void finalize()
   {
-    int val;
-    // Scan the buffer with full validation checks
-    for (int i = buf_offset; i < buf_offset + len; i++) {
-      byte [] newArray = new BigInteger("" + ((int) buf[i])).toByteArray();
-      if (newArray.length < 2)
-	{
-	  bbuf[bbuf_offset++] = 0;
-	  bbuf[bbuf_offset++] = newArray[0];
-	}
-      else
-	{
-	  bbuf[bbuf_offset++] = newArray[0];
-	  bbuf[bbuf_offset++] = newArray[1];
-	}
-    }
-    return bbuf;
+    closeIconv();
+  }
 }
 
-  /**
-   * Writes a char array as bytes to the underlying stream.
-   */
-  public void write(char[] buf, int offset, int len) throws IOException
-  {
-    byte[] bbuf = new byte[bytesInCharArray(buf, offset, len)];
-    convertToBytes(buf, offset, len, bbuf, 0);
-    out.write(bbuf);
-  }
-
-} // class EncoderUTF16BE
 

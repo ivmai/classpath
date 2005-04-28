@@ -43,6 +43,20 @@ AC_ARG_ENABLE([jni],
 AM_CONDITIONAL(CREATE_JNI_LIBRARIES, test "x${COMPILE_JNI}" = xyes)
 
 dnl -----------------------------------------------------------
+dnl Enable core JNI libraries (enabled by default)
+dnl -----------------------------------------------------------
+AC_ARG_ENABLE([core-jni],
+              [AS_HELP_STRING(--enable-core-jni,
+	                      compile JNI sources for core [default=yes])],
+              [case "${enableval}" in 
+                yes) COMPILE_CORE_JNI=yes; COMPILE_JAVA=yes ;;
+                no) COMPILE_CORE_JNI=no ;;
+                *) COMPILE_CORE_JNI=yes; COMPILE_JAVA=yes ;;
+              esac],
+              [COMPILE_CORE_JNI=yes])
+AM_CONDITIONAL(CREATE_CORE_JNI_LIBRARIES, test "x${COMPILE_CORE_JNI}" = xyes)
+
+dnl -----------------------------------------------------------
 dnl Whether to compile with -Werror or not (enabled by default)
 dnl -----------------------------------------------------------
 AC_ARG_ENABLE([Werror],
@@ -53,6 +67,18 @@ AC_ARG_ENABLE([Werror],
                 *) ENABLE_WERROR=yes ;;
               esac],
               [ENABLE_WERROR=no])
+
+dnl -----------------------------------------------------------
+dnl Default AWT toolkit
+dnl -----------------------------------------------------------
+AC_ARG_ENABLE(default-toolkit,
+  AS_HELP_STRING([--enable-default-toolkit],
+                 [fully qualified class name of default AWT toolkit]))
+default_toolkit=$enable_default_tookit
+if test "$default_toolkit" = ""; then
+   default_toolkit=gnu.java.awt.peer.gtk.GtkToolkit
+fi
+AC_SUBST(default_toolkit)
 
 dnl -----------------------------------------------------------
 dnl Native libxml/xslt library (disabled by default)
@@ -134,33 +160,34 @@ if test "x${COMPILE_JNI}" = xyes; then
 
   dnl Checking sizeof void * is needed for fdlibm to work properly on ppc64, 
   dnl at least. 
-  AC_CHECK_SIZEOF(void *)
+  AC_COMPILE_CHECK_SIZEOF(void *)
 
   dnl Checking for endianess.
-  AC_C_BIGENDIAN
+  AC_C_BIGENDIAN_CROSS
   
   dnl We check for sys/filio.h because Solaris 2.5 defines FIONREAD there.
   dnl On that system, sys/ioctl.h will not include sys/filio.h unless
   dnl BSD_COMP is defined; just including sys/filio.h is simpler.
-  AC_CHECK_HEADERS([unistd.h sys/types.h sys/config.h sys/ioctl.h asm/ioctls.h])
-  AC_CHECK_HEADERS([inttypes.h stdint.h utime.h sys/utime.h sys/filio.h])
-  AC_CHECK_HEADERS([sys/time.h])
-  AC_CHECK_HEADERS([sys/select.h])
   dnl Check for crt_externs.h on Darwin.
-  AC_CHECK_HEADERS([crt_externs.h])
+  AC_CHECK_HEADERS([unistd.h sys/types.h sys/config.h sys/ioctl.h \
+		    asm/ioctls.h \
+		    inttypes.h stdint.h utime.h sys/utime.h sys/filio.h \
+		    sys/time.h \
+		    sys/select.h \
+		    crt_externs.h])
 
   AC_EGREP_HEADER(uint32_t, stdint.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(uint32_t, inttypes.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(u_int32_t, sys/types.h, AC_DEFINE(HAVE_BSD_INT32_DEFINED, 1, [Define to 1 if you have BSD u_int32_t]))
   AC_EGREP_HEADER(u_int32_t, sys/config.h, AC_DEFINE(HAVE_BSD_INT32_DEFINED, 1, [Define to 1 if you have BSD u_int32_t]))
 
-  AC_CHECK_FUNCS([ftruncate fsync select])
-  AC_CHECK_FUNCS([gethostname socket strerror fork pipe execve open close])
-  AC_CHECK_FUNCS([lseek fstat read write htonl memset htons connect])
-  AC_CHECK_FUNCS([getsockname sizeof getpeername bind listen accept])
-  AC_CHECK_FUNCS([recvfrom send sendto setsockopt getsockopt time mktime])
-  AC_CHECK_FUNCS([localtime_r])
-  AC_CHECK_FUNCS([strerror_r])
+  AC_CHECK_FUNCS([ftruncate fsync select \
+		  gethostname socket strerror fork pipe execve open close \
+		  lseek fstat read write htonl memset htons connect \
+		  getsockname getpeername bind listen accept \
+		  recvfrom send sendto setsockopt getsockopt time mktime \
+		  localtime_r \
+		  strerror_r])
 
   AC_HEADER_TIME
   AC_STRUCT_TM
@@ -190,8 +217,8 @@ if test "x${COMPILE_JNI}" = xyes; then
 
   AC_C_CONST
 
-  dnl FIXME - does not allow cross compiling
-  AC_C_BIGENDIAN
+  dnl See if we HAVE_ICONV, how ICONV_CONST is set and LTLIBICONV
+  AM_ICONV
 
   dnl When using gcc we want warnings, lots of warnings :-)
   if test "x${GCC}" = xyes; then
@@ -218,8 +245,7 @@ if test "x${COMPILE_JNI}" = xyes; then
   fi
 
   dnl Check for libxml and libxslt libraries (when xmlj is enabled).
-  if test "x${COMPILE_XMLJ}" = xyes
-  then
+  if test "x${COMPILE_XMLJ}" = xyes; then
     PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.6.8)
     PKG_CHECK_MODULES(XSLT, libxslt >= 1.1.11)
     AC_SUBST(XML_LIBS)
@@ -243,8 +269,7 @@ if test "x${COMPILE_JNI}" = xyes; then
      AC_SUBST(GTK_LIBS)
   fi
 
-  if test "x${enable_gtk_cairo}" = xyes
-  then
+  if test "x${enable_gtk_cairo}" = xyes; then
     PKG_CHECK_MODULES(CAIRO, cairo)
     PKG_CHECK_MODULES(PANGOFT2, pangoft2)
   fi
@@ -274,13 +299,13 @@ if test "x${COMPILE_JNI}" = xyes; then
     AC_MSG_WARN("no, using x86-linux-gnu")
   fi
   ac_sources="include/jni_md-${target_cpu}-${target_os}.h"
-ac_dests="include/jni_md.h"
-while test -n "$ac_sources"; do
-  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
-  set $ac_sources; ac_source=$1; shift; ac_sources=$*
-  ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
-done
-AC_CONFIG_LINKS([$ac_config_links_1])
+  ac_dests="include/jni_md.h"
+  while test -n "$ac_sources"; do
+    set $ac_dests; ac_dest=$1; shift; ac_dests=$*
+    set $ac_sources; ac_source=$1; shift; ac_sources=$*
+    ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
+  done
+  AC_CONFIG_LINKS([$ac_config_links_1])
 fi
 
 CLASSPATH_FIND_JAVAC

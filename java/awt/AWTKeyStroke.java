@@ -111,11 +111,12 @@ public class AWTKeyStroke implements Serializable
   private static Constructor ctor;
 
   /**
-   * A table of keyCode names to values.
+   * A table of keyCode names to values.  This is package-private to
+   * avoid an accessor method.
    *
    * @see #getAWTKeyStroke(String)
    */
-  private static final HashMap<String,Object> vktable = new HashMap<String,Object>();
+  static final HashMap<String,Object> vktable = new HashMap<String,Object>();
   static
   {
     // Using reflection saves the hassle of keeping this in sync with KeyEvent,

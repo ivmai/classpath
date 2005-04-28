@@ -1,4 +1,4 @@
-/* EncoderUnicodeBig.java -- Encoder for the UTF-16BE encoding with byte-order marker.
+/* IconvProvider.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,75 +36,76 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.io.encode;
+package gnu.java.nio.charset.iconv;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.spi.CharsetProvider;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
- * This class implements character encoding in the UCS Transformation Format 16
- * Big Endian (UTF-16BE) encoding scheme, with byte-order markers.
- * 
- * @version 0.0
+ * Charset provider wrapping iconv.
+ *
  * @author Sven de Marothy
  */
-public class EncoderUnicodeBig extends Encoder
+public final class IconvProvider extends CharsetProvider
 {
+  private static IconvProvider singleton;
 
-  public EncoderUnicodeBig(OutputStream out)
-  {
-    super(out, "UnicodeBig");
-  }
-
-  /**
-   * Returns the number of bytes the specified char array will be encoded
-   * into
-   */
-  public int bytesInCharArray(char[] buf, int offset, int len)
-  {
-      return 2 + 2 * len; // 2 extra bytes for the byte-order marker
-  }
-
-  /**
-   * This method converts a char array to bytes
-   */
-  public byte[] convertToBytes(char[] buf, int buf_offset, int len,
-			       byte[] bbuf, int bbuf_offset)
-  {
-    int val;
-    // Write byte-order marker
-    bbuf[bbuf_offset++] = (byte)0xFE;
-    bbuf[bbuf_offset++] = (byte)0xFF;
-
-    // Scan the buffer with full validation checks
-    for (int i = buf_offset; i < buf_offset + len; i++) {
-      byte [] newArray = new BigInteger("" + ((int) buf[i])).toByteArray();
-      if (newArray.length < 2)
-	{
-	  bbuf[bbuf_offset++] = 0;
-	  bbuf[bbuf_offset++] = newArray[0];
-	}
-      else
-	{
-	  bbuf[bbuf_offset++] = newArray[0];
-	  bbuf[bbuf_offset++] = newArray[1];
-	}
+  static
+    {
+      synchronized (IconvProvider.class)
+        {
+	  singleton = null;
+        }
     }
-    return bbuf;
-  }
 
-  /**
-   * Writes a char array as bytes to the underlying stream.
-   */
-  public void write(char[] buf, int offset, int len) throws IOException
+  private IconvProvider()
   {
-    byte[] bbuf = new byte[bytesInCharArray(buf, offset, len)];
-    convertToBytes(buf, offset, len, bbuf, 0);
-    out.write(bbuf);
+    IconvMetaData.setup();
   }
 
-} // class EncoderUnicodeBig
+  public Iterator charsets()
+  {
+    Vector names = IconvMetaData.charsets();
+    Vector charsets = new Vector();
+    for (int i = 0; i < names.size(); i++)
+      {
+	try
+	  {
+	    charsets.add(new IconvCharset((IconvMetaData) names.elementAt(i)));
+	  }
+	catch (IllegalArgumentException e)
+	  {
+	  }
+      }
+    return charsets.iterator();
+  }
 
+  public Charset charsetForName(String charsetName)
+  {
+    try
+      {
+	IconvMetaData info = IconvMetaData.get(charsetName);
 
+	// Try anyway if the set isn't found.
+	if (info == null)
+	  info = new IconvMetaData(charsetName, 2.0f, 2.0f, 2.0f, 2.0f,
+	                           new String[] {  }, charsetName);
+	return new IconvCharset(info);
+      }
+    catch (IllegalArgumentException e)
+      {
+	return null;
+      }
+  }
 
+  public static synchronized IconvProvider provider()
+  {
+    if (singleton == null)
+      singleton = new IconvProvider();
+    return singleton;
+  }
+}
