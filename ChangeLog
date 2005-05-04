@@ -1,3 +1,16 @@
+2005-05-04  Tom Tromey  <tromey@redhat.com>
+
+	* native/jni/java-lang/java_lang_VMProcess.c
+	(Java_java_lang_VMProcess_nativeSpawn): Added 'redirect'
+	argument.  Use defines instead of contents.
+	* vm/reference/java/lang/VMProcess.java (redirect): New field.
+	(spawn): Updated.
+	(setProcessInfo): Updated.
+	(VMProcess): Added 'redirect' argument.
+	(nativeSpawn): Likewise.
+	(exec): New overload.
+	* java/lang/ProcessBuilder.java: New file.
+
 2005-04-28  Robert Schuster  <thebohemian@gmx.net>
 
 	* java/beans/Introspector: Fixed bug #12624, BeanDescriptors
