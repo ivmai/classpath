@@ -329,4 +329,26 @@ final class VMClass
    */
   static native boolean isEnum(Class klass);
 
+  /**
+   * Returns the simple name for this class, as used in the source
+   * code.  For normal classes, this is the content returned by
+   * <code>getName()</code> which follows the last ".".  Anonymous
+   * classes have no name, and so the result of calling this method is
+   * "".  The simple name of an array consists of the simple name of
+   * its component type, followed by "[]".  Thus, an array with the 
+   * component type of an anonymous class has a simple name of simply
+   * "[]".
+   *
+   * @return the simple name for this class.
+   */
+  static String getSimpleName(Class klass)
+  {
+    if (klass.isArray())
+      {
+	return klass.getComponentType().getSimpleName() + "[]";
+      }
+    String fullName = klass.getName();
+    return fullName.substring(fullName.lastIndexOf(".") + 1);
+  }
+
 } // class VMClass
