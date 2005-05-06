@@ -38,6 +38,8 @@ exception statement from your version. */
 #include <config.h>
 
 #include "java_lang_VMProcess.h"
+#include "gnu_java_nio_channels_FileChannelImpl.h"
+
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
