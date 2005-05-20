@@ -1,5 +1,5 @@
 /* Charset.java -- 
-   Copyright (C) 2002, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,7 +38,10 @@ exception statement from your version. */
 
 package java.nio.charset;
 
+import gnu.classpath.SystemProperties;
+
 import gnu.java.nio.charset.Provider;
+import gnu.java.nio.charset.iconv.IconvProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -126,22 +129,39 @@ public abstract class Charset implements Comparable<Charset>
   public static Charset defaultCharset()
   {
     String encoding;
+    
     try 
       {
-	encoding = System.getProperty("file.encoding");
-      } catch(SecurityException e) {
+	encoding = SystemProperties.getProperty("file.encoding");
+      }
+    catch(SecurityException e)
+      {
+	// Use fallback.
 	encoding = "ISO-8859-1";
-      } catch(IllegalArgumentException e) {
+      }
+    catch(IllegalArgumentException e)
+      {
+	// Use fallback.
 	encoding = "ISO-8859-1";
       }
 
     try
       {
 	return forName(encoding);
-      } catch(UnsupportedCharsetException e) {
-      } catch(IllegalCharsetNameException e) {
-      } catch(IllegalArgumentException e) {
       }
+    catch(UnsupportedCharsetException e)
+      {
+	// Ignore.
+      }
+    catch(IllegalCharsetNameException e)
+      {
+	// Ignore.
+      }
+    catch(IllegalArgumentException e)
+      {
+	// Ignore.
+      }
+    
     throw new IllegalStateException("Can't get default charset!");
   }
 
@@ -214,6 +234,12 @@ public abstract class Charset implements Comparable<Charset>
 
   private static CharsetProvider provider()
   {
+    String useIconv = SystemProperties.getProperty
+      ("gnu.classpath.nio.charset.provider.iconv");
+
+    if (useIconv != null)
+      return IconvProvider.provider();
+
     return Provider.provider();
   }
 
@@ -303,25 +329,22 @@ public abstract class Charset implements Comparable<Charset>
     return true;
   }
 
-  public final ByteBuffer encode (CharBuffer cb)
+  // NB: This implementation serializes different threads calling
+  // Charset.encode(), a potential performance problem.  It might
+  // be better to remove the cache, or use ThreadLocal to cache on
+  // a per-thread basis.
+  public final synchronized ByteBuffer encode (CharBuffer cb)
   {
     try
       {
-        // NB: This implementation serializes different threads calling
-        // Charset.encode(), a potential performance problem.  It might
-        // be better to remove the cache, or use ThreadLocal to cache on
-        // a per-thread basis.
-        synchronized (Charset.class)
-          {
-            if (cachedEncoder == null)
-              {
-                cachedEncoder = newEncoder ()
-                  .onMalformedInput (CodingErrorAction.REPLACE)
-                  .onUnmappableCharacter (CodingErrorAction.REPLACE);
-              } else
- 	        cachedEncoder.reset();
-            return cachedEncoder.encode (cb);
-          }
+	if (cachedEncoder == null)
+	  {
+	    cachedEncoder = newEncoder ()
+	      .onMalformedInput (CodingErrorAction.REPLACE)
+	      .onUnmappableCharacter (CodingErrorAction.REPLACE);
+	  } else
+	  cachedEncoder.reset();
+	return cachedEncoder.encode (cb);
       }
     catch (CharacterCodingException e)
       {
@@ -334,26 +357,23 @@ public abstract class Charset implements Comparable<Charset>
     return encode (CharBuffer.wrap (str));
   }
 
-  public final CharBuffer decode (ByteBuffer bb)
+  // NB: This implementation serializes different threads calling
+  // Charset.decode(), a potential performance problem.  It might
+  // be better to remove the cache, or use ThreadLocal to cache on
+  // a per-thread basis.
+  public final synchronized CharBuffer decode (ByteBuffer bb)
   {
     try
       {
-        // NB: This implementation serializes different threads calling
-        // Charset.decode(), a potential performance problem.  It might
-        // be better to remove the cache, or use ThreadLocal to cache on
-        // a per-thread basis.
-        synchronized (Charset.class)
-          {
-            if (cachedDecoder == null)
-              {
-                cachedDecoder = newDecoder ()
-                  .onMalformedInput (CodingErrorAction.REPLACE)
-                  .onUnmappableCharacter (CodingErrorAction.REPLACE);
-              } else
- 	        cachedDecoder.reset();
+	if (cachedDecoder == null)
+	  {
+	    cachedDecoder = newDecoder ()
+	      .onMalformedInput (CodingErrorAction.REPLACE)
+	      .onUnmappableCharacter (CodingErrorAction.REPLACE);
+	  } else
+	  cachedDecoder.reset();
 
-            return cachedDecoder.decode (bb);
-          }
+	return cachedDecoder.decode (bb);
       }
     catch (CharacterCodingException e)
       {

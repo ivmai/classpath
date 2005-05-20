@@ -1,17 +1,22 @@
 #! @SH@
 # @configure_input@
 
+# Make sure sorting is done the same on all configurations
+LC_ALL=C; export LC_ALL
+LANG=C; export LANG
+
 echo "Adding java source files from srcdir '@top_srcdir@'."
 @FIND@ @top_srcdir@/java @top_srcdir@/javax @top_srcdir@/gnu \
        @top_srcdir@/org @top_srcdir@/vm/reference \
        @top_srcdir@/external/w3c_dom @top_srcdir@/external/sax \
-       -follow -type f -print | grep '\.java$' > ${top_builddir}/lib/classes.1
+       -follow -type f -print | sort | grep '\.java$' \
+       > ${top_builddir}/lib/classes.1
 
 # Only include generated files once.
 if test ! "${top_builddir}" -ef "@top_srcdir@"; then
   echo "Adding generated files in builddir '${top_builddir}'."
   @FIND@ ${top_builddir}/gnu ${top_builddir}/java -follow -type f -print \
-  | grep '\.java$' >> ${top_builddir}/lib/classes.1
+  | sort | grep '\.java$' >> ${top_builddir}/lib/classes.1
 fi
 
 for filexp in `cat @top_srcdir@/lib/$1.omit` ; do { grep -v ${filexp} < ${top_builddir}/lib/classes.1 > ${top_builddir}/lib/classes.2 ; mv ${top_builddir}/lib/classes.2 ${top_builddir}/lib/classes.1 ; } ; done
@@ -38,10 +43,8 @@ fi
 # Split in multiple parts for gcj
 grep -v /javax/ classes | grep -v /awt/ \
                         | grep -v /beans/ \
-                        | grep -v /locale/ \
 			| grep -v /xml/ > classes.standard
 grep /awt/ classes > classes.awt
 grep /beans/ classes >> classes.awt
-grep /locale/ classes > classes.locale
 grep /xml/ classes > classes.xml
 grep /javax/ classes | grep -v /xml/ > classes.standardx

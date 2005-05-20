@@ -33,6 +33,7 @@ import javax.swing.event.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.tree.*;
 import javax.swing.border.*;
 
 import java.net.URL;
@@ -142,12 +143,98 @@ public class Demo
     preferences.add(new JCheckBoxMenuItem("World Peace"));
     edit.add(preferences);
 
+    JMenu examples = new JMenu("Examples");
+    new PopUpAction("Buttons",
+		    mkPanel(new JComponent[]
+			{mkBigButton("mango"), 
+			 mkBigButton("guava"),
+			 mkBigButton("lemon")}),
+		    examples);
+    
+    new PopUpAction("Toggles",
+		    mkToggle("cool and refreshing"),
+		    examples);
+
+    new PopUpAction("Checkbox",
+		    mkCheckbox("ice cold"),
+		    examples);
+
+    new PopUpAction("Radio",
+		    mkRadio("delicious"),
+		    examples);
+
+    new PopUpAction("Slider",
+		    mkSliders(),
+		    examples);
+
+    new PopUpAction("List",
+		    mkListPanel(new String[] { "hello",
+					       "this",
+					       "is",
+					       "a",
+					       "list",
+                                               "that",
+                                               "wraps",
+                                               "over"}),
+		    examples);
+
+    new PopUpAction("Scrollbar",
+		    mkScrollBar(),
+		    examples);
+
+    new PopUpAction("Viewport",
+		    mkViewportBox(mkBigButton("View Me!")),
+		    examples);
+
+    new PopUpAction("ScrollPane",
+		    mkScrollPane(mkBigButton("Scroll Me!")),
+		    examples);
+
+    new PopUpAction("TabPane",
+		    mkTabs(new String[] {"happy",
+					 "sad",
+					 "indifferent"}),
+		    examples);
+
+    new PopUpAction("Spinner",
+		    mkSpinner(),
+		    examples);
+
+    new PopUpAction("TextField",
+		    mkTextField("Hello, World!"),
+		    examples);
+
+    new PopUpAction("ColorChooser",
+		    mkColorChooser(),
+		    examples);
+
+    new PopUpAction("ComboBox",
+		    mkComboBox(new String[] {"Stop",
+					     "Software",
+					     "Hoarders",
+					     "Support",
+					     "GNU!"}),
+		    examples);
+
+    new PopUpAction("Editor",
+                    mkEditorPane(),
+                    examples);
+    
+    new PopUpAction("Tree",
+                    mkTree(),
+                    examples);
+
+    new PopUpAction("Table",
+                    mkTable(),
+                    examples);
+
     help.add(new JMenuItem("just play with the widgets"));
     help.add(new JMenuItem("and enjoy the sensation of"));
     help.add(new JMenuItem("your neural connections growing"));
 
     bar.add(file);
     bar.add(edit);
+    bar.add(examples);
     bar.add(help);
     return bar;
   }
@@ -485,9 +572,11 @@ public class Demo
     JComponent component = (JComponent) frame.getContentPane();
     component.setLayout(new BorderLayout());
     component.add(mkToolBar(), BorderLayout.NORTH);
-    component.add(mkTabbedPane(), BorderLayout.CENTER);
-    component.add(mkButtonBar(), BorderLayout.SOUTH);
-    
+    JPanel main = new JPanel();
+    main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
+    main.add(mkTabbedPane());
+    main.add(mkButtonBar());
+    component.add(main, BorderLayout.CENTER);
     frame.pack();
     frame.show();
   }
@@ -677,6 +766,16 @@ public class Demo
     private JComponent inner;
     private String name;
 
+    PopUpAction(String n, JComponent i, JMenu m)
+    {
+      name = n;
+      inner = i;
+
+      JMenuItem item = new JMenuItem(name);
+      item.addActionListener(this);
+      m.add(item);
+    }
+
     PopUpAction(String n, JComponent i, JPanel p)
     {
       name = n;
@@ -698,6 +797,71 @@ public class Demo
     }
   }
 
+  private static JEditorPane mkEditorPane()
+  {
+    JEditorPane editorPane = new JEditorPane();
+    editorPane.setEditable(true);
+    return editorPane;
+  }
+  
+  private static JTree mkTree()
+  {
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root node");
+    DefaultMutableTreeNode child1 = new DefaultMutableTreeNode("Child node 1");
+    DefaultMutableTreeNode child11 =
+      new DefaultMutableTreeNode("Child node 1.1");
+    DefaultMutableTreeNode child12 =
+      new DefaultMutableTreeNode("Child node 1.2");
+    DefaultMutableTreeNode child13 =
+      new DefaultMutableTreeNode("Child node 1.3");
+    DefaultMutableTreeNode child2 = new DefaultMutableTreeNode("Child node 2");
+    DefaultMutableTreeNode child21 =
+      new DefaultMutableTreeNode("Child node 2.1");
+    DefaultMutableTreeNode child22 =
+      new DefaultMutableTreeNode("Child node 2.2");
+    DefaultMutableTreeNode child23 =
+      new DefaultMutableTreeNode("Child node 2.3");
+    DefaultMutableTreeNode child24 =
+      new DefaultMutableTreeNode("Child node 2.4");
+
+    DefaultMutableTreeNode child3 = new DefaultMutableTreeNode("Child node 3");
+    root.add(child1);
+    root.add(child2);
+    root.add(child3);
+    child1.add(child11);
+    child1.add(child12);
+    child1.add(child13);
+    child2.add(child21);
+    child2.add(child22);
+    child2.add(child23);
+    child2.add(child24);
+
+    JTree tree = new JTree(root);
+    return tree;
+  }
+
+  private static JTable mkTable()
+  {
+    Object[][] tableData = new Object[][] {
+      {
+        "Field 1", "Field 2" , "Field 3"
+      },
+      {
+        "Field 4", "Field 5" , "Field 6"
+      },
+      {
+        "Field 7", "Field 8" , "Field 9"
+      },
+      {
+        "Field 10", "Field 11" , "Field 12"
+      }
+    };
+    Object[] columnNames = new Object[] {"Column 1", "Column 2", "Column 3"};
+
+    JTable table = new JTable(tableData, columnNames);
+    return table;
+  }
+  
   private JPanel mkButtonBar()
   {    
     JPanel panel = new JPanel ();
@@ -775,6 +939,18 @@ public class Demo
 					     "GNU!"}),
 		    panel);
 
+    new PopUpAction("Editor",
+                    mkEditorPane(),
+                    panel);
+    
+    new PopUpAction("Tree",
+                    mkTree(),
+                    panel);
+    
+    new PopUpAction("Table",
+                    mkTable(),
+                    panel);
+    
     JButton exitDisposer = mkDisposerButton(frame);
     panel.add(exitDisposer);
 
