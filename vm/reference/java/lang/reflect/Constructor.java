@@ -79,8 +79,6 @@ public final class Constructor<T>
 {
   private Class<T> clazz;
   private int slot;
-  private Class[] parameterTypes;
-  private Class[] exceptionTypes;
   
   /**
    * This class is uninstantiable except from native code.
@@ -130,12 +128,7 @@ public final class Constructor<T>
    *
    * @return a list of the types of the constructor's parameters
    */
-  public Class<?>[] getParameterTypes()
-  {
-    if (parameterTypes == null)
-      return new Class[0];
-    return parameterTypes;
-  }
+  public native Class<?>[] getParameterTypes();
 
   /**
    * Get the exception types this constructor says it throws, in no particular
@@ -144,12 +137,7 @@ public final class Constructor<T>
    *
    * @return a list of the types in the constructor's throws clause
    */
-  public Class<?>[] getExceptionTypes()
-  {
-    if (exceptionTypes == null)
-      return new Class[0];
-    return exceptionTypes;
-  }
+  public native Class<?>[] getExceptionTypes();
 
   /**
    * Compare two objects to see if they are semantically equivalent.

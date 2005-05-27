@@ -858,8 +858,10 @@ public abstract class Component
    */
   public void enableInputMethods(boolean enable)
   {
-    // XXX Implement.
-    throw new Error("not implemented");
+    if (enable)
+      eventMask |= AWTEvent.INPUT_ENABLED_EVENT_MASK;
+    else
+      eventMask &= ~AWTEvent.INPUT_ENABLED_EVENT_MASK;
   }
 
   /**
@@ -1149,7 +1151,9 @@ public abstract class Component
   public Point getLocationOnScreen()
   {
     if (! isShowing())
-      throw new IllegalComponentStateException("component not showing");
+      throw new IllegalComponentStateException("component "
+                                               + getClass().getName()
+                                               + " not showing");
     // We know peer != null here.
     return peer.getLocationOnScreen();
   }
@@ -4763,6 +4767,10 @@ p   * <li>the set of backward traversal keys
                     .getCurrentKeyboardFocusManager()
                     .dispatchEvent(e))
                     return;
+              case MouseEvent.MOUSE_PRESSED:
+                if (isLightweight())
+                  requestFocus();
+                break;
               }
           }
         processEvent (e);

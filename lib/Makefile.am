@@ -15,22 +15,26 @@ if FOUND_ECJ
 JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
 else
 if FOUND_GCJ
-JAVAC = $(GCJ) --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.standard \
-&& $(GCJ) -Wno-deprecated --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.awt \
-&& $(GCJ) -Wno-deprecated --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.xml \
-&& $(GCJ) -Wno-deprecated --bootclasspath '' --classpath $(compile_classpath) -C -d . @classes.standardx
+## Like GCJ but include some common flags.
+GCJF = $(GCJ) -Wno-deprecated --encoding=UTF-8 \
+    --bootclasspath '' --classpath $(compile_classpath)
+JAVAC = $(GCJF) -C -d . @classes.standard \
+&& $(GCJF) -C -d . @classes.awt \
+&& $(GCJF) -C -d . @classes.xml \
+&& $(GCJF) -C -d . @classes.standardx
 else
 if FOUND_JIKES
-JAVAC = $(JIKES) +Pno-shadow +F -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
+JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F -encoding UTF-8 -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
 else
 if FOUND_KJC
+## FIXME: from what I can tell, kjc does not support a -encoding option.
 JAVAC = $(KJC) -classpath .:$(USER_CLASSLIB) -d . @classes
 else
 if FOUND_GCJX
-JAVAC = $(GCJX) -classpath .:$(USER_CLASSLIB) -d . @classes
+JAVAC = $(GCJX) -encoding UTF-8 -classpath .:$(USER_CLASSLIB) -d . @classes
 else
 if FOUND_ECJ
-JAVAC = $(ECJ) -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
+JAVAC = $(ECJ) -encoding UTF-8 -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
 endif # FOUND_ECJ
 endif # FOUND_GCJX
 endif # FOUND_KJC
@@ -56,6 +60,7 @@ install-data-local: genclasses compile-classes
 	cp -R java $(DESTDIR)$(pkgdatadir)
 	cp -R javax $(DESTDIR)$(pkgdatadir)
 	cp -R org $(DESTDIR)$(pkgdatadir)
+	cp -R META-INF $(DESTDIR)$(pkgdatadir)
 
 # FIXME - should mimic doc/api/Makefile.am instead...
 uninstall-local:
@@ -63,13 +68,14 @@ uninstall-local:
 	rm -rf $(DESTDIR)$(pkgdatadir)/java
 	rm -rf $(DESTDIR)$(pkgdatadir)/javax
 	rm -rf $(DESTDIR)$(pkgdatadir)/org
+	rm -rf $(DESTDIR)$(pkgdatadir)/META-INF
 
 endif # INSTALL_CLASS_FILES
 
 .PHONY: genclasses
 
 glibj.zip: classes compile-classes resources
-	if test "$(ZIP)" != ""; then $(ZIP) -r -D glibj.zip gnu java javax org > /dev/null; fi
+	if test "$(ZIP)" != ""; then $(ZIP) -r -D glibj.zip gnu java javax org META-INF > /dev/null; fi
 
 resources:
 	if ! [ -e gnu ]; then mkdir gnu; fi
@@ -81,6 +87,8 @@ resources:
 	@list='$(propertyfiles)'; for p in $$list; do \
 	  cp $(top_srcdir)/resource/$$p $$p; \
 	done
+	if [ -e META-INF ]; then rm -rf META-INF; fi
+	cp -r $(top_srcdir)/resource/META-INF .
 	touch resources
 
 classes: genclasses
@@ -125,6 +133,7 @@ clean-local:
 	-rm -rf java
 	-rm -rf javax
 	-rm -rf org
+	-rm -rf META-INF
 
 dist-hook:
 	mkdir -p $(distdir)
