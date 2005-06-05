@@ -647,6 +647,7 @@ public abstract class Calendar
     clear();
     this.time = time;
     isTimeSet = true;
+    computeFields();
   }
 
   /**

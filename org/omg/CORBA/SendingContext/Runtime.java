@@ -1,5 +1,5 @@
-/* GtkOffScreenImage.java
-   Copyright (C) 1999 Free Software Foundation, Inc.
+/* Runtime.java --
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -36,58 +36,25 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.java.awt.peer.gtk;
+package org.omg.CORBA.SendingContext;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
+import org.omg.CORBA.Object;
+import org.omg.CORBA.portable.IDLEntity;
 
-public class GtkOffScreenImage extends Image
+import java.io.Serializable;
+
+/**
+ * Defines the base class that represents the Sending Context. The sending
+ * context provides access to information about the originator of a
+ * GIOP message. For example, when a value type is sent in a GIOP
+ * Request, the receiver may need to ask the sender about
+ * the CodeBase for the implementation of the value type.
+ *
+ * @since 1.3
+ *
+ * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
+ */
+public interface Runtime
+  extends IDLEntity, Object, RunTimeOperations, Serializable
 {
-  int width, height;
-  ImageProducer source;
-  Graphics g;
-  
-  public GtkOffScreenImage (ImageProducer source, Graphics g,
-			    int width, int height)
-  {
-    this.width = width;
-    this.height = height;
-
-    this.source = source;
-    this.g = g;
-  }
-
-  public int getWidth (ImageObserver observer)
-  {
-    return width;
-  }
-
-  public int getHeight (ImageObserver observer)
-  {
-    return height;
-  }
-
-  public ImageProducer getSource ()
-  {
-    return source;
-  }
-
-  public Graphics getGraphics ()
-  {
-    if (g instanceof GdkGraphics2D)
-      return new GdkGraphics2D ((GdkGraphics2D) this.g);
-    else
-      return new GdkGraphics ((GdkGraphics) this.g);
-  }
-
-  public Object getProperty (String name, ImageObserver observer)
-  {
-    return Image.UndefinedProperty;
-  }
-
-  public void flush ()
-  {
-  }
 }

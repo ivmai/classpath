@@ -103,6 +103,11 @@ public class Functional_ORB
     extends Thread
   {
     /**
+     * The number of the currently running parallel threads.
+     */
+    private int running_threads;
+
+    /**
      * The port on that this portServer is listening for requests.
      */
     int s_port;
@@ -111,6 +116,12 @@ public class Functional_ORB
      * The server socket of this portServer.
      */
     ServerSocket service;
+
+    /**
+     * True if the serving node must shutdown due
+     * call of the close_now().
+     */
+    boolean terminated;
 
     /**
      * Create a new portServer, serving on specific port.
@@ -127,30 +138,32 @@ public class Functional_ORB
      */
     public void run()
     {
-      boolean terminated;
-
       try
         {
           service = new ServerSocket(s_port);
         }
       catch (IOException ex)
         {
-          throw new BAD_OPERATION("Unable to open the server socket.");
+          BAD_OPERATION bad =
+            new BAD_OPERATION("Unable to open the server socket.");
+          bad.initCause(ex);
+          throw bad;
         }
 
       while (running)
         {
           try
             {
-              serve(service);
+              serve(this, service);
             }
           catch (SocketException ex)
             {
-              // Thrown when the service is closed by
+              // May be thrown when the service is closed by
               // the close_now().
-              return;
+              if (terminated)
+                return;
             }
-          catch (IOException iex)
+          catch (Exception iex)
             {
               // Wait 5 seconds. Do not terminate the
               // service due potentially transient error.
@@ -172,6 +185,7 @@ public class Functional_ORB
     {
       try
         {
+          terminated = true;
           service.close();
         }
       catch (Exception ex)
@@ -217,9 +231,71 @@ public class Functional_ORB
   public static final String NAME_SERVICE = "NameService";
 
   /**
+   * The if the client has once opened a socket, it should start sending
+   * the message header in a given time. Otherwise the server will close the
+   * socket. This prevents server hang when the client opens the socket,
+   * but does not send any message, usually due crash on the client side.
+   */
+  public static String START_READING_MESSAGE =
+    "gnu.classpath.CORBA.TOUT_START_READING_MESSAGE";
+
+  /**
+   * If the client has started to send the request message, the socket time
+   * out changes to the specified value.
+   */
+  public static String WHILE_READING = "gnu.classpath.CORBA.TOUT_WHILE_READING";
+
+  /**
+   * If the message body is received, the time out changes to the
+   * specifice value. This must be longer, as includes time, required to
+   * process the received task. We make it 40 minutes.
+   */
+  public static String AFTER_RECEIVING =
+    "gnu.classpath.CORBA.TOUT_AFTER_RECEIVING";
+
+  /**
    * The address of the local host.
    */
   public final String LOCAL_HOST;
+
+  /**
+   * The if the client has once opened a socket, it should start sending
+   * the message header in a given time. Otherwise the server will close the
+   * socket. This prevents server hang when the client opens the socket,
+   * but does not send any message, usually due crash on the client side.
+   */
+  private int TOUT_START_READING_MESSAGE = 20 * 1000;
+
+  // (Here and below, we use * to make meaning of the constant clearler).
+
+  /**
+   * If the client has started to send the request message, the socket time
+   * out changes to the specified value.
+   */
+  private int TOUT_WHILE_READING = 2 * 60 * 1000;
+
+  /**
+   * If the message body is received, the time out changes to the
+   * specifice value. This must be longer, as includes time, required to
+   * process the received task. We make it 40 minutes.
+   */
+  private int TOUT_AFTER_RECEIVING = 40 * 60 * 1000;
+
+  /**
+   * Some clients tend to submit multiple requests over the
+   * same socket. The server waits for the next request on
+   * the same socket for the duration, specified
+   * below. The default time is seven seconds.
+   */
+  public int TANDEM_REQUESTS = 7000;
+
+  /**
+   * If the maximal number of threads per object is reached,
+   * the server waits for the given time interval before checking
+   * again maybe some threads are already complete.
+   * Thr default time is 0.5 second.
+   */
+  public int PAUSE_ON_THREAD_OVERLOAD = 500;
 
   /**
    * The map of the already conncted objects.
@@ -280,6 +356,14 @@ public class Functional_ORB
   protected LinkedList freed_ports = new LinkedList();
 
   /**
+   * The maximal allowed number of the currently running parallel
+   * threads per object. For security reasons, this is made private and
+   * unchangeable. After exceeding this limit, the NO_RESOURCES
+   * is thrown back to the client.
+   */
+  private int MAX_RUNNING_THREADS = 256;
+
+  /**
    * Create the instance of the Functional ORB.
    */
   public Functional_ORB()
@@ -290,7 +374,10 @@ public class Functional_ORB
       }
     catch (UnknownHostException ex)
       {
-        throw new BAD_OPERATION("Unable to resolve the local host address.");
+        BAD_OPERATION bad =
+          new BAD_OPERATION("Unable to open the server socket.");
+        bad.initCause(ex);
+        throw bad;
       }
   }
 
@@ -329,6 +416,7 @@ public class Functional_ORB
                   throws BAD_OPERATION
   {
     ServerSocket s;
+    int a_port;
 
     try
       {
@@ -349,14 +437,14 @@ public class Functional_ORB
         // OK then, use a new port.
       }
 
-    for (int i = Port; i < Port + 20; i++)
+    for (a_port = Port; a_port < Port + 20; a_port++)
       {
         try
           {
-            s = new ServerSocket(i);
+            s = new ServerSocket(a_port);
             s.close();
-            Port = i + 1;
-            return s.getLocalPort();
+            Port = a_port + 1;
+            return a_port;
           }
         catch (IOException ex)
           {
@@ -368,12 +456,16 @@ public class Functional_ORB
       {
         // Try any port.
         s = new ServerSocket();
+        a_port = s.getLocalPort();
         s.close();
-        return s.getLocalPort();
+        return a_port;
       }
-    catch (IOException ex1)
+    catch (IOException ex)
       {
-        throw new NO_RESOURCES("Unable to open the server socket");
+        NO_RESOURCES bad =
+          new NO_RESOURCES("Unable to open the server socket.");
+        bad.initCause(ex);
+        throw bad;
       }
   }
 
@@ -508,16 +600,16 @@ public class Functional_ORB
       {
         Delegate delegate = ((ObjectImpl) object)._get_delegate();
         if (delegate instanceof Simple_delegate)
-        {
-          byte[] key = ((Simple_delegate) delegate).getIor().key;
-          rmKey = connected_objects.get(key);
-        }
+          {
+            byte[] key = ((Simple_delegate) delegate).getIor().key;
+            rmKey = connected_objects.get(key);
+          }
       }
 
     // Try to find and disconned the object that is not an instance of the
     // object implementation.
     if (rmKey == null)
-     rmKey = connected_objects.getKey(object);
+      rmKey = connected_objects.getKey(object);
 
     // Disconnect the object on any success.
     if (rmKey != null)
@@ -646,7 +738,9 @@ public class Functional_ORB
       }
     catch (Exception ex)
       {
-        throw new InvalidName(name + ":" + ex.getMessage());
+        InvalidName err = new InvalidName(name);
+        err.initCause(ex);
+        throw err;
       }
     if (object != null)
       return object;
@@ -784,7 +878,7 @@ public class Functional_ORB
   protected org.omg.CORBA.Object find_connected_object(byte[] key)
   {
     Connected_objects.cObject ref = connected_objects.get(key);
-    return ref==null?null:ref.object;
+    return ref == null ? null : ref.object;
   }
 
   /**
@@ -820,6 +914,15 @@ public class Functional_ORB
             if (para [ i ] [ 0 ].equals(NS_HOST))
               ns_host = para [ i ] [ 1 ];
 
+            if (para [ i ] [ 0 ].equals(START_READING_MESSAGE))
+              TOUT_START_READING_MESSAGE = Integer.parseInt(para [ i ] [ 1 ]);
+
+            if (para [ i ] [ 0 ].equals(WHILE_READING))
+              TOUT_WHILE_READING = Integer.parseInt(para [ i ] [ 1 ]);
+
+            if (para [ i ] [ 0 ].equals(AFTER_RECEIVING))
+              TOUT_AFTER_RECEIVING = Integer.parseInt(para [ i ] [ 1 ]);
+
             try
               {
                 if (para [ i ] [ 0 ].equals(NS_PORT))
@@ -827,10 +930,13 @@ public class Functional_ORB
               }
             catch (NumberFormatException ex)
               {
-                throw new BAD_PARAM("Invalid " + NS_PORT +
-                                    "property, unable to parse '" +
-                                    props.getProperty(NS_PORT) + "'"
-                                   );
+                BAD_PARAM bad =
+                  new BAD_PARAM("Invalid " + NS_PORT +
+                                "property, unable to parse '" +
+                                props.getProperty(NS_PORT) + "'"
+                               );
+                bad.initCause(ex);
+                throw bad;
               }
           }
       }
@@ -991,6 +1097,7 @@ public class Functional_ORB
     handler.getBuffer().buffer.writeTo(out);
 
     MessageHeader msh_reply = new MessageHeader();
+
     msh_reply.version = msh_request.version;
     msh_reply.message_type = MessageHeader.REPLY;
     msh_reply.message_size = out.buffer.size();
@@ -1002,127 +1109,205 @@ public class Functional_ORB
   }
 
   /**
-   * Contains a single servicing step.
+   * Contains a single servicing task.
+   *
+   * Normally, each task matches a single remote invocation.
+   * However under frequent tandem submissions the same
+   * task may span over several invocations.
    *
    * @param serverSocket the ORB server socket.
    *
    * @throws MARSHAL
    * @throws IOException
    */
-  private void serve(ServerSocket serverSocket)
+  private void serve(final portServer p, ServerSocket serverSocket)
               throws MARSHAL, IOException
   {
-    Socket service = null;
+    final Socket service;
+    service = serverSocket.accept();
+
+    // Tell the server there are no more resources.
+    while (p.running_threads >= MAX_RUNNING_THREADS)
+      {
+        serveStep(service, true);
+      }
+
+    new Thread()
+      {
+        public void run()
+        {
+          try
+            {
+              synchronized (p)
+                {
+                  p.running_threads++;
+                }
+              serveStep(service, false);
+            }
+          finally
+            {
+              synchronized (p)
+                {
+                  p.running_threads--;
+                }
+            }
+        }
+      }.start();
+  }
+
+  /**
+   * A single servicing step, when the client socket is alrady open.
+   *
+   * Normally, each task matches a single remote invocation.
+   * However under frequent tandem submissions the same
+   * task may span over several invocations.
+   *
+   * @param service the opened client socket.
+   * @param no_resources if true, the "NO RESOURCES" exception
+   * is thrown to the client.
+   */
+  private void serveStep(Socket service, boolean no_resources)
+  {
     try
       {
-        service = serverSocket.accept();
-        service.setKeepAlive(true);
-
-        InputStream in = service.getInputStream();
-
-        MessageHeader msh_request = new MessageHeader();
-        msh_request.read(in);
-
-        if (max_version != null)
-          if (!msh_request.version.until_inclusive(max_version.major,
-                                                   max_version.minor
-                                                  )
-             )
-            {
-              OutputStream out = service.getOutputStream();
-              new ErrorMessage(max_version).write(out);
-              service.close();
-              return;
-            }
-
-        byte[] r = new byte[ msh_request.message_size ];
-
-        int n = 0;
-
-        reading:
-        while (n < r.length)
+        Serving:
+        while (true)
           {
-            n = in.read(r, n, r.length - n);
-          }
+            InputStream in = service.getInputStream();
+            service.setSoTimeout(TOUT_START_READING_MESSAGE);
 
-        if (msh_request.message_type == MessageHeader.REQUEST)
-          {
-            RequestHeader rh_request;
-
-            cdrBufInput cin = new cdrBufInput(r);
-            cin.setOrb(this);
-            cin.setVersion(msh_request.version);
-            cin.setOffset(msh_request.getHeaderSize());
-
-            rh_request = msh_request.create_request_header();
-
-            // Read header and auto set the charset.
-            rh_request.read(cin);
-
-            // in 1.2 and higher, align the current position at
-            // 8 octet boundary.
-            if (msh_request.version.since_inclusive(1, 2))
-              cin.align(8);
-
-            // find the target object.
-            InvokeHandler target =
-              (InvokeHandler) find_connected_object(rh_request.object_key);
-
-            // Prepare the reply header. This must be done in advance,
-            // as the size must be known for handler to set alignments
-            // correctly.
-            ReplyHeader rh_reply = msh_request.create_reply_header();
-
-            // TODO log errors about not existing objects and methods.
-            bufferedResponseHandler handler =
-              new bufferedResponseHandler(this, msh_request, rh_reply);
-
-            SystemException sysEx = null;
+            MessageHeader msh_request = new MessageHeader();
 
             try
               {
-                if (target == null)
-                  throw new OBJECT_NOT_EXIST();
-                target._invoke(rh_request.operation, cin, handler);
+                msh_request.read(in);
               }
-            catch (SystemException ex)
+            catch (MARSHAL ex)
               {
-                sysEx = ex;
-
-                org.omg.CORBA.portable.OutputStream ech =
-                  handler.createExceptionReply();
-                ObjectCreator.writeSystemException(ech, ex);
+                // This exception may be thrown due closing the connection.
+                return;
               }
-            catch (Exception except)
+
+            if (max_version != null)
+              if (!msh_request.version.until_inclusive(max_version.major,
+                                                       max_version.minor
+                                                      )
+                 )
+                {
+                  OutputStream out = service.getOutputStream();
+                  new ErrorMessage(max_version).write(out);
+                  return;
+                }
+
+            byte[] r = new byte[ msh_request.message_size ];
+
+            int n = 0;
+
+            service.setSoTimeout(TOUT_WHILE_READING);
+
+            reading:
+            while (n < r.length)
               {
-                sysEx =
-                  new UNKNOWN("Unknown", 2, CompletionStatus.COMPLETED_MAYBE);
-
-                org.omg.CORBA.portable.OutputStream ech =
-                  handler.createExceptionReply();
-
-                ObjectCreator.writeSystemException(ech, sysEx);
+                n += in.read(r, n, r.length - n);
               }
 
-            // Write the response.
-            if (rh_request.isResponseExpected())
+            service.setSoTimeout(TOUT_AFTER_RECEIVING);
+
+            if (msh_request.message_type == MessageHeader.REQUEST)
               {
-                respond_to_client(service.getOutputStream(), msh_request,
-                                  rh_request, handler, sysEx
-                                 );
+                RequestHeader rh_request;
+
+                cdrBufInput cin = new cdrBufInput(r);
+                cin.setOrb(this);
+                cin.setVersion(msh_request.version);
+                cin.setOffset(msh_request.getHeaderSize());
+                cin.setBigEndian(msh_request.isBigEndian());
+
+                rh_request = msh_request.create_request_header();
+
+                // Read header and auto set the charset.
+                rh_request.read(cin);
+
+                // in 1.2 and higher, align the current position at
+                // 8 octet boundary.
+                if (msh_request.version.since_inclusive(1, 2))
+                  cin.align(8);
+
+                // find the target object.
+                InvokeHandler target =
+                  (InvokeHandler) find_connected_object(rh_request.object_key);
+
+                // Prepare the reply header. This must be done in advance,
+                // as the size must be known for handler to set alignments
+                // correctly.
+                ReplyHeader rh_reply = msh_request.create_reply_header();
+
+                // TODO log errors about not existing objects and methods.
+                bufferedResponseHandler handler =
+                  new bufferedResponseHandler(this, msh_request, rh_reply);
+
+                SystemException sysEx = null;
+
+                try
+                  {
+                    if (no_resources)
+                      throw new NO_RESOURCES();
+                    if (target == null)
+                      throw new OBJECT_NOT_EXIST();
+                    target._invoke(rh_request.operation, cin, handler);
+                  }
+                catch (SystemException ex)
+                  {
+                    sysEx = ex;
+
+                    org.omg.CORBA.portable.OutputStream ech =
+                      handler.createExceptionReply();
+                    ObjectCreator.writeSystemException(ech, ex);
+                  }
+                catch (Exception except)
+                  {
+                    sysEx =
+                      new UNKNOWN("Unknown", 2, CompletionStatus.COMPLETED_MAYBE);
+
+                    org.omg.CORBA.portable.OutputStream ech =
+                      handler.createExceptionReply();
+
+                    ObjectCreator.writeSystemException(ech, sysEx);
+                  }
+
+                // Write the response.
+                if (rh_request.isResponseExpected())
+                  {
+                    OutputStream sou = service.getOutputStream();
+                    respond_to_client(sou, msh_request, rh_request, handler,
+                                      sysEx
+                                     );
+                  }
               }
+            else
+              ;
+
+            // TODO log error: "Not a request message."
+            if (service != null && !service.isClosed())
+              {
+                // Wait for the subsequent invocations on the
+                // same socket for 2 minutes.
+                service.setSoTimeout(TANDEM_REQUESTS);
+              }
+            else
+              return;
           }
-        else
-          ;
-
-        // TODO log error: "Not a request message."
       }
-    finally
+    catch (SocketException ex)
       {
-        if (service != null && !service.isClosed())
-          {
-            service.close();
-          }
+        // OK.
+        return;
+      }
+    catch (IOException ioex)
+      {
+        // Network error, probably transient.
+        // TODO log it.
+        return;
       }
   }
 
@@ -1140,6 +1325,18 @@ public class Functional_ORB
           {
             if (props.containsKey(NS_PORT))
               ns_port = Integer.parseInt(props.getProperty(NS_PORT));
+
+            if (props.containsKey(START_READING_MESSAGE))
+              TOUT_START_READING_MESSAGE =
+                Integer.parseInt(props.getProperty(START_READING_MESSAGE));
+
+            if (props.containsKey(WHILE_READING))
+              TOUT_WHILE_READING =
+                Integer.parseInt(props.getProperty(WHILE_READING));
+
+            if (props.containsKey(AFTER_RECEIVING))
+              TOUT_AFTER_RECEIVING =
+                Integer.parseInt(props.getProperty(AFTER_RECEIVING));
           }
         catch (NumberFormatException ex)
           {
@@ -1241,5 +1438,3 @@ public class Functional_ORB
     super.finalize();
   }
 }
-
-

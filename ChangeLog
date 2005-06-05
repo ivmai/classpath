@@ -1,3 +1,521 @@
+2005-06-04  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/plaf/basic/BasicListUI.java (focusListener): Use
+	correct type.
+	(listDataListener, listSelectionListener, mouseInputListener,
+	propertyChangeListener): Likewise.
+	* javax/swing/plaf/basic/BasicMenuUI.java (ChangeHandler): Now
+	public and deprecated.
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java
+	(TabbedPaneLayout): Now public.
+	* javax/swing/plaf/basic/BasicOptionPaneUI.java
+	(ButtonActionListener): Now public.
+	(PropertyChangeHandler): Likewise.
+	(ButtonAreaLayout): Likewise.
+	* javax/swing/plaf/basic/BasicInternalFrameTitlePane.java
+	(TitlePaneLayout): Now public.
+	(PropertyChangeHandler): Likewise.
+	* javax/swing/plaf/basic/BasicCheckBoxUI.java
+	(getPropertyPrefix): New method.
+	* javax/swing/plaf/basic/BasicProgressBarUI.java (ChangeHandler):
+	Now public.
+	* javax/swing/plaf/basic/BasicSliderUI.java (ComponentHandler):
+	Now public.
+	* javax/swing/plaf/basic/BasicSplitPaneUI.java
+	(BasicVerticalLayoutManager): Now public.
+	(FocusHandler): Likewise.
+	(BasicHorizontalLayoutManager): Likewise.
+	* javax/swing/plaf/basic/BasicFileChooserUI.java
+	(AcceptAllFileFilter): New public constructor.
+	(BasicFileView): Likewise.
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java
+	(BorderListener.RESIZE_NONE): Now final.
+
+2005-06-04  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA/DefinitionKindHelper.java,
+	org/omg/CORBA/FieldNameHelper.java,
+	org/omg/CORBA/IdentifierHelper.java,
+	org/omg/CORBA/ParameterMode.java,
+	org/omg/CORBA/ParameterModeHelper.java,
+	org/omg/CORBA/ParameterModeHolder.java,
+	org/omg/CORBA/RepositoryIdHelper.java,
+	org/omg/CORBA/SetOverrideTypeHelper.java,
+	org/omg/CORBA/VersionSpecHelper.java,
+	gnu/CORBA/SetOverrideTypeHolder.java,
+	gnu/CORBA/DefinitionKindHolder.java: New files.
+
+2005-06-04  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/stub/java/rmi/_Remote_Stub.java,
+	org/omg/stub/java/rmi/package.html: New package.
+
+2005-06-04  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/Messaging/SyncScopeHelper.java
+	org/omg/Messaging/SYNC_WITH_TRANSPORT.java
+	org/omg/Messaging/package.html: New package.
+
+2005-06-04  Michael Koch  <konqueror@gmx.de>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImage.c
+	(Java_gnu_java_awt_peer_gtk_GtkImage_loadPixbuf):
+	Fixed method declaration format.
+	(Java_gnu_java_awt_peer_gtk_GtkImage_drawPixelsScaled):
+	Likewise.
+
+2005-06-03  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* AUTHORS (Roman Kennke): New author.
+
+2005-06-03  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA/portable/BoxedValueHelper.java,
+	org/omg/CORBA_2_3/portable/OutputStream.java,
+	org/omg/CORBA_2_3/portable/Delegate.java,
+	org/omg/CORBA_2_3/portable/ObjectImpl.java,
+	org/omg/CORBA_2_3/portable/package.html: New files.
+
+2005-06-03  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CosNaming/NamingContextPackage/AlreadyBound.java,
+	org/omg/CosNaming/NamingContextPackage/CannotProceed.java,
+	org/omg/CosNaming/NamingContextPackage/InvalidName.java,
+	org/omg/CosNaming/NamingContextPackage/NotEmpty.java,
+	org/omg/CosNaming/NamingContextPackage/NotFound.java,
+	org/omg/CosNaming/NamingContextPackage/NotFoundReason.java:
+	Added SerialVersionUID.
+
+2005-06-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+    * gnu/CORBA/GIOP/uncObjectInputStream.java,
+	gnu/CORBA/GIOP/uncObjectInputStream/uncObjectOutputStream.java:
+	Deleting files.
+    * gnu/CORBA/CDR/uncObjectInputStream.java,
+	gnu/CORBA/CDR/uncObjectInputStream/uncObjectOutputStream.java:
+	Adding files.
+
+2005-06-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/Functional_ORB.java,
+	gnu/CORBA/IOR_Delegate.java,
+	gnu/CORBA/Simple_delegate.java,
+	gnu/CORBA/universalHolder.java,
+	gnu/CORBA/CDR/aligningInputStream.java,
+	gnu/CORBA/CDR/aligningOutputStream.java,
+	gnu/CORBA/CDR/cdrInput.java,
+	gnu/CORBA/CDR/cdrOutput.java,
+	gnu/CORBA/CDR/encapsulatedOutput.java,
+	gnu/CORBA/GIOP/ErrorMessage.java,
+	gnu/CORBA/GIOP/MessageHeader.java,
+	gnu/CORBA/GIOP/cxCodeSet.java,
+	gnu/CORBA/GIOP/v1_2/RequestHeader.java,
+	org/omg/CosNaming/BindingIteratorHelper.java,
+	org/omg/CosNaming/BindingListHelper.java,
+	org/omg/CosNaming/BindingTypeHelper.java,
+	org/omg/CosNaming/NameComponentHelper.java,
+	org/omg/CosNaming/NameHelper.java,
+	org/omg/CosNaming/NamingContextExtHelper.java,
+	org/omg/CosNaming/NamingContextHelper.java:
+	Initialise instances of org.omg.SystemException, thrown
+	after catching the other exception, with InitCause.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicListUI.java
+	(damageLayout): Check for list beeing null before revalidating
+	it.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/PlainDocument.java
+	(removeUpdate): Fixed indices in text buffer access.
+	* javax/swing/text/PlainView.java
+	(drawLine): Simplified element access.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JTextArea.java
+	(constructor): Set preferredSize to a sane default.
+
+2005-06-03  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/GIOP/uncObjectInputStream.java,
+	gnu/CORBA/GIOP/uncObjectInputStream/uncObjectOutputStream.java: New streams.
+	* org/omg/CORBA/ValueBaseHelper.java: Removing inner classes,
+	using uncObjectInputStream, uncObjectOutputStream instead.
+	* org/omg/CORBA_2_3/portable (read_value): Delegate call to 
+	ValueBaseHelper.
+
+2005-06-03  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA/SendingContext/Runtime.java,
+	org/omg/CORBA/SendingContext/RunTimeOperations.java:
+	Fixing the package statement.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/SwingUtilites.java
+	(replaceUIActionMap): Fixed loop again. Now correctly, I hope.
+	* javax/swing/ActionMap.java
+	(setParent): Make sure we don't build a loop.
+	* javax/swing/plaf/basic/BasicTextUI.java
+	(createActionMap): Create ActionMapUIResource instead of
+	plain ActionMap.
+
+2005-06-03  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java:
+	Removed declarations for the previously removed native methods.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/SwingUtilites.java
+	(replaceUIActionMap): Fixed condition in while loop that caused
+	infinite looping.
+
+2005-06-03  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicTableUI.java
+	(uninstallDefault): Don't set properties to null, this corrupts
+	component state.
+
+2005-06-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* lib/Makefile.am:
+	Fix permissions problem with creation of META-INF tree.
+
+2005-06-02  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/Component.java
+	(setBackgroundColor): Return if the color equals the existing bgcolor.
+
+2005-06-02  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java:
+	(drawImage): Remove reference to GtkOffScreenImage.
+	* gnu/java/awt/peer/gtk/GtkImageConsumer.java:
+	Add additional comments.
+
+2005-06-02  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java:
+	(GdkGraphics): New constructor.
+	(drawImage): Reimplemented.
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java:
+	(checkImage,createImage): Reimplemented.
+	(prepareImage): Just call the GdkToolkit method.
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java:
+	(setIconImage): Reimplemented.
+	* gnu/java/awt/peer/gtk/GtkImage.java: Reimplemented.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java:
+	(checkImage): Change handling of GtkImage.
+	(createImage): Reimplemented for GtkImage.
+	(getColorModel): Return the actual native color model.
+	(prepareImage): Reimplemented.
+	* include/Makefile.am,
+	* native/jni/gtk-peer/Makefile.am: Removed old files, added new ones.
+	* include/gnu_java_awt_peer_gtk_GdkGraphics.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphics.c:
+	(initFromImage): New method.
+	(copyPixmap, flip_pixbuf, copyAndScalePixmap): Removed.
+	* include/gnu_java_awt_peer_gtk_GtkFramePeer.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkFramePeer.c:
+	(nativeSetIconImage): New method.
+	(nativeSetIconImageFromData,nativeSetIconImageFromDecoder): Removed.
+	* gnu/java/awt/peer/gtk/GtkImageConsumer.java,
+	* include/gnu_java_awt_peer_gtk_GtkImage.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImage.c: 
+	New files.
+	* gnu/java/awt/peer/gtk/GtkImagePainter.java,
+	* gnu/java/awt/peer/gtk/GtkOffScreenImage.java,
+	* include/gnu_java_awt_peer_gtk_GtkImagePainter.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImagePainter.c:
+	Removed files.
+
+2005-06-01  Tom Tromey  <tromey@redhat.com>
+
+	* java/io/ObjectInputStream.java (currentLoader): Fixed typo.
+
+2005-06-01  Tom Tromey  <tromey@redhat.com>
+
+	* org/omg/CosNaming/IstringHelper.java: Changed non-ascii
+	characters.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/SendingContext/package.html,
+	org/omg/SendingContext/RunTimeOperations.java,
+	org/omg/SendingContext/Runtime.java: New package.
+	
+2005-06-01  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/DefaultStyledDocument.java
+	(setLogicalStyle): Implemented this method.
+
+2005-06-01  Sven de Marothy  <sven@physto.se>
+
+	* java/util/GregorianCalendar.java
+	(setTimeInMillis): Recompute time fields.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CosNaming/BindingType.java,
+	org/omg/CosNaming/NameComponent.java,
+	org/omg/CosNaming/_BindingIteratorStub.java,
+	org/omg/CosNaming/_NamingContextStub.java,
+    org/omg/CosNaming/_NamingContextExtStub.java,	
+	org/omg/CosNaming/_BindingIteratorImplBase.java,
+	org/omg/CosNaming/_NamingContextImplBase.java: Added SerialVersionUID.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+	
+	* org/omg/CosNaming/IstringHelper.java: New class.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/CDR/cdrInput.java (read_wstring): Correcting
+	check for native encoding.
+
+2005-06-01  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/basic/BasicFileChooserUI.java
+	(installComponents): Changed layout of main panel from GridBagLayout
+	to BorderLayout (as is the case in Suns JDK). This fixes
+	bug#13244.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/Functional_ORB.java (serveStep),
+	gnu/CORBA/gnuRequest.java (submit),
+	gnu/CORBA/CDR/cdrInput.java (read_encapsulation): Correcting
+	data read loop.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/Functional_ORG.java (getFreePort): Remember
+	the port number in the local variable.
+
+2005-06-01  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/ourUserExceptionHelper.java (extract): New method.
+	* examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/RequestTest.java:Use helper extract method.
+
+2005-06-01  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JPopupMenu.java
+	(insert): Do not check for index == -1 at this point, this is done
+	in java.awt.Container. Catching -1 indices here disturbes the
+	Container.addImpl which leads to bug #13247 for example.
+
+2005-06-01  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/text/PlainDocument.java
+	(removeUpdate): Fixed indices in call to rootElement.replace().
+
+2005-06-01  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JComponent.java
+	(processKeyEvent): Call super.processKeyEvent() so that KeyEvents
+	are delivered to registered KeyListeners.
+
+2005-05-31  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA_2_3/ORB.java,
+	org/omg/CORBA_2_3/portable/InputStream.java,
+	org/omg/CORBA/portable/ValueFactory.java: New classes.
+
+2005-05-31  Audrius Meskauskas <AudriusA@Bioinformatics.org>
+
+	* org/omg.CORBA/DynValue.java (declaration): Inherit from DynAny,
+	org.omg.CORBA.Object. (set_members): Declare it may throw InvalidSeq.
+
+2005-06-01  Sven de Marothy  <sven@physto.se>
+
+	* java/util/TimeZone (getDefaultTimeZone): Reimplemented.
+	(parseTime, getDateParams): New private methods.
+
+2005-06-01  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* gnu/java/awt/GradientPaintContext.java: New file.
+	* java/awt/GradientPaint.java: Implemented.
+	* java/awt/image/IndexColorModel.java: Reimplemented.
+
+2005-05-31 Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/CDR/BigEndianInputStream.java,
+	gnu/CORBA/CDR/BigEndianOutputStream.java,
+	gnu/CORBA/CDR/LittleEndianInputStream.java,
+	gnu/CORBA/CDR/LittleEndianOutputStream.java: New streams.
+	gnu/CORBA/CDR/abstractDataInputStream.java,
+	gnu/CORBA/CDR/abstractDataOutputStream.java: New interfaces.
+	* gnu/CORBA/IOR.java: Implemented parsing of the Little
+	Endian encoded IOR references. 
+	* gnu/CORBA/Functional_ORB.java, 
+	gnu/CORBA/binaryReply.java, 
+	gnu/CORBA/gnuRequest.java, 
+	gnu/CORBA/CDR/cdrInput.java, 
+	gnu/CORBA/CDR/cdrOutput.java, 
+	gnu/CORBA/CDR/encapsulatedOutput.java, 
+	gnu/CORBA/GIOP/MessageHeader.java: Implemented support
+	for Big and Little Endian.
+	* org/omg/CORBA/package.html: Documentation update.
+
+2005-05-31  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/net/ServerSocket.java
+	(bound): Removed.
+	(local): New field.
+	(bind): Cache local socket address.
+	(getInetAddress, getLocalPort, getLocalSocketAddress, isBound):
+	Use cached local socket address.
+	(close): bound field was removed.
+
+2005-05-31  Jeroen Frijters  <jeroen@frijters.net>
+
+	* gnu/java/nio/channels/FileChannelImpl.java
+	(FileChannelImpl()): Removed.
+	(FileChannelImpl(File,int)): Made private.
+	(create): New method.
+	* java/io/FileInputStream.java,
+	java/io/FileOutputStream.java,
+	java/io/RandomAccessFile.java:
+	Updated construction of FileChannelImpl instance.
+
+2005-05-31  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/image/BufferedImage.java:
+	(ImageProducer): Use Vector instead of HashMap.
+	* java/awt/image/DirectColorModel.java:
+	(getAlpha): Default to 255 (opaque).
+	
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JTree.java
+	(getNextMatch): Implemented new method.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/plaf/metal/MetalSplitPaneUI.java:
+	(createUI): Do not share one instance of MetalSplitPaneUI
+	between multiple JSplitPanes.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JComponent.java:
+	Made JComponent.AccessibleJComponent implement
+	AccessibleExtendedComponent.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JButton.java
+	(constructor): Set initial actionCommand equal to the buttons label.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JList.java
+	(getNextMatch): Implemented new method.
+	(getCellBounds): Implemented new method.
+
+2005-05-30  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/Functional_ORB.java (serve, portServer, serveStep):
+	Implemented support for the subsequent invocations reusing the same
+	socket.
+	* gnu/CORBA/GIOP/MessageHeader.java (read): throw
+	NO_IMPLEMENT, not MARSHAL for Little Endian request.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JLayeredPane.java
+	(putLayer): Implemented new method.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/JFileChooser.java:
+	Fixed values of some constant fields.
+
+2005-05-30  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/SwingUtilities.java:
+	(getWindowAncestor): This method has to be static instead of
+	non-static.
+
+2005-05-29  Michael Koch  <konqueror@gmx.de>
+
+	* java/util/LinkedHashMap.java (access): Set 'root.pred'.
+
+2005-05-29  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* org/omg/CosNaming/_BindingIteratorImplBase.java ,
+	org/omg/CosNaming/_NamingContextExtImplBase.java,
+	org/omg/CosNaming/_NamingContextImplBase.java: Inherit from
+	DynamicImplementation.
+	* gnu/CORBA/ServiceRequestAdapter.java: New class.
+	* gnu/CORBA/gnuNVList.java (add, add_item):
+	Replacing null by constructed instance.
+
+2005-05-29  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA/Functional_ORB.java (serve, useProperties, init):
+	Implementing the property-configurable time-outs. 
+
+2005-05-29  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/CORBA/gnuRequest.java (p_invoke): Wrap the received UserException into
+	UnknownUserException.
+	* gnu/CORBA/streamReadyHolder.java: New wrapper for UserException. 
+	* org/omg/CORBA/UnknownUserException.java: New exception.
+
+2005-05-27  Roman Kennke  <roman@kennke.org>
+
+	* javax/swing/AbstractButton.java:
+	Bumped up serialVersionUID(s) to JDK1.4 compatibility.
+	* javax/swing/ImageIcon.java: Likewise.
+	* javax/swing/JFileChooser.java: Likewise.
+	* javax/swing/JInternalFrame.java: Likewise.
+	* javax/swing/JMenu.java: Likewise.
+	* javax/swing/JRadioButton.java: Likewise.
+	* javax/swing/JScrollPane.java: Likewise.
+	* javax/swing/JSpinner.java: Likewise.
+	* javax/swing/JTabbedPane.java: Likewise.
+	* javax/swing/ImageIcons.java: Likewise.
+	* javax/swing/JToggleButton.java: Likewise.
+	* javax/swing/JToolTip.java: Likewise.
+	* javax/swing/JViewPort.java: Likewise.
+	* javax/swing/LayoutFocusTraversalPolicy.java: Likewise.
+	* javax/swing/SpinnerDateModel.java: Likewise.
+	* javax/swing/TransferHandler.java: Likewise.
+
+2005-05-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkContainerPeer.java (setFont): Handle
+	lightweight peers specially.
+
+2005-05-27  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* omg/org/CORBA/ORB.java (create_recursive_sequence_tc): New method.
+
+2005-05-27  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* omg/org/CORBA/DynValue.java: New interface.
+
+2005-05-27  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* omg/org/CORBA/package.html: Documentation update.
+
+2005-05-26  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* org/omg/CORBA/ORB.java (create_basic_dyn_any): 
+	Declare it may throw an InconsistentTypeCode.
+	(create_dyn_any): Remove wrong exception declaration.
+	(create_operation_list, create_abstract_interface_tc, 
+	create_native_tc, get_service_information): Implementing these methods.
+	* org/omg/CORBA/ServerRequest.java (result, except, params, op_name): 
+	Marking deprecated.
+
 2005-05-26  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* gnu/java/net/protocol/http/HTTPURLConnection.java:
@@ -41,6 +559,10 @@
 	Properties for the XML facilities.
 
 2005-05-25  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkScrollBarPeer.c
+	(create): Prevent min == max scrollbars.
+	(setValues): Likewise.
 
 	* java/awt/Component.java (enableInputMethods): Implement.
 

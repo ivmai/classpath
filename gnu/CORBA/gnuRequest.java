@@ -69,6 +69,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.net.Socket;
+import org.omg.CORBA.UnknownUserException;
 
 /**
  * The implementation of the CORBA request.
@@ -172,13 +173,26 @@ public class gnuRequest
   private ORB orb;
 
   /**
+   * The encoding, used to send the message.
+   *
+   * The default encoding is inherited from the set IOR
+   * (that string reference can be encoded in either Big or
+   * Little endian). If the IOR encoding is not known
+   * (for example, by obtaining the reference from the naming
+   * service), the Big Endian is used.
+   */
+  private boolean Big_endian = true;
+
+  /**
    * Set the IOR data, sufficient to find the invocation target.
+   * This also sets default endian encoding for invocations.
    *
    * @see IOR.parse(String)
    */
   public void setIor(IOR an_ior)
   {
     ior = an_ior;
+    setBigEndian(ior.Big_Endian);
   }
 
   /**
@@ -197,6 +211,22 @@ public class gnuRequest
   public void setORB(ORB an_orb)
   {
     orb = an_orb;
+  }
+
+  /**
+   * Set the encoding that will be used to send the message.
+   * The default encoding is inherited from the set IOR
+   * (that string reference can be encoded in either Big or
+   * Little endian). If the IOR encoding is not known
+   * (for example, by obtaining the reference from the naming
+   * service), the Big Endian is used.
+   *
+   * @param use_big_endian true to use the Big Endian, false
+   * to use the Little Endian encoding.
+   */
+  public void setBigEndian(boolean use_big_endian)
+  {
+    Big_endian = use_big_endian;
   }
 
   /**
@@ -220,6 +250,7 @@ public class gnuRequest
     m_parameter_buffer.setVersion(ior.Internet.version);
     m_parameter_buffer.setCodeSet(cxCodeSet.negotiate(ior.CodeSets));
     m_parameter_buffer.setOrb(orb);
+    m_parameter_buffer.setBigEndian(Big_endian);
     return m_parameter_buffer;
   }
 
@@ -574,6 +605,8 @@ public class gnuRequest
   {
     gnu.CORBA.GIOP.MessageHeader header = new gnu.CORBA.GIOP.MessageHeader();
 
+    header.setBigEndian(Big_endian);
+
     // The byte order will be Big Endian by default.
     header.message_type = gnu.CORBA.GIOP.MessageHeader.REQUEST;
     header.version = useVersion(ior.Internet.version);
@@ -590,6 +623,7 @@ public class gnuRequest
     request_part.setVersion(header.version);
     request_part.setCodeSet(cxCodeSet.negotiate(ior.CodeSets));
     request_part.setOrb(orb);
+    request_part.setBigEndian(header.isBigEndian());
 
     // This also sets the stream encoding to the encoding, specified
     // in the header.
@@ -638,7 +672,7 @@ public class gnuRequest
             reading:
             while (n < r.length)
               {
-                n = socketInput.read(r, n, r.length - n);
+                n += socketInput.read(r, n, r.length - n);
               }
             socketInput.close();
             return new binaryReply(orb, response_header, r);
@@ -786,17 +820,15 @@ public class gnuRequest
               input.align(8);
               align = false;
             }
-          input.mark(2000);
 
-          String uxId = input.read_string();
-          input.reset();
+          // Prepare an Any that will hold the exception.
+          gnuAny exc = new gnuAny();
 
-          UserException uex = ObjectCreator.readUserException(uxId, input);
+          exc.insert_Streamable(new streamReadyHolder(input));
 
-          if (uex == null)
-            m_environment.exception(new UserException(uxId));
-          else
-            m_environment.exception(uex);
+          UnknownUserException unuex = new UnknownUserException(exc);
+          m_environment.exception(unuex);
+
           break;
 
         case ReplyHeader.LOCATION_FORWARD_PERM :
