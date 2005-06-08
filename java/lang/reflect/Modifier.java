@@ -288,7 +288,7 @@ public class Modifier
    */
   public static String toString(int mod)
   {
-    return toString(mod, new StringBuffer()).toString();
+    return toString(mod, new StringBuilder()).toString();
   }
 
   /**
@@ -297,7 +297,7 @@ public class Modifier
    * @param r the StringBuffer to which the String representation is appended
    * @return r, with information appended
    */
-  static StringBuffer toString(int mod, StringBuffer r)
+  static StringBuilder toString(int mod, StringBuilder r)
   {
     if (isPublic(mod))
       r.append("public ");

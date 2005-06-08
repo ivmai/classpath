@@ -185,7 +185,7 @@ public final class Constructor<T>
   public String toString()
   {
     // 128 is a reasonable buffer initial size for constructor
-    StringBuffer sb = new StringBuffer(128);
+    StringBuilder sb = new StringBuilder(128);
     Modifier.toString(getModifiers(), sb).append(' ');
     sb.append(getDeclaringClass().getName()).append('(');
     Class[] c = getParameterTypes();
@@ -248,11 +248,18 @@ public final class Constructor<T>
     throws InstantiationException, IllegalAccessException,
            InvocationTargetException;
 
-  /** FIXME
+  /**
+   * Returns an array of <code>TypeVariable</code> objects that represents
+   * the type variables declared by this constructor, in declaration order.
+   * An array of size zero is returned if this class has no type
+   * variables.
+   *
+   * @return the type variables associated with this class. 
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
    * @since 1.5
    */
-  public TypeVariable<?>[] getTypeParameters()
-  {
-    return new TypeVariable<?>[0];
-  }
+  public native TypeVariable<?>[] getTypeParameters();
+
 }

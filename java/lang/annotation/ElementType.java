@@ -49,5 +49,11 @@ public enum ElementType
   METHOD,
   PACKAGE,
   PARAMETER,
-  TYPE
+  TYPE;
+
+  /**
+   * For compatability with Sun's JDK
+   */
+  private static final long serialVersionUID = -7822481094880900790L;
+
 }

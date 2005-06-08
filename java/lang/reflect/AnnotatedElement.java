@@ -41,14 +41,75 @@ package java.lang.reflect;
 import java.lang.annotation.Annotation;
 
 /**
+ * <p>
+ * Represents an element that can be annotated.  The methods of this interface
+ * provide reflection-based access to the annotations associated with a
+ * particular element, such as a class, field, method or package.  Each
+ * annotation returned by these methods is both immutable and serializable.
+ * The returned arrays may be freely modified, without any effect on the
+ * arrays returned to future callers.
+ * </p>
+ * <p>
+ * If an annotation refers to a type or enumeration constant that is
+ * inaccessible, then a <code>TypeNotPresentException</code> or
+ * <code>EnumConstantNotPresentException</code> will be thrown.  Likewise,
+ * invalid annotations will produce either a
+ * <code>AnnotationTypeMismatchException</code> or
+ * <code>IncompleteAnnotationException</code>.
+ * </p>
+ * 
  * @author Tom Tromey (tromey@redhat.com)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.5
  */
 public interface AnnotatedElement
 {
-  <T extends Annotation> T getAnnotation(Class<T> annoType);
+
+  /**
+   * Returns the element's annotation for the specified annotation type,
+   * or <code>null</code> if no such annotation exists.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return this element's annotation for the specified type, or
+   *         <code>null</code> if no such annotation exists.
+   * @throws NullPointerException if the annotation class is <code>null</code>.
+   */
+  <T extends Annotation> T getAnnotation(Class<T> annotationClass);
+
+  /**
+   * Returns all annotations associated with the element.  If there are
+   * no annotations associated with the element, then a zero-length array
+   * will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of the
+   * element, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return this element's annotations.
+   */
   Annotation[] getAnnotations();
-  Annotation[] getDeclaredAnnotation();
-  boolean isAnnotationPresent(Class<? extends Annotation> annoType);
+
+  /**
+   * Returns all annotations directly defined by the element.  If there are
+   * no annotations directly associated with the element, then a zero-length
+   * array will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * class, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return the annotations directly defined by the element.
+   * @since 1.5
+   */
+  Annotation[] getDeclaredAnnotations();
+
+  /**
+   * Returns true if an annotation for the specified type is associated
+   * with the element.  This is primarily a short-hand for using marker
+   * annotations.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return true if an annotation exists for the specified type.
+   * @since 1.5
+   */
+  boolean isAnnotationPresent(Class<? extends Annotation> annotationClass);
+
 }

@@ -1,3 +1,69 @@
+2005-06-09  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Class.java:
+	(internalGetClasses()): Use collections with type parameters.
+	(internalGetFields()): Likewise.
+	(internalGetMethods()): Likewise.
+	(getSuperclass()): Changed to new return type.
+	(asSubclass(Class<U>)): Documented.
+	(getEnumConstants()): Calls VMClass.
+	(getAnnotation(Class<?>)): Implemented.
+	(getAnnotations()): Implemented.
+	(getCanonicalName()): Implemented.
+	(getDeclaredAnnotations()): Implemented.
+	(getEnclosingClass()): Implemented.
+	(getEnclosingConstructor()): Implemented.
+	(getEnclosingMethod()): Implemented.
+	(getGenericInterfaces()): Implemented.
+	(getGenericSuperclass()): Implemented.
+	(getTypeParameters()): Implemented.
+	(isAnnotationPresent(Class<?>)): Implemented.
+	(isAnonymousClass()): Implemented.
+	(isLocalClass()): Implemented.
+	(isMemberClass()): Implemented.
+	* java/lang/Package.java:
+	(getAnnotation(Class<?>)): Implemented.
+	(getAnnotations()): Implemented.
+	(getDeclaredAnnotations()): Implemented.
+	(isAnnotationPresent(Class<?>)): Implemented.
+	* java/lang/annotation/AnnotationTypeMismatchException.java:
+	Added serial version UID.
+	* java/lang/annotation/ElementType.java: Likewise.
+	* java/lang/annotation/RetentionPolicy.java: Likewise.
+	* java/lang/reflect/AnnotatedElement.java: Documented.
+	* java/lang/reflect/Modifier.java:
+	(toString(int)): Switched to using StringBuilder.
+	(toString(int,StringBuilder)): Likewise.
+	* vm/reference/java/lang/VMClass.java:
+	(getSuperClass(Class<T>)): Updated return type.
+	(getSimpleName(Class<?>)): Use VM methods directly.
+	(getEnumConstants(Class<T>)): Implementation moved from Class.
+	(getDeclaredAnnotations(Class<?>)): New native method.
+	(getCanonicalName(Class<?>)): Implemented.
+	(getEnclosingClass(Class<?>)): New native method.
+	(getEnclosingConstructor(Class<?>)): New native method.
+	(getEnclosingMethod(Class<?>)): New native method.
+	(getGenericInterfaces(Class<?>)): New native method.
+	(getGenericSuperclass(Class<?>)): New native method.
+	(getTypeParameters(Class<T>)): New native method.
+	(isAnonymousClass(Class<?>)): New native method.
+	(isLocalClass(Class<?>)): New native method.
+	(isMemberClass(Class<?>)): New native method.
+	* vm/reference/java/lang/VMPackage.java:
+	New VM class corresponding to java.lang.Package.
+	(getDeclaredAnnotations(Class<?>)): New native method.
+	* vm/reference/java/lang/VMSystem.java:
+	Removed unnecessary imports.
+	* vm/reference/java/lang/reflect/Constructor.java:
+	(toString()): Changed StringBuffer to StringBuilder.
+	(getTypeParameters()): Changed to native method.
+	* vm/reference/java/lang/reflect/Field.java:
+	(toString()): Changed StringBuffer to StringBuilder.
+	* vm/reference/java/lang/reflect/Method.java:
+	(getReturnType()): Updated return type.
+	(toString()): Changed StringBuffer to StringBuilder.
+	(invoke(Object,...)): Updated arguments.
+	
 2005-06-04  Tom Tromey  <tromey@redhat.com>
 
 	* javax/swing/plaf/basic/BasicListUI.java (focusListener): Use

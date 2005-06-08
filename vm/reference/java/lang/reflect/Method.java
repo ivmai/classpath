@@ -124,7 +124,7 @@ extends AccessibleObject implements Member
    * Gets the return type of this method.
    * @return the type of this method
    */
-  public native Class getReturnType();
+  public native Class<?> getReturnType();
 
   /**
    * Get the parameter list for this method, in declaration order. If the
@@ -210,7 +210,7 @@ extends AccessibleObject implements Member
   public String toString()
   {
     // 128 is a reasonable buffer initial size for constructor
-    StringBuffer sb = new StringBuffer(128);
+    StringBuilder sb = new StringBuilder(128);
     Modifier.toString(getModifiers(), sb).append(' ');
     sb.append(getUserTypeName(getReturnType().getName())).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
@@ -323,7 +323,7 @@ extends AccessibleObject implements Member
    * @throws ExceptionInInitializerError if accessing a static method triggered
    *         class initialization, which then failed
    */
-  public Object invoke(Object o, Object[] args)
+  public Object invoke(Object o, Object... args)
     throws IllegalAccessException, InvocationTargetException
   {
     return invokeNative(o, args, declaringClass, slot);

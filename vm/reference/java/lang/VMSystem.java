@@ -38,8 +38,6 @@ exception statement from your version. */
 package java.lang;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -37,9 +37,13 @@ exception statement from your version. */
 
 package java.lang;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 /*
  * This class is a reference version, mainly for compiling a class library
@@ -152,7 +156,7 @@ final class VMClass
    * @param klass the Class object that's calling us
    * @return the direct superclass of this class
    */
-  static native Class getSuperclass(Class klass);
+  static native <T> Class<? super T> getSuperclass(Class<T> klass);
 
   /**
    * Get the interfaces this class <EM>directly</EM> implements, in the
@@ -325,7 +329,7 @@ final class VMClass
   static native boolean isEnum(Class klass);
 
   /**
-   * Returns the simple name for this class, as used in the source
+   * Returns the simple name for the specified class, as used in the source
    * code.  For normal classes, this is the content returned by
    * <code>getName()</code> which follows the last ".".  Anonymous
    * classes have no name, and so the result of calling this method is
@@ -334,16 +338,276 @@ final class VMClass
    * component type of an anonymous class has a simple name of simply
    * "[]".
    *
+   * @param klass the class whose simple name should be returned. 
    * @return the simple name for this class.
    */
-  static String getSimpleName(Class klass)
+  static String getSimpleName(Class<?> klass)
   {
-    if (klass.isArray())
+    if (isArray(klass))
       {
-	return klass.getComponentType().getSimpleName() + "[]";
+	return getComponentType(klass).getSimpleName() + "[]";
       }
-    String fullName = klass.getName();
+    String fullName = getName(klass);
     return fullName.substring(fullName.lastIndexOf(".") + 1);
   }
+
+  /**
+   * Returns the enumeration constants of this class, or
+   * null if this class is not an <code>Enum</code>.
+   *
+   * @param klass the class whose enumeration constants should be returned.
+   * @return an array of <code>Enum</code> constants
+   *         associated with this class, or null if this
+   *         class is not an <code>enum</code>.
+   * @since 1.5
+   */
+  static <T> T[] getEnumConstants(Class<T> klass)
+  {
+    if (isEnum(klass))
+      {
+	try
+	  {
+	    return (T[])
+	      klass.getMethod("values").invoke(null);
+	  }
+	catch (NoSuchMethodException exception)
+	  {
+	    throw new Error("Enum lacks values() method");
+	  }
+	catch (IllegalAccessException exception)
+	  {
+	    throw new Error("Unable to access Enum class");
+	  }
+	catch (InvocationTargetException exception)
+	  {
+	    throw new
+	      RuntimeException("The values method threw an exception",
+			       exception);
+	  }
+      }
+    else
+      {
+	return null;
+      }
+  }
+
+  /**
+   * Returns all annotations directly defined by the specified class.  If
+   * there are no annotations associated with this class, then a zero-length
+   * array will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * class, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @param klass the class whose annotations should be returned.
+   * @return the annotations directly defined by the specified class.
+   * @since 1.5
+   */
+  static native Annotation[] getDeclaredAnnotations(Class<?> klass);
+
+  /**
+   * <p>
+   * Returns the canonical name of the specified class, as defined by section
+   * 6.7 of the Java language specification.  Each package, top-level class,
+   * top-level interface and primitive type has a canonical name.  A member
+   * class has a canonical name, if its parent class has one.  Likewise,
+   * an array type has a canonical name, if its component type does.
+   * Local or anonymous classes do not have canonical names.
+   * </p>
+   * <p>
+   * The canonical name for top-level classes, top-level interfaces and
+   * primitive types is always the same as the fully-qualified name.
+   * For array types, the canonical name is the canonical name of its
+   * component type with `[]' appended.  
+   * </p>
+   * <p>
+   * The canonical name of a member class always refers to the place where
+   * the class was defined, and is composed of the canonical name of the
+   * defining class and the simple name of the member class, joined by `.'.
+   *  For example, if a <code>Person</code> class has an inner class,
+   * <code>M</code>, then both its fully-qualified name and canonical name
+   * is <code>Person.M</code>.  A subclass, <code>Staff</code>, of
+   * <code>Person</code> refers to the same inner class by the fully-qualified
+   * name of <code>Staff.M</code>, but its canonical name is still
+   * <code>Person.M</code>.
+   * </p>
+   * <p>
+   * Where no canonical name is present, <code>null</code> is returned.
+   * </p>
+   *
+   * @param klass the class whose canonical name should be retrieved.
+   * @return the canonical name of the class, or <code>null</code> if the
+   *         class doesn't have a canonical name.
+   * @since 1.5
+   */
+  static String getCanonicalName(Class<?> klass)
+  {
+    if (isArray(klass))
+      {
+	String componentName = getComponentType(klass).getCanonicalName();
+	if (componentName != null)
+	  return componentName + "[]";
+      }
+    if (isMemberClass(klass))
+      {
+	String memberName = getDeclaringClass(klass).getCanonicalName();
+	if (memberName != null)
+	  return memberName + "." + getSimpleName(klass);
+      }
+    if (isLocalClass(klass) || isAnonymousClass(klass))
+      return null;
+    return getName(klass);
+  }
+
+  /**
+   * Returns the class which immediately encloses the specified class.  If
+   * the class is a top-level class, this method returns <code>null</code>.
+   *
+   * @param klass the class whose enclosing class should be returned.
+   * @return the immediate enclosing class, or <code>null</code> if this is
+   *         a top-level class.
+   * @since 1.5
+   */
+  static native Class<?> getEnclosingClass(Class<?> klass);
+
+  /**
+   * Returns the constructor which immediately encloses the specified class.
+   * If the class is a top-level class, or a local or anonymous class 
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @param klass the class whose enclosing constructor should be returned.
+   * @return the immediate enclosing constructor if the specified class is
+   *         declared within a constructor.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  static native Constructor<?> getEnclosingConstructor(Class<?> klass);
+
+  /**
+   * Returns the method which immediately encloses the specified class.  If
+   * the class is a top-level class, or a local or anonymous class 
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @param klass the class whose enclosing method should be returned.
+   * @return the immediate enclosing method if the specified class is
+   *         declared within a method.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  static native Method getEnclosingMethod(Class<?> klass);
+
+  /**
+   * <p>
+   * Returns an array of <code>Type</code> objects which represent the
+   * interfaces directly implemented by the specified class or extended by the
+   * specified interface.
+   * </p>
+   * <p>
+   * If one of the superinterfaces is a parameterized type, then the
+   * object returned for this interface reflects the actual type
+   * parameters used in the source code.  Type parameters are created
+   * using the semantics specified by the <code>ParameterizedType</code>
+   * interface, and only if an instance has not already been created.
+   * </p>
+   * <p>
+   * The order of the interfaces in the array matches the order in which
+   * the interfaces are declared.  For classes which represent an array,
+   * an array of two interfaces, <code>Cloneable</code> and
+   * <code>Serializable</code>, is always returned, with the objects in
+   * that order.  A class representing a primitive type or void always
+   * returns an array of zero size.
+   * </p>
+   *
+   * @param klass the class whose generic interfaces should be retrieved.
+   * @return an array of interfaces implemented or extended by the specified
+   *         class.
+   * @throws GenericSignatureFormatError if the generic signature of one
+   *         of the interfaces does not comply with that specified by the Java
+   *         Virtual Machine specification, 3rd edition.
+   * @throws TypeNotPresentException if any of the superinterfaces refers
+   *         to a non-existant type.
+   * @throws MalformedParameterizedTypeException if any of the interfaces
+   *         refer to a parameterized type that can not be instantiated for
+   *         some reason.
+   * @since 1.5
+   * @see java.lang.reflect.ParameterizedType
+   */
+  static native Type[] getGenericInterfaces(Class<?> klass);
+
+  /**
+   * <p>
+   * Returns a <code>Type</code> object representing the direct superclass,
+   * whether class, interface, primitive type or void, of the specified class.
+   * If the class is an array class, then a class instance representing
+   * the <code>Object</code> class is returned.  If the class is primitive,
+   * an interface, or a representation of either the <code>Object</code>
+   * class or void, then <code>null</code> is returned.
+   * </p>
+   * <p>
+   * If the superclass is a parameterized type, then the
+   * object returned for this interface reflects the actual type
+   * parameters used in the source code.  Type parameters are created
+   * using the semantics specified by the <code>ParameterizedType</code>
+   * interface, and only if an instance has not already been created.
+   * </p>
+   *
+   * @param klass the class whose generic superclass should be obtained.
+   * @return the superclass of the specified class.
+   * @throws GenericSignatureFormatError if the generic signature of the
+   *         class does not comply with that specified by the Java
+   *         Virtual Machine specification, 3rd edition.
+   * @throws TypeNotPresentException if the superclass refers
+   *         to a non-existant type.
+   * @throws MalformedParameterizedTypeException if the superclass
+   *         refers to a parameterized type that can not be instantiated for
+   *         some reason.
+   * @since 1.5
+   * @see java.lang.reflect.ParameterizedType
+   */
+  static native Type getGenericSuperclass(Class<?> klass);
+
+  /**
+   * Returns an array of <code>TypeVariable</code> objects that represents
+   * the type variables declared by the specified class, in declaration order.
+   * An array of size zero is returned if the specified class has no type
+   * variables.
+   *
+   * @param klass the class whose type variables should be returned.
+   * @return the type variables associated with this class. 
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
+   * @since 1.5
+   */
+  static native <T> TypeVariable<Class<T>>[] getTypeParameters(Class<T> klass);
+
+  /**
+   * Returns true if the specified class represents an anonymous class.
+   *
+   * @param klass the klass to test.
+   * @return true if the specified class represents an anonymous class.
+   * @since 1.5
+   */
+  static native boolean isAnonymousClass(Class<?> klass);
+
+  /**
+   * Returns true if the specified class represents an local class.
+   *
+   * @param klass the klass to test.
+   * @return true if the specified class represents an local class.
+   * @since 1.5
+   */
+  static native boolean isLocalClass(Class<?> klass);
+
+  /**
+   * Returns true if the specified class represents an member class.
+   *
+   * @param klass the klass to test. 
+   * @return true if the specified class represents an member class.
+   * @since 1.5
+   */
+  static native boolean isMemberClass(Class<?> klass);
 
 } // class VMClass

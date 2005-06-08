@@ -39,6 +39,8 @@ package java.lang;
 
 import gnu.classpath.VMStackWalker;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.net.URL;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -70,9 +72,10 @@ import java.util.StringTokenizer;
  * @see ClassLoader#definePackage(String, String, String, String, String,
  *      String, String, URL)
  * @since 1.2
- * @status updated to 1.4
+ * @status updated to 1.5
  */
 public class Package
+  implements AnnotatedElement
 {
   /** The name of the Package */
   private final String name;
@@ -233,7 +236,7 @@ public class Package
    *
    * @return true if the version is compatible, false otherwise
    *
-   * @Throws NumberFormatException if either version string is invalid
+   * @throws NumberFormatException if either version string is invalid
    * @throws NullPointerException if either version string is null
    */
   public boolean isCompatibleWith(String version)
@@ -315,4 +318,72 @@ public class Package
     return ("package " + name + (specTitle == null ? "" : ", " + specTitle)
 	    + (specVersion == null ? "" : ", version " + specVersion));
   }
+
+  /**
+   * Returns this package's annotation for the specified annotation type,
+   * or <code>null</code> if no such annotation exists.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return this package's annotation for the specified type, or
+   *         <code>null</code> if no such annotation exists.
+   * @since 1.5
+   */
+  public <A extends Annotation> A getAnnotation(Class<A> annotationClass)
+  {
+    A foundAnnotation = null;
+    Annotation[] annotations = getAnnotations();
+    for (Annotation annotation : annotations)
+      if (annotation.annotationType() == annotationClass)
+	foundAnnotation = (A) annotation;
+    return foundAnnotation;
+  }
+
+  /**
+   * Returns all annotations associated with this package.  If there are
+   * no annotations associated with this package, then a zero-length array
+   * will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * package, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return this package' annotations.
+   * @since 1.5
+   */
+  public Annotation[] getAnnotations()
+  {
+    /** All a package's annotations are declared within it. */
+    return getDeclaredAnnotations();
+  }
+
+  /**
+   * Returns all annotations directly defined by this package.  If there are
+   * no annotations associated with this package, then a zero-length array
+   * will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * package, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return the annotations directly defined by this package.
+   * @since 1.5
+   */
+  public Annotation[] getDeclaredAnnotations()
+  {
+    return VMPackage.getDeclaredAnnotations(this);
+  }
+
+  /**
+   * Returns true if an annotation for the specified type is associated
+   * with this package.  This is primarily a short-hand for using marker
+   * annotations.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return true if an annotation exists for the specified type.
+   * @since 1.5
+   */
+  public boolean isAnnotationPresent(Class<? extends Annotation> 
+				     annotationClass)
+  {
+    return getAnnotation(annotationClass) != null;
+  }
+
 } // class Package

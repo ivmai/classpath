@@ -42,13 +42,17 @@ import gnu.classpath.VMStackWalker;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.AllPermission;
@@ -92,7 +96,7 @@ import java.util.HashSet;
  * @see ClassLoader
  */
 public final class Class<T> 
-  implements Serializable, Type
+  implements Serializable, Type, AnnotatedElement, GenericDeclaration
 {
   /**
    * Compatible with JDK 1.0+.
@@ -251,12 +255,12 @@ public final class Class<T>
    */
   private Class[] internalGetClasses()
   {
-    ArrayList list = new ArrayList();
+    ArrayList<Class> list = new ArrayList<Class>();
     list.addAll(Arrays.asList(getDeclaredClasses(true)));
     Class superClass = getSuperclass();
     if (superClass != null)
       list.addAll(Arrays.asList(superClass.internalGetClasses()));
-    return (Class[])list.toArray(new Class[list.size()]);
+    return list.toArray(new Class[list.size()]);
   }
   
   /**
@@ -591,7 +595,7 @@ public final class Class<T>
    */
   private Field[] internalGetFields()
   {
-    HashSet set = new HashSet();
+    HashSet<Field> set = new HashSet<Field>();
     set.addAll(Arrays.asList(getDeclaredFields(true)));
     Class[] interfaces = getInterfaces();
     for (int i = 0; i < interfaces.length; i++)
@@ -599,7 +603,7 @@ public final class Class<T>
     Class superClass = getSuperclass();
     if (superClass != null)
       set.addAll(Arrays.asList(superClass.internalGetFields()));
-    return (Field[])set.toArray(new Field[set.size()]);
+    return set.toArray(new Field[set.size()]);
   }
 
   /**
@@ -815,7 +819,7 @@ public final class Class<T>
    */
   private Method[] internalGetMethods()
   {
-    HashMap map = new HashMap();
+    HashMap<MethodKey,Method> map = new HashMap<MethodKey,Method>();
     Method[] methods;
     Class[] interfaces = getInterfaces();
     for(int i = 0; i < interfaces.length; i++)
@@ -840,7 +844,7 @@ public final class Class<T>
       {
 	map.put(new MethodKey(methods[i]), methods[i]);
       }
-    return (Method[])map.values().toArray(new Method[map.size()]);
+    return map.values().toArray(new Method[map.size()]);
   }
 
   /**
@@ -994,7 +998,7 @@ public final class Class<T>
    *
    * @return the direct superclass of this class
    */
-  public Class getSuperclass()
+  public Class<? super T> getSuperclass()
   {
     return VMClass.getSuperclass (this);
   }
@@ -1270,18 +1274,43 @@ public final class Class<T>
   }
 
   /**
-   * FIXME
+   * <p>
+   * Casts this class to represent a subclass of the specified class.
+   * This method is useful for `narrowing' the type of a class so that
+   * the class object, and instances of that class, can match the contract
+   * of a more restrictive method.  For example, if this class has the
+   * static type of <code>Class&lt;Object&gt;</code>, and a dynamic type of
+   * <code>Class&lt;Rectangle&gt;</code>, then, assuming <code>Shape</code> is
+   * a superclass of <code>Rectangle</code>, this method can be used on
+   * this class with the parameter, <code>Class&lt;Shape&gt;</code>, to retain
+   * the same instance but with the type
+   * <code>Class&lt;? extends Shape&gt;</code>.
+   * </p>
+   * <p>
+   * If this class can be converted to an instance which is parameterised
+   * over a subtype of the supplied type, <code>U</code>, then this method
+   * returns an appropriately cast reference to this object.  Otherwise,
+   * a <code>ClassCastException</code> is thrown.
+   * </p>
+   * 
+   * @param klass the class object, the parameterized type (<code>U</code>) of
+   *              which should be a superclass of the parameterized type of
+   *              this instance.
+   * @return a reference to this object, appropriately cast.
+   * @throws ClassCastException if this class can not be converted to one
+   *                            which represents a subclass of the specified
+   *                            type, <code>U</code>. 
    * @since 1.5
    */
-  public <T> Class<? extends T> asSubclass(Class<T> klass)
+  public <U> Class<? extends U> asSubclass(Class<U> klass)
   {
     if (! klass.isAssignableFrom(this))
       throw new ClassCastException();
-    return (Class<? extends T>) this;
+    return (Class<? extends U>) this;
   }
 
   /**
-   * Return object, cast to this Class' type.
+   * Returns the specified object, cast to this <code>Class</code>' type.
    *
    * @param obj the object to cast
    * @throws ClassCastException  if obj is not an instance of this class
@@ -1293,8 +1322,8 @@ public final class Class<T>
   }
 
   /**
-   * Like <code>getField(String)</code> but without the security checks and returns null
-   * instead of throwing NoSuchFieldException.
+   * Like <code>getField(String)</code> but without the security checks and
+   * returns null instead of throwing NoSuchFieldException.
    */
   private Field internalGetField(String name)
   {
@@ -1355,41 +1384,18 @@ public final class Class<T>
    * @return an array of <code>Enum</code> constants
    *         associated with this class, or null if this
    *         class is not an <code>enum</code>.
+   * @since 1.5
    */
   public T[] getEnumConstants()
   {
-    if (isEnum())
-      {
-	try
-	  {
-	    return (T[])
-	      getMethod("values", null).invoke(null,null);
-	  }
-	catch (NoSuchMethodException exception)
-	  {
-	    throw new Error("Enum lacks values() method");
-	  }
-	catch (IllegalAccessException exception)
-	  {
-	    throw new Error("Unable to access Enum class");
-	  }
-	catch (InvocationTargetException exception)
-	  {
-	    throw new
-	      RuntimeException("The values method threw an exception",
-			       exception);
-	  }
-      }
-    else
-      {
-	return null;
-      }
+    return VMClass.getEnumConstants(this);
   }
 
   /**
    * Returns true if this class is an <code>Enum</code>.
    *
    * @return true if this is an enumeration class.
+   * @since 1.5
    */
   public boolean isEnum()
   {
@@ -1401,6 +1407,7 @@ public final class Class<T>
    * the compiler.
    *
    * @return true if this is a synthetic class.
+   * @since 1.5
    */
   public boolean isSynthetic()
   {
@@ -1411,6 +1418,7 @@ public final class Class<T>
    * Returns true if this class is an <code>Annotation</code>.
    *
    * @return true if this is an annotation class.
+   * @since 1.5
    */
   public boolean isAnnotation()
   {
@@ -1428,10 +1436,293 @@ public final class Class<T>
    * "[]".
    *
    * @return the simple name for this class.
+   * @since 1.5
    */
   public String getSimpleName()
   {
     return VMClass.getSimpleName(this);
   }
+
+  /**
+   * Returns this class' annotation for the specified annotation type,
+   * or <code>null</code> if no such annotation exists.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return this class' annotation for the specified type, or
+   *         <code>null</code> if no such annotation exists.
+   * @since 1.5
+   */
+  public <A extends Annotation> A getAnnotation(Class<A> annotationClass)
+  {
+    A foundAnnotation = null;
+    Annotation[] annotations = getAnnotations();
+    for (Annotation annotation : annotations)
+      if (annotation.annotationType() == annotationClass)
+	foundAnnotation = (A) annotation;
+    return foundAnnotation;
+  }
+
+  /**
+   * Returns all annotations associated with this class.  If there are
+   * no annotations associated with this class, then a zero-length array
+   * will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * class, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return this class' annotations.
+   * @since 1.5
+   */
+  public Annotation[] getAnnotations()
+  {
+    HashSet<Annotation> set = new HashSet<Annotation>();
+    set.addAll(Arrays.asList(getDeclaredAnnotations()));
+    Class[] interfaces = getInterfaces();
+    for (int i = 0; i < interfaces.length; i++)
+      set.addAll(Arrays.asList(interfaces[i].getAnnotations()));
+    Class<? super T> superClass = getSuperclass();
+    if (superClass != null)
+      set.addAll(Arrays.asList(superClass.getAnnotations()));
+    return set.toArray(new Annotation[set.size()]);
+  }
+
+  /**
+   * <p>
+   * Returns the canonical name of this class, as defined by section
+   * 6.7 of the Java language specification.  Each package, top-level class,
+   * top-level interface and primitive type has a canonical name.  A member
+   * class has a canonical name, if its parent class has one.  Likewise,
+   * an array type has a canonical name, if its component type does.
+   * Local or anonymous classes do not have canonical names.
+   * </p>
+   * <p>
+   * The canonical name for top-level classes, top-level interfaces and
+   * primitive types is always the same as the fully-qualified name.
+   * For array types, the canonical name is the canonical name of its
+   * component type with `[]' appended.  
+   * </p>
+   * <p>
+   * The canonical name of a member class always refers to the place where
+   * the class was defined, and is composed of the canonical name of the
+   * defining class and the simple name of the member class, joined by `.'.
+   *  For example, if a <code>Person</code> class has an inner class,
+   * <code>M</code>, then both its fully-qualified name and canonical name
+   * is <code>Person.M</code>.  A subclass, <code>Staff</code>, of
+   * <code>Person</code> refers to the same inner class by the fully-qualified
+   * name of <code>Staff.M</code>, but its canonical name is still
+   * <code>Person.M</code>.
+   * </p>
+   * <p>
+   * Where no canonical name is present, <code>null</code> is returned.
+   * </p>
+   *
+   * @return the canonical name of the class, or <code>null</code> if the
+   *         class doesn't have a canonical name.
+   * @since 1.5
+   */
+  public String getCanonicalName()
+  {
+    return VMClass.getCanonicalName(this);
+  }
+
+  /**
+   * Returns all annotations directly defined by this class.  If there are
+   * no annotations associated with this class, then a zero-length array
+   * will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * class, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @return the annotations directly defined by this class.
+   * @since 1.5
+   */
+  public Annotation[] getDeclaredAnnotations()
+  {
+    return VMClass.getDeclaredAnnotations(this);
+  }
+
+  /**
+   * Returns the class which immediately encloses this class.  If this class
+   * is a top-level class, this method returns <code>null</code>.
+   *
+   * @return the immediate enclosing class, or <code>null</code> if this is
+   *         a top-level class.
+   * @since 1.5
+   */
+  public Class<?> getEnclosingClass()
+  {
+    return VMClass.getEnclosingClass(this);
+  }
+
+  /**
+   * Returns the constructor which immediately encloses this class.  If
+   * this class is a top-level class, or a local or anonymous class 
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @return the immediate enclosing constructor if this class is
+   *         declared within a constructor.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  public Constructor<?> getEnclosingConstructor()
+  {
+    return VMClass.getEnclosingConstructor(this);
+  }
+
+  /**
+   * Returns the method which immediately encloses this class.  If
+   * this class is a top-level class, or a local or anonymous class 
+   * immediately enclosed by a type definition, instance initializer
+   * or static initializer, then <code>null</code> is returned.
+   *
+   * @return the immediate enclosing method if this class is
+   *         declared within a method.  Otherwise, <code>null</code>
+   *         is returned.
+   * @since 1.5
+   */
+  public Method getEnclosingMethod()
+  {
+    return VMClass.getEnclosingMethod(this);
+  }
+
+  /**
+   * <p>
+   * Returns an array of <code>Type</code> objects which represent the
+   * interfaces directly implemented by this class or extended by this
+   * interface.
+   * </p>
+   * <p>
+   * If one of the superinterfaces is a parameterized type, then the
+   * object returned for this interface reflects the actual type
+   * parameters used in the source code.  Type parameters are created
+   * using the semantics specified by the <code>ParameterizedType</code>
+   * interface, and only if an instance has not already been created.
+   * </p>
+   * <p>
+   * The order of the interfaces in the array matches the order in which
+   * the interfaces are declared.  For classes which represent an array,
+   * an array of two interfaces, <code>Cloneable</code> and
+   * <code>Serializable</code>, is always returned, with the objects in
+   * that order.  A class representing a primitive type or void always
+   * returns an array of zero size.
+   * </p>
+   *
+   * @return an array of interfaces implemented or extended by this class.
+   * @throws GenericSignatureFormatError if the generic signature of one
+   *         of the interfaces does not comply with that specified by the Java
+   *         Virtual Machine specification, 3rd edition.
+   * @throws TypeNotPresentException if any of the superinterfaces refers
+   *         to a non-existant type.
+   * @throws MalformedParameterizedTypeException if any of the interfaces
+   *         refer to a parameterized type that can not be instantiated for
+   *         some reason.
+   * @since 1.5
+   * @see java.lang.reflect.ParameterizedType
+   */
+  public Type[] getGenericInterfaces()
+  {
+    return VMClass.getGenericInterfaces(this);
+  }
+
+  /**
+   * <p>
+   * Returns a <code>Type</code> object representing the direct superclass,
+   * whether class, interface, primitive type or void, of this class.
+   * If this class is an array class, then a class instance representing
+   * the <code>Object</code> class is returned.  If this class is primitive,
+   * an interface, or a representation of either the <code>Object</code>
+   * class or void, then <code>null</code> is returned.
+   * </p>
+   * <p>
+   * If the superclass is a parameterized type, then the
+   * object returned for this interface reflects the actual type
+   * parameters used in the source code.  Type parameters are created
+   * using the semantics specified by the <code>ParameterizedType</code>
+   * interface, and only if an instance has not already been created.
+   * </p>
+   *
+   * @return the superclass of this class.
+   * @throws GenericSignatureFormatError if the generic signature of the
+   *         class does not comply with that specified by the Java
+   *         Virtual Machine specification, 3rd edition.
+   * @throws TypeNotPresentException if the superclass refers
+   *         to a non-existant type.
+   * @throws MalformedParameterizedTypeException if the superclass
+   *         refers to a parameterized type that can not be instantiated for
+   *         some reason.
+   * @since 1.5
+   * @see java.lang.reflect.ParameterizedType
+   */
+  public Type getGenericSuperclass()
+  {
+    return VMClass.getGenericSuperclass(this);
+  }
+
+  /**
+   * Returns an array of <code>TypeVariable</code> objects that represents
+   * the type variables declared by this class, in declaration order.
+   * An array of size zero is returned if this class has no type
+   * variables.
+   *
+   * @return the type variables associated with this class. 
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
+   * @since 1.5
+   */
+  public TypeVariable<Class<T>>[] getTypeParameters()
+  {
+    return VMClass.getTypeParameters(this);
+  }
+
+  /**
+   * Returns true if an annotation for the specified type is associated
+   * with this class.  This is primarily a short-hand for using marker
+   * annotations.
+   *
+   * @param annotationClass the type of annotation to look for.
+   * @return true if an annotation exists for the specified type.
+   * @since 1.5
+   */
+  public boolean isAnnotationPresent(Class<? extends Annotation> 
+				     annotationClass)
+  {
+    return getAnnotation(annotationClass) != null;
+  }
+
+  /**
+   * Returns true if this object represents an anonymous class.
+   *
+   * @return true if this object represents an anonymous class.
+   * @since 1.5
+   */
+  public boolean isAnonymousClass()
+  {
+    return VMClass.isAnonymousClass(this);
+  }
+
+  /**
+   * Returns true if this object represents an local class.
+   *
+   * @return true if this object represents an local class.
+   * @since 1.5
+   */
+  public boolean isLocalClass()
+  {
+    return VMClass.isLocalClass(this);
+  }
+
+  /**
+   * Returns true if this object represents an member class.
+   *
+   * @return true if this object represents an member class.
+   * @since 1.5
+   */
+  public boolean isMemberClass()
+  {
+    return VMClass.isMemberClass(this);
+  }
+
 
 }

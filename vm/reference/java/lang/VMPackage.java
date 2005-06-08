@@ -1,5 +1,5 @@
-/* RetentionPolicy.java - Enum listing lifetimes for an annotation
-   Copyright (C) 2004 Free Software Foundation
+/* VMPackage.java -- VM Specific Package methods
+   Copyright (C) 2005 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,32 +35,42 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package java.lang.annotation;
+package java.lang;
+
+import java.lang.annotation.Annotation;
+
+/*
+ * This class is a reference version, mainly for compiling a class library
+ * jar.  It is likely that VM implementers replace this with their own
+ * version that can communicate effectively with the VM.
+ */
 
 /**
- * This enum is used to control the lifetime of an annotation.
+ * This class provides static methods to be implemented by a VM in order
+ * to support the full functionality of the <code>Package</code> class.
  *
- * @see Retention
- *
- * @since 1.5
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
-public enum RetentionPolicy
+final class VMPackage
 {
-  /** Indicates that the annotation should be stored in class files.  */
-  CLASS,
 
-  /** Indicates that the annotation should be available at runtime.  */
-  RUNTIME,
-
-  /**
-   * Indicates that the annotation should only be available when
-   * parsing the source code.
-   */
-  SOURCE;
+  // Only static methods. Cannot be instantiated.
+  private VMPackage()
+  {
+  }
 
   /**
-   * For compatability with Sun's JDK
+   * Returns all annotations directly defined by the specified package.  If
+   * there are no annotations associated with this package, then a zero-length
+   * array will be returned.  The returned array may be modified by the client
+   * code, but this will have no effect on the annotation content of this
+   * class, and hence no effect on the return value of this method for
+   * future callers.
+   *
+   * @param pack the package whose annotations should be returned.
+   * @return the annotations directly defined by the specified package.
+   * @since 1.5
    */
-  private static final long serialVersionUID = 2098916047332259179L;
+  static native Annotation[] getDeclaredAnnotations(Package pack);
 
-}
+} // class VMPackage
