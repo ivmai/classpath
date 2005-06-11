@@ -54,6 +54,6 @@ public enum ElementType
   /**
    * For compatability with Sun's JDK
    */
-  private static final long serialVersionUID = -7822481094880900790L;
+  private static final long serialVersionUID = 2798216111136361587L;
 
 }

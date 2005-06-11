@@ -61,6 +61,6 @@ public enum RetentionPolicy
   /**
    * For compatability with Sun's JDK
    */
-  private static final long serialVersionUID = 2098916047332259179L;
+  private static final long serialVersionUID = -1700821648800605045L;
 
 }
