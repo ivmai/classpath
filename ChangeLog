@@ -1,3 +1,9 @@
+2005-06-17  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/lang/ThreadLocal.java,
+	java/util/TreeMap.java: Fixes to make compiling with Eclipse Java
+	Compiler SVN HEAD possible.
+
 2005-06-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* doc/unicode/Blocks-4.0.0.txt:

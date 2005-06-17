@@ -101,13 +101,20 @@ public class ThreadLocal<T>
    * We can't use "this", because a subclass may override equals/hashCode
    * and we need to use object identity for the map.
    */
-  final Key key = new Key();
+  final Key key = new Key(this);
 
-  class Key
+  static class Key
   {
+    private ThreadLocal outer;
+
+    Key(ThreadLocal outer)
+    {
+      this.outer = outer;
+    }
+
     ThreadLocal get()
     {
-      return ThreadLocal.this;
+      return outer;
     }
   }
 
