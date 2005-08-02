@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,20 +38,32 @@ exception statement from your version. */
 
 package org.omg.stub.java.rmi;
 
-import org.omg.CORBA_2_3.portable.ObjectImpl;
+import java.io.Serializable;
+
+import java.rmi.Remote;
+
+import javax.rmi.CORBA.Stub;
 
 /**
  * Provides a stub for Remote type.
  *
  * Despite this class has appeared since v 1.3, it is oficially marked
- * as incomplete at least till v 1.4 inclusive. Hence significant alterations
+ * as incomplete at least till v 1.5 inclusive. Hence significant alterations
  * are expected in the future.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
 public final class _Remote_Stub
-  extends ObjectImpl
+  extends Stub
+  implements Remote, Serializable
 {
+
+ /**
+  * Use serialVersionUID (v1.4) for interoperability.
+  */
+ private static final long serialVersionUID = -1967190271952680697L;
+
+
   /**
    * Returs the array of repository ids, implemented by this object.
    * The method must be overridden to return the meaningful information.
@@ -62,4 +74,5 @@ public final class _Remote_Stub
   {
     return new String[] { "" };
   }
+
 }

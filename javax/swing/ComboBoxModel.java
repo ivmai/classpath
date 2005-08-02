@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,13 +39,12 @@ package javax.swing;
 
 
 /**
- * ComboBoxModel is a data model for JComboBox. This model keeps
+ * The data model for {@link JComboBox}. This model keeps
  * track of elements contained in the JComboBox as well as the current
  * combo box selection. Whenever selection in the JComboBox changes, the
  * ComboBoxModel should fire ListDataEvents to ComboBox's ListDataListeners.
  *
- * @author        Andrew Selkirk
- * @version        1.0
+ * @author Andrew Selkirk
  */
 public interface ComboBoxModel extends ListModel
 {

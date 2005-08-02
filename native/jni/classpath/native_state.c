@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -36,13 +36,14 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <jni.h>
 #include "native_state.h"
 
 #define DEFAULT_TABLE_SIZE 97
 
 struct state_table *
-init_state_table_with_size (JNIEnv * env, jclass clazz, jint size)
+cp_gtk_init_state_table_with_size (JNIEnv * env, jclass clazz, jint size)
 {
   struct state_table *table;
   jfieldID hash;
@@ -67,9 +68,9 @@ init_state_table_with_size (JNIEnv * env, jclass clazz, jint size)
 }
 
 struct state_table *
-init_state_table (JNIEnv * env, jclass clazz)
+cp_gtk_init_state_table (JNIEnv * env, jclass clazz)
 {
-  return init_state_table_with_size (env, clazz, DEFAULT_TABLE_SIZE);
+  return cp_gtk_init_state_table_with_size (env, clazz, DEFAULT_TABLE_SIZE);
 }
 
 static void *
@@ -165,8 +166,20 @@ add_node (struct state_node **head, jint obj_id, void *state)
   *head = new_node;
 }
 
+#ifndef NDEBUG
+static void
+cp_gtk_check_compat (JNIEnv * env, jobject obj, struct state_table *table)
+{
+  jclass objclazz;
+
+  objclazz = (*env)->GetObjectClass(env, obj);
+  assert ((*env)->IsAssignableFrom(env, objclazz, table->clazz));
+  (*env)->DeleteLocalRef(env, objclazz);
+}
+#endif
+
 void
-set_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
+cp_gtk_set_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 	       jint obj_id, void *state)
 {
   jint hash;
@@ -179,7 +192,7 @@ set_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 }
 
 void *
-get_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
+cp_gtk_get_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 	       jint obj_id)
 {
   jint hash;
@@ -195,7 +208,7 @@ get_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 }
 
 void *
-remove_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
+cp_gtk_remove_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 		  jint obj_id)
 {
   jint hash;
@@ -211,38 +224,53 @@ remove_state_oid (JNIEnv * env, jobject lock, struct state_table *table,
 }
 
 int
-set_state (JNIEnv * env, jobject obj, struct state_table *table, void *state)
+cp_gtk_set_state (JNIEnv * env, jobject obj, struct state_table *table, void *state)
 {
   jint obj_id;
+
+#ifndef NDEBUG
+  cp_gtk_check_compat(env, obj, table);
+#endif
+
   obj_id = (*env)->GetIntField (env, obj, table->hash);
 
   if ((*env)->ExceptionOccurred (env) != NULL)
     return -1;
 
-  set_state_oid (env, table->clazz, table, obj_id, state);
+  cp_gtk_set_state_oid (env, table->clazz, table, obj_id, state);
   return 0;
 }
 
 void *
-get_state (JNIEnv * env, jobject obj, struct state_table *table)
+cp_gtk_get_state (JNIEnv * env, jobject obj, struct state_table *table)
 {
   jint obj_id;
+
+#ifndef NDEBUG
+  cp_gtk_check_compat(env, obj, table);
+#endif
+
   obj_id = (*env)->GetIntField (env, obj, table->hash);
 
   if ((*env)->ExceptionOccurred (env) != NULL)
     return NULL;
 
-  return get_state_oid (env, table->clazz, table, obj_id);
+  return cp_gtk_get_state_oid (env, table->clazz, table, obj_id);
 }
 
 void *
-remove_state_slot (JNIEnv * env, jobject obj, struct state_table *table)
+cp_gtk_remove_state_slot (JNIEnv * env, jobject obj, struct state_table *table)
 {
   jint obj_id;
+
+#ifndef NDEBUG
+  cp_gtk_check_compat(env, obj, table);
+#endif
+
   obj_id = (*env)->GetIntField (env, obj, table->hash);
 
   if ((*env)->ExceptionOccurred (env) != NULL)
     return NULL;
 
-  return remove_state_oid (env, table->clazz, table, obj_id);
+  return cp_gtk_remove_state_oid (env, table->clazz, table, obj_id);
 }

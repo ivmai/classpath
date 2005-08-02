@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -50,9 +50,11 @@ import java.text.AttributedCharacterIterator;
 
 
 /**
- * DebugGraphics
- * @author	Andrew Selkirk
- * @version	1.0
+ * An extension of {@link Graphics} that can be used for debugging
+ * custom Swing widgets. <code>DebugGraphics</code> has the ability to
+ * draw slowly and can log drawing actions.
+ *
+ * @author Andrew Selkirk
  */
 public class DebugGraphics extends Graphics
 {
@@ -404,11 +406,11 @@ public class DebugGraphics extends Graphics
   {
     try
       {
-	Thread.sleep(milliseconds);
+        Thread.sleep(milliseconds);
       }
     catch (InterruptedException e)
       {
-	// Ignore this.
+        // Ignore this.
       }
   }
   
@@ -424,13 +426,13 @@ public class DebugGraphics extends Graphics
   {
     for (int index = 0; index < (debugFlashCount - 1); ++index)
       {
-	graphics.setColor(color);
-	graphics.drawRect(x, y, width, height);
-	sleep(debugFlashTime);
-	
-	graphics.setColor(debugFlashColor);
-	graphics.drawRect(x, y, width, height);
-	sleep(debugFlashTime);
+        graphics.setColor(color);
+        graphics.drawRect(x, y, width, height);
+        sleep(debugFlashTime);
+
+        graphics.setColor(debugFlashColor);
+        graphics.drawRect(x, y, width, height);
+        sleep(debugFlashTime);
       }
 
     graphics.setColor(color);
@@ -449,13 +451,13 @@ public class DebugGraphics extends Graphics
   {
     for (int index = 0; index < (debugFlashCount - 1); ++index)
       {
-	graphics.setColor(color);
-	graphics.fillRect(x, y, width, height);
-	sleep(debugFlashTime);
-	
-	graphics.setColor(debugFlashColor);
-	graphics.fillRect(x, y, width, height);
-	sleep(debugFlashTime);
+        graphics.setColor(color);
+        graphics.fillRect(x, y, width, height);
+        sleep(debugFlashTime);
+
+        graphics.setColor(debugFlashColor);
+        graphics.fillRect(x, y, width, height);
+        sleep(debugFlashTime);
       }
 
     graphics.setColor(color);
@@ -696,13 +698,13 @@ public class DebugGraphics extends Graphics
   {
     for (int index = 0; index < (debugFlashCount - 1); ++index)
       {
-	graphics.setColor(color);
-	graphics.drawChars(data, offset, length, x, y);
-	sleep(debugFlashTime);
-	
-	graphics.setColor(debugFlashColor);
-	graphics.drawChars(data, offset, length, x, y);
-	sleep(debugFlashTime);
+        graphics.setColor(color);
+        graphics.drawChars(data, offset, length, x, y);
+        sleep(debugFlashTime);
+
+        graphics.setColor(debugFlashColor);
+        graphics.drawChars(data, offset, length, x, y);
+        sleep(debugFlashTime);
       }
 
     graphics.setColor(color);

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -334,7 +334,7 @@ public class MessageFormat extends Format
   /**
    * Applies the specified pattern to this MessageFormat.
    *
-   * @param aPattern The Pattern
+   * @param newPattern The Pattern
    */
   public void applyPattern (String newPattern)
   {
@@ -378,7 +378,6 @@ public class MessageFormat extends Format
   /**
    * A convinience method to format patterns.
    *
-   * @param aPattern The pattern used when formatting.
    * @param arguments The array containing the objects to be formatted.
    */
   public AttributedCharacterIterator formatToCharacterIterator (Object arguments)
@@ -394,7 +393,7 @@ public class MessageFormat extends Format
   /**
    * A convinience method to format patterns.
    *
-   * @param aPattern The pattern used when formatting.
+   * @param pattern The pattern used when formatting.
    * @param arguments The array containing the objects to be formatted.
    */
   public static String format (String pattern, Object arguments[])
@@ -408,8 +407,8 @@ public class MessageFormat extends Format
   /**
    * Returns the pattern with the formatted objects.
    *
-   * @param source The array containing the objects to be formatted.
-   * @param result The StringBuffer where the text is appened.
+   * @param arguments The array containing the objects to be formatted.
+   * @param appendBuf The StringBuffer where the text is appened.
    * @param fp A FieldPosition object (it is ignored).
    */
   public final StringBuffer format (Object arguments[], StringBuffer appendBuf,
@@ -658,7 +657,11 @@ public class MessageFormat extends Format
 	  {
 	    // We have a String format.  This can lose in a number
 	    // of ways, but we give it a shot.
-	    int next_index = sourceStr.indexOf(elements[i].trailer, index);
+	    int next_index;
+	    if (elements[i].trailer.length() > 0)
+	      next_index = sourceStr.indexOf(elements[i].trailer, index);
+	    else
+	      next_index = sourceStr.length();
 	    if (next_index == -1)
 	      {
 		pos.setErrorIndex(index);
@@ -705,8 +708,8 @@ public class MessageFormat extends Format
    * Sets the format for the argument at an specified
    * index.
    *
-   * @param index The index.
-   * @format The Format object.
+   * @param variableNum The index.
+   * @param newFormat The Format object.
    */
   public void setFormat (int variableNum, Format newFormat)
   {
@@ -716,7 +719,7 @@ public class MessageFormat extends Format
   /**
    * Sets the formats for the arguments.
    *
-   * @param formats An array of Format objects.
+   * @param newFormats An array of Format objects.
    */
   public void setFormats (Format[] newFormats)
   {
@@ -731,7 +734,7 @@ public class MessageFormat extends Format
   /**
    * Sets the locale.
    *
-   * @param locale A Locale
+   * @param loc A Locale
    */
   public void setLocale (Locale loc)
   {

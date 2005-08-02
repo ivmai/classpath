@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -83,15 +83,18 @@ public class GdkPixbufDecoder extends gnu.java.awt.image.ImageDecoder
   
   static native void initStaticState();
   private final int native_state = GtkGenericPeer.getUniqueInteger ();
-  private boolean initialized = false;
+
+  // initState() has been called, but pumpDone() has not yet been called.
+  private boolean needsClose = false;
 
   // the current set of ImageConsumers for this decoder
   Vector curr;
 
   // interface to GdkPixbuf
   native void initState ();
-  native void pumpBytes (byte[] bytes, int len);
-  native void finish ();
+  native void pumpBytes (byte[] bytes, int len) throws IOException;
+  native void pumpDone () throws IOException;
+  native void finish (boolean needsClose);
   static native void streamImage(int[] bytes, String format, int width, int height, boolean hasAlpha, DataOutput sink);
   
   // gdk-pixbuf provids data in RGBA format
@@ -163,8 +166,11 @@ public class GdkPixbufDecoder extends gnu.java.awt.image.ImageDecoder
     byte bytes[] = new byte[4096];
     int len = 0;
     initState();
+    needsClose = true;
     while ((len = is.read (bytes)) != -1)
       pumpBytes (bytes, len);
+    pumpDone();
+    needsClose = false;
     
     for (int i = 0; i < curr.size (); i++)
       {
@@ -177,7 +183,7 @@ public class GdkPixbufDecoder extends gnu.java.awt.image.ImageDecoder
 
   public void finalize()
   {
-    finish();
+    finish(needsClose);
   }
 
 

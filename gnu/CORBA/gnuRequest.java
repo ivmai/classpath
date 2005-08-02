@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -51,25 +51,27 @@ import org.omg.CORBA.ARG_OUT;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_INV_ORDER;
 import org.omg.CORBA.Bounds;
+import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.Environment;
 import org.omg.CORBA.ExceptionList;
 import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.NO_RESOURCES;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.UserException;
+import org.omg.CORBA.UnknownUserException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.net.BindException;
 import java.net.Socket;
-import org.omg.CORBA.UnknownUserException;
 
 /**
  * The implementation of the CORBA request.
@@ -86,9 +88,23 @@ public class gnuRequest
   public static Version MAX_SUPPORTED = new Version(1, 2);
 
   /**
-   * The request reading buffer size.
+   * The initial pause that the Request makes when
+   * the required port is not available.
    */
-  public static final int READ_BUFFER_SIZE = 2048;
+  public static int PAUSE_INITIAL = 50;
+
+  /**
+   * The number of repretetive attempts to get a required
+   * port, if it is not immediately available.
+   */
+  public static int PAUSE_STEPS = 12;
+
+  /**
+   * The maximal pausing interval between two repetetive attempts.
+   * The interval doubles after each unsuccessful attempt, but
+   * will not exceed this value.
+   */
+  public static int PAUSE_MAX = 1000;
 
   /**
    * The empty byte array.
@@ -194,6 +210,11 @@ public class gnuRequest
     ior = an_ior;
     setBigEndian(ior.Big_Endian);
   }
+
+  /**
+   * Used when redirecting request to another target.
+   */
+  gnuRequest redirected;
 
   /**
    * Get the IOR data, sufficient to find the invocation target.
@@ -648,9 +669,54 @@ public class gnuRequest
     // Now the message size is available.
     header.message_size = request_part.buffer.size();
 
+    Socket socket = null;
+
+    java.lang.Object key = ior.Internet.host + ":" + ior.Internet.port;
+
+    synchronized (SocketRepository.class)
+      {
+        socket = SocketRepository.get_socket(key);
+      }
+
     try
       {
-        Socket socket = new Socket(ior.Internet.host, ior.Internet.port);
+        long pause = PAUSE_INITIAL;
+
+        if (socket == null)
+          {
+            // The BindException may be thrown under very heavy parallel
+            // load. For some time, just wait, exceptiong the socket to free.
+            Open:
+            for (int i = 0; i < PAUSE_STEPS; i++)
+              {
+                try
+                  {
+                    socket = new Socket(ior.Internet.host, ior.Internet.port);
+                    break Open;
+                  }
+                catch (BindException ex)
+                  {
+                    try
+                      {
+                        // Expecting to free a socket via finaliser.
+                        System.gc();
+                        Thread.sleep(pause);
+                        pause = pause * 2;
+                        if (pause > PAUSE_MAX)
+                          pause = PAUSE_MAX;
+                      }
+                    catch (InterruptedException iex)
+                      {
+                      }
+                  }
+              }
+          }
+
+        if (socket == null)
+          throw new NO_RESOURCES(ior.Internet.host + ":" + ior.Internet.port +
+                                 " in use"
+                                );
+        socket.setKeepAlive(true);
 
         OutputStream socketOutput = socket.getOutputStream();
 
@@ -674,16 +740,37 @@ public class gnuRequest
               {
                 n += socketInput.read(r, n, r.length - n);
               }
-            socketInput.close();
             return new binaryReply(orb, response_header, r);
           }
         else
           return EMPTY;
       }
-    catch (IOException ex1)
+    catch (IOException io_ex)
       {
-        ex1.printStackTrace();
-        return null;
+        MARSHAL m =
+          new MARSHAL("Unable to open a socket at " + ior.Internet.host + ":" +
+                      ior.Internet.port, 10000 + ior.Internet.port,
+                      CompletionStatus.COMPLETED_NO
+                     );
+        m.initCause(io_ex);
+        throw m;
+      }
+    finally
+      {
+        try
+          {
+            if (socket != null && !socket.isClosed())
+              {
+                socket.setSoTimeout(Functional_ORB.TANDEM_REQUESTS);
+                SocketRepository.put_socket(key, socket);
+              }
+          }
+        catch (IOException scx)
+          {
+            InternalError ierr = new InternalError();
+            ierr.initCause(scx);
+            throw ierr;
+          }
       }
   }
 
@@ -753,8 +840,6 @@ public class gnuRequest
 
     // The stream must be aligned sinve v1.2, but only once.
     boolean align = response.header.version.since_inclusive(1, 2);
-
-    boolean moved_permanently = false;
 
     switch (rh.reply_status)
       {
@@ -843,16 +928,21 @@ public class gnuRequest
             }
           catch (IOException ex)
             {
-              throw new MARSHAL(ex + " while reading the forwarding info");
+              new MARSHAL("Cant read forwarding info", 5103,
+                          CompletionStatus.COMPLETED_NO
+                         );
             }
 
           setIor(forwarded);
+
           // Repeat with the forwarded information.
           p_invoke();
           return;
 
         default :
-          throw new MARSHAL("Unknow reply status: " + rh.reply_status);
+          throw new MARSHAL("Unknow reply status", 8100 + rh.reply_status,
+                            CompletionStatus.COMPLETED_NO
+                           );
       }
   }
 
@@ -864,10 +954,10 @@ public class gnuRequest
    *
    * @throws MARSHAL if the attempt to write the parameters has failde.
    */
-  private void write_parameter_buffer(MessageHeader header,
-                                      cdrBufOutput request_part
-                                     )
-                               throws MARSHAL
+  protected void write_parameter_buffer(MessageHeader header,
+                                        cdrBufOutput request_part
+                                       )
+                                 throws MARSHAL
   {
     try
       {
@@ -891,8 +981,10 @@ public class gnuRequest
    *
    * @throws MARSHAL if the attempt to write the parameters has failde.
    */
-  private void write_parameters(MessageHeader header, cdrBufOutput request_part)
-                         throws MARSHAL
+  protected void write_parameters(MessageHeader header,
+                                  cdrBufOutput request_part
+                                 )
+                           throws MARSHAL
   {
     // Align after 1.2, but only once.
     boolean align = header.version.since_inclusive(1, 2);
@@ -919,7 +1011,9 @@ public class gnuRequest
       }
     catch (Bounds ex)
       {
-        throw new MARSHAL("Unable to write method arguments to CDR output.");
+        InternalError ierr = new InternalError();
+        ierr.initCause(ex);
+        throw ierr;
       }
   }
 }

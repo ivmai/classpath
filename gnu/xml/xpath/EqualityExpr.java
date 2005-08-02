@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,6 +39,7 @@ package gnu.xml.xpath;
 
 import java.util.Collection;
 import java.util.Iterator;
+import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
 /**
@@ -91,6 +92,10 @@ final class EqualityExpr
       {
         Collection lns = (Collection) left;
         Collection rns = (Collection) right;
+        if (lns.isEmpty())
+          {
+            return false;
+          }
         boolean all = true;
         for (Iterator i = lns.iterator(); i.hasNext(); )
           {
@@ -119,7 +124,7 @@ final class EqualityExpr
                   }
               }
           }
-        return false;
+        return all;
       }
     /* 
      * If one object to be compared is a node-set and the other is a number,
@@ -241,6 +246,11 @@ final class EqualityExpr
   public Expr clone(Object context)
   {
     return new EqualityExpr(lhs.clone(context), rhs.clone(context), invert);
+  }
+
+  public boolean references(QName var)
+  {
+    return (lhs.references(var) || rhs.references(var));
   }
 
   public String toString()

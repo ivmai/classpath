@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -89,7 +89,7 @@ import javax.swing.plaf.ViewportUI;
  *
  * <p>But in terms of drawing its child, the viewport thinks of itself as
  * covering a particular position <em>of the view's coordinate space</em>.
- * For example, the {@link javax.JViewPort.getViewPosition} method returns
+ * For example, the {@link #getViewPosition} method returns
  * the position <code>(VX,VY)</code> shown above, which is an position in
  * "view space", even though this is <em>implemented</em> by positioning
  * the underlying child at position <code>(-VX,-VY)</code></p>
@@ -486,5 +486,48 @@ public class JViewport extends JComponent
   protected LayoutManager createLayoutManager()
   {
     return new ViewportLayout();
+  }
+
+  /**
+   * Scrolls the view so that contentRect becomes visible.
+   *
+   * @param contentRect the rectangle to make visible within the view
+   */
+  public void scrollRectToVisible(Rectangle contentRect)
+  {
+    Point pos = getViewPosition();
+    Rectangle viewBounds = getView().getBounds();
+    Rectangle portBounds = getBounds();
+
+    // FIXME: should validate the view if it is not valid, however
+    // this may cause excessive validation when the containment
+    // hierarchy is being created.
+
+    // if contentRect is larger than the portBounds, center the view
+    if (contentRect.height > portBounds.height || 
+        contentRect.width > portBounds.width)
+      {
+        setViewPosition(new Point(contentRect.x, contentRect.y));
+        return;
+      }
+
+    // Y-DIRECTION
+    if (contentRect.y + viewBounds.y < portBounds.y)
+      setViewPosition(new Point(pos.x, contentRect.y));
+    else if (contentRect.y + viewBounds.y + contentRect.height > 
+             (portBounds.y+portBounds.height))
+      setViewPosition (new Point(pos.x, contentRect.y - 
+                                 (portBounds.height - contentRect.height) -
+                                 portBounds.y));
+
+    // X-DIRECTION
+    pos = getViewPosition();
+    if (contentRect.x + viewBounds.x < portBounds.x)
+      setViewPosition(new Point(contentRect.x, pos.y));
+    else if (contentRect.x + viewBounds.x + contentRect.width > 
+             (portBounds.x + portBounds.height))
+      setViewPosition (new Point(contentRect.x - 
+                                 (portBounds.width - contentRect.width)
+                                 - portBounds.x, pos.y));
   }
 }

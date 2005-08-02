@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -49,6 +49,14 @@ import java.util.Set;
 
 
 /**
+ * Maps {@link KeyStroke}s to arbitrary objects, usually Strings. This
+ * is used in combination with {@link ActionMap}s.
+ *
+ * If a component receives an input event, this is looked up in
+ * the component's <code>InputMap</code>. The result is an object which
+ * serves as a key to the components <code>ActionMap</code>. Finally
+ * the <code>Action</code> that is stored is executed.
+ *
  * @author Andrew Selkirk
  * @author Michael Koch
  *
@@ -80,7 +88,7 @@ public class InputMap
   /**
    * Returns the binding for keystroke.
    *
-   * @param key the key of the enty
+   * @param keystroke the key of the enty
    *
    * @return the binding associated with keystroke may be null
    */
@@ -111,7 +119,7 @@ public class InputMap
   /**
    * Remove an entry from the <code>InputMap</code>.
    *
-   * @param key the key of the entry to remove
+   * @param keystroke the key of the entry to remove
    */
   public void remove(KeyStroke keystroke)
   {

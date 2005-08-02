@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -348,7 +348,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
 		    height = Math.max(height, dims.height);
 	        }
 	    }
-	  return new Dimension(500, 500); //width, height);	
+	  return new Dimension(width, height);	
         }
       return null;
     }
@@ -613,7 +613,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
 		  width = Math.max(width, dims.width);
 	        }
 	    }
-	  return new Dimension(500, 500); //width, height);
+	  return new Dimension(width, height);
         }
       return null;
     }
@@ -990,8 +990,8 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   protected void installDefaults()
   {
-    resetLayoutManager();
     divider = createDefaultDivider();
+    resetLayoutManager();
     nonContinuousLayoutDivider = createDefaultNonContinuousLayoutDivider();
     splitPane.add(divider, JSplitPane.DIVIDER);
 
@@ -1000,6 +1000,7 @@ public class BasicSplitPaneUI extends SplitPaneUI
     splitPane.setBackground(defaults.getColor("SplitPane.background"));
     splitPane.setBorder(defaults.getBorder("SplitPane.border"));
     splitPane.setDividerSize(defaults.getInt("SplitPane.dividerSize"));
+    splitPane.setOpaque(true);
   }
 
   /**
@@ -1384,11 +1385,6 @@ public class BasicSplitPaneUI extends SplitPaneUI
    */
   public void paint(Graphics g, JComponent jc)
   {
-    // Make sure that the location is valid
-    int divLoc = splitPane.getDividerLocation();
-    int valLoc = validLocation(divLoc);
-    if (divLoc != valLoc)
-      splitPane.setDividerLocation(valLoc);
   }
 
   /**
@@ -1449,9 +1445,8 @@ public class BasicSplitPaneUI extends SplitPaneUI
       layoutManager = new BasicHorizontalLayoutManager();
     else
       layoutManager = new BasicVerticalLayoutManager();
-    layoutManager.invalidateLayout(splitPane);
-    layoutManager.updateComponents();
     getSplitPane().setLayout(layoutManager);
+    layoutManager.updateComponents();
 
     // invalidating by itself does not invalidate the layout.
     getSplitPane().revalidate();

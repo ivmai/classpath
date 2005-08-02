@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -327,7 +327,7 @@ public class Parser
    * Handle the tag with no content, like &lt;br&gt;. The method is
    * called for the elements that, in accordance with the current DTD,
    * has an empty content.
-   * @param The tag being handled.
+   * @param tag The tag being handled.
    * @throws javax.swing.text.ChangedCharSetException
    */
   protected void handleEmptyTag(TagElement tag)
@@ -339,7 +339,7 @@ public class Parser
    * The method is called when the HTML closing tag ((like &lt;/table&gt;)
    * is found or if the parser concludes that the one should be present
    * in the current position.
-   * @param The tag being handled
+   * @param tag The tag being handled
    */
   protected void handleEndTag(TagElement tag)
   {
@@ -354,7 +354,7 @@ public class Parser
    * The method is called when the HTML opening tag ((like &lt;table&gt;)
    * is found or if the parser concludes that the one should be present
    * in the current position.
-   * @param The tag being handled
+   * @param tag The tag being handled
    */
   protected void handleStartTag(TagElement tag)
   {
@@ -383,7 +383,7 @@ public class Parser
    * both title starting and closing tags are already behind.
    * The passed argument contains the concatenation of all
    * title text sections.
-   * @param The title text.
+   * @param title The title text.
    */
   protected void handleTitle(char[] title)
   {
@@ -402,7 +402,7 @@ public class Parser
 
   /**
    * Constructs the tag from the given element.
-   * @param the tag base {@link javax.swing.text.html.parser.Element}
+   * @param element the tag base {@link javax.swing.text.html.parser.Element}
    * @param isSupposed true if the tag is not actually present in the
    * html input, but the parser supposes that it should to occur in
    * the current location.
@@ -427,7 +427,7 @@ public class Parser
    * is found or if the parser concludes that the one should be present
    * in the current position. The method is called immediately before
    * calling the handleStartTag.
-   * @param The tag
+   * @param tag The tag
    */
   protected void startTag(TagElement tag)
     throws ChangedCharSetException

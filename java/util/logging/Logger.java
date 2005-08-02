@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -585,10 +585,10 @@ public class Logger
 			       String message,
 			       Object param)
   {
-  	StackTraceElement caller = getCallerStackFrame();
+    StackTraceElement caller = getCallerStackFrame();
     logp(level,
-	 caller.getClassName(),
-	 caller.getMethodName(),
+	 caller != null ? caller.getClassName() : "<unknown>",
+	 caller != null ? caller.getMethodName() : "<unknown>",
 	 message,
 	 param);
   }
@@ -600,8 +600,8 @@ public class Logger
   {
     StackTraceElement caller = getCallerStackFrame();
     logp(level,
-	 caller.getClassName(),
-	 caller.getMethodName(),
+	 caller != null ? caller.getClassName() : "<unknown>",
+	 caller != null ? caller.getMethodName() : "<unknown>",
 	 message,
 	 params);
   }
@@ -611,10 +611,10 @@ public class Logger
 			       String message,
 			       Throwable thrown)
   {
-	StackTraceElement caller = getCallerStackFrame();    
+    StackTraceElement caller = getCallerStackFrame();    
     logp(level,
-	 caller.getClassName(),
-	 caller.getMethodName(),
+	 caller != null ? caller.getClassName() : "<unknown>",
+	 caller != null ? caller.getMethodName() : "<unknown>",
 	 message,
 	 thrown);
   }
@@ -1146,13 +1146,8 @@ public class Logger
     lm = LogManager.getLogManager();
 
     if (this == lm.rootLogger)
-    {
-      if (parent != null)
         throw new IllegalArgumentException(
           "only the root logger can have a null parent");
-      this.parent = null;
-      return;
-    }
 
     /* An application is allowed to control an anonymous logger
      * without having the permission to control the logging
@@ -1167,19 +1162,38 @@ public class Logger
   /**
    * Gets the StackTraceElement of the first class that is not this class.
    * That should be the initial caller of a logging method.
-   * @return caller of the initial looging method
+   * @return caller of the initial logging method or null if unknown.
    */
   private StackTraceElement getCallerStackFrame()
   {
     Throwable t = new Throwable();
     StackTraceElement[] stackTrace = t.getStackTrace();
     int index = 0;
-    // skip to stackentries until this class
-    while(!stackTrace[index].getClassName().equals(getClass().getName())){index++;}
-    // skip the stackentries of this class
-    while(stackTrace[index].getClassName().equals(getClass().getName())){index++;}
 
-    return stackTrace[index];
+    // skip to stackentries until this class
+    while(index < stackTrace.length
+	  && !stackTrace[index].getClassName().equals(getClass().getName()))
+      index++;
+
+    // skip the stackentries of this class
+    while(index < stackTrace.length
+	  && stackTrace[index].getClassName().equals(getClass().getName()))
+      index++;
+
+    return index < stackTrace.length ? stackTrace[index] : null;
   }
   
+  /**
+   * Reset and close handlers attached to this logger. This function is package
+   * private because it must only be avaiable to the LogManager.
+   */
+  void resetLogger()
+  {
+    for (int i = 0; i < handlers.length; i++)
+      {
+        handlers[i].close();
+        handlerList.remove(handlers[i]);
+      }
+    handlers = getHandlers();
+  }
 }

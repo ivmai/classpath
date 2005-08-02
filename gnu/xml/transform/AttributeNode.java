@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -60,10 +60,9 @@ final class AttributeNode
   final TemplateNode namespace;
   final Node source;
   
-  AttributeNode(TemplateNode children, TemplateNode next, TemplateNode name,
+  AttributeNode(TemplateNode name,
                 TemplateNode namespace, Node source)
   {
-    super(children, next);
     this.name = name;
     this.namespace = namespace;
     this.source = source;
@@ -71,13 +70,19 @@ final class AttributeNode
 
   TemplateNode clone(Stylesheet stylesheet)
   {
-    return new AttributeNode((children == null) ? null :
-                             children.clone(stylesheet),
-                             (next == null) ? null : next.clone(stylesheet),
-                             name.clone(stylesheet),
-                             (namespace == null) ? null : 
-                             namespace.clone(stylesheet),
-                             source);
+    TemplateNode ret = new AttributeNode(name.clone(stylesheet),
+                                         (namespace == null) ? null :
+                                         namespace.clone(stylesheet),
+                                         source);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,
@@ -231,6 +236,19 @@ final class AttributeNode
         ret = base + Integer.toString(count);
       }
     return ret;
+  }
+
+  public boolean references(QName var)
+  {
+    if (name != null && name.references(var))
+      {
+        return true;
+      }
+    if (namespace != null && namespace.references(var))
+      {
+        return true;
+      }
+    return super.references(var);
   }
   
   public String toString()

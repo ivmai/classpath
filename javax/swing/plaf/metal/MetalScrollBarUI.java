@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -129,28 +129,9 @@ public class MetalScrollBarUI
                thumbBounds.y + thumbBounds.height);
 
     // draw the pattern
-    int xOff = 0;
-    for (int y = thumbBounds.y + 4;
-         y < (thumbBounds.y + thumbBounds.height - 4); y++)
-      {
-        // set color alternating with every line
-        if ((y % 2) == 0)
-          g.setColor(thumbHighlightColor);
-        else
-          g.setColor(thumbDarkShadowColor);
-
-        for (int x = thumbBounds.x + 3 + (xOff);
-             x < (thumbBounds.x + thumbBounds.width - 3); x = x + 4)
-          {
-            g.drawLine(x, y, x, y);
-          }
-
-        // increase x offset
-        xOff++;
-        if (xOff > 3)
-          xOff = 0;
-
-      }
+    MetalUtils.fillMetalPattern(g, thumbBounds.x + 3, thumbBounds.y + 3,
+                                thumbBounds.width - 6, thumbBounds.height - 6,
+                                thumbHighlightColor, thumbDarkShadowColor);
   }
 
   /**

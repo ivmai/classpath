@@ -1,5 +1,5 @@
 /* Icon.java -- 
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,9 +40,34 @@ package javax.swing;
 import java.awt.Component;
 import java.awt.Graphics;
 
+/**
+ * Defines the methods that an object must implement if it should be used
+ * as an icon in Swing.
+ */
 public interface Icon
 {
+  /**
+   * Returns the height of the icon.
+   * 
+   * @return The height of the icon.
+   */
   int getIconHeight();
+  
+  /**
+   * Returns the width of the icon.
+   * 
+   * @return The width of the icon.
+   */
   int getIconWidth();
+  
+  /**
+   * Draws the icon at the location (x, y) on the specified graphics device.
+   * 
+   * @param c  a component related to the icon in some way (can be ignored by
+               some implementing classes).
+   * @param g  the graphics device.
+   * @param x  the x-coordinate.
+   * @param y  the y-coordinate.
+   */
   void paintIcon(Component c, Graphics g, int x, int y);
 }

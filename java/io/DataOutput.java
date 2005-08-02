@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -195,7 +195,7 @@ public interface DataOutput
    *
    * @exception IOException If an error occurs
    *
-   * @see writeInt
+   * @see #writeInt
    * @see DataInput#readFloat
    * @see Float#floatToIntBits
    */
@@ -216,7 +216,7 @@ public interface DataOutput
    *
    * @exception IOException If any other error occurs
    *
-   * @see writeLong
+   * @see #writeLong
    * @see DataInput#readDouble
    * @see Double#doubleToLongBits
    */
@@ -245,7 +245,7 @@ public interface DataOutput
    *
    * @exception IOException If an error occurs
    *
-   * @see writeChar
+   * @see #writeChar(int)
    */
   void writeChars(String value) throws IOException;
 

@@ -1,6 +1,6 @@
 /* LogManager.java -- a class for maintaining Loggers and managing
    configuration properties
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002,2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -95,6 +95,10 @@ import java.util.StringTokenizer;
  *     the system property <code>gnu.classpath.home.url</code>.</li>
  * </ul>
  *
+ * <p>The <code>LogManager</code> has a level of <code>INFO</code> by
+ * default, and this will be inherited by <code>Logger</code>s unless they
+ * override it either by properties or programmatically.
+ *
  * @author Sascha Brawer (brawer@acm.org)
  */
 public class LogManager
@@ -140,6 +144,7 @@ public class LogManager
     logManager = this;
     loggers = new java.util.HashMap();
     rootLogger = new Logger("", null);
+    rootLogger.setLevel(Level.INFO);
     addLogger(rootLogger);
 
     /* Make sure that Logger.global has the rootLogger as its parent.
@@ -441,11 +446,15 @@ public class LogManager
 	    if (logger == null)
 	      iter.remove();
 	    else if (logger != rootLogger)
-	      logger.setLevel(null);
+	      {
+	        logger.resetLogger();
+	        logger.setLevel(null);
+	      }
 	  }
       }
 
     rootLogger.setLevel(Level.INFO);
+    rootLogger.resetLogger();
   }
 
   /**
@@ -508,6 +517,7 @@ public class LogManager
     checkAccess();
     newProperties = new Properties();
     newProperties.load(inputStream);
+    reset();
     this.properties = newProperties;
     keys = newProperties.propertyNames();
 
@@ -529,7 +539,7 @@ public class LogManager
 		String handlerName = tokenizer.nextToken();
 		try
 		  {
-		    Class handlerClass = Class.forName(handlerName);
+		    Class handlerClass = ClassLoader.getSystemClassLoader().loadClass(handlerName);
 		    getLogger("").addHandler((Handler) handlerClass
 		                             .newInstance());
 		  }

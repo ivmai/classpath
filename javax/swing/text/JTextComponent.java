@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -54,6 +54,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -94,7 +96,6 @@ public abstract class JTextComponent extends JComponent
 
     /**
      * Constructor AccessibleJTextComponent
-     * @param component TODO
      */
     public AccessibleJTextComponent()
     {
@@ -320,7 +321,9 @@ public abstract class JTextComponent extends JComponent
      */
     public void actionPerformed(ActionEvent ev)
     {
-      caret.setVisible(!caret.isVisible());
+      Caret c = caret;
+      if (c != null)
+	c.setVisible(!c.isVisible());
     }
 
     /**
@@ -329,11 +332,15 @@ public abstract class JTextComponent extends JComponent
     public void update()
     {
       stop();
-      setDelay(caret.getBlinkRate());
-      if (editable)
-        start();
-      else
-        caret.setVisible(false);
+      Caret c = caret;
+      if (c != null)
+	{
+	  setDelay(c.getBlinkRate());
+	  if (editable)
+	    start();
+	  else
+	    c.setVisible(false);
+	}
     }
   }
 
@@ -704,8 +711,8 @@ public abstract class JTextComponent extends JComponent
    * @return A Keymap associated with the provided name, or
    * <code>null</code> if no such Keymap exists
    *
-   * @see #addKeymap()
-   * @see #removeKeymap()
+   * @see #addKeymap
+   * @see #removeKeymap
    * @see #keymaps
    */
   public static Keymap getKeymap(String n)
@@ -720,7 +727,7 @@ public abstract class JTextComponent extends JComponent
    *
    * @return The keymap removed from the global table
    *
-   * @see #addKeymap()
+   * @see #addKeymap
    * @see #getKeymap()
    * @see #keymaps
    */  
@@ -743,7 +750,7 @@ public abstract class JTextComponent extends JComponent
    *
    * @return The newly created Keymap
    *
-   * @see #removeKeymap()
+   * @see #removeKeymap
    * @see #getKeymap()
    * @see #keymaps
    */
@@ -761,7 +768,7 @@ public abstract class JTextComponent extends JComponent
    *
    * @return The component's current Keymap
    *
-   * @see #setKeymap()
+   * @see #setKeymap
    * @see #keymap
    */
   public Keymap getKeymap() 
@@ -893,8 +900,8 @@ public abstract class JTextComponent extends JComponent
    * @param actions The set of actions to resolve binding names against
    *
    * @see Action#NAME
-   * @see Action#getValue()
-   * @see KeyBinding#ActionName
+   * @see Action#getValue
+   * @see KeyBinding#actionName
    */
   public static void loadKeymap(Keymap map, 
                                 JTextComponent.KeyBinding[] bindings, 
@@ -913,12 +920,12 @@ public abstract class JTextComponent extends JComponent
    * editor can run.  Equivalent to calling
    * <code>getUI().getEditorKit().getActions()</code>. This set of Actions
    * is a reasonable value to provide as a parameter to {@link
-   * #loadKeymap()}, when resolving a set of {@link #KeyBinding} objects
+   * #loadKeymap}, when resolving a set of {@link KeyBinding} objects
    * against this component.
    *
    * @return The set of available Actions on this component's {@link EditorKit}
    *
-   * @see TextUI#getEditorKit()
+   * @see TextUI#getEditorKit
    * @see EditorKit#getActions()
    */
   public Action[] getActions()
@@ -926,15 +933,16 @@ public abstract class JTextComponent extends JComponent
     return getUI().getEditorKit(this).getActions();
   }
     
-  // This is package-private to avoid an accessor method.
+  // These are package-private to avoid an accessor method.
   Document doc;
-  private Caret caret;
+  Caret caret;
+  boolean editable;
+  
   private Highlighter highlighter;
   private Color caretColor;
   private Color disabledTextColor;
   private Color selectedTextColor;
   private Color selectionColor;
-  private boolean editable;
   private Insets margin;
   private boolean dragEnabled;
 
@@ -1113,7 +1121,7 @@ public abstract class JTextComponent extends JComponent
   /**
    * This method sets the label's UI delegate.
    *
-   * @param ui The label's UI delegate.
+   * @param newUI The label's UI delegate.
    */
   public void setUI(TextUI newUI)
   {
@@ -1351,7 +1359,7 @@ public abstract class JTextComponent extends JComponent
   /**
    * Selects the text from the given postion to the selection end position.
    *
-   * @param end the start positon of the selected text.
+   * @param start the start positon of the selected text.
    */
   public void setSelectionStart(int start)
   {
@@ -1382,7 +1390,7 @@ public abstract class JTextComponent extends JComponent
    * Selects a part of the content of the text component.
    *
    * @param start the start position of the selected text
-   * @param ent the end position of the selected text
+   * @param end the end position of the selected text
    */
   public void select(int start, int end)
   {
@@ -1611,4 +1619,55 @@ public abstract class JTextComponent extends JComponent
   {
     navigationFilter = filter;
   }
+  
+  /**
+   * Read and set the content this component. If not overridden, the
+   * method reads the component content as a plain text.
+   *
+   * The second parameter of this method describes the input stream. It can
+   * be String, URL, File and so on. If not null, this object is added to
+   * the properties of the associated document under the key
+   * {@link Document#StreamDescriptionProperty}.
+   *
+   * @param input an input stream to read from.
+   * @param streamDescription an object, describing the stream.
+   *
+   * @throws IOException if the reader throws it.
+   *
+   * @see #getDocument()
+   * @see Document#getProperty(Object)
+   */
+  public void read(Reader input, Object streamDescription)
+            throws IOException
+  {
+    if (streamDescription != null)
+      {
+        Document d = getDocument();
+        if (d != null)
+          d.putProperty(Document.StreamDescriptionProperty, streamDescription);
+      }
+
+    StringBuffer b = new StringBuffer();
+    int c;
+
+    // Read till -1 (EOF).
+    while ((c = input.read()) >= 0)
+      b.append((char) c);
+
+    setText(b.toString());
+  }
+
+  /**
+   * Write the content of this component to the given stream. If not
+   * overridden, the method writes the component content as a plain text.
+   *
+   * @param output the writer to write into.
+   *
+   * @throws IOException if the writer throws it.
+   */
+  public void write(Writer output)
+             throws IOException
+  {
+    output.write(getText());
+  }  
 }

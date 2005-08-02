@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -147,12 +147,14 @@ public abstract class RGBImageFilter extends ImageFilter
     public void filterRGBPixels(int x, int y, int w, int h, int[] pixels,
 				int offset, int scansize)
     {
-      for (int xp = x; xp < (x + w); xp++)
-	for (int yp = y; yp < (y + h); yp++)
-	  {
-	    pixels[offset] = filterRGB(xp, yp, pixels[offset]);
-	    offset++;
-	  }
+      for (int yp = 0; yp < h; yp++)
+	{
+	  for (int xp = 0; xp < w; xp++)
+	    {
+	      pixels[offset + xp] = filterRGB(xp + x, yp + y, pixels[offset + xp]);
+	    }
+	  offset += scansize;
+	}
     }
 
 
@@ -212,9 +214,9 @@ public abstract class RGBImageFilter extends ImageFilter
 	else
 	{
 	    //FIXME: Store the filtered pixels in a separate temporary buffer?
-	    convertColorModelToDefault( x, y, w, h, model, pixels, offset, scansize );
-	    filterRGBPixels( x, y, w, h, pixels, offset, scansize );
-	    consumer.setPixels(x, y, w, h, ColorModel.getRGBdefault(), pixels, offset, scansize);
+	  convertColorModelToDefault( x, y, w, h, model, pixels, offset, scansize );
+	  filterRGBPixels( x, y, w, h, pixels, offset, scansize );
+	  consumer.setPixels(x, y, w, h, ColorModel.getRGBdefault(), pixels, offset, scansize);
 	}
     }
 

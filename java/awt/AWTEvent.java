@@ -1,3 +1,4 @@
+
 /* AWTEvent.java -- the root event in AWT
    Copyright (C) 1999, 2000, 2002, 2005 Free Software Foundation
 
@@ -15,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -238,16 +239,7 @@ public abstract class AWTEvent extends EventObject
    */
   public String toString ()
   {
-    String string = null;
-
-    if (source instanceof Component)
-      string = getClass ().getName () + "[" + paramString () + "] on "
-        + ((Component) source).getName ();
-    else if (source instanceof MenuComponent)
-      string = getClass ().getName () + "[" + paramString () + "] on "
-        + ((MenuComponent) source).getName ();
-    else 
-      string = getClass ().getName () + "[" + paramString () + "] on "
+    String string = getClass ().getName () + "[" + paramString () + "] on "
     + source;
 
     return string;

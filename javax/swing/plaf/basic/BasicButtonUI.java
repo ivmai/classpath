@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -200,7 +200,7 @@ public class BasicButtonUI extends ButtonUI
 
   /**
    * Calculate the preferred size of this component, by delegating to
-   * {@link BasicGraphicsUtils.getPreferredButtonSize}.
+   * {@link BasicGraphicsUtils#getPreferredButtonSize}.
    *
    * @param c The component to measure
    *
@@ -285,7 +285,8 @@ public class BasicButtonUI extends ButtonUI
     paintIcon(g, c, ir);
     if (text != null)
       paintText(g, b, tr, text);
-    paintFocus(g, b, vr, tr, ir);
+    if (b.isFocusOwner())
+      paintFocus(g, b, vr, tr, ir);
   }
 
   /**
@@ -300,21 +301,14 @@ public class BasicButtonUI extends ButtonUI
    * @param tr Text rectangle, contained in visible rectangle
    * @param ir Icon rectangle, contained in visible rectangle
    *
-   * @see AbstractButton.isFocusPainted()
-   * @see JComponent.hasFocus()
+   * @see AbstractButton#isFocusPainted()
+   * @see JComponent#hasFocus()
    */
   protected void paintFocus(Graphics g, AbstractButton b, Rectangle vr,
                             Rectangle tr, Rectangle ir)
   {
-    if (b.hasFocus() && b.isFocusPainted())
-      {
-        Color saved_color = g.getColor();
-        g.setColor(focusColor);
-        Rectangle focusRect = ir.union(tr);
-        g.drawRect(focusRect.x, focusRect.y,
-                   focusRect.width, focusRect.height);
-        g.setColor(saved_color);
-      }
+    // In the BasicLookAndFeel no focus border is drawn. This can be
+    // overridden in subclasses to implement such behaviour.
   }
 
   /**

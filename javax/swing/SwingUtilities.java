@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -63,7 +63,7 @@ import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.InputMapUIResource;
 
 /**
- * This class contains a number of static utility functions which are
+ * A number of static utility functions which are
  * useful when drawing swing components, dispatching events, or calculating
  * regions which need painting.
  *
@@ -848,8 +848,14 @@ public class SwingUtilities
       }
     else
       {
+        int fromIndex = 0;
         textR.width = fm.stringWidth(text);
         textR.height = fm.getHeight(); 
+        while (text.indexOf('\n', fromIndex) != -1)
+          {
+            textR.height += fm.getHeight();
+            fromIndex = text.indexOf('\n', fromIndex) + 1;
+          }
       }
 
     // Work out the position of text and icon, assuming the top-left coord

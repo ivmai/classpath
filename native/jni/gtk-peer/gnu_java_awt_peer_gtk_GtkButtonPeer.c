@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,15 +39,27 @@ exception statement from your version. */
 #include "gtkpeer.h"
 #include "gnu_java_awt_peer_gtk_GtkButtonPeer.h"
 
-static gboolean focus_in_cb (GtkWidget *widget,
-                             GdkEventFocus *event,
-                             jobject peer);
-static gboolean focus_out_cb (GtkWidget *widget,
-                              GdkEventFocus *event,
-                              jobject peer);
+static jmethodID beginNativeRepaintID;
+static jmethodID endNativeRepaintID;
+ 
+void
+cp_gtk_button_init_jni (void)
+{
+  jclass gtkbuttonpeer;
 
-static void block_expose_events_cb (GtkWidget *widget,
-                                    jobject peer);
+  gtkbuttonpeer = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
+                                           "gnu/java/awt/peer/gtk/GtkButtonPeer");
+
+  beginNativeRepaintID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkbuttonpeer,
+                                                    "beginNativeRepaint",
+                                                    "()V");
+
+  endNativeRepaintID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkbuttonpeer,
+                                                  "endNativeRepaint", "()V");
+}
+
+static void block_expose_event_cb (GtkWidget *widget,
+                                   jobject peer);
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkButtonPeer_create
@@ -57,21 +69,21 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_create
   GtkWidget *eventbox;
   GtkWidget *button;
 
+  gdk_threads_enter ();
+
   NSA_SET_GLOBAL_REF (env, obj);
 
   c_label = (*env)->GetStringUTFChars (env, label, NULL);
-
-  gdk_threads_enter ();
 
   eventbox = gtk_event_box_new ();
   button = gtk_button_new_with_label (c_label);
   gtk_container_add (GTK_CONTAINER (eventbox), button);
   gtk_widget_show (button);
 
-  gdk_threads_leave ();
-
   (*env)->ReleaseStringUTFChars (env, label, c_label);
   NSA_SET_PTR (env, obj, eventbox);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL
@@ -82,30 +94,22 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_connectSignals
   jobject *gref;
   GtkWidget *button;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
   gref = NSA_GET_GLOBAL_REF (env, obj);
 
-  gdk_threads_enter ();
-
   button = gtk_bin_get_child (GTK_BIN (ptr));
 
-  g_signal_connect (G_OBJECT (ptr), "event",
-                    G_CALLBACK (pre_event_handler), *gref);
-
-  g_signal_connect (G_OBJECT (button), "event",
-                    G_CALLBACK (pre_event_handler), *gref);
-
-  g_signal_connect (G_OBJECT (button), "focus-in-event",
-                    G_CALLBACK (focus_in_cb), *gref);
-
-  g_signal_connect (G_OBJECT (button), "focus-out-event",
-                    G_CALLBACK (focus_out_cb), *gref);
-
+  /* Button signals */
   g_signal_connect_after (G_OBJECT (button), "pressed",
-                          G_CALLBACK (block_expose_events_cb), *gref);
+                          G_CALLBACK (block_expose_event_cb), *gref);
 
   g_signal_connect_after (G_OBJECT (button), "released",
-                          G_CALLBACK (block_expose_events_cb), *gref);
+                          G_CALLBACK (block_expose_event_cb), *gref);
+
+  /* Component signals */
+  cp_gtk_component_connect_signals (G_OBJECT (button), gref);
 
   gdk_threads_leave ();
 }
@@ -119,19 +123,19 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkSetLabel
   GtkWidget *label;
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
   text = (*env)->GetStringUTFChars (env, jtext, NULL);
-
-  gdk_threads_enter ();
 
   button = gtk_bin_get_child (GTK_BIN (ptr));
   label = gtk_bin_get_child (GTK_BIN (button));
   gtk_label_set_text (GTK_LABEL (label), text);
 
-  gdk_threads_leave ();
-
   (*env)->ReleaseStringUTFChars (env, jtext, text);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL 
@@ -144,17 +148,18 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetModifyFont
   GtkWidget *label;
   PangoFontDescription *font_desc;
 
+  gdk_threads_enter();
+
   ptr = NSA_GET_PTR (env, obj);
 
   font_name = (*env)->GetStringUTFChars (env, name, NULL);
-
-  gdk_threads_enter();
 
   button = gtk_bin_get_child (GTK_BIN (ptr));
   label = gtk_bin_get_child (GTK_BIN (button));
 
   font_desc = pango_font_description_from_string (font_name);
-  pango_font_description_set_size (font_desc, size * dpi_conversion_factor);
+  pango_font_description_set_size (font_desc,
+                                   size * cp_gtk_dpi_conversion_factor);
 
   if (style & AWT_STYLE_BOLD)
     pango_font_description_set_weight (font_desc, PANGO_WEIGHT_BOLD);
@@ -166,9 +171,9 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetModifyFont
 
   pango_font_description_free (font_desc);
 
-  gdk_threads_leave();
-
   (*env)->ReleaseStringUTFChars (env, name, font_name);
+
+  gdk_threads_leave();
 }
 
 JNIEXPORT void JNICALL 
@@ -183,6 +188,8 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetSetBackground
   int prelight_green;
   GtkWidget *button;
   void *ptr;
+
+  gdk_threads_enter ();
 
   ptr = NSA_GET_PTR (env, obj);
 
@@ -205,8 +212,6 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetSetBackground
   prelight_color.green = prelight_green > 65535 ? 65535 : prelight_green;
   prelight_color.blue = prelight_blue > 65535 ? 65535 : prelight_blue;
 
-  gdk_threads_enter ();
-
   button = gtk_bin_get_child (GTK_BIN (ptr));
 
   gtk_widget_modify_bg (button, GTK_STATE_NORMAL, &normal_color);
@@ -225,13 +230,13 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetSetForeground
   GtkWidget *label;
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
   color.red = (red / 255.0) * 65535;
   color.green = (green / 255.0) * 65535;
   color.blue = (blue / 255.0) * 65535;
-
-  gdk_threads_enter ();
 
   button = gtk_bin_get_child (GTK_BIN (ptr));
   label = gtk_bin_get_child (GTK_BIN (button));
@@ -250,9 +255,9 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkActivate
   GtkWidget *button;
   void *ptr;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   button = gtk_bin_get_child (GTK_BIN (ptr));
   gtk_widget_activate (GTK_WIDGET (button));
@@ -267,11 +272,13 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_gtkWidgetRequestFocus
   void *ptr;
   GtkWidget *button;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
-  gdk_threads_enter ();
   button = gtk_bin_get_child (GTK_BIN (ptr));
   gtk_widget_grab_focus (button);
+
   gdk_threads_leave ();
 }
 
@@ -282,9 +289,9 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_setNativeBounds
   GtkWidget *widget, *child;
   void *ptr;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   widget = GTK_WIDGET (ptr);
 
@@ -310,46 +317,22 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_setNativeBounds
   gdk_threads_leave ();
 }
 
-static gboolean
-focus_in_cb (GtkWidget *widget __attribute((unused)),
-             GdkEventFocus *event __attribute((unused)),
-             jobject peer)
-{
-  gdk_threads_leave ();
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer,
-                              postFocusEventID,
-                              AWT_FOCUS_GAINED,
-                              JNI_FALSE);
-  gdk_threads_enter ();
-  return FALSE;
-}
-
-static gboolean
-focus_out_cb (GtkWidget *widget __attribute((unused)),
-              GdkEventFocus *event __attribute((unused)),
-              jobject peer)
-{
-  gdk_threads_leave ();
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer,
-                              postFocusEventID,
-                              AWT_FOCUS_LOST,
-                              JNI_FALSE);
-  gdk_threads_enter ();
-  return FALSE;
-}
-
 static void
-block_expose_events_cb (GtkWidget *widget, jobject peer)
+block_expose_event_cb (GtkWidget *widget, jobject peer)
 {
   gdk_threads_leave ();
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer,
-                              beginNativeRepaintID);
+
+  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
+                                beginNativeRepaintID);
+
   gdk_threads_enter ();
 
   gdk_window_process_updates (widget->window, TRUE);
 
   gdk_threads_leave ();
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer,
+
+  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
                               endNativeRepaintID);
+
   gdk_threads_enter ();
 }

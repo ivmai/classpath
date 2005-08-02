@@ -40,11 +40,13 @@ Suggested Software
 	are required unless --disable-gtk-peer is used as an argument to
 	configure.
 
-        - GTK+ 2.6.x (or higher)
-        - libart_lgpl 2.1.0
+        - GTK+ 2.4.x (or higher)
         - gdk-pixbuf
 
 	- XTest Extension (libXtst) for GdkRobot support in java.awt.
+
+	For building the Cairo GdkGraphics2D backend you need at least
+	Cairo 0.5.0.
 
 	For building the xmlj JAXP implementation (dsabled by default, use
 	configure --enable-xmlj) you need the following installed:

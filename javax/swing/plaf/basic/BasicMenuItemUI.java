@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -506,11 +506,10 @@ public class BasicMenuItemUI extends MenuItemUI
     br.width += insets.right + insets.left;
     br.height += insets.top + insets.bottom;
 
-    /* Menu item is considered to be highlighted when it is selected.
-       It is considered to be selected if menu item is inside some menu
-       and is armed or if it is both armed and pressed */
-    if (m.getModel().isArmed()
-        && (m.getParent() instanceof MenuElement || m.getModel().isPressed()))
+    // Menu item is considered to be highlighted when it is selected.
+    // But we don't want to paint the background of JCheckBoxMenuItems
+    if ((m.isSelected() && checkIcon == null) || m.getModel().isArmed() && 
+        (m.getParent() instanceof MenuElement)) 
       {
 	if (m.isContentAreaFilled())
 	  {
@@ -606,12 +605,10 @@ public class BasicMenuItemUI extends MenuItemUI
       {
 	if (menuItem.isEnabled())
           {
-            /* Menu item is considered to be highlighted when it is selected.
-               It is considered to be selected if menu item is inside some menu
-               and is armed or if it is both armed and pressed */
-            if (menuItem.getModel().isArmed()
-                && (menuItem.getParent() instanceof MenuElement
-                    || menuItem.getModel().isPressed()))
+            // Menu item is considered to be highlighted when it is selected.
+            // But not if it's a JCheckBoxMenuItem
+            if ((menuItem.isSelected() && checkIcon == null) || menuItem.getModel().isArmed() && 
+                (menuItem.getParent() instanceof MenuElement)) 
               g.setColor(selectionForeground);
             else
               g.setColor(menuItem.getForeground());
@@ -619,7 +616,10 @@ public class BasicMenuItemUI extends MenuItemUI
 	else
 	  // FIXME: should fix this to use 'disabledForeground', but its
 	  // default value in BasicLookAndFeel is null.	  
-	  g.setColor(Color.gray);
+          
+          // FIXME: should there be different foreground colours for selected
+          // or deselected, when disabled?
+          g.setColor(Color.gray);
 
 	int mnemonicIndex = menuItem.getDisplayedMnemonicIndex();
 

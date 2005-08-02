@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,12 +38,18 @@ exception statement from your version. */
 
 package java.awt.event;
 
+import java.awt.Adjustable;
 import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.ScrollPane;
+
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 
 /**
  * This event is generated for a mouse wheel rotation. The wheel (the middle
  * mouse button on most modern mice) can be rotated towards or away from the
- * user, and is ofteh used for scrolling.
+ * user, and is often used for scrolling.
  *
  * <p>Because of the special use for scrolling components, MouseWheelEvents
  * often affect a different component than the one located at the point of
@@ -143,7 +149,7 @@ public class MouseWheelEvent extends MouseEvent
 
   /**
    * This method returns the scrolling pattern this event requests. Legal
-   * values are WHEEL_UNIT_SCROLL and WHEEL_BLOCK_SCROLL.
+   * values are {@link #WHEEL_UNIT_SCROLL} and {@link #WHEEL_BLOCK_SCROLL}.
    *
    * @return the scroll type
    * @see Adjustable#getUnitIncrement()

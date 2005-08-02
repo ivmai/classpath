@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -46,6 +46,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.MenuSelectionManager;
 import javax.swing.UIDefaults;
@@ -179,6 +180,12 @@ public class BasicMenuUI extends BasicMenuItemUI
    */
   public Dimension getMaximumSize(JComponent c)
   {
+    // If this menu is in a popup menu, treat it like a regular JMenuItem
+    if (!((JMenu)c).isTopLevelMenu())
+      {
+        JMenuItem menuItem = new JMenuItem(((JMenu)c).getText(), ((JMenu)c).getIcon());
+        return menuItem.getMaximumSize();
+      }
     return c.getPreferredSize();
   }
 
@@ -292,19 +299,42 @@ public class BasicMenuUI extends BasicMenuItemUI
       manager.processMouseEvent(e);
     }
 
+    private boolean popupVisible()
+    {
+      JMenuBar mb = (JMenuBar) ((JMenu) menuItem).getParent();
+      // check if mb.isSelected because if no menus are selected
+      // we don't have to look through the list for popup menus
+      if (!mb.isSelected())
+        return false;
+      for (int i = 0; i < mb.getMenuCount(); i++)
+      {
+         JMenu m = mb.getMenu(i);
+        if (m != null && m.isPopupMenuVisible())
+          return true;
+      }
+      return false;
+    }
+
     public void mouseEntered(MouseEvent e)
     {
       /* When mouse enters menu item, it should be considered selected
 
        if (i) if this menu is a submenu in some other menu
-          (ii) or if this menu is in a menu bar and some other menu in a menu bar was just
-               selected. (If nothing was selected, menu should be pressed before
+          (ii) or if this menu is in a menu bar and some other menu in a 
+          menu bar was just selected and has its popup menu visible. 
+               (If nothing was selected, menu should be pressed before
                it will be selected)
       */
       JMenu menu = (JMenu) menuItem;
-      if (! menu.isTopLevelMenu()
-          || (menu.isTopLevelMenu()
-          && (((JMenuBar) menu.getParent()).isSelected() && ! menu.isArmed())))
+
+      // NOTE: the following if used to require !menu.isArmed but I could find
+      // no reason for this and it was preventing some JDK-compatible behaviour.
+      // Specifically, if a menu is selected but its popup menu not visible,
+      // and then another menu is selected whose popup menu IS visible, when
+      // the mouse is moved over the first menu, its popup menu should become
+      // visible.
+
+      if (! menu.isTopLevelMenu() || popupVisible())
         {
 	  // set new selection and forward this event to MenuSelectionManager
 	  MenuSelectionManager manager = MenuSelectionManager.defaultManager();
@@ -419,7 +449,7 @@ public class BasicMenuUI extends BasicMenuItemUI
       *
       * @param e The PropertyChangeEvent.
       */
-    public void propertyChange(PropertyChangeEvent evt)
+    public void propertyChange(PropertyChangeEvent e)
     {
     }
   }

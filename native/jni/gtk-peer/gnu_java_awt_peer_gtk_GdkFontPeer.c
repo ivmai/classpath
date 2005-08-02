@@ -15,8 +15,8 @@
    
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
    
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -38,7 +38,7 @@
 #include "gdkfont.h"
 #include "gnu_java_awt_peer_gtk_GdkFontPeer.h"
 
-struct state_table *native_font_state_table;
+struct state_table *cp_gtk_native_font_state_table;
 
 enum java_awt_font_style {
   java_awt_font_PLAIN = 0,
@@ -75,11 +75,14 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_initState
   (JNIEnv *env, jobject self)
 {
   struct peerfont *pfont = NULL;
+
   gdk_threads_enter ();
+
   g_assert (self != NULL);
   pfont = (struct peerfont *) g_malloc0 (sizeof (struct peerfont));
   g_assert (pfont != NULL);
   NSA_SET_FONT_PTR (env, self, pfont);
+
   gdk_threads_leave ();
 }
 
@@ -91,6 +94,7 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_dispose
   struct peerfont *pfont = NULL;
 
   gdk_threads_enter ();
+
   pfont = (struct peerfont *)NSA_DEL_FONT_PTR (env, self);
   g_assert (pfont != NULL);
   if (pfont->layout != NULL)
@@ -102,6 +106,7 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_dispose
   if (pfont->desc != NULL)
     pango_font_description_free (pfont->desc);
   g_free (pfont);
+
   gdk_threads_leave ();
 }
 
@@ -114,11 +119,13 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_getGlyphVector
    jobject fontRenderContext)
 {
   struct peerfont *pfont = NULL;
-  GList *items = NULL, *i = NULL;
+  GList *items = NULL;
+  GList *i = NULL;
   gchar *str = NULL;
-  int len, j;
-  double *native_extents;
-  int *native_codes;
+  int len = 0;
+  int j = 0;
+  double *native_extents = NULL;
+  int *native_codes = NULL;
   jintArray java_codes = NULL;
   jdoubleArray java_extents = NULL;
 
@@ -127,7 +134,7 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_getGlyphVector
   pfont = (struct peerfont *)NSA_GET_FONT_PTR (env, self);
   g_assert (pfont != NULL);
 
-  len = (*gdk_env())->GetStringUTFLength (env, chars);  
+  len = (*cp_gtk_gdk_env())->GetStringUTFLength (env, chars);  
   str = (gchar *)(*env)->GetStringUTFChars (env, chars, NULL);
   g_assert (str != NULL);
 
@@ -143,8 +150,12 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_getGlyphVector
 
   if (i == NULL)       
     {
+      gdk_threads_leave ();
+
       java_extents = (*env)->NewDoubleArray (env, 0);
       java_codes = (*env)->NewIntArray (env, 0);
+
+      gdk_threads_enter ();
     }
   else
     { 
@@ -166,8 +177,13 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_getGlyphVector
 	  int x = 0;
 	  double scale = ((double) PANGO_SCALE);
 
+          gdk_threads_leave ();
+
 	  java_extents = (*env)->NewDoubleArray (env, glyphs->num_glyphs * NUM_GLYPH_METRICS);
 	  java_codes = (*env)->NewIntArray (env, glyphs->num_glyphs);
+
+          gdk_threads_enter ();
+
 	  native_extents = (*env)->GetDoubleArrayElements (env, java_extents, NULL);
 	  native_codes = (*env)->GetIntArrayElements (env, java_codes, NULL);
 
@@ -227,7 +243,7 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_getFontMetrics
 {
   struct peerfont *pfont = NULL;
   jdouble *native_metrics = NULL;
-  PangoFontMetrics *pango_metrics;
+  PangoFontMetrics *pango_metrics = NULL;
 
   gdk_threads_enter();
 
@@ -329,9 +345,10 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_setFont
   struct peerfont *pfont = NULL;
   char const *family_name = NULL;
   enum java_awt_font_style style;
-  PangoFT2FontMap *ft2_map;
+  PangoFT2FontMap *ft2_map = NULL;
 
   gdk_threads_enter ();
+
   style = (enum java_awt_font_style) style_int;
 
   g_assert (self != NULL);
@@ -372,8 +389,8 @@ Java_gnu_java_awt_peer_gtk_GdkFontPeer_setFont
   else
     {
       /* GDK uses a slightly different DPI setting. */
-      pango_font_description_set_size (pfont->desc, 
-				       size * dpi_conversion_factor);
+      pango_font_description_set_size (pfont->desc,
+				   size * cp_gtk_dpi_conversion_factor);
       if (pfont->ctx == NULL)
 	pfont->ctx = gdk_pango_context_get();
     }

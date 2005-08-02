@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -37,6 +37,8 @@ exception statement from your version. */
 
 
 package java.text;
+
+import java.util.Arrays;
 
 /* Written using "Java Class Libraries", 2nd edition, plus online
  * API docs for JDK 1.2 from http://www.javasoft.com.
@@ -154,7 +156,7 @@ public final class CollationKey implements Comparable
     if (!ck.getSourceString ().equals (getSourceString ()))
       return false;
 
-    if (!ck.toByteArray ().equals (toByteArray ()))
+    if (! Arrays.equals (ck.toByteArray (), toByteArray ()))
       return false;
 
     return true;
@@ -190,7 +192,7 @@ public final class CollationKey implements Comparable
   /**
    * This method returns the collation bit sequence as a byte array.
    *
-   * @param A byte array containing the collation bit sequence.
+   * @return A byte array containing the collation bit sequence.
    */
   public byte[] toByteArray()
   {

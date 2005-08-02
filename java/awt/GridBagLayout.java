@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -130,7 +130,9 @@ public class GridBagLayout
 	    return;
 
 	if (!(constraints instanceof GridBagConstraints))
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException("constraints " 
+					       + constraints 
+					       + " are not an instance of GridBagConstraints");
 
 	setConstraints (component, (GridBagConstraints) constraints);
     }
@@ -915,7 +917,7 @@ public class GridBagLayout
           sizes[start] = Math.max(sizes[start], size);
           weights[start] = Math.max(weights[start], weight);
         }
-      else
+      else if (span > 1)
         {
           int numOccupied = span;
           int lastOccupied = -1;

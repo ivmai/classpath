@@ -15,8 +15,8 @@
    
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
    
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -41,6 +41,7 @@
 #include <gdk/gdktypes.h>
 #include <gdk/gdkprivate.h>
 #include <gdk/gdkx.h>
+#include <X11/extensions/Xrender.h>
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk-pixbuf/gdk-pixdata.h>
@@ -51,26 +52,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct state_table *native_graphics2d_state_table;
+static jmethodID initComponentGraphics2DID;
+
+void
+cp_gtk_graphics2d_init_jni (void)
+{
+  jclass gdkgraphics2d;
+
+  gdkgraphics2d = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
+                                           "gnu/java/awt/peer/gtk/GdkGraphics2D");
+
+  initComponentGraphics2DID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gdkgraphics2d,
+                                                         "initComponentGraphics2D",
+                                                         "()V");
+}
+
+static struct state_table *native_graphics2d_state_table;
 
 #define NSA_G2D_INIT(env, clazz) \
-  native_graphics2d_state_table = init_state_table (env, clazz)
+  native_graphics2d_state_table = cp_gtk_init_state_table (env, clazz)
 
 #define NSA_GET_G2D_PTR(env, obj) \
-  get_state (env, obj, native_graphics2d_state_table)
+  cp_gtk_get_state (env, obj, native_graphics2d_state_table)
 
 #define NSA_SET_G2D_PTR(env, obj, ptr) \
-  set_state (env, obj, native_graphics2d_state_table, (void *)ptr)
+  cp_gtk_set_state (env, obj, native_graphics2d_state_table, (void *)ptr)
 
 #define NSA_DEL_G2D_PTR(env, obj) \
-  remove_state_slot (env, obj, native_graphics2d_state_table)
+  cp_gtk_remove_state_slot (env, obj, native_graphics2d_state_table)
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initStaticState 
   (JNIEnv *env, jclass clazz)
 {
    gdk_threads_enter();
+
    NSA_G2D_INIT (env, clazz);
+
    gdk_threads_leave();
 }
 
@@ -196,15 +214,16 @@ init_graphics2d_as_pixbuf (struct graphics2d *gr)
   g_assert (gdk_pixbuf_get_bits_per_sample (gr->drawbuf) == bits_per_sample);
   g_assert (gdk_pixbuf_get_n_channels (gr->drawbuf) == total_channels);
   
-  gr->surface = cairo_surface_create_for_image ((char *) gdk_pixbuf_get_pixels (gr->drawbuf), 
+  gr->surface = cairo_image_surface_create_for_data (gdk_pixbuf_get_pixels (gr->drawbuf), 
 						CAIRO_FORMAT_ARGB32, 
 						gdk_pixbuf_get_width (gr->drawbuf), 
 						gdk_pixbuf_get_height (gr->drawbuf), 
 						gdk_pixbuf_get_rowstride (gr->drawbuf));      
   g_assert (gr->surface != NULL);
-  g_assert (gr->cr != NULL);
   gr->mode = MODE_DRAWABLE_NO_RENDER;
-  cairo_set_target_surface (gr->cr, gr->surface);
+  if (gr->cr != NULL)
+    cairo_destroy (gr->cr);
+  gr->cr = cairo_create (gr->surface);
 }
 
 static void
@@ -228,13 +247,12 @@ init_graphics2d_as_renderable (struct graphics2d *gr)
   vis = gdk_x11_visual_get_xvisual (gdk_drawable_get_visual (gr->drawable));
   g_assert (vis != NULL);
   
-  gr->surface = cairo_xlib_surface_create (dpy, draw, vis, 
-					   CAIRO_FORMAT_ARGB32,
-					   DefaultColormap (dpy, DefaultScreen (dpy)));
+  gr->surface = cairo_xlib_surface_create (dpy, draw, vis, gr->width, gr->height);
   g_assert (gr->surface != NULL);
-  g_assert (gr->cr != NULL);
   gr->mode = MODE_DRAWABLE_WITH_RENDER;
-  cairo_set_target_surface (gr->cr, gr->surface);
+  if (gr->cr != NULL)
+    cairo_destroy (gr->cr);
+  gr->cr = cairo_create (gr->surface);
 }
 
 static void
@@ -272,15 +290,18 @@ begin_drawing_operation (JNIEnv *env, struct graphics2d * gr)
       break;
 
     case MODE_JAVA_ARRAY:
-      gr->javabuf = (*env)->GetIntArrayElements (env, gr->jarray, &gr->isCopy);
-      gr->surface = cairo_surface_create_for_image ((char *) gr->javabuf, 
-						    CAIRO_FORMAT_ARGB32, 
-						    gr->width, 
-						    gr->height, 
-						    gr->width * 4);
-      g_assert(gr->surface != NULL);
-      g_assert(gr->cr != NULL);
-      cairo_set_target_surface (gr->cr, gr->surface);
+      {
+        jboolean isCopy;
+        gr->javabuf = (*env)->GetPrimitiveArrayCritical (env, gr->jarray, &isCopy);
+        gr->isCopy |= isCopy;
+        if (gr->isCopy)
+          {
+	    /* Make sure that the pixel buffer copy is already initalized,
+	       i.e. we already failed to get direct access in initState. */
+	    g_assert (gr->javabuf_copy != NULL);
+	    memcpy (gr->javabuf_copy, gr->javabuf, gr->width * gr->height * 4);
+	  }
+      }
       break;
     }
 }
@@ -319,13 +340,9 @@ end_drawing_operation (JNIEnv *env, struct graphics2d * gr)
       break;
       
     case MODE_JAVA_ARRAY:
-      /* 
-       * FIXME: Perhaps this should use the isCopy flag to try to avoid
-       * tearing down the cairo surface.
-       */
-      cairo_surface_destroy (gr->surface);
-      gr->surface = NULL;
-      (*env)->ReleaseIntArrayElements (env, gr->jarray, gr->javabuf, JNI_COMMIT);
+      if (gr->isCopy)
+	memcpy (gr->javabuf, gr->javabuf_copy, gr->width * gr->height * 4);
+      (*env)->ReleasePrimitiveArrayCritical (env, gr->jarray, gr->javabuf, JNI_COMMIT);
     }
 }
 
@@ -333,21 +350,14 @@ end_drawing_operation (JNIEnv *env, struct graphics2d * gr)
 static void 
 update_pattern_transform (struct graphics2d *gr)
 {
-  double a, b, c, d, tx, ty;
-  cairo_matrix_t *mat = NULL;
+  cairo_matrix_t mat;
 
   g_assert (gr != NULL);
   if (gr->pattern == NULL)
     return;
 
-  return;
-  /* temporarily disabled: ambiguous behavior */
-  /*   cairo_get_matrix (gr->cr, &a, &b, &c, &d, &tx, &ty); */
-  mat = cairo_matrix_create ();
-  g_assert (mat != NULL);
-  cairo_matrix_set_affine (mat, a, b, c, d, tx, ty);
-  cairo_pattern_set_matrix (gr->pattern, mat);
-  cairo_matrix_destroy (mat);
+  cairo_get_matrix (gr->cr, &mat);
+  cairo_pattern_set_matrix (gr->pattern, &mat);
 }
 
 static void
@@ -361,7 +371,7 @@ realize_cb (GtkWidget *widget __attribute__ ((unused)), jobject peer)
 {
   gdk_threads_leave ();
 
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer, initComponentGraphics2DID);
+  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer, initComponentGraphics2DID);
 
   gdk_threads_enter ();
 }
@@ -373,7 +383,8 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_copyState
   struct graphics2d *g = NULL, *g_old = NULL;
 
   gdk_threads_enter();
-  g = (struct graphics2d *) malloc (sizeof (struct graphics2d));
+
+  g = (struct graphics2d *) g_malloc (sizeof (struct graphics2d));
   g_assert (g != NULL);
   memset (g, 0, sizeof(struct graphics2d));
 
@@ -385,20 +396,32 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_copyState
   g->debug = g_old->debug; 
   g->mode = g_old->mode;
 
+  g->width = g_old->width;
+  g->height = g_old->height;
+
   if (g_old->mode == MODE_JAVA_ARRAY)
     {
-      g->width = g_old->width;
-      g->height = g_old->height;
-      g->jarray = (*env)->NewGlobalRef(env, g_old->jarray);
+      jint size = g->width * g->height * 4;
+      
+      g->jarray = (*env)->NewGlobalRef (env, g_old->jarray);
+      g->javabuf = (*env)->GetIntArrayElements (env, g->jarray, &g->isCopy);
+      g->isCopy = JNI_TRUE;
+      g->javabuf_copy = (jint *) g_malloc (size);
+      memcpy (g->javabuf_copy, g->javabuf, size);
+      g->surface = cairo_image_surface_create_for_data ((unsigned char *) g->javabuf,
+						         CAIRO_FORMAT_ARGB32,
+						         g->width,
+						         g->height,
+						         g->width * 4);
+      g_assert (g->surface != NULL);
+      g->cr = cairo_create (g->surface);
+      g_assert (g->cr != NULL);
+      (*env)->ReleaseIntArrayElements (env, g->jarray, g->javabuf, JNI_ABORT);
     }
   else
     {
       g->drawable = g_old->drawable;
-
       g_object_ref (g->drawable);
-  
-      g->cr = cairo_create();
-      g_assert (g->cr != NULL);
 
       if (x_server_has_render_extension ())
 	init_graphics2d_as_renderable (g);
@@ -406,9 +429,11 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_copyState
 	init_graphics2d_as_pixbuf (g);
     }
 
-  cairo_surface_set_filter (g->surface, CAIRO_FILTER_FAST);
+  if (g->pattern)
+    cairo_pattern_set_filter (g->pattern, CAIRO_FILTER_FAST);
 
   NSA_SET_G2D_PTR (env, obj, g);
+
   gdk_threads_leave();
 }
 
@@ -417,10 +442,12 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState___3III
 (JNIEnv *env, jobject obj, jintArray jarr, jint width, jint height)
 {
-  struct graphics2d *gr;
+  struct graphics2d *gr = NULL;
+  jint *cairobuf = NULL;
 
   gdk_threads_enter();
-  gr = (struct graphics2d *) malloc (sizeof (struct graphics2d));
+
+  gr = (struct graphics2d *) g_malloc (sizeof (struct graphics2d));
   g_assert (gr != NULL);
   memset (gr, 0, sizeof(struct graphics2d));
 
@@ -428,19 +455,42 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState___3III
 
   if (gr->debug) printf ("constructing java-backed image of size (%d,%d)\n",
 			 width, height);
-  
-  gr->cr = cairo_create();
-  g_assert (gr->cr != NULL);
 
   gr->width = width;
   gr->height = height;
   gr->jarray = (*env)->NewGlobalRef(env, jarr);
+  gr->javabuf = (*env)->GetPrimitiveArrayCritical (env, gr->jarray, &gr->isCopy);
+  if (gr->isCopy)
+    {
+      /* We didn't get direct access to the pixel buffer, so we'll have to
+         maintain a separate copy for Cairo. */
+      jint size = gr->width * gr->height * 4;
+      gr->javabuf_copy = (jint *) g_malloc (size);
+      memcpy (gr->javabuf_copy, gr->javabuf, size);
+      cairobuf = gr->javabuf_copy;
+    }
+  else
+    {
+      /* Have Cairo write directly to the Java array. */
+      cairobuf = gr->javabuf;
+    }
+  gr->surface = cairo_image_surface_create_for_data ((unsigned char *) cairobuf,
+						     CAIRO_FORMAT_ARGB32,
+						     gr->width,
+						     gr->height,
+						     gr->width * 4);
+  g_assert (gr->surface != NULL);
+  gr->cr = cairo_create (gr->surface);
+  g_assert (gr->cr != NULL);
+  (*env)->ReleasePrimitiveArrayCritical (env, gr->jarray, gr->javabuf, JNI_COMMIT);
+  
   gr->mode = MODE_JAVA_ARRAY;
 
   if (gr->debug) printf ("constructed java-backed image of size (%d,%d)\n",
 			 width, height);
 
   NSA_SET_G2D_PTR (env, obj, gr);
+
   gdk_threads_leave();  
 }
 
@@ -448,10 +498,11 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState__II
   (JNIEnv *env, jobject obj, jint width, jint height)
 {
-  struct graphics2d *gr;
+  struct graphics2d *gr = NULL;
   
   gdk_threads_enter();
-  gr = (struct graphics2d *) malloc (sizeof (struct graphics2d));
+
+  gr = (struct graphics2d *) g_malloc (sizeof (struct graphics2d));
   g_assert (gr != NULL);
   memset (gr, 0, sizeof(struct graphics2d));
 
@@ -464,8 +515,8 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState__II
 						 gdk_rgb_get_visual ()->depth);
   g_assert (gr->drawable != NULL);
 
-  gr->cr = cairo_create();
-  g_assert (gr->cr != NULL);
+  gr->width = width;
+  gr->height = height;
 
   if (x_server_has_render_extension ())
     init_graphics2d_as_renderable (gr);
@@ -475,6 +526,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState__II
   if (gr->debug) printf ("constructed offscreen drawable of size (%d,%d)\n",
 			 width, height);
   NSA_SET_G2D_PTR (env, obj, gr);
+
   gdk_threads_leave();
 }
 
@@ -482,13 +534,25 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_gdkDrawDrawable
   (JNIEnv *env, jobject self, jobject other, jint x, jint y)
 {
-  struct graphics2d *src = NULL, *dst = NULL;
-  gint s_height, s_width, d_height, d_width, height, width;
-  cairo_matrix_t *matrix;
+  struct graphics2d *src = NULL;
+  struct graphics2d *dst = NULL;
+  gint s_height;
+  gint s_width;
+  gint d_height;
+  gint d_width;
+  gint height;
+  gint width;
+  cairo_matrix_t matrix;
   cairo_operator_t tmp_op;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, self)) { gdk_threads_leave(); return; }
+  
+  if (peer_is_disposed(env, self))
+    {
+      gdk_threads_leave();
+      return;
+    }
+
   src = (struct graphics2d *)NSA_GET_G2D_PTR (env, other);
   dst = (struct graphics2d *)NSA_GET_G2D_PTR (env, self);
   g_assert (src != NULL);
@@ -505,25 +569,26 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_gdkDrawDrawable
   width = min (s_width, d_width);
   height = min (s_height, d_height);
 
-  matrix = cairo_matrix_create ();
-  cairo_surface_get_matrix (src->surface, matrix);
-  cairo_matrix_translate (matrix, (double)-x, (double)-y);
-  cairo_surface_set_matrix (src->surface, matrix);
-
-  tmp_op = cairo_current_operator (dst->cr); 
-  cairo_set_operator(dst->cr, CAIRO_OPERATOR_SRC); 
-  cairo_show_surface (dst->cr, src->surface, width, height);
+  cairo_get_matrix (src->cr, &matrix);
+  cairo_matrix_translate (&matrix, (double)-x, (double)-y); 
+  if (src->pattern)
+    cairo_pattern_set_matrix (src->pattern, &matrix); 
+  tmp_op = cairo_get_operator (dst->cr); 
+  cairo_set_operator(dst->cr, CAIRO_OPERATOR_SOURCE); 
+  cairo_set_source_surface (dst->cr, src->surface, 0, 0);
+  cairo_paint (dst->cr);
   cairo_set_operator(dst->cr, tmp_op);
 
-  cairo_matrix_translate (matrix, (double)x, (double)y);
-  cairo_surface_set_matrix (src->surface, matrix);
-  cairo_matrix_destroy (matrix);
+  cairo_matrix_translate (&matrix, (double)x, (double)y);
+  if (src->pattern)
+    cairo_pattern_set_matrix (src->pattern, &matrix);
 
   gdk_flush();
 
   end_drawing_operation(env, dst);
 
   if (src->debug) printf ("copied %d x %d pixels from offscreen drawable\n", width, height);
+
   gdk_threads_leave();
 }
 
@@ -536,18 +601,21 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState__Lgnu_java_awt_peer_gtk_GtkCo
   void *ptr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   ptr = NSA_GET_PTR (env, peer);
   g_assert (ptr != NULL);
 
-  gr = (struct graphics2d *) malloc (sizeof (struct graphics2d));
+  gr = (struct graphics2d *) g_malloc (sizeof (struct graphics2d));
   g_assert (gr != NULL);
   memset (gr, 0, sizeof(struct graphics2d));
 
   check_for_debug (gr);
-
-  gr->cr = cairo_create();
-  g_assert (gr->cr != NULL);
 
   widget = GTK_WIDGET (ptr);
   g_assert (widget != NULL);
@@ -555,12 +623,16 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_initState__Lgnu_java_awt_peer_gtk_GtkCo
   grab_current_drawable (widget, &(gr->drawable), &(gr->win));
   g_assert (gr->drawable != NULL);
 
+  gr->width = widget->allocation.width;
+  gr->height = widget->allocation.height;
+
   if (x_server_has_render_extension ())
     init_graphics2d_as_renderable (gr);
   else
     init_graphics2d_as_pixbuf (gr);
 
   NSA_SET_G2D_PTR (env, obj, gr);
+
   gdk_threads_leave();
 }
 
@@ -570,9 +642,9 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_connectSignals
 {
   void *ptr;
 
-  ptr = NSA_GET_PTR (env, peer);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, peer);
 
   g_signal_connect_after (G_OBJECT (ptr), "realize",
                           G_CALLBACK (realize_cb), obj);
@@ -587,7 +659,9 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_dispose
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
+
   gr = (struct graphics2d *) NSA_DEL_G2D_PTR (env, obj);
+
   if (gr == NULL) 
     {
       gdk_threads_leave();
@@ -602,7 +676,8 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_dispose
   if (gr->drawbuf)
     g_object_unref (gr->drawbuf); 
 
-  g_object_unref (gr->drawable);
+  if (gr->drawable)
+    g_object_unref (gr->drawable);
 
   if (gr->pattern)
     cairo_pattern_destroy (gr->pattern);
@@ -611,17 +686,21 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_dispose
     cairo_surface_destroy (gr->pattern_surface);
 
   if (gr->pattern_pixels)
-    free (gr->pattern_pixels);
+    g_free (gr->pattern_pixels);
 
   if (gr->mode == MODE_JAVA_ARRAY)
-    (*env)->DeleteGlobalRef(env, gr->jarray);
+    {
+      (*env)->DeleteGlobalRef (env, gr->jarray);
+      if (gr->javabuf_copy)
+        g_free (gr->javabuf_copy);
+    }
 
   if (gr->debug) printf ("disposed of graphics2d\n");
 
-  free (gr);
+  g_free (gr);
+
   gdk_threads_leave();
 }
-
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setGradient 
@@ -634,19 +713,25 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setGradient
 {
   struct graphics2d *gr = NULL;
   cairo_surface_t *surf = NULL;
-  cairo_matrix_t *mat = NULL;
+  cairo_t *cr2 = NULL;
+  cairo_matrix_t mat;
+
+  gdk_threads_enter();
+
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
 
-  gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   if (gr->debug) printf ("setGradient (%f,%f) -> (%f,%f); (%d,%d,%d,%d) -> (%d,%d,%d,%d)\n",
 			 x1, y1, 
 			 x2, y2, 
 			 r1, g1, b1, a1, 
 			 r2, g2, b2, a2);
-  
-  cairo_save (gr->cr);
   
   if (cyclic)
     surf = cairo_surface_create_similar (gr->surface, CAIRO_FORMAT_ARGB32, 3, 2);
@@ -654,30 +739,26 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setGradient
     surf = cairo_surface_create_similar (gr->surface, CAIRO_FORMAT_ARGB32, 2, 2);      
   g_assert (surf != NULL);
 
-  cairo_set_target_surface (gr->cr, surf);
+  cr2 = cairo_create (surf);
   
-  cairo_identity_matrix (gr->cr);
+  cairo_identity_matrix (cr2);
 
-  cairo_set_rgb_color (gr->cr, r1 / 255.0, g1 / 255.0, b1 / 255.0);
-  cairo_set_alpha (gr->cr, a1 / 255.0);
-  cairo_rectangle (gr->cr, 0, 0, 1, 2);
-  cairo_fill (gr->cr);
+  cairo_set_source_rgba (cr2, r1 / 255.0, g1 / 255.0, b1 / 255.0, a1 / 255.0);
+  cairo_rectangle (cr2, 0, 0, 1, 2);
+  cairo_fill (cr2);
     
-  cairo_set_rgb_color (gr->cr, r2 / 255.0, g2 / 255.0, b2 / 255.0);
-  cairo_set_alpha (gr->cr, a2 / 255.0);
-  cairo_rectangle (gr->cr, 1, 0, 1, 2);
-  cairo_fill (gr->cr);
+  cairo_set_source_rgba (cr2, r2 / 255.0, g2 / 255.0, b2 / 255.0, a2 / 255.0);
+  cairo_rectangle (cr2, 1, 0, 1, 2);
+  cairo_fill (cr2);
 
   if (cyclic)
     {
-      cairo_set_rgb_color (gr->cr, r1 / 255.0, g1 / 255.0, b1 / 255.0);
-      cairo_set_alpha (gr->cr, a1 / 255.0);
-      cairo_rectangle (gr->cr, 2, 0, 1, 2);
-      cairo_fill (gr->cr);
+      cairo_set_source_rgba (cr2, r1 / 255.0, g1 / 255.0, b1 / 255.0, a1 / 255.0);
+      cairo_rectangle (cr2, 2, 0, 1, 2);
+      cairo_fill (cr2);
     }
 
-  mat = cairo_matrix_create ();
-  g_assert (mat != NULL);
+  cairo_matrix_init_identity (&mat);
 
   /* 
      consider the vector [x2 - x1, y2 - y1] = [p,q]
@@ -716,15 +797,16 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setGradient
     double c = (y2 - y1 == 0.) ? 0. : (1. / (y2 - y1));
     double dx = (x1 == 0.) ? 0. : 1. / x1;
     double dy = (y1 == 0.) ? 0. : 1. / y1;
+    cairo_pattern_t *p;
     
-    cairo_matrix_set_affine (mat,
-			     a, 0.,
-			     c, 0.,
-			     dx, dy);
+    cairo_matrix_init (&mat,
+                       a, 0.,
+                       c, 0.,
+                       dx, dy);
     
-    cairo_surface_set_matrix (surf, mat);
-    cairo_matrix_destroy (mat);
-    cairo_surface_set_filter (surf, CAIRO_FILTER_BILINEAR);
+    p = cairo_pattern_create_for_surface (surf);
+    cairo_pattern_set_matrix (p, &mat);
+    cairo_pattern_set_filter (p, CAIRO_FILTER_BILINEAR);
   }
 
   /* FIXME: repeating gradients (not to mention hold gradients) don't seem to work. */
@@ -737,14 +819,14 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setGradient
     cairo_surface_destroy (gr->pattern_surface);
 
   if (gr->pattern_pixels)
-    free (gr->pattern_pixels);
+    g_free (gr->pattern_pixels);
   
   gr->pattern_pixels = NULL;  
   gr->pattern_surface = surf;  
   gr->pattern = cairo_pattern_create_for_surface(surf);
 
-  cairo_restore (gr->cr);    
-  cairo_set_pattern (gr->cr, gr->pattern);
+  cairo_set_source (gr->cr, gr->pattern);
+
   gdk_threads_leave();
 }
 
@@ -756,7 +838,13 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setTexturePixels
   jint *jpixels = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
 
@@ -770,13 +858,13 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setTexturePixels
     cairo_surface_destroy (gr->pattern_surface);
 
   if (gr->pattern_pixels)
-    free (gr->pattern_pixels);
+    g_free (gr->pattern_pixels);
 
   gr->pattern = NULL;
   gr->pattern_surface = NULL;
   gr->pattern_pixels = NULL;
 
-  gr->pattern_pixels = (char *) malloc (h * stride * 4);
+  gr->pattern_pixels = (char *) g_malloc (h * stride * 4);
   g_assert (gr->pattern_pixels != NULL);
 
   jpixels = (*env)->GetIntArrayElements (env, jarr, NULL);
@@ -784,14 +872,15 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_setTexturePixels
   memcpy (gr->pattern_pixels, jpixels, h * stride * 4);
   (*env)->ReleaseIntArrayElements (env, jarr, jpixels, 0);
 
-  gr->pattern_surface = cairo_surface_create_for_image (gr->pattern_pixels, 
+  gr->pattern_surface = cairo_image_surface_create_for_data ((unsigned char *)gr->pattern_pixels, 
 							CAIRO_FORMAT_ARGB32, 
 							w, h, stride * 4);
   g_assert (gr->pattern_surface != NULL);
-  cairo_surface_set_repeat (gr->pattern_surface, 1);
+  cairo_pattern_set_extend (gr->pattern, 1);
   gr->pattern = cairo_pattern_create_for_surface (gr->pattern_surface);
   g_assert (gr->pattern != NULL);
-  cairo_set_pattern (gr->cr, gr->pattern);
+  cairo_set_source (gr->cr, gr->pattern);
+
   gdk_threads_leave();
 }
 
@@ -805,7 +894,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_drawPixels
   jdouble *native_matrix = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -822,19 +916,24 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_drawPixels
   begin_drawing_operation (env, gr);
   
  {
-   cairo_matrix_t *mat = NULL;
-   cairo_surface_t *surf = cairo_surface_create_for_image ((char *)native_pixels, 
+   cairo_matrix_t mat;
+   cairo_pattern_t *p;
+   cairo_surface_t *surf = cairo_image_surface_create_for_data ((unsigned char *)native_pixels, 
 							   CAIRO_FORMAT_ARGB32, 
 							   w, h, stride * 4);   
-   mat = cairo_matrix_create ();
-   cairo_matrix_set_affine (mat, 
-			    native_matrix[0], native_matrix[1],
-			    native_matrix[2], native_matrix[3],
-			    native_matrix[4], native_matrix[5]);
-   cairo_surface_set_matrix (surf, mat);
-   cairo_surface_set_filter (surf, cairo_surface_get_filter(gr->surface));
-   cairo_show_surface (gr->cr, surf, w, h);
-   cairo_matrix_destroy (mat);
+   cairo_matrix_init_identity (&mat);
+   cairo_matrix_init (&mat, 
+                      native_matrix[0], native_matrix[1],
+                      native_matrix[2], native_matrix[3],
+                      native_matrix[4], native_matrix[5]);
+
+   p = cairo_pattern_create_for_surface (surf);
+   cairo_pattern_set_matrix (p, &mat);
+   if (gr->pattern)
+     cairo_pattern_set_filter (p, cairo_pattern_get_filter (gr->pattern));
+   cairo_set_source (gr->cr, p);
+   cairo_paint (gr->cr);
+   cairo_pattern_destroy (p);
    cairo_surface_destroy (surf);
  }
   
@@ -855,12 +954,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSave
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_save\n");
   cairo_save (gr->cr);
+
   gdk_threads_leave();
 }
 
@@ -871,13 +976,19 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoRestore
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_restore\n");
   cairo_restore (gr->cr);
   update_pattern_transform (gr);
+
   gdk_threads_leave();
 }
 
@@ -889,12 +1000,22 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetMatrix
   jdouble *native_matrix = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
+
   /* cairoSetMatrix was called before this graphics object's component
      was realized. */
-  if (gr == NULL) { gdk_threads_leave (); return; }
+  if (gr == NULL)
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   native_matrix = (*env)->GetDoubleArrayElements (env, java_matrix, NULL);  
   g_assert (native_matrix != NULL);
@@ -906,17 +1027,19 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetMatrix
 			 native_matrix[4], native_matrix[5]);
 
   {
-    cairo_matrix_t * mat = cairo_matrix_create ();
-    cairo_matrix_set_affine (mat, 
-			     native_matrix[0], native_matrix[1],
-			     native_matrix[2], native_matrix[3],
-			     native_matrix[4], native_matrix[5]);
-    cairo_set_matrix (gr->cr, mat);
-    cairo_matrix_destroy (mat);
+    cairo_matrix_t mat;
+
+    cairo_matrix_init_identity (&mat);
+    cairo_matrix_init (&mat, 
+                       native_matrix[0], native_matrix[1],
+                       native_matrix[2], native_matrix[3],
+                       native_matrix[4], native_matrix[5]);
+    cairo_set_matrix (gr->cr, &mat);
   }
 
   (*env)->ReleaseDoubleArrayElements (env, java_matrix, native_matrix, 0);
   update_pattern_transform (gr);
+
   gdk_threads_leave();
 }
 
@@ -925,7 +1048,7 @@ install_font_peer(cairo_t *cr,
 		  struct peerfont *pfont,
 		  int debug)
 {
-  cairo_font_t *ft;
+  cairo_font_face_t *ft;
   FT_Face face = NULL;
 
   g_assert(cr != NULL);
@@ -936,7 +1059,7 @@ install_font_peer(cairo_t *cr,
       face = pango_ft2_font_get_face (pfont->font);
       g_assert (face != NULL);
       
-      ft = cairo_ft_font_create_for_ft_face (face);
+      ft = cairo_ft_font_face_create_for_ft_face (face, 0);
       g_assert (ft != NULL);
       
       if (debug) printf ("install_font_peer made new cairo font for '%s' at %f\n", 
@@ -944,19 +1067,19 @@ install_font_peer(cairo_t *cr,
 			 (pango_font_description_get_size (pfont->desc) / 
 			  (double)PANGO_SCALE));
     
-      cairo_set_font (cr, ft); 
-      cairo_font_destroy (ft);
-      cairo_scale_font (cr, 
+      cairo_set_font_face (cr, ft); 
+      cairo_font_face_destroy (ft);
+      cairo_set_font_size (cr, 
 			(pango_font_description_get_size (pfont->desc) / 
 			 (double)PANGO_SCALE));
-      ft = cairo_current_font (cr);
+      ft = cairo_get_font_face (cr);
       pfont->graphics_resource = ft;
     }
   else
     {
       if (debug) printf ("install_font_peer reused existing font resource\n");
-      ft = (cairo_font_t *) pfont->graphics_resource;
-      cairo_set_font (cr, ft);       
+      ft = (cairo_font_face_t *) pfont->graphics_resource;
+      cairo_set_font_face (cr, ft);       
     }
 }
 
@@ -967,16 +1090,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_releasePeerGraphicsResource
 {
   struct peerfont *pfont = NULL;
 
+  gdk_threads_enter();
+
   g_assert(java_font != NULL);
 
-  gdk_threads_enter();
   pfont = (struct peerfont *) NSA_GET_FONT_PTR (env, java_font);
   g_assert (pfont != NULL);
   if (pfont->graphics_resource != NULL)
     {
-      cairo_font_destroy ((cairo_font_t *) pfont->graphics_resource);
+      cairo_font_face_destroy ((cairo_font_face_t *) pfont->graphics_resource);
       pfont->graphics_resource = NULL;
     }
+
   gdk_threads_leave();
 }
 
@@ -1053,12 +1178,17 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGlyphVector
   float *native_positions;
   jint i = 0;
 
+  gdk_threads_enter ();
+
   g_assert (self != NULL);
   g_assert (java_codes != NULL);
   g_assert (java_positions != NULL);
 
-  gdk_threads_enter ();
-  if (peer_is_disposed(env, self)) { gdk_threads_leave(); return; }
+  if (peer_is_disposed(env, self))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *)NSA_GET_G2D_PTR (env, self);
   g_assert (gr != NULL);
@@ -1068,7 +1198,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGlyphVector
 
   install_font_peer(gr->cr, pfont, gr->debug);
 
-  glyphs = malloc( sizeof(cairo_glyph_t) * n);
+  glyphs = g_malloc( sizeof(cairo_glyph_t) * n);
   g_assert (glyphs != NULL);
 
   native_codes = (*env)->GetIntArrayElements (env, java_codes, NULL);
@@ -1088,8 +1218,9 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGlyphVector
   cairo_show_glyphs (gr->cr, glyphs, n);
   end_drawing_operation (env, gr);
 
+  g_free(glyphs);
+
   gdk_threads_leave ();  
-  free(glyphs);
 }
 
 JNIEXPORT void JNICALL
@@ -1108,6 +1239,8 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkTextLayout
   cairo_glyph_t *glyphs = NULL;
   gint n_glyphs = 0;
 
+  gdk_threads_enter ();
+
   g_assert (self != NULL);
   g_assert (java_layout != NULL);
 
@@ -1120,8 +1253,11 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkTextLayout
 
   if (gr->debug) printf ("painting pango layout\n");
 
-  gdk_threads_enter ();
-  if (peer_is_disposed(env, self)) { gdk_threads_leave(); return; }
+  if (peer_is_disposed(env, self))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   i = pango_layout_get_iter (tl->pango_layout);
   g_assert (i != NULL);
@@ -1142,6 +1278,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoDrawGdkTextLayout
   cairo_translate (gr->cr, -x, -y);
   
   pango_layout_iter_free (i);
+
   gdk_threads_leave ();
 }
 
@@ -1152,7 +1289,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1164,7 +1306,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
       break;
       
     case java_awt_alpha_composite_SRC: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_SRC);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_SOURCE);
       break;
       
     case java_awt_alpha_composite_SRC_OVER: 
@@ -1172,7 +1314,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
       break;
 
     case java_awt_alpha_composite_DST_OVER: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_OVER_REVERSE);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DEST_OVER);
       break;
 
     case java_awt_alpha_composite_SRC_IN: 
@@ -1180,7 +1322,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
       break;
 
     case java_awt_alpha_composite_DST_IN: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_IN_REVERSE);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DEST_IN);
       break;
 
     case java_awt_alpha_composite_SRC_OUT: 
@@ -1188,11 +1330,11 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
       break;
 
     case java_awt_alpha_composite_DST_OUT: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_OUT_REVERSE);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DEST_OUT);
       break;
 
     case java_awt_alpha_composite_DST: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DST);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DEST);
       break;
 
     case java_awt_alpha_composite_SRC_ATOP: 
@@ -1200,24 +1342,30 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetOperator
       break;
 
     case java_awt_alpha_composite_DST_ATOP: 
-      cairo_set_operator (gr->cr, CAIRO_OPERATOR_ATOP_REVERSE);
+      cairo_set_operator (gr->cr, CAIRO_OPERATOR_DEST_ATOP);
       break;
 
     case java_awt_alpha_composite_XOR: 
       cairo_set_operator (gr->cr, CAIRO_OPERATOR_XOR);
       break;
     }
+
   gdk_threads_leave();
 }
 
 JNIEXPORT void JNICALL
-Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetRGBColor 
-   (JNIEnv *env, jobject obj, jdouble r, jdouble g, jdouble b)
+Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetRGBAColor 
+   (JNIEnv *env, jobject obj, jdouble r, jdouble g, jdouble b, jdouble a)
 {
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1227,29 +1375,13 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetRGBColor
      draw to a PixBuf, you must exchange the R and B components of your
      color. */
 
-  if (gr->debug) printf ("cairo_set_rgb_color (%f, %f, %f)\n", r, g, b);
+  if (gr->debug) printf ("cairo_set_source_rgb (%f, %f, %f)\n", r, g, b);
 
   if (gr->drawbuf)
-    cairo_set_rgb_color (gr->cr, b, g, r);
+    cairo_set_source_rgba (gr->cr, b, g, r, a);
   else
-    cairo_set_rgb_color (gr->cr, r, g, b);
+    cairo_set_source_rgba (gr->cr, r, g, b, a);
 
-  gdk_threads_leave();
-}
-
-JNIEXPORT void JNICALL
-Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetAlpha 
-   (JNIEnv *env, jobject obj, jdouble a)
-{
-  struct graphics2d *gr = NULL;
-
-  gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
-
-  gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
-  g_assert (gr != NULL);
-  if (gr->debug) printf ("cairo_set_alpha %f\n", a);  
-  cairo_set_alpha (gr->cr, a);
   gdk_threads_leave();
 }
 
@@ -1260,7 +1392,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetFillRule
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   if (gr->debug) printf ("cairo_set_fill_rule %d\n", rule);
@@ -1274,6 +1411,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetFillRule
       cairo_set_fill_rule (gr->cr, CAIRO_FILL_RULE_EVEN_ODD);
       break;
     }  
+
   gdk_threads_leave();
 }
 
@@ -1284,12 +1422,15 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineWidth
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    return;
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_set_line_width %f\n", width);
   cairo_set_line_width (gr->cr, width);
+
   gdk_threads_leave();
 }
 
@@ -1300,7 +1441,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineCap
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1319,17 +1465,23 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineCap
       cairo_set_line_cap (gr->cr, CAIRO_LINE_CAP_SQUARE);
       break;
     }
+
   gdk_threads_leave();
 }
 
 JNIEXPORT void JNICALL
-Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineJoin 
+Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineJoin
    (JNIEnv *env, jobject obj, jint join)
 {
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1348,6 +1500,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetLineJoin
       cairo_set_line_join (gr->cr, CAIRO_LINE_JOIN_BEVEL);
       break;
     }
+
   gdk_threads_leave();
 }
 
@@ -1359,7 +1512,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetDash
   jdouble *dasharr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1368,6 +1526,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetDash
   g_assert (dasharr != NULL);
   cairo_set_dash (gr->cr, dasharr, ndash, offset);
   (*env)->ReleaseDoubleArrayElements (env, dashes, dasharr, 0);
+
   gdk_threads_leave();
 }
 
@@ -1378,15 +1537,20 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSetMiterLimit
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_set_miter_limit %f\n", miter);
   cairo_set_miter_limit (gr->cr, miter);
+
   gdk_threads_leave();
 }
-
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoNewPath 
@@ -1395,12 +1559,24 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoNewPath
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
-  if (gr == NULL) { gdk_threads_leave (); return; }
+
+  if (gr == NULL)
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   if (gr->debug) printf ("cairo_new_path\n");
   cairo_new_path (gr->cr);
+
   gdk_threads_leave();
 }
 
@@ -1411,12 +1587,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoMoveTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_move_to (%f, %f)\n", x, y);
   cairo_move_to (gr->cr, x, y);
+
   gdk_threads_leave();
 }
 
@@ -1427,12 +1609,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoLineTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_line_to (%f, %f)\n", x, y);
   cairo_line_to (gr->cr, x, y);
+
   gdk_threads_leave();
 }
 
@@ -1443,12 +1631,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoCurveTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_curve_to (%f, %f), (%f, %f), (%f, %f)\n", x1, y1, x2, y2, x3, y3);
   cairo_curve_to (gr->cr, x1, y1, x2, y2, x3, y3);
+
   gdk_threads_leave();
 }
 
@@ -1459,12 +1653,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoRelMoveTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_rel_move_to (%f, %f)\n", dx, dy);
   cairo_rel_move_to (gr->cr, dx, dy);
+
   gdk_threads_leave();
 }
 
@@ -1475,12 +1675,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoRelLineTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_rel_line_to (%f, %f)\n", dx, dy);
   cairo_rel_line_to (gr->cr, dx, dy);
+
   gdk_threads_leave();
 }
 
@@ -1491,12 +1697,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoRelCurveTo
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_rel_curve_to (%f, %f), (%f, %f), (%f, %f)\n", dx1, dy1, dx2, dy2, dx3, dy3);
   cairo_rel_curve_to (gr->cr, dx1, dy1, dx2, dy2, dx3, dy3);
+
   gdk_threads_leave();
 }
 
@@ -1507,12 +1719,24 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoRectangle
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
-  if (gr == NULL) { gdk_threads_leave (); return; }
+
+  if (gr == NULL)
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   if (gr->debug) printf ("cairo_rectangle (%f, %f) (%f, %f)\n", x, y, width, height);
   cairo_rectangle (gr->cr, x, y, width, height);
+
   gdk_threads_leave();
 }
 
@@ -1523,12 +1747,18 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoClosePath
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
   if (gr->debug) printf ("cairo_close_path\n");
   cairo_close_path (gr->cr);
+
   gdk_threads_leave();
 }
 
@@ -1539,7 +1769,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoStroke
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1547,6 +1782,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoStroke
   begin_drawing_operation (env, gr);
   cairo_stroke (gr->cr);
   end_drawing_operation (env, gr);
+
   gdk_threads_leave();
 }
 
@@ -1557,7 +1793,12 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoFill
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
   g_assert (gr != NULL);
@@ -1565,6 +1806,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoFill
   begin_drawing_operation (env, gr);
   cairo_fill (gr->cr);
   end_drawing_operation (env, gr);
+
   gdk_threads_leave();
 }
 
@@ -1575,15 +1817,27 @@ Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoClip
   struct graphics2d *gr = NULL;
 
   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave();
+      return;
+    }
 
   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
-  if (gr == NULL) { gdk_threads_leave (); return; }
+
+  if (gr == NULL)
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
   if (gr->debug) printf ("cairo_clip\n");
   begin_drawing_operation (env, gr);
-  cairo_init_clip (gr->cr);
+  cairo_reset_clip (gr->cr);
   cairo_clip (gr->cr);
   end_drawing_operation (env, gr);
+
   gdk_threads_leave();
 }
 
@@ -1591,31 +1845,37 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphics2D_cairoSurfaceSetFilter
    (JNIEnv *env, jobject obj, jint filter)
 {
-   struct graphics2d *gr = NULL;   
+  struct graphics2d *gr = NULL;   
 
-   gdk_threads_enter();
-  if (peer_is_disposed(env, obj)) { gdk_threads_leave(); return; }
+  gdk_threads_enter();
 
-   gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
-   g_assert (gr != NULL);
-   if (gr->debug) printf ("cairo_surface_set_filter %d\n", filter);   
-   switch ((enum java_awt_rendering_hints_filter) filter)
-     {
-     case java_awt_rendering_hints_VALUE_INTERPOLATION_NEAREST_NEIGHBOR:
-       cairo_surface_set_filter (gr->surface, CAIRO_FILTER_NEAREST);
-       break;
-     case java_awt_rendering_hints_VALUE_INTERPOLATION_BILINEAR:
-       cairo_surface_set_filter (gr->surface, CAIRO_FILTER_BILINEAR);
-       break; 
-     case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_SPEED:
-       cairo_surface_set_filter (gr->surface, CAIRO_FILTER_FAST);
-       break;
-     case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_DEFAULT:
-       cairo_surface_set_filter (gr->surface, CAIRO_FILTER_NEAREST);
-       break;
-     case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_QUALITY:
-       cairo_surface_set_filter (gr->surface, CAIRO_FILTER_BEST);
-       break;
-     }
+  if (peer_is_disposed(env, obj))
+    {
+      gdk_threads_leave ();
+      return;
+    }
+
+  gr = (struct graphics2d *) NSA_GET_G2D_PTR (env, obj);
+  g_assert (gr != NULL);
+  if (gr->debug) printf ("cairo_surface_set_filter %d\n", filter);   
+  switch ((enum java_awt_rendering_hints_filter) filter)
+    {
+    case java_awt_rendering_hints_VALUE_INTERPOLATION_NEAREST_NEIGHBOR:
+      cairo_pattern_set_filter (gr->pattern, CAIRO_FILTER_NEAREST);
+      break;
+    case java_awt_rendering_hints_VALUE_INTERPOLATION_BILINEAR:
+      cairo_pattern_set_filter (gr->pattern, CAIRO_FILTER_BILINEAR);
+      break; 
+    case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_SPEED:
+      cairo_pattern_set_filter (gr->pattern, CAIRO_FILTER_FAST);
+      break;
+    case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_DEFAULT:
+      cairo_pattern_set_filter (gr->pattern, CAIRO_FILTER_NEAREST);
+      break;
+    case java_awt_rendering_hints_VALUE_ALPHA_INTERPOLATION_QUALITY:
+      cairo_pattern_set_filter (gr->pattern, CAIRO_FILTER_BEST);
+      break;
+    }
+
    gdk_threads_leave();
 }

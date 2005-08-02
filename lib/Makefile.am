@@ -7,25 +7,23 @@ sinclude $(JAVA_DEPEND)
 
 propertydirs :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java org META-INF -type d ! -name CVS -print)
 propertyfiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java org -name \*\.properties -print)
-metafiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) META-INF -print)
+metafiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) META-INF -path \*/CVS -prune -o -type f -print)
+iconfiles :=  $(shell cd $(top_srcdir) && $(FIND) gnu/javax/swing/plaf/gtk/icons -name *.png -type f -print)
 
-compile_classpath = $(top_srcdir):$(top_srcdir)/vm/reference:$(top_srcdir)/external/w3c_dom:$(top_srcdir)/external/sax:.:$(USER_CLASSLIB)
+compile_classpath = $(vm_classes):$(top_srcdir):$(top_srcdir)/external/w3c_dom:$(top_srcdir)/external/sax:.:$(USER_CLASSLIB)
 
 # handling source to bytecode compiler programs like gcj, jikes  and kjc
 if FOUND_ECJ
 JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
 else
 if FOUND_GCJ
-## Like GCJ but include some common flags.
-GCJF = $(GCJ) -Wno-deprecated --encoding=UTF-8 \
-    --bootclasspath '' --classpath $(compile_classpath)
-JAVAC = $(GCJF) -C -d . @classes.standard \
-&& $(GCJF) -C -d . @classes.awt \
-&& $(GCJF) -C -d . @classes.xml \
-&& $(GCJF) -C -d . @classes.standardx
+# Since we don't feed all classes at once gcj needs to know where to find
+# the generated classes (in top_builddir).
+JAVAC = $(srcdir)/split-for-gcj.sh && $(MAKE) -f $(srcdir)/Makefile.gcj \
+    GCJ='$(GCJ)' compile_classpath='$(top_builddir):$(compile_classpath)'
 else
 if FOUND_JIKES
-JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F -encoding UTF-8 -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
+JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F $(JIKESENCODING) -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
 else
 if FOUND_KJC
 ## FIXME: from what I can tell, kjc does not support a -encoding option.
@@ -51,9 +49,11 @@ pkgdata_DATA = glibj.zip
 
 endif # INSTALL_GLIBJ_ZIP
 
-if INSTALL_CLASS_FILES
-
+if BUILD_CLASS_FILES
 noinst_DATA = genclasses compile-classes resources
+endif # BUILD_CLASS_FILES
+
+if INSTALL_CLASS_FILES
 
 install-data-local: genclasses compile-classes
 	-$(top_srcdir)/mkinstalldirs $(DESTDIR)$(pkgdatadir)
@@ -82,6 +82,7 @@ resources:
 	if ! [ -e gnu ]; then mkdir gnu; fi
 	if ! [ -e gnu/java ]; then mkdir gnu/java; fi
 	if ! [ -e gnu/java/locale ]; then mkdir gnu/java/locale; fi
+	if ! [ -e gnu/javax/swing/plaf/gtk/icons ]; then mkdir -p gnu/javax/swing/plaf/gtk/icons; fi
 	@list='$(propertydirs)'; for p in $$list; do \
 	  if ! [ -e $$p ]; then mkdir $$p; fi; \
 	done
@@ -90,6 +91,9 @@ resources:
 	done
 	@list='$(metafiles)'; for p in $$list; do \
 	  cp $(top_srcdir)/resource/$$p $$p; \
+	done
+	@list='$(iconfiles)'; for p in $$list; do \
+	  cp $(top_srcdir)/$$p $$p; \
 	done
 	touch resources
 
@@ -100,7 +104,7 @@ $(top_builddir)/java/util/LocaleData.java: $(top_srcdir)/scripts/generate-locale
 	$(top_srcdir)/scripts/generate-locale-list.sh > $(top_builddir)/java/util/LocaleData.java
 
 genclasses: gen-classlist.sh standard.omit $(top_builddir)/java/util/LocaleData.java gen-xpath-parser
-	top_builddir=$(top_builddir) $(SHELL) ./gen-classlist.sh standard
+	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) $(SHELL) ./gen-classlist.sh standard
 
 # Only rebuild parsers when explicitly asked to.
 if REGEN_PARSERS
@@ -123,7 +127,7 @@ compile-classes: classes $(JAVA_SRCS) Makefile
 	$(JAVAC)
 	touch compile-classes
 
-EXTRA_DIST = standard.omit mkcollections.pl.in
+EXTRA_DIST = standard.omit mkcollections.pl.in Makefile.gcj split-for-gcj.sh
 CLEANFILES = compile-classes resources classes \
 	classes.standard classes.awt classes.standardx classes.xml \
 	glibj.zip classes.1 \
@@ -136,6 +140,8 @@ clean-local:
 	-rm -rf javax
 	-rm -rf org
 	-rm -rf META-INF
+	-rm -rf lists
+	-rm -f Makefile.deps
 
 dist-hook:
 	mkdir -p $(distdir)
@@ -146,6 +152,3 @@ dist-hook:
 	$(FIND) $(top_distdir)/gnu $(top_distdir)/java $(top_distdir)/javax $(top_distdir)/org $(top_distdir)/vm -name class-dependencies.conf -print | xargs rm -f
 	rm -f $(top_distdir)/gnu/classpath/Configuration.java
 	rm -f $(top_distdir)/java/util/LocaleData.java
-# Omit files listed in standard.omit.
-	( cd $(top_distdir)/lib ; cat $(top_builddir)/lib/standard.omit | sed -e 's/\$$//' | sed -e 's/\/\.\*//' | xargs rm -fr )
-

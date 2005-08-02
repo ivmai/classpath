@@ -1,5 +1,5 @@
 /* HTTPURLConnection.java --
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -82,11 +82,12 @@ public class HTTPURLConnection
    */
   private HTTPConnection connection;
 
-  private String proxyHostname;
-  private int proxyPort;
-  private String agent;
-  private boolean keepAlive;
-  private int maxConnections;
+  // These are package private for use in anonymous inner classes.
+  String proxyHostname;
+  int proxyPort;
+  String agent;
+  boolean keepAlive;
+  int maxConnections;
 
   private Request request;
   private Headers requestHeaders;
@@ -328,6 +329,8 @@ public class HTTPURLConnection
     if (keepAlive)
       {
         StringBuffer buf = new StringBuffer(secure ? "https://" : "http://");
+        buf.append(Thread.currentThread().hashCode());
+        buf.append('@');
         buf.append(host);
         buf.append(':');
         buf.append(port);
@@ -575,6 +578,10 @@ public class HTTPURLConnection
     int count = 1;
     do
       {
+        if (!i.hasNext())
+          {
+            return null;
+          }
         entry = (Map.Entry) i.next();
         count++;
       }

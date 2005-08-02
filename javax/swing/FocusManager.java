@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,17 +40,19 @@ package javax.swing;
 
 import java.awt.Component;
 import java.awt.DefaultKeyboardFocusManager;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
 /**
- * FocusManager
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class has been obsoleted by the new
+ * {@link java.awt.KeyboardFocusManager} and
+ * {@link java.awt.DefaultKeyboardFocusManager} API.
+ *
+ * @author Andrew Selkirk
  */
 public abstract class FocusManager
   extends DefaultKeyboardFocusManager
 {
-
   /**
    * DisabledFocusManager
    */
@@ -95,7 +97,6 @@ public abstract class FocusManager
     }
   }
 
-
   /**
    * FOCUS_MANAGER_CLASS_PROPERTY
    */
@@ -107,7 +108,7 @@ public abstract class FocusManager
    */
   public FocusManager()
   {
-    // TODO
+    super();
   }
 
   /**
@@ -116,7 +117,20 @@ public abstract class FocusManager
    */
   public static FocusManager getCurrentManager()
   {
-    return null; // TODO
+    KeyboardFocusManager fm =
+      KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    if (fm instanceof FocusManager)
+      return (FocusManager) fm;
+    else
+      {
+        System.err.println("The Swing FocusManager API has been obsoleted by");
+        System.err.println("the new KeyboardFocusManager system.");
+        System.err.println("You should either not use the Swing FocusManager");
+        System.err.println("API or set the system property");
+        System.err.println
+          ("gnu.java.awt.FocusManager=javax.swing.FocusManager");
+      }
+      return null;
   }
 
   /**
@@ -125,7 +139,7 @@ public abstract class FocusManager
    */
   public static void setCurrentManager(FocusManager manager)
   {
-    // TODO
+    KeyboardFocusManager.setCurrentKeyboardFocusManager(manager);
   }
 
   /**
@@ -146,24 +160,4 @@ public abstract class FocusManager
   {
     return false; // TODO
   }
-
-  /**
-   * processKeyEvent
-   * @param component TODO
-   * @param event TODO
-   */
-  public abstract void processKeyEvent(Component component, KeyEvent event);
-
-  /**
-   * focusNextComponent
-   * @param component TODO
-   */
-  public abstract void focusNextComponent(Component component);
-
-  /**
-   * focusPreviousComponent
-   * @param component TODO
-   */
-  public abstract void focusPreviousComponent(Component component);
-
 }

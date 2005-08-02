@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -46,11 +46,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.EventListenerList;
 
 /**
- * The abstract superclass for table and tree cells. This provides some
+ * An abstract superclass for table and tree cell editors. This provides some
  * common shared functionality.
  *
- * @author	Andrew Selkirk
- * @version	1.0
+ * @author Andrew Selkirk
  */
 public abstract class AbstractCellEditor
   implements CellEditor, Serializable
@@ -162,8 +161,8 @@ public abstract class AbstractCellEditor
   }
 
   /**
-   * Notifies all registered listeners that the editing of the cell has
-   * has been stopped.
+   * Notifies all registered listeners that the editing of the cell has has been
+   * stopped.
    */
   protected void fireEditingStopped()
   {
@@ -171,7 +170,7 @@ public abstract class AbstractCellEditor
 
     for (int index = 0; index < listeners.length; index++)
       {
-	listeners [index].editingStopped (changeEvent);
+        listeners[index].editingStopped(changeEvent);
       }
   }
 
@@ -185,7 +184,7 @@ public abstract class AbstractCellEditor
 
     for (int index = 0; index < listeners.length; index++)
       {
-	listeners [index].editingCanceled (changeEvent);
+        listeners[index].editingCanceled(changeEvent);
       }
   }
 }

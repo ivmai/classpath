@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -62,7 +62,8 @@ import java.util.Vector;
  * <p>
  * If you need more information about SGML DTD documents,
  * the author suggests to read SGML tutorial on
- * {@link http://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html}.
+ * <a href="http://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html"
+ * >http://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html</a>.
  * We also recommend Goldfarb C.F (1991) <i>The SGML Handbook</i>,
  * Oxford University Press, 688 p, ISBN: 0198537379.
  * </p>
@@ -402,7 +403,7 @@ public class DTD
    * placed to the field
    * {@link javax.swing.text.html.parser.AttributeList#next },
    * creating a linked list.
-   * @return
+   * @return The attributes.
    */
   protected AttributeList defAttributeList(String name, int type, int modifier,
                                            String default_value,
@@ -541,7 +542,7 @@ public class DTD
    * The unknown elements are automatically defined and added
    * to the element table.
    * @param elements
-   * @return
+   * @return The bit set.
    */
   private BitSet bitSet(String[] elements)
   {

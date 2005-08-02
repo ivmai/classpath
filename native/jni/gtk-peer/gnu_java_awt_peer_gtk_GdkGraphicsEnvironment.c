@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
 
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -52,9 +52,10 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphicsEnvironment_nativeGetFontFamilies
 (JNIEnv *env, jobject  self __attribute__((unused)), jobjectArray family_name)
 {
-  PangoContext *context;
-  PangoFontFamily **families;
-  int n_families, idx;
+  PangoContext *context = NULL;
+  PangoFontFamily **families = NULL;
+  int n_families = 0;
+  int idx = 0;
 
   gdk_threads_enter ();
 
@@ -72,6 +73,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphicsEnvironment_nativeGetFontFamilies
       (*env)->SetObjectArrayElement (env, family_name, idx, name);
     }
   g_free (families);
+
   gdk_threads_leave ();
 }
 
@@ -79,10 +81,10 @@ JNIEXPORT jint JNICALL
 Java_gnu_java_awt_peer_gtk_GdkGraphicsEnvironment_nativeGetNumFontFamilies
 (JNIEnv *env __attribute__((unused)), jobject obj __attribute__((unused)))
 {
-  PangoContext *context;
-  PangoFontFamily **families;
-  gint n_families;
-  jint num;
+  PangoContext *context = NULL;
+  PangoFontFamily **families = NULL;
+  gint n_families = 0;
+  gint num = 0;
 
   gdk_threads_enter ();
 
@@ -93,6 +95,7 @@ Java_gnu_java_awt_peer_gtk_GdkGraphicsEnvironment_nativeGetNumFontFamilies
 
   num = n_families;
   g_free (families);
+
   gdk_threads_leave ();
   
   return num;

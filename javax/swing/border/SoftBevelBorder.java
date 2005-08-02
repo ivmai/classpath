@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -120,7 +120,7 @@ public class SoftBevelBorder
    * @throws NullPointerException if <code>highlight</code> or
    *         <code>shadow</code> is <code>null</code>.
    *
-   * @see java.awt.Color.brighter()
+   * @see java.awt.Color#brighter()
    */
   public SoftBevelBorder(int bevelType, Color highlight, Color shadow)
   {
@@ -235,7 +235,7 @@ public class SoftBevelBorder
    *
    * @return the same object that was passed for <code>insets</code>.
    *
-   * @see #getBorderInsets()
+   * @see #getBorderInsets(Component)
    */
   public Insets getBorderInsets(Component c, Insets insets)
   {

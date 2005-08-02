@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -50,9 +50,13 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreeCellEditor;
 
 /**
- * DefaultCellEditor
- * @author	Andrew Selkirk
- * @version	1.0
+ * The default implementation of {@link TableCellEditor} and
+ * {@link TreeCellEditor}. It provides editor components for
+ * some standard object types.
+ * 
+ * @author Andrew Selkirk
+ *
+ * @status mostly unimplemented
  */
 public class DefaultCellEditor
   extends AbstractCellEditor
@@ -61,7 +65,9 @@ public class DefaultCellEditor
   private static final long serialVersionUID = 3564035141373880027L;
 
   /**
-   * EditorDelegate
+   * Delegates a couple of method calls (such as {@link #isCellEditable)
+   * to the component it contains and listens for events that indicate
+   * that editing has stopped.
    */
   protected class EditorDelegate
     implements ActionListener, ItemListener, Serializable
@@ -75,7 +81,6 @@ public class DefaultCellEditor
 
     /**
      * Constructor EditorDelegate
-     * @param value0 TODO
      */
     protected EditorDelegate()
     {
@@ -83,212 +88,261 @@ public class DefaultCellEditor
 
     /**
      * setValue
+     *
      * @param event TODO
      */
     public void setValue(Object event)
     {
     }
 
-		/**
-		 * getCellEditorValue
-		 * @returns Object
-		 */
-		public Object getCellEditorValue() {
-			return null; // TODO
-		} // getCellEditorValue()
+   /**
+     * getCellEditorValue
+     * 
+     * @returns Object
+     */
+    public Object getCellEditorValue()
+    {
+      return null; // TODO
+    } // getCellEditorValue()
 
-		/**
-		 * isCellEditable
-		 * @param event TODO
-		 * @returns boolean
-		 */
-		public boolean isCellEditable(EventObject event) {
-			return false; // TODO
-		} // isCellEditable()
+    /**
+     * isCellEditable
+     * 
+     * @param event TODO
+     *
+     * @returns boolean
+     */
+    public boolean isCellEditable(EventObject event)
+    {
+      return false; // TODO
+    } // isCellEditable()
 
-		/**
-		 * shouldSelectCell
-		 * @param event TODO
-		 * @returns boolean
-		 */
-		public boolean shouldSelectCell(EventObject event) {
-			return false; // TODO
-		} // shouldSelectCell()
+    /**
+     * shouldSelectCell
+     * 
+     * @param event TODO
+     *
+     * @returns boolean
+     */
+    public boolean shouldSelectCell(EventObject event)
+    {
+      return false; // TODO
+    } // shouldSelectCell()
 
-		/**
-		 * stopCellEditing
-		 * @returns boolean
-		 */
-		public boolean stopCellEditing() {
-			return false; // TODO
-		} // stopCellEditing()
+    /**
+     * stopCellEditing
+     * 
+     * @returns boolean
+     */
+    public boolean stopCellEditing()
+    {
+      return false; // TODO
+    } // stopCellEditing()
 
-		/**
-		 * cancelCellEditing
-		 */
-		public void cancelCellEditing() {
-			// TODO
-		} // cancelCellEditing()
+    /**
+     * cancelCellEditing
+     */
+    public void cancelCellEditing()
+    {
+      // TODO
+    } // cancelCellEditing()
 
-		/**
-		 * startCellEditing
-		 * @param event TODO
-		 * @returns boolean
-		 */
-		public boolean startCellEditing(EventObject event) {
-			return false; // TODO
-		} // startCellEditing()
+    /**
+     * startCellEditing
+     * 
+     * @param event TODO
+     *
+     * @returns boolean
+     */
+    public boolean startCellEditing(EventObject event)
+    {
+      return false; // TODO
+    } // startCellEditing()
 
-		/**
-		 * actionPerformed
-		 * @param event TODO
-		 */
-		public void actionPerformed(ActionEvent event) {
-			// TODO
-		} // actionPerformed()
+    /**
+     * actionPerformed
+     * 
+     * @param event TODO
+     */
+    public void actionPerformed(ActionEvent event)
+    {
+      // TODO
+    } // actionPerformed()
 
-		/**
-		 * itemStateChanged
-		 * @param event TODO
-		 */
-		public void itemStateChanged(ItemEvent event) {
-			// TODO
-		} // itemStateChanged()
+    /**
+     * itemStateChanged
+     * 
+     * @param event TODO
+     */
+    public void itemStateChanged(ItemEvent event)
+    {
+      // TODO
+    } // itemStateChanged()
 
-
-	} // EditorDelegate
-
-	/**
-	 * editorComponent
-	 */
-	protected JComponent editorComponent;
-
-	/**
-	 * delegate
-	 */
-	protected EditorDelegate delegate;
-
-	/**
-	 * clickCountToStart
-	 */
-	protected int clickCountToStart;
-
-	/**
-	 * Constructor DefaultCellEditor
-	 * @param textfield TODO
-	 */
-	public DefaultCellEditor(JTextField textfield) {
-		// TODO
-	} // DefaultCellEditor()
+  } // EditorDelegate
 
 	/**
-	 * Constructor DefaultCellEditor
-	 * @param checkbox TODO
-	 */
-	public DefaultCellEditor(JCheckBox checkbox) {
-		// TODO
-	} // DefaultCellEditor()
+   * editorComponent
+   */
+  protected JComponent editorComponent;
 
-	/**
-	 * Constructor DefaultCellEditor
-	 * @param combobox TODO
-	 */
-	public DefaultCellEditor(JComboBox combobox) {
-		// TODO
-	} // DefaultCellEditor()
+  /**
+   * delegate
+   */
+  protected EditorDelegate delegate;
 
-	/**
-	 * getComponent
-	 * @returns Component
-	 */
-	public Component getComponent() {
-		return null; // TODO
-	} // getComponent()
+  /**
+   * clickCountToStart
+   */
+  protected int clickCountToStart;
 
-	/**
-	 * getClickCountToStart
-	 * @returns int
-	 */
-	public int getClickCountToStart() {
-		return 0; // TODO
-	} // getClickCountToStart()
+  /**
+   * Constructor DefaultCellEditor
+   * 
+   * @param textfield TODO
+   */
+  public DefaultCellEditor(JTextField textfield)
+  {
+    // TODO
+  } // DefaultCellEditor()
 
-	/**
-	 * setClickCountToStart
-	 * @param count TODO
-	 */
-	public void setClickCountToStart(int count) {
-		// TODO
-	} // setClickCountToStart()
+  /**
+   * Constructor DefaultCellEditor
+   * 
+   * @param checkbox TODO
+   */
+  public DefaultCellEditor(JCheckBox checkbox)
+  {
+    // TODO
+  } // DefaultCellEditor()
 
-	/**
-	 * getCellEditorValue
-	 * @returns Object
-	 */
-	public Object getCellEditorValue() {
-		return null; // TODO
-	} // getCellEditorValue()
+  /**
+   * Constructor DefaultCellEditor
+   * 
+   * @param combobox TODO
+   */
+  public DefaultCellEditor(JComboBox combobox)
+  {
+    // TODO
+  } // DefaultCellEditor()
 
-	/**
-	 * isCellEditable
-	 * @param event TODO
-	 * @returns boolean
-	 */
-	public boolean isCellEditable(EventObject event) {
-		return false; // TODO
-	} // isCellEditable()
+  /**
+   * getComponent
+   * 
+   * @returns Component
+   */
+  public Component getComponent()
+  {
+    return null; // TODO
+  } // getComponent()
 
-	/**
-	 * shouldSelectCell
-	 * @param event TODO
-	 * @returns boolean
-	 */
-	public boolean shouldSelectCell(EventObject event) {
-		return false; // TODO
-	} // shouldSelectCell()
+  /**
+   * getClickCountToStart
+   * 
+   * @returns int
+   */
+  public int getClickCountToStart()
+  {
+    return 0; // TODO
+  } // getClickCountToStart()
 
-	/**
-	 * stopCellEditing
-	 * @returns boolean
-	 */
-	public boolean stopCellEditing() {
-		return false; // TODO
-	} // stopCellEditing()
+  /**
+   * setClickCountToStart
+   * 
+   * @param count TODO
+   */
+  public void setClickCountToStart(int count)
+  {
+    // TODO
+  } // setClickCountToStart()
 
-	/**
-	 * cancelCellEditing
-	 */
-	public void cancelCellEditing() {
-		// TODO
-	} // cancelCellEditing()
+  /**
+   * getCellEditorValue
+   * 
+   * @returns Object
+   */
+  public Object getCellEditorValue()
+  {
+    return null; // TODO
+  } // getCellEditorValue()
 
-	/**
-	 * getTreeCellEditorComponent
-	 * @param tree TODO
-	 * @param value TODO
-	 * @param isSelected TODO
-	 * @param expanded TODO
-	 * @param leaf TODO
-	 * @param row TODO
-	 * @returns Component
-	 */
-	public Component getTreeCellEditorComponent(JTree tree,
-			Object value, boolean isSelected, boolean expanded,
-			boolean leaf, int row) {
-		return null; // TODO
-	} // getTreeCellEditorComponent()
+  /**
+   * isCellEditable
+   * 
+   * @param event TODO
+   *
+   * @returns boolean
+   */
+  public boolean isCellEditable(EventObject event)
+  {
+    return false; // TODO
+  } // isCellEditable()
 
-	/**
-	 * getTableCellEditorComponent
-	 * @param tree TODO
-	 * @param value TODO
-	 * @param isSelected TODO
-	 * @param row TODO
-	 * @param column TODO
-	 * @returns Component
-	 */
-	public Component getTableCellEditorComponent(JTable tree, 
-			Object value, boolean isSelected, int row, int column) {
-		return null; // TODO
-	} // getTableCellEditorComponent()
+  /**
+   * shouldSelectCell
+   * 
+   * @param event TODO
+   *
+   * @returns boolean
+   */
+  public boolean shouldSelectCell(EventObject event)
+  {
+    return false; // TODO
+  } // shouldSelectCell()
+
+  /**
+   * stopCellEditing
+   * 
+   * @returns boolean
+   */
+  public boolean stopCellEditing()
+  {
+    return false; // TODO
+  } // stopCellEditing()
+
+  /**
+   * cancelCellEditing
+   */
+  public void cancelCellEditing()
+  {
+    // TODO
+  } // cancelCellEditing()
+
+  /**
+   * getTreeCellEditorComponent
+   * 
+   * @param tree TODO
+   * @param value TODO
+   * @param isSelected TODO
+   * @param expanded TODO
+   * @param leaf TODO
+   * @param row TODO
+   *
+   * @returns Component
+   */
+  public Component getTreeCellEditorComponent(JTree tree, Object value,
+                                              boolean isSelected,
+                                              boolean expanded, boolean leaf,
+                                              int row)
+  {
+    return null; // TODO
+  } // getTreeCellEditorComponent()
+
+  /**
+   * getTableCellEditorComponent
+   * 
+   * @param tree TODO
+   * @param value TODO
+   * @param isSelected TODO
+   * @param row TODO
+   * @param column TODO
+   *
+   * @returns Component
+   */
+  public Component getTableCellEditorComponent(JTable tree, Object value,
+                                               boolean isSelected, int row,
+                                               int column)
+  {
+    return null; // TODO
+  } // getTableCellEditorComponent()
 }

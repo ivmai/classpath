@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -46,17 +46,23 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * DefaultListCellRenderer. This class is responsible for rendering  list
- * cells.
+ * The default implementation {@link ListCellRenderer}. It provides a standard
+ * renderer for data objects of all types via {@link Object#toString()}.
  *
  * @author Andrew Selkirk
- * @version 1.0
  */
 public class DefaultListCellRenderer extends JLabel
   implements ListCellRenderer, Serializable
 {
   private static final long serialVersionUID = 7708947179685189462L;
 
+  /**
+   * Subclasses <code>DefaultListCellRenderers</code> and implements
+   * {@link javax.swing.plaf.UIResource}. This is used by
+   * {@link javax.swing.plaf.ListUI} subclasses to provide a default for
+   * the <code>List.cellRenderer</code> property. If you want to override
+   * this property, use <code>DefaultListCellRenderer</code> or a subclass.
+   */
   public static class UIResource extends DefaultListCellRenderer
     implements javax.swing.plaf.UIResource
   {
@@ -93,21 +99,21 @@ public class DefaultListCellRenderer extends JLabel
 
     if (isSelected)
       {
-	setBackground(list.getSelectionBackground());
-	setForeground(list.getSelectionForeground());
+        setBackground(list.getSelectionBackground());
+        setForeground(list.getSelectionForeground());
       }
     else
       {
-	setBackground(list.getBackground());
-	setForeground(list.getForeground());
+        setBackground(list.getBackground());
+        setForeground(list.getForeground());
       }
 
     setEnabled(list.isEnabled());
     setFont(list.getFont());
 
-    // Use focusCellHighlightBorder when renderer has focus and 
+    // Use focusCellHighlightBorder when renderer has focus and
     // noFocusBorder otherwise
-    
+
     if (cellHasFocus)
       setBorder(UIManager.getBorder("List.focusCellHighlightBorder"));
     else

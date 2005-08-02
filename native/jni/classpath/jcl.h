@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -55,6 +55,9 @@ JNIEXPORT void JNICALL JCL_free_cstring (JNIEnv * env, jstring s,
 					 const char *cstr);
 JNIEXPORT jint JNICALL JCL_MonitorEnter (JNIEnv * env, jobject o);
 JNIEXPORT jint JNICALL JCL_MonitorExit (JNIEnv * env, jobject o);
+
+JNIEXPORT jobject JNICALL JCL_NewRawDataObject (JNIEnv * env, void *data);
+JNIEXPORT void * JNICALL JCL_GetRawData (JNIEnv * env, jobject rawdata);
 
 #define JCL_RETHROW_EXCEPTION(env) if((*(env))->ExceptionOccurred((env)) != NULL) return NULL;
 

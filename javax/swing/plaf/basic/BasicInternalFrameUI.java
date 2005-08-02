@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -53,7 +53,10 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.DesktopManager;
 import javax.swing.JComponent;
@@ -62,11 +65,16 @@ import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.UIResource;
@@ -642,6 +650,9 @@ public class BasicInternalFrameUI extends InternalFrameUI
     /** The last component entered. */
     private transient Component lastComponentEntered;
 
+    /** Used to store/reset lastComponentEntered. */
+    private transient Component tempComponent;
+
     /** The number of presses. */
     private transient int pressCount;
 
@@ -762,8 +773,9 @@ public class BasicInternalFrameUI extends InternalFrameUI
 	                                     tp.x, tp.y, me.getClickCount(),
 	                                     me.isPopupTrigger(),
 	                                     me.getButton());
-	  lastComponentEntered.dispatchEvent(exited);
+          tempComponent = lastComponentEntered;
 	  lastComponentEntered = null;
+	  tempComponent.dispatchEvent(exited);
         }
 
       // If we have a candidate, maybe enter it.
@@ -864,8 +876,32 @@ public class BasicInternalFrameUI extends InternalFrameUI
    * JInternalFrame.
    */
   public class InternalFramePropertyChangeListener
-    implements PropertyChangeListener
+    implements PropertyChangeListener, VetoableChangeListener
   {
+
+    /**
+     * This method is called when one of the JInternalFrame's properties
+     * change.  This method is to allow JInternalFrame to veto an attempt
+     * to close the internal frame.  This allows JInternalFrame to honour
+     * its defaultCloseOperation if that is DO_NOTHING_ON_CLOSE.
+     */
+    public void vetoableChange(PropertyChangeEvent e) throws PropertyVetoException
+    {
+      if (e.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY))
+        {
+          if (frame.getDefaultCloseOperation() == JInternalFrame.HIDE_ON_CLOSE)
+            {
+              frame.setVisible(false);
+              frame.getDesktopPane().repaint();
+              throw new PropertyVetoException ("close operation is HIDE_ON_CLOSE\n", e);
+            }
+          else if (frame.getDefaultCloseOperation() == JInternalFrame.DISPOSE_ON_CLOSE)
+            closeFrame(frame);
+          else
+            throw new PropertyVetoException ("close operation is DO_NOTHING_ON_CLOSE\n", e);
+        }
+    }
+    
     /**
      * This method is called when one of the JInternalFrame's properties
      * change.
@@ -881,8 +917,6 @@ public class BasicInternalFrameUI extends InternalFrameUI
 	  else
 	    minimizeFrame(frame);
         }
-      else if (evt.getPropertyName().equals(JInternalFrame.IS_CLOSED_PROPERTY))
-	closeFrame(frame);
       else if (evt.getPropertyName().equals(JInternalFrame.IS_ICON_PROPERTY))
         {
 	  if (frame.isIcon())
@@ -1031,6 +1065,13 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   protected PropertyChangeListener propertyChangeListener;
 
+  /**
+   * The VetoableChangeListener.  Listens to PropertyChangeEvents
+   * from the JInternalFrame and allows the JInternalFrame to 
+   * veto attempts to close it.
+   */
+  private VetoableChangeListener internalFrameVetoableChangeListener;
+
   /** The InternalFrameListener that listens to the JInternalFrame. */
   private transient BasicInternalFrameListener internalFrameListener;
 
@@ -1109,7 +1150,6 @@ public class BasicInternalFrameUI extends InternalFrameUI
 	installKeyboardActions();
 
 	frame.setOpaque(true);
-	titlePane.setOpaque(true);
 	frame.invalidate();
       }
   }
@@ -1137,9 +1177,31 @@ public class BasicInternalFrameUI extends InternalFrameUI
    * This method installs the defaults specified by the look and feel.
    */
   protected void installDefaults()
-  {
-    // FIXME: Move border to MetalBorders
-    frame.setBorder(new InternalFrameBorder());
+    {
+      // This is the border of InternalFrames in the BasicLookAndFeel.
+      // Note that there exist entries for various border colors in
+      // BasicLookAndFeel's defaults, but obviously they differ
+      // from the colors that are actually used by the JDK.
+      UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+      Color borderColor = defaults.getColor("InternalFrame.borderColor");
+      Border inner = BorderFactory.createLineBorder(borderColor, 1);
+      Color borderDarkShadow = defaults.getColor
+	  ("InternalFrame.borderDarkShadow");
+      Color borderHighlight = defaults.getColor
+	  ("InternalFrame.borderHighlight");
+      Color borderShadow = defaults.getColor("InternalFrame.borderShadow");
+      Color borderLight = defaults.getColor("InternalFrame.borderLight");
+      Border outer = BorderFactory.createBevelBorder(BevelBorder.RAISED,
+						     borderShadow,
+						     borderHighlight,
+						     borderDarkShadow,
+						     borderShadow);
+      Border border = new BorderUIResource.CompoundBorderUIResource(outer,
+								    inner);
+      frame.setBorder(border);
+      frame.setFrameIcon(defaults.getIcon("InternalFrame.icon"));
+      // InternalFrames are invisible by default.
+      frame.setVisible(false);
   }
 
   /**
@@ -1171,12 +1233,13 @@ public class BasicInternalFrameUI extends InternalFrameUI
     borderListener = createBorderListener(frame);
     componentListener = createComponentListener();
     propertyChangeListener = createPropertyChangeListener();
+    internalFrameVetoableChangeListener = new InternalFramePropertyChangeListener();
 
     frame.addMouseListener(borderListener);
     frame.addMouseMotionListener(borderListener);
     frame.addInternalFrameListener(internalFrameListener);
     frame.addPropertyChangeListener(propertyChangeListener);
-
+    frame.addVetoableChangeListener(internalFrameVetoableChangeListener);
     frame.getRootPane().getGlassPane().addMouseListener(glassPaneDispatcher);
     frame.getRootPane().getGlassPane().addMouseMotionListener(glassPaneDispatcher);
   }
@@ -1552,7 +1615,10 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   protected DesktopManager getDesktopManager()
   {
-    DesktopManager value = frame.getDesktopPane().getDesktopManager();
+    DesktopManager value = null;
+    JDesktopPane pane = frame.getDesktopPane();
+    if (pane != null)
+      value = frame.getDesktopPane().getDesktopManager();
     if (value == null)
       value = createDesktopManager();
     return value;

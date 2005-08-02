@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -102,6 +102,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_mouseMove
 				 x, y, CurrentTime);
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -123,6 +124,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_mousePress
 				 True, CurrentTime);
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -144,6 +146,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_mouseRelease
 				 False, CurrentTime);
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -182,6 +185,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_mouseWheel
       }
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -201,7 +205,8 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_keyPress
   display = gdk_display_get_default ();
   xdisplay = GDK_DISPLAY_XDISPLAY (display);
 
-  lookup_keyval = awt_keycode_to_keysym (keycode, AWT_KEY_LOCATION_LEFT);
+  lookup_keyval = cp_gtk_awt_keycode_to_keysym (keycode,
+                                                       AWT_KEY_LOCATION_LEFT);
 
   if (!gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
                                           lookup_keyval,
@@ -225,6 +230,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_keyPress
   g_free (keymap_keys);
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -244,7 +250,8 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_keyRelease
   display = gdk_display_get_default ();
   xdisplay = GDK_DISPLAY_XDISPLAY (display);
 
-  lookup_keyval = awt_keycode_to_keysym (keycode, AWT_KEY_LOCATION_LEFT);
+  lookup_keyval = cp_gtk_awt_keycode_to_keysym (keycode,
+                                                       AWT_KEY_LOCATION_LEFT);
 
   if (!gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
                                           lookup_keyval,
@@ -268,6 +275,7 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_keyRelease
   g_free (keymap_keys);
 
   XFlush (xdisplay);
+
   gdk_threads_leave ();
 }
 
@@ -303,7 +311,12 @@ Java_gnu_java_awt_peer_gtk_GdkRobotPeer_nativeGetRGBPixels
   n_pixels = height * stride_pixels;
   gdk_pixels = gdk_pixbuf_get_pixels (pixbuf);
 
+  gdk_threads_leave ();
+
   jpixels = (*env)->NewIntArray (env, n_pixels);
+
+  gdk_threads_enter ();
+
   java_pixels = (*env)->GetIntArrayElements (env, jpixels, NULL);
 
   memcpy (java_pixels,

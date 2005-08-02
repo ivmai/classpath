@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,7 +38,11 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
+import java.awt.Color;
+
 import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToggleButtonUI;
 
@@ -46,7 +50,15 @@ public class MetalToggleButtonUI
   extends BasicToggleButtonUI
 {
 
-  // FIXME: maybe replace by a Map of instances when this becomes stateful
+  /** The color for the focus border. */
+  protected Color focusColor;
+
+  /** The color that indicates a selected button. */
+  protected Color selectColor;
+
+  /** The color for disabled button labels. */
+  protected Color disabledTextColor;
+
   /** The shared UI instance for MetalToggleButtonUIs */
   private static MetalToggleButtonUI instance = null;
 
@@ -56,6 +68,43 @@ public class MetalToggleButtonUI
   public MetalToggleButtonUI()
   {
     super();
+    focusColor = getFocusColor();
+    selectColor = getSelectColor();
+    disabledTextColor = getDisabledTextColor();
+  }
+
+
+  /**
+   * Returns the color for the focus border.
+   *
+   * @return the color for the focus border
+   */
+  protected Color getFocusColor()
+  {
+    UIDefaults def = UIManager.getLookAndFeelDefaults();
+    return def.getColor(getPropertyPrefix() + ".focus");
+  }
+
+  /**
+   * Returns the color that indicates a selected button.
+   *
+   * @return the color that indicates a selected button
+   */
+  protected Color getSelectColor()
+  {
+    UIDefaults def = UIManager.getLookAndFeelDefaults();
+    return def.getColor(getPropertyPrefix() + ".select");
+  }
+
+  /**
+   * Returns the color for the text label of disabled buttons.
+   *
+   * @return the color for the text label of disabled buttons
+   */
+  protected Color getDisabledTextColor()
+  {
+    UIDefaults def = UIManager.getLookAndFeelDefaults();
+    return def.getColor(getPropertyPrefix() + ".disabledText");
   }
 
   /**

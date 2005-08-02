@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -92,6 +92,16 @@ public class DefaultEditorKit extends EditorKit
     }
   }
 
+  /**
+   * This action is executed as default action when a KEY_TYPED
+   * event is received and no keymap entry exists for that. The purpose
+   * of this action is to filter out a couple of characters. This includes
+   * the control characters and characters with the ALT-modifier.
+   * 
+   * If an event does not get filtered, it is inserted into the document
+   * of the text component. If there is some text selected in the text component,
+   * this text will be replaced.
+   */
   public static class DefaultKeyTypedAction 
     extends TextAction
   {
@@ -102,6 +112,13 @@ public class DefaultEditorKit extends EditorKit
 
     public void actionPerformed(ActionEvent event)
     {
+      // first we filter the following events:
+      // - control characters
+      // - key events with the ALT modifier (FIXME: filter that too!)
+      char c = event.getActionCommand().charAt(0);
+      if (Character.isISOControl(c))
+        return;
+
       JTextComponent t = getTextComponent(event);
       if (t != null)
         {
@@ -119,6 +136,11 @@ public class DefaultEditorKit extends EditorKit
     }
   }
 
+  /**
+   * This action inserts a newline character into the document
+   * of the text component. This is typically triggered by hitting
+   * ENTER on the keyboard.
+   */
   public static class InsertBreakAction 
     extends TextAction
   {
@@ -129,6 +151,8 @@ public class DefaultEditorKit extends EditorKit
 
     public void actionPerformed(ActionEvent event)
     {
+      JTextComponent t = getTextComponent(event);
+      t.replaceSelection("\n");
     }
   }
 

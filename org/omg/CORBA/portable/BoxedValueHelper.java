@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -41,14 +41,18 @@ package org.omg.CORBA.portable;
 import java.io.Serializable;
 
 /**
- * Provides a helper operations for the value type.
+ * Provides a helper operations for the boxed value type.
+ * A boxed value type is a value type with no inheritance, no methods
+ * and with a single state member. No additional properties can
+ * be defined. It is an error to box value types.
+ *
  * The value type may have its own helper, implementing
  * this interface.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface BoxedValueHelper {
-
+public interface BoxedValueHelper
+{
   /**
    * Get the repository id of this value type.
    *
@@ -72,5 +76,4 @@ public interface BoxedValueHelper {
    * @param value a value to write.
    */
   void write_value(OutputStream ostream, Serializable value);
-
 }

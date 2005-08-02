@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -53,10 +53,11 @@ import org.omg.CORBA.portable.ResponseHandler;
 import org.omg.CORBA.portable.Streamable;
 
 /**
- * This class exists to handle obsolete invocation style using
- * ServerRequest.
- *
- * @deprecated The method {@link ObjectImpl#_invoke} is much faster.
+ * This class supports invocation using ServerRequest. When possible,
+ * it is better to use  the {@link ObjectImpl#_invoke} rather than
+ * working via ServerRequest. However since 1.4 the ServerRequest is
+ * involved into POA machinery making this type of call is sometimes
+ * inavoidable.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
@@ -86,13 +87,13 @@ public class ServiceRequestAdapter
   }
 
   /**
-   * The old style invocation using the currently deprecated server
-   * request class.
+   * Make an invocation.
    *
    * @param request a server request, containg the invocation information.
    * @param target the invocation target
-   * @param result the result holder with the set suitable streamable to read
-   * the result or null for void.
+   * @param result the result holder with the set suitable streamable.
+   * Using this parameter only increase the performance. It can be
+   * null if the return type is void or unknown.
    */
   public static void invoke(ServerRequest request, InvokeHandler target,
                             Streamable result
@@ -133,12 +134,20 @@ public class ServiceRequestAdapter
         else
           {
             if (result != null)
-            {
-              result._read(in);
-              gnuAny r = new gnuAny();
-              r.insert_Streamable(result);
-              request.set_result(r);
-            };
+              {
+                // Use the holder for the return value, if provided.
+                result._read(in);
+
+                gnuAny r = new gnuAny();
+                r.insert_Streamable(result);
+                request.set_result(r);
+              }
+            else
+              {
+                // Use the universal holder otherwise.
+                gnuAny r = new gnuAny();
+                r.insert_Streamable(new streamReadyHolder(in));
+              }
 
             // Unpack the arguments
             for (int i = 0; i < args.count(); i++)

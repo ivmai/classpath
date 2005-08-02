@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -63,11 +63,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.PaintEvent;
+import java.awt.event.TextEvent;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GtkComponentPeer extends GtkGenericPeer
   implements ComponentPeer
@@ -80,6 +84,8 @@ public class GtkComponentPeer extends GtkGenericPeer
   Insets insets;
 
   boolean isInRepaint;
+
+  Timer repaintTimer = new Timer (true);
 
   /* this isEnabled differs from Component.isEnabled, in that it
      knows if a parent is disabled.  In that case Component.isEnabled 
@@ -102,6 +108,13 @@ public class GtkComponentPeer extends GtkGenericPeer
                                          int keyCode, int keyLocation);
 
   native boolean isRealized ();
+
+  void realize ()
+  {
+    // Default implementation does nothing
+  }
+
+  native void setNativeEventMask ();
 
   void create ()
   {
@@ -135,6 +148,10 @@ public class GtkComponentPeer extends GtkGenericPeer
     if (awtComponent instanceof Window
         || (parent != null && ! parent.isShowing ()))
       setParentAndBounds ();
+
+    setNativeEventMask ();
+
+    realize ();
   }
 
   void setParentAndBounds ()
@@ -208,7 +225,12 @@ public class GtkComponentPeer extends GtkGenericPeer
 
   public Image createImage (int width, int height)
   {
-    GtkImage image = new GtkImage (width, height);
+    Image image;
+    if (GtkToolkit.useGraphics2D ())
+      image = new BufferedImage (width, height, BufferedImage.TYPE_INT_RGB);
+    else
+      image = new GtkImage (width, height);
+
     Graphics g = image.getGraphics();
     g.setColor(getBackground());
     g.fillRect(0, 0, width, height);
@@ -354,8 +376,26 @@ public class GtkComponentPeer extends GtkGenericPeer
     if (x == 0 && y == 0 && width == 0 && height == 0)
       return;
 
-    q().postEvent (new PaintEvent (awtComponent, PaintEvent.UPDATE,
-                                 new Rectangle (x, y, width, height)));
+    repaintTimer.schedule(new RepaintTimerTask(x, y, width, height), tm);
+  }
+
+  private class RepaintTimerTask extends TimerTask
+  {
+    private int x, y, width, height;
+
+    RepaintTimerTask(int x, int y, int width, int height)
+    {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+    }
+
+    public void run()
+    {
+      q().postEvent (new PaintEvent (awtComponent, PaintEvent.UPDATE,
+                                     new Rectangle (x, y, width, height)));
+    }
   }
 
   public void requestFocus ()
@@ -524,6 +564,11 @@ public class GtkComponentPeer extends GtkGenericPeer
 				item, stateChange));
   }
 
+  protected void postTextEvent ()
+  {
+    q().postEvent (new TextEvent (awtComponent, TextEvent.TEXT_VALUE_CHANGED));
+  }
+
   public GraphicsConfiguration getGraphicsConfiguration ()
   {
     // FIXME: just a stub for now.
@@ -563,7 +608,8 @@ public class GtkComponentPeer extends GtkGenericPeer
 
   public void updateCursorImmediately ()
   {
-    
+    if (awtComponent.getCursor() != null)
+      setCursor(awtComponent.getCursor());
   }
 
   public boolean handlesWheelScrolling ()

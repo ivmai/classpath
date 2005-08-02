@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -51,6 +51,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
@@ -73,8 +74,8 @@ public class BasicPopupMenuUI extends PopupMenuUI
   /* popupMenu for which this UI delegate is for*/
   protected JPopupMenu popupMenu;
 
-  /* MouseInputListener listens to mouse events */
-  private static transient MouseInputListener mouseInputListener;
+  /* MouseInputListener listens to mouse events. Package private for inner classes. */
+  static transient MouseInputListener mouseInputListener;
 
   /* PopupMenuListener listens to popup menu events fired by JPopupMenu*/
   private transient PopupMenuListener popupMenuListener;
@@ -415,6 +416,7 @@ public class BasicPopupMenuUI extends PopupMenuUI
     private transient Component mouseEventTarget;
     private transient Component pressedComponent;
     private transient Component lastComponentEntered;
+    private transient Component tempComponent;
     private transient int pressCount;
 
     /**
@@ -552,7 +554,9 @@ public class BasicPopupMenuUI extends PopupMenuUI
 	                                         me.isPopupTrigger(),
 	                                         me.getButton());
 
-	      lastComponentEntered.dispatchEvent(exited);
+              tempComponent = lastComponentEntered;
+              lastComponentEntered = null;
+	      tempComponent.dispatchEvent(exited);
 	    }
 
 	  lastComponentEntered = null;

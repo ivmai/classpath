@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -152,7 +152,7 @@ public class ObjectOutputStream extends OutputStream
     useSubclassMethod = false;
     writeStreamHeader();
 
-    if (Configuration.DEBUG)
+    if (DEBUG)
       {
 	String val = System.getProperty("gcj.dumpobjects");
 	if (val != null && !val.equals(""))
@@ -384,7 +384,7 @@ public class ObjectOutputStream extends OutputStream
 	setBlockDataMode(false);
 	try
 	  {
-	    if (Configuration.DEBUG)
+	    if (DEBUG)
 	      {
 		e.printStackTrace(System.out);
 	      }
@@ -395,7 +395,7 @@ public class ObjectOutputStream extends OutputStream
 	    StreamCorruptedException ex = 
 	      new StreamCorruptedException
 	      (ioe + " thrown while exception was being written to stream.");
-	    if (Configuration.DEBUG)
+	    if (DEBUG)
 	      {
 		ex.printStackTrace(System.out);
 	      }
@@ -1492,10 +1492,16 @@ public class ObjectOutputStream extends OutputStream
 	Field f = getField (klass, field_name);
 	ObjectStreamField of = new ObjectStreamField(f.getName(), f.getType());
 
-	if (of.getTypeString() == null ||
-	    !of.getTypeString().equals(type_code))
+	/* if of is primitive something went wrong
+	 * in the check for primitive classes in writeFields.
+	 */
+	if (of.isPrimitive())
 	  throw new InvalidClassException
-	    ("invalid type code for " + field_name + " in class " + klass.getName());
+	    ("invalid type code for " + field_name + " in class " + klass.getName() + " : object stream field is primitive");
+
+	if (!of.getTypeString().equals(type_code))
+	    throw new InvalidClassException
+		("invalid type code for " + field_name + " in class " + klass.getName() + " : object stream field " + of + " has type string " + of.getTypeString() + " instead of " + type_code);
 
 	Object o = f.get (obj);
 	// FIXME: We should check the type_code here
@@ -1565,6 +1571,8 @@ public class ObjectOutputStream extends OutputStream
 
   // Set if we're generating debugging dumps
   private boolean dump = false;
+
+  private static final boolean DEBUG = false;
 
   static
   {

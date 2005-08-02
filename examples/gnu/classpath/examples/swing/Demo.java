@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 */
 
 
@@ -429,6 +429,109 @@ public class Demo
     return jsp;
   }
 
+  private static JPanel mkTreeWorld()
+  {     
+    // non-leafs
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode("Exotic Subsistence");
+    DefaultMutableTreeNode fruit = new DefaultMutableTreeNode("Interesting Fruit");
+    DefaultMutableTreeNode veg = new DefaultMutableTreeNode("Extraordinary Vegetables");
+    DefaultMutableTreeNode liq = new DefaultMutableTreeNode("Peculiar Liquids");
+    
+    // leafs
+    DefaultMutableTreeNode f1 = new DefaultMutableTreeNode("Abiu");
+    DefaultMutableTreeNode f2 = new DefaultMutableTreeNode("Bamboo Shoots");
+    DefaultMutableTreeNode f3 = new DefaultMutableTreeNode("Breadfruit");
+    DefaultMutableTreeNode f4 = new DefaultMutableTreeNode("Canistel");
+    DefaultMutableTreeNode f5 = new DefaultMutableTreeNode("Duku");
+    DefaultMutableTreeNode f6 = new DefaultMutableTreeNode("Guava");
+    DefaultMutableTreeNode f7 = new DefaultMutableTreeNode("Jakfruit");
+    DefaultMutableTreeNode f8 = new DefaultMutableTreeNode("Quaribea");
+    
+    DefaultMutableTreeNode v1 = new DefaultMutableTreeNode("Amaranth");
+    DefaultMutableTreeNode v2 = new DefaultMutableTreeNode("Kiwano");
+    DefaultMutableTreeNode v3 = new DefaultMutableTreeNode("Leeks");
+    DefaultMutableTreeNode v4 = new DefaultMutableTreeNode("Luffa");
+    DefaultMutableTreeNode v5 = new DefaultMutableTreeNode("Chayote");
+    DefaultMutableTreeNode v6 = new DefaultMutableTreeNode("Jicama");
+    DefaultMutableTreeNode v7 = new DefaultMutableTreeNode("Okra");
+    
+    DefaultMutableTreeNode l1 = new DefaultMutableTreeNode("Alcoholic");
+    DefaultMutableTreeNode l11 = new DefaultMutableTreeNode("Caipirinha");
+    DefaultMutableTreeNode l21 = new DefaultMutableTreeNode("Mojito");
+    DefaultMutableTreeNode l31 = new DefaultMutableTreeNode("Margarita");
+    DefaultMutableTreeNode l41 = new DefaultMutableTreeNode("Martini");
+    DefaultMutableTreeNode l5 = new DefaultMutableTreeNode("Non Alcoholic");
+    DefaultMutableTreeNode l55 = new DefaultMutableTreeNode("Babaji");
+    DefaultMutableTreeNode l65 = new DefaultMutableTreeNode("Chikita");
+    
+    root.add(fruit);
+    root.add(veg);
+    root.add(liq);
+    fruit.add(f1);
+    fruit.add(f2);
+    fruit.add(f3);
+    fruit.add(f4);
+    fruit.add(f5);
+    fruit.add(f6);
+    fruit.add(f7);
+    fruit.add(f8);
+    veg.add(v1);
+    veg.add(v2);
+    veg.add(v3);
+    veg.add(v4);
+    veg.add(v5);
+    veg.add(v6);
+    veg.add(v7);
+    liq.add(l1);
+    l1.add(l11);
+    l1.add(l21);
+    l1.add(l31);
+    l1.add(l41);
+    liq.add(l5);
+    l5.add(l55);
+    l5.add(l65);
+
+    final JTree tree = new JTree(root);
+    tree.setLargeModel(true);
+    DefaultTreeSelectionModel dtsm = new DefaultTreeSelectionModel();
+    dtsm.setSelectionMode(DefaultTreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.setSelectionModel(dtsm);
+    
+    // buttons to add and delete
+    JButton add = mkButton("add element");
+    add.addActionListener(new ActionListener()
+      {
+        int i = 0;
+        public void actionPerformed(ActionEvent e)
+        {
+           for (int i = 0; i < tree.getRowCount(); i++)
+           {
+              if (tree.isRowSelected(i))
+              {
+                 TreePath p = tree.getPathForRow(i);
+                 DefaultMutableTreeNode n = (DefaultMutableTreeNode) p.
+                                                  getLastPathComponent();
+                 n.add(new DefaultMutableTreeNode("New Element"));
+                 tree.repaint();
+                 break;
+              }
+           }
+        }
+      });
+
+
+    JPanel p1 = new JPanel(); 
+    p1.setLayout(new BorderLayout());
+    
+    JPanel p2 = new JPanel(); 
+    p2.add(add);
+
+    p1.add(p2, BorderLayout.NORTH);
+    p1.add(mkScrollPane(tree), BorderLayout.CENTER);
+    
+    return p1;
+  }
+  
   public static JPanel mkListWorld()
   {
 
@@ -524,6 +627,7 @@ public class Demo
 				 BorderLayout.CENTER);
           desk.add(f);
           f.setBounds(i, i, 250, 200);
+	  f.setVisible(true);
           i += 30;
         }
       });
@@ -544,6 +648,7 @@ public class Demo
     tabs.add("Button world!", mkButtonWorld());
     tabs.add("List world!", mkListWorld());
     tabs.add("Desktop world!", mkDesktopWorld());
+    tabs.add("Tree world!", mkTreeWorld());
     return tabs;
   }
 
@@ -553,6 +658,8 @@ public class Demo
     slider.setPaintTrack(true);
     slider.setPaintTicks(true);
     slider.setMajorTickSpacing(30);
+    slider.setMinorTickSpacing(5);
+    slider.setPaintLabels(true);
     slider.setInverted(false);
     JProgressBar progress = new JProgressBar();
     BoundedRangeModel model = new DefaultBoundedRangeModel(10, 1, 0, 100);
@@ -837,6 +944,11 @@ public class Demo
     child2.add(child24);
 
     JTree tree = new JTree(root);
+    tree.setLargeModel(true);
+    DefaultTreeSelectionModel dtsm = new DefaultTreeSelectionModel();
+    dtsm.setSelectionMode(DefaultTreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.setSelectionModel(dtsm);
+    
     return tree;
   }
 

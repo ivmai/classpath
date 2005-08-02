@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -281,5 +281,20 @@ final class VMClassLoader
   static ClassLoader getSystemClassLoader()
   {
     return ClassLoader.defaultGetSystemClassLoader();
+  }
+
+  /**
+   * Set this field to true if the VM wants to keep its own cache.
+   * Note that this field is not final, to allow VMs to have a
+   * different setting without having to recompile ClassLoader.java.
+   */
+  static boolean USE_VM_CACHE = false;
+
+  /**
+   * If the VM wants to keep its own cache, this method can be replaced.
+   */
+  static Class findLoadedClass(ClassLoader cl, String name)
+  {
+    return (Class) cl.loadedClasses.get(name);
   }
 }

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -177,4 +177,48 @@ JCL_FindClass (JNIEnv * env, const char *className)
       JCL_ThrowException (env, "java/lang/ClassNotFoundException", className);
     }
   return retval;
+}
+
+
+/*
+ * Build a RawData object. The function caches the class type 
+ */
+
+static jclass rawDataClass;
+static jfieldID rawData_fid;
+static jmethodID rawData_mid;
+
+JNIEXPORT jobject JNICALL
+JCL_NewRawDataObject (JNIEnv * env, void *data)
+{
+  if (rawDataClass == NULL)
+    {
+#ifdef POINTERS_ARE_64BIT
+      rawDataClass = (*env)->FindClass (env, "gnu/classpath/RawData64");
+      rawData_mid = (*env)->GetMethodID (env, rawDataClass, "<init>", "(J)V");
+      rawData_fid = (*env)->GetFieldID (env, rawDataClass, "data", "J");
+#else
+      rawDataClass = (*env)->FindClass (env, "gnu/classpath/RawData32");
+      rawData_mid = (*env)->GetMethodID (env, rawDataClass, "<init>", "(I)V");
+      rawData_fid = (*env)->GetFieldID (env, rawDataClass, "data", "I");
+#endif
+      (*env)->DeleteLocalRef(env, rawDataClass);
+      rawDataClass = (*env)->NewGlobalRef (env, rawDataClass);
+    }
+
+#ifdef POINTERS_ARE_64BIT
+  return (*env)->NewObject (env, rawDataClass, rawData_mid, (jlong) data);
+#else
+  return (*env)->NewObject (env, rawDataClass, rawData_mid, (jint) data);
+#endif
+}
+
+JNIEXPORT void * JNICALL
+JCL_GetRawData (JNIEnv * env, jobject rawdata)
+{
+#ifdef POINTERS_ARE_64BIT
+  return (void *) (*env)->GetLongField (env, rawdata, rawData_fid);
+#else
+  return (void *) (*env)->GetIntField (env, rawdata, rawData_fid);
+#endif  
 }

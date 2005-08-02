@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -45,6 +45,7 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
+import java.awt.image.MemoryImageSource;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -70,7 +71,10 @@ public class GtkImageConsumer implements ImageConsumer
 
   public synchronized void imageComplete (int status)
   {
-    source.removeConsumer(this);
+    // we need to reuse the pixel cache for memory image sources since
+    // a memory image's backing array can be updated "live".
+    if (!(source instanceof MemoryImageSource))
+      source.removeConsumer(this);
     target.setImage(width, height, pixelCache, properties);
   }
 

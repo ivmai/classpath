@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,6 +39,7 @@ package gnu.xml.transform;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
@@ -57,10 +58,8 @@ final class CallTemplateNode
   final QName name;
   final List withParams;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   QName name, List withParams)
+  CallTemplateNode(QName name, List withParams)
   {
-    super(children, next);
     this.name = name;
     this.withParams = withParams;
   }
@@ -73,11 +72,16 @@ final class CallTemplateNode
       {
         withParams2.add(((WithParam) withParams.get(i)).clone(stylesheet));
       }
-    return new CallTemplateNode((children == null) ? null :
-                                children.clone(stylesheet),
-                                (next == null) ? null :
-                                next.clone(stylesheet),
-                                name, withParams2);
+    TemplateNode ret = new CallTemplateNode(name, withParams2);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,
@@ -87,14 +91,30 @@ final class CallTemplateNode
   {
     if (withParams != null)
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
+        // compute the parameter values
+        LinkedList values = new LinkedList();
         for (Iterator i = withParams.iterator(); i.hasNext(); )
           {
             WithParam p = (WithParam) i.next();
             Object value = p.getValue(stylesheet, mode, context, pos, len);
-            stylesheet.bindings.set(p.name, value, false);
+            Object[] pair = new Object[2];
+            pair[0] = p.name;
+            pair[1] = value;
+            values.add(pair);
+          }
+        // push the parameter context
+        stylesheet.bindings.push(Bindings.WITH_PARAM);
+        // set the parameters
+        for (Iterator i = values.iterator(); i.hasNext(); )
+          {
+            Object[] pair = (Object[]) i.next();
+            QName name = (QName) pair[0];
+            Object value = pair[1];
+            stylesheet.bindings.set(name, value, Bindings.WITH_PARAM);
+            if (stylesheet.debug)
+              {
+                System.err.println("with-param: " + name + " = " + value);
+              }
           }
       }
     TemplateNode t = stylesheet.getTemplate(mode, name);
@@ -106,7 +126,7 @@ final class CallTemplateNode
     if (withParams != null)
       {
         // pop the variable context
-        stylesheet.bindings.pop(false);
+        stylesheet.bindings.pop(Bindings.WITH_PARAM);
       }
     // call-template doesn't have processable children
     if (next != null)
@@ -115,6 +135,21 @@ final class CallTemplateNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+  
+  public boolean references(QName var)
+  {
+    if (withParams != null)
+      {
+        for (Iterator i = withParams.iterator(); i.hasNext(); )
+          {
+            if (((WithParam) i.next()).references(var))
+              {
+                return true;
+              }
+          }
+      }
+    return super.references(var);
   }
   
   public String toString()

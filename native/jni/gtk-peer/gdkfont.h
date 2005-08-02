@@ -18,8 +18,8 @@
    
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
    
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -45,47 +45,47 @@
 #include <pango/pango-fontmap.h>
 #include <pango/pangoft2.h>
 
-extern struct state_table *native_font_state_table;
+extern struct state_table *cp_gtk_native_font_state_table;
 extern struct state_table *native_glyphvector_state_table;
-extern struct state_table *native_text_layout_state_table;
+extern struct state_table *cp_gtk_native_text_layout_state_table;
 
 #define NSA_FONT_INIT(env, clazz) \
-  native_font_state_table = init_state_table (env, clazz)
+  cp_gtk_native_font_state_table = cp_gtk_init_state_table (env, clazz)
 
 #define NSA_GET_FONT_PTR(env, obj) \
-  get_state (env, obj, native_font_state_table)
+  cp_gtk_get_state (env, obj, cp_gtk_native_font_state_table)
 
 #define NSA_SET_FONT_PTR(env, obj, ptr) \
-  set_state (env, obj, native_font_state_table, (void *)ptr)
+  cp_gtk_set_state (env, obj, cp_gtk_native_font_state_table, (void *)ptr)
 
 #define NSA_DEL_FONT_PTR(env, obj) \
-  remove_state_slot (env, obj, native_font_state_table)
+  cp_gtk_remove_state_slot (env, obj, cp_gtk_native_font_state_table)
 
 
 #define NSA_GV_INIT(env, clazz) \
-  native_glyphvector_state_table = init_state_table (env, clazz)
+  native_glyphvector_state_table = cp_gtk_init_state_table (env, clazz)
 
 #define NSA_GET_GV_PTR(env, obj) \
-  get_state (env, obj, native_glyphvector_state_table)
+  cp_gtk_get_state (env, obj, native_glyphvector_state_table)
 
 #define NSA_SET_GV_PTR(env, obj, ptr) \
-  set_state (env, obj, native_glyphvector_state_table, (void *)ptr)
+  cp_gtk_set_state (env, obj, native_glyphvector_state_table, (void *)ptr)
 
 #define NSA_DEL_GV_PTR(env, obj) \
-  remove_state_slot (env, obj, native_glyphvector_state_table)
+  cp_gtk_remove_state_slot (env, obj, native_glyphvector_state_table)
 
 
 #define NSA_TEXT_LAYOUT_INIT(env, clazz) \
-  native_text_layout_state_table = init_state_table (env, clazz)
+  cp_gtk_native_text_layout_state_table = cp_gtk_init_state_table (env, clazz)
 
 #define NSA_GET_TEXT_LAYOUT_PTR(env, obj) \
-  get_state (env, obj, native_text_layout_state_table)
+  cp_gtk_get_state (env, obj, cp_gtk_native_text_layout_state_table)
 
 #define NSA_SET_TEXT_LAYOUT_PTR(env, obj, ptr) \
-  set_state (env, obj, native_text_layout_state_table, (void *)ptr)
+  cp_gtk_set_state (env, obj, cp_gtk_native_text_layout_state_table, (void *)ptr)
 
 #define NSA_DEL_TEXT_LAYOUT_PTR(env, obj) \
-  remove_state_slot (env, obj, native_text_layout_state_table)
+  cp_gtk_remove_state_slot (env, obj, cp_gtk_native_text_layout_state_table)
 
 #define FONT_METRICS_ASCENT      0
 #define FONT_METRICS_MAX_ASCENT  1

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -42,20 +42,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 
 /**
- * The CellRendererPane's purpose is to paint the cells of JList, JTable and
- * JTree. It intercepts the usual paint tree, so that we don't walk up and
+ * Paints the cells of JList, JTable and JTree.
+ * It intercepts the usual paint tree, so that we don't walk up and
  * repaint everything.
  *
- * @author	Andrew Selkirk
- * @version	1.0
+ * @author Andrew Selkirk
  */
 public class CellRendererPane
   extends Container
@@ -64,7 +61,7 @@ public class CellRendererPane
   private static final long serialVersionUID = -7642183829532984273L;
 
   /**
-   * AccessibleCellRendererPane
+   * Provides accessibility support for CellRendererPanes.
    */
   protected class AccessibleCellRendererPane extends AccessibleAWTContainer
   {
@@ -72,7 +69,6 @@ public class CellRendererPane
 
     /**
      * Constructor AccessibleCellRendererPane
-     * @param component TODO
      */
     protected AccessibleCellRendererPane()
     {
@@ -216,10 +212,9 @@ public class CellRendererPane
    * @param h the height of the components drawing area
    */
   public void paintComponent(Graphics graphics, Component c,
-                             Container p, int x, int y, int w, int h) {
-
+                             Container p, int x, int y, int w, int h)
+  {
     paintComponent(graphics, c, p, x, y, w, h, false);
-
   } // paintComponent()
 
   /**
@@ -237,9 +232,7 @@ public class CellRendererPane
   public void paintComponent(Graphics graphics, Component c,
                              Container p, Rectangle r)
   {
-
     paintComponent(graphics, c, p, r.x, r.y, r.width, r.height);
-
   } // paintComponent()
 
   /**

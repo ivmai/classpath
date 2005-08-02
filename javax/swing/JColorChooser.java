@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -58,13 +58,15 @@ import javax.swing.plaf.ColorChooserUI;
 
 
 /**
- * The JColorChooser is a Swing widget that offers users different ways to
+ * A Swing widget that offers users different ways to
  * select a color. By default, three different panels are presented to the
  * user that are capable of changing the selected color. There are three ways
  * to utilize JColorChooser. The first is to build a JColorChooser and add it
  * to the content pane. The second is to use the createDialog method to
  * create a JDialog that holds a JColorChooser. The third is to show a
  * JColorChooser in a JDialog directly using the showDialog method.
+ *
+ * @author original author unknown
  */
 public class JColorChooser extends JComponent implements Accessible
 {
@@ -72,7 +74,7 @@ public class JColorChooser extends JComponent implements Accessible
   private static final long serialVersionUID = 9168066781620640889L;
 
   /**
-   * AccessibleJColorChooser
+   * Accessibility support for <code>JColorChooser</code>.
    */
   protected class AccessibleJColorChooser
     extends JComponent.AccessibleJComponent
@@ -237,11 +239,11 @@ public class JColorChooser extends JComponent implements Accessible
   {
     try
       {
-	synchronized (dialog)
-	  {
-	    while (dialog.isVisible())
-	      dialog.wait();
-	  }
+        synchronized (dialog)
+          {
+            while (dialog.isVisible())
+              dialog.wait();
+          }
       }
     catch (InterruptedException e)
       {
@@ -393,9 +395,9 @@ public class JColorChooser extends JComponent implements Accessible
   {
     if (component != previewPanel)
       {
-	JComponent old = previewPanel;
-	previewPanel = component;
-	firePropertyChange(PREVIEW_PANEL_PROPERTY, old, previewPanel);
+        JComponent old = previewPanel;
+        previewPanel = component;
+        firePropertyChange(PREVIEW_PANEL_PROPERTY, old, previewPanel);
       }
   } // setPreviewPanel()
 
@@ -421,10 +423,8 @@ public class JColorChooser extends JComponent implements Accessible
     if (panel == null)
       return;
     AbstractColorChooserPanel[] old = chooserPanels;
-    AbstractColorChooserPanel[] newPanels = new AbstractColorChooserPanel[(old == null)
-                                                                          ? 1
-                                                                          : old.length
-                                                                          + 1];
+    AbstractColorChooserPanel[] newPanels =
+      new AbstractColorChooserPanel[(old == null) ? 1 : old.length + 1];
     if (old != null)
       System.arraycopy(old, 0, newPanels, 0, old.length);
     newPanels[newPanels.length - 1] = panel;
@@ -447,8 +447,8 @@ public class JColorChooser extends JComponent implements Accessible
     for (int i = 0; i < chooserPanels.length; i++)
       if (panel == chooserPanels[i])
         {
-	  index = i;
-	  break;
+          index = i;
+          break;
         }
 
     if (index == -1)
@@ -459,12 +459,12 @@ public class JColorChooser extends JComponent implements Accessible
       chooserPanels = null;
     else
       {
-	AbstractColorChooserPanel[] newPanels = new AbstractColorChooserPanel[chooserPanels.length
-	                                        - 1];
-	System.arraycopy(chooserPanels, 0, newPanels, 0, index);
-	System.arraycopy(chooserPanels, index, newPanels, index - 1,
-	                 chooserPanels.length - index);
-	chooserPanels = newPanels;
+        AbstractColorChooserPanel[] newPanels =
+          new AbstractColorChooserPanel[chooserPanels.length - 1];
+        System.arraycopy(chooserPanels, 0, newPanels, 0, index);
+        System.arraycopy(chooserPanels, index, newPanels, index - 1,
+                         chooserPanels.length - index);
+        chooserPanels = newPanels;
       }
     panel.uninstallChooserPanel(this);
     firePropertyChange(CHOOSER_PANELS_PROPERTY, old, chooserPanels);
@@ -480,20 +480,20 @@ public class JColorChooser extends JComponent implements Accessible
   {
     if (panels != chooserPanels)
       {
-	if (chooserPanels != null)
-	  for (int i = 0; i < chooserPanels.length; i++)
-	    if (chooserPanels[i] != null)
-	      chooserPanels[i].uninstallChooserPanel(this);
+        if (chooserPanels != null)
+          for (int i = 0; i < chooserPanels.length; i++)
+            if (chooserPanels[i] != null)
+              chooserPanels[i].uninstallChooserPanel(this);
 
-	AbstractColorChooserPanel[] old = chooserPanels;
-	chooserPanels = panels;
+        AbstractColorChooserPanel[] old = chooserPanels;
+        chooserPanels = panels;
 
-	if (panels != null)
-	  for (int i = 0; i < panels.length; i++)
-	    if (panels[i] != null)
-	      panels[i].installChooserPanel(this);
+        if (panels != null)
+          for (int i = 0; i < panels.length; i++)
+            if (panels[i] != null)
+              panels[i].installChooserPanel(this);
 
-	firePropertyChange(CHOOSER_PANELS_PROPERTY, old, chooserPanels);
+        firePropertyChange(CHOOSER_PANELS_PROPERTY, old, chooserPanels);
       }
   } // setChooserPanels()
 

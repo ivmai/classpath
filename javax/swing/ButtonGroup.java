@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -43,7 +43,25 @@ import java.util.Vector;
 
 
 /**
- * DOCUMENT ME!
+ * Logically groups a set of buttons, so that only one of the buttons in
+ * a <code>ButtonGroup</code> can be selected at the same time. If one
+ * button in a <code>ButtonGroup</code> is selected, all other buttons
+ * are automatically deselected.
+ *
+ * While <code>ButtonGroup</code> can be used for all buttons that are derived
+ * from {@link AbstractButton}, it is normally only used for
+ * {@link JRadioButton}s, {@link JRadioButtonMenuItem}s and
+ * {@link JToggleButton}s.
+ *
+ * You could use it for {@link JCheckBox}es, but for the sake of usability
+ * this is strongly discouraged because the common expectation of checkboxes
+ * is that the user is allowed to make multiple selections.
+ *
+ * It makes no sense to put {@link JButton}s or {@link JMenuItem}s in
+ * a <code>ButtonGroup</code> because they don't implement the
+ * <code>selected</code> semantics.
+ *
+ * @author original author unknown
  */
 public class ButtonGroup implements Serializable
 {
@@ -138,16 +156,16 @@ public class ButtonGroup implements Serializable
 
     if (b && sel != m)
       {
-	ButtonModel old = sel;
-	sel = m;
+        ButtonModel old = sel;
+        sel = m;
 
-	if (old != null)
-	  old.setSelected(false);
-	AbstractButton button = FindButton(old);
-	if (button != null)
-	  button.repaint();
+        if (old != null)
+          old.setSelected(false);
+        AbstractButton button = FindButton(old);
+        if (button != null)
+          button.repaint();
       }
-    else if (! b && sel == m)
+    else if (!b && sel == m)
       m.setSelected(true);
   }
 

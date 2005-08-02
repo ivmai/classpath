@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -55,17 +55,17 @@ struct state_node
   struct state_node *next;
 };
 
-struct state_table *init_state_table_with_size (JNIEnv *, jclass, jint);
-struct state_table *init_state_table (JNIEnv *, jclass);
+struct state_table *cp_gtk_init_state_table_with_size (JNIEnv *, jclass, jint);
+struct state_table *cp_gtk_init_state_table (JNIEnv *, jclass);
 
 /* lowlevel api */
-void set_state_oid (JNIEnv *, jobject, struct state_table *, jint, void *);
-void *get_state_oid (JNIEnv *, jobject, struct state_table *, jint);
-void *remove_state_oid (JNIEnv *, jobject, struct state_table *, jint);
+void cp_gtk_set_state_oid (JNIEnv *, jobject, struct state_table *, jint, void *);
+void *cp_gtk_get_state_oid (JNIEnv *, jobject, struct state_table *, jint);
+void *cp_gtk_remove_state_oid (JNIEnv *, jobject, struct state_table *, jint);
 
 /* highlevel api */
-int set_state (JNIEnv *, jobject, struct state_table *, void *);
-void *get_state (JNIEnv *, jobject, struct state_table *);
-void *remove_state_slot (JNIEnv *, jobject, struct state_table *);
+int cp_gtk_set_state (JNIEnv *, jobject, struct state_table *, void *);
+void *cp_gtk_get_state (JNIEnv *, jobject, struct state_table *);
+void *cp_gtk_remove_state_slot (JNIEnv *, jobject, struct state_table *);
 
 #endif

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,7 +40,7 @@ package javax.swing.plaf;
 
 /**
  * This public interface is used to designate which objects were created by
- * <code>ComponentUI</code> delegates.  When uninstalling the user public interface
+ * {@link ComponentUI} delegates.  When uninstalling the user public interface
  * renderer with <code>ComponentUI.uninstallUI()</code> the renderer
  * property is set to <code>null</code>.
  * <br>
@@ -50,6 +50,6 @@ package javax.swing.plaf;
  * they are initialized or set to <code>null</code>.
  * 
  * @author Brian Jones
- * @see java.lang.ComponentUI 
+ * @see ComponentUI 
  */
 public interface UIResource { }

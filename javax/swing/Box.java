@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -60,6 +60,9 @@ public class Box extends JComponent implements Accessible
 {
   private static final long serialVersionUID = 1525417495883046342L;
   
+  /**
+   * Provides accessibility support for <code>Box</code>es.
+   */
   // FIXME: disable to make libjava compile; visibility rules are broken
   protected class AccessibleBox // extends Container.AccessibleAWTContainer
   {
@@ -82,6 +85,9 @@ public class Box extends JComponent implements Accessible
   {
     private static final long serialVersionUID = -1204263191910183998L;
   
+    /**
+     * Provides accessibility support for <code>Box.Filler</code>.
+     */
     // FIXME: disable to make libjava compile; visibility rules are broken
     protected class AccessibleBoxFiller // extends Component.AccessibleAWTComponent
     {
@@ -192,7 +198,7 @@ public class Box extends JComponent implements Accessible
   public static Component createGlue()
   {
     Filler glue = new Filler(new Dimension(0,0), new Dimension(0,0),
-                             new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE)
+                             new Dimension(Short.MAX_VALUE,Short.MAX_VALUE)
                              );
     return glue;
   }
@@ -211,7 +217,10 @@ public class Box extends JComponent implements Accessible
    */
   public static Component createHorizontalGlue()
   {
-    return createGlue();
+    Filler glue = new Filler(new Dimension(0,0), new Dimension(0,0),
+                             new Dimension(Short.MAX_VALUE, 0)
+                             );
+    return glue;
   }
   
   /**

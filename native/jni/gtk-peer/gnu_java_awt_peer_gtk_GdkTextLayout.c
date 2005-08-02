@@ -15,8 +15,8 @@
    
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
    
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -42,7 +42,7 @@
 #include "gdkfont.h"
 #include "gnu_java_awt_peer_gtk_GdkTextLayout.h"
 
-struct state_table *native_text_layout_state_table;
+struct state_table *cp_gtk_native_text_layout_state_table;
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkTextLayout_initStaticState 
@@ -58,12 +58,14 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_initState
   struct textlayout *tl;
 
   gdk_threads_enter ();
+
   g_assert(self != NULL);
   tl = g_malloc0 (sizeof (struct textlayout));
   g_assert(tl != NULL);
   tl->pango_layout = pango_layout_new(gdk_pango_context_get());
   g_assert(tl->pango_layout != NULL);
   NSA_SET_TEXT_LAYOUT_PTR (env, self, tl);
+
   gdk_threads_leave ();
 }
 
@@ -76,6 +78,7 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_setText
   gint len = 0;
 
   gdk_threads_enter ();
+
   g_assert(self != NULL);
   g_assert(text != NULL);
 
@@ -90,6 +93,7 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_setText
   pango_layout_set_text (tl->pango_layout, text, len);
 
   (*env)->ReleaseStringUTFChars (env, text, str);
+
   gdk_threads_leave ();  
 }
 
@@ -102,6 +106,7 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_indexToPos
   jdouble *nativePos;
 
   gdk_threads_enter ();
+
   g_assert(self != NULL);
   g_assert(javaPos != NULL);
 
@@ -121,6 +126,7 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_indexToPos
   nativePos[3] = (jdouble) pangoPos.height;
 
   (*env)->ReleaseDoubleArrayElements (env, javaPos, nativePos, 0);
+
   gdk_threads_leave ();  
 }
 
@@ -133,6 +139,7 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_getExtents
   jdouble *nativeInkExtents, *nativeLogExtents;
 
   gdk_threads_enter ();
+
   g_assert(self != NULL);
   g_assert(javaInkExtents != NULL);
   g_assert(javaLogExtents != NULL);
@@ -173,11 +180,13 @@ Java_gnu_java_awt_peer_gtk_GdkTextLayout_dispose
   struct textlayout *tl;
 
   gdk_threads_enter ();
+
   g_assert(self != NULL);
   tl = (struct textlayout *) NSA_DEL_TEXT_LAYOUT_PTR (env, self);
   g_assert(tl != NULL);
   if (tl->pango_layout != NULL)
     g_object_unref (tl->pango_layout);
   g_free(tl);
+
   gdk_threads_leave ();
 }

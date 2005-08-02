@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -45,6 +45,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -65,7 +66,18 @@ public class JFrame extends Frame
   private int close_action = HIDE_ON_CLOSE;
   protected AccessibleContext accessibleContext;
   protected JRootPane rootPane;
-  protected boolean rootPaneCheckingEnabled;
+  
+  /**
+   * @specnote rootPaneCheckingEnabled is false to comply with J2SE 5.0
+   */
+  protected boolean rootPaneCheckingEnabled = false;
+
+  /**
+   * Tells us if we're in the initialization stage.
+   * If so, adds go to top-level Container, otherwise they go
+   * to the content pane for this container.
+   */
+  private boolean initStageDone = false;
 
   public JFrame()
   {
@@ -79,11 +91,44 @@ public class JFrame extends Frame
     frameInit();
   }
 
+  /**
+   * Creates a new JFrame in the specified {@link GraphicsConfiguration}
+   * and with an empty title.
+   *
+   * @param gc the <code>GraphicsConfiguration</code> that is used for
+   *     the new <code>JFrame</code>
+   *
+   * @see Frame#Frame(GraphicsConfiguration)
+   */
+  public JFrame(GraphicsConfiguration gc)
+  {
+    super(gc);
+    frameInit();
+  }
+
+  /**
+   * Creates a new JFrame in the specified {@link GraphicsConfiguration}
+   * and with the specified title.
+   *
+   * @param title the title for the new <code>JFrame</code>
+   * @param gc the <code>GraphicsConfiguration</code> that is used for
+   *     the new <code>JFrame</code>
+   *
+   * @see Frame#Frame(String, GraphicsConfiguration)
+   */
+  public JFrame(String title, GraphicsConfiguration gc)
+  {
+    super(title, gc);
+    frameInit();
+  }
+
   protected void frameInit()
   {
     super.setLayout(new BorderLayout(1, 1));
     enableEvents(AWTEvent.WINDOW_EVENT_MASK);
     getRootPane(); // will do set/create
+    // We're now done the init stage.
+    initStageDone = true;
   }
 
   public Dimension getPreferredSize()
@@ -103,7 +148,17 @@ public class JFrame extends Frame
 
   public void setLayout(LayoutManager manager)
   {
-    super.setLayout(manager);
+    // Check if we're in initialization stage.  If so, call super.setLayout
+    // otherwise, valid calls go to the content pane.
+    if (initStageDone)
+      {
+        if (isRootPaneCheckingEnabled())
+          throw new Error("Cannot set layout. Use getContentPane().setLayout()"
+                           + " instead.");
+        getContentPane().setLayout(manager);
+      }
+    else
+      super.setLayout(manager);
   }
 
   public void setLayeredPane(JLayeredPane layeredPane)
@@ -159,12 +214,27 @@ public class JFrame extends Frame
 
   protected void addImpl(Component comp, Object constraints, int index)
   {
-    super.addImpl(comp, constraints, index);
+    // If we're adding in the initialization stage use super.add.
+    // Otherwise pass the add onto the content pane.
+    if (!initStageDone)
+      super.addImpl(comp, constraints, index);
+    else
+      {
+        if (isRootPaneCheckingEnabled())
+          throw new Error("rootPaneChecking is enabled - adding components "
+                           + "disallowed.");
+        getContentPane().add(comp,constraints,index);
+      }
   }
 
   public void remove(Component comp)
   {
-    getContentPane().remove(comp);
+    // If we're removing the root pane, use super.remove. Otherwise
+    // pass it on to the content pane instead.
+    if (comp==rootPane)
+      super.remove(rootPane);
+    else
+      getContentPane().remove(comp);
   }
 
   protected boolean isRootPaneCheckingEnabled()
@@ -272,7 +342,7 @@ public class JFrame extends Frame
 
     if (operation != EXIT_ON_CLOSE && operation != DISPOSE_ON_CLOSE
         && operation != HIDE_ON_CLOSE && operation != DO_NOTHING_ON_CLOSE)
-      throw new IllegalArgumentException("operation = " + operation);
+      throw new IllegalArgumentException("defaultCloseOperation must be EXIT_ON_CLOSE, HIDE_ON_CLOSE, DISPOSE_ON_CLOSE, or DO_NOTHING_ON_CLOSE");
 
     close_action = operation;
   }

@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.15+cvs],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.17+cvs],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -174,7 +174,9 @@ if test "x${COMPILE_JNI}" = xyes; then
 		    inttypes.h stdint.h utime.h sys/utime.h sys/filio.h \
 		    sys/time.h \
 		    sys/select.h \
-		    crt_externs.h])
+		    crt_externs.h \
+                    fcntl.h \
+		    sys/mman.h])
 
   AC_EGREP_HEADER(uint32_t, stdint.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(uint32_t, inttypes.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
@@ -187,7 +189,9 @@ if test "x${COMPILE_JNI}" = xyes; then
 		  getsockname getpeername bind listen accept \
 		  recvfrom send sendto setsockopt getsockopt time mktime \
 		  localtime_r \
-		  strerror_r])
+		  strerror_r \
+                  fcntl \
+		  mmap munmap mincore msync madvise getpagesize sysconf])
 
   AC_HEADER_TIME
   AC_STRUCT_TM
@@ -254,7 +258,7 @@ if test "x${COMPILE_JNI}" = xyes; then
     AC_SUBST(XSLT_CFLAGS)
   fi
 
-  dnl Check for AWT related gthread/gtk/libart_lgpl
+  dnl Check for AWT related gthread/gtk
   if test "x${COMPILE_GTK_PEER}" = xyes; then
      AC_PATH_XTRA
      if test "$no_x" = yes; then
@@ -264,13 +268,13 @@ if test "x${COMPILE_JNI}" = xyes; then
      AC_CHECK_LIB([Xtst], [XTestQueryExtension], [true],
 		  [AC_MSG_ERROR([libXtst NOT found, required for GdkRobot])],
 		  [${X_LIBS}])
-     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.6 gthread-2.0 >= 2.2 libart-2.0 gdk-pixbuf-2.0)
+     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.4 gthread-2.0 >= 2.2 gdk-pixbuf-2.0)
      AC_SUBST(GTK_CFLAGS)
      AC_SUBST(GTK_LIBS)
   fi
 
   if test "x${enable_gtk_cairo}" = xyes; then
-    PKG_CHECK_MODULES(CAIRO, cairo)
+    PKG_CHECK_MODULES(CAIRO, cairo >= 0.5.0)
     PKG_CHECK_MODULES(PANGOFT2, pangoft2)
   fi
   AC_SUBST(CAIRO_LIBS)

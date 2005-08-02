@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -89,7 +89,7 @@ public class SortingFocusTraversalPolicy
    * Creates a new <code>SortingFocusTraversalPolicy</code> with the given
    * comparator set.
    *
-   * @param the comparator to set
+   * @param comparator the comparator to set
    */
   public SortingFocusTraversalPolicy(Comparator comparator)
   {
@@ -306,12 +306,12 @@ public class SortingFocusTraversalPolicy
   }
 
   /**
-   * Return the current value of the {@link implicitDownCycleTraversal}
+   * Return the current value of the {@link #implicitDownCycleTraversal}
    * property.
    *
    * @return the current value of the property
    * 
-   * @see setImplicitDownCycleTraversal
+   * @see #setImplicitDownCycleTraversal
    */
   public boolean getImplicitDownCycleTraversal()
   {
@@ -319,12 +319,12 @@ public class SortingFocusTraversalPolicy
   }
 
   /**
-   * Set the current value of the {@link implicitDownCycleTraversal}
+   * Set the current value of the {@link #implicitDownCycleTraversal}
    * property.
    *
    * @param down the new value of the property
    * 
-   * @see getImplicitDownCycleTraversal
+   * @see #getImplicitDownCycleTraversal
    */
   public void setImplicitDownCycleTraversal(boolean down)
   {

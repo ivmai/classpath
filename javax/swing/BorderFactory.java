@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -50,20 +50,25 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * A factory for commonly used borders.
+ *
+ * @author original author unknown
+ */
 public class BorderFactory
 {
   private BorderFactory()
   {
     // Do nothing.
   }
-  
+
   /**
    * Creates a line border withe the specified color.
    *
    * @param color A color to use for the line.
    *
    * @return The Border object
-   */ 
+   */
   public static Border createLineBorder(Color color)
   {
     return null;
@@ -79,10 +84,10 @@ public class BorderFactory
    * @param thickness An int specifying the width in pixels.
    *
    * @return The Border object
-   */ 
-  public static Border createLineBorder (Color color, int thickness)
+   */
+  public static Border createLineBorder(Color color, int thickness)
   {
-    return new LineBorder (color, thickness);
+    return new LineBorder(color, thickness);
   }
 
   /**
@@ -92,10 +97,10 @@ public class BorderFactory
    * shadows are underneath.)
    *
    * @return The Border object
-   */ 
-  public static Border createRaisedBevelBorder ()
+   */
+  public static Border createRaisedBevelBorder()
   {
-    return new BevelBorder (BevelBorder.RAISED);
+    return new BevelBorder(BevelBorder.RAISED);
   }
 
   /**
@@ -105,10 +110,10 @@ public class BorderFactory
    * highlights are underneath.)
    *
    * @return The Border object
-   */ 
-  public static Border createLoweredBevelBorder ()
+   */
+  public static Border createLoweredBevelBorder()
   {
-    return new BevelBorder (BevelBorder.LOWERED);
+    return new BevelBorder(BevelBorder.LOWERED);
   }
 
   /**
@@ -118,13 +123,13 @@ public class BorderFactory
    * highlights are underneath.).
    *
    * @param type An int specifying either BevelBorder.LOWERED or
-   * BevelBorder.RAISED
+   *     BevelBorder.RAISED
    *
-   * @Return The Border object
-   */ 
-  public static Border createBevelBorder (int type)
+   * @return The Border object
+   */
+  public static Border createBevelBorder(int type)
   {
-    return new BevelBorder (type);
+    return new BevelBorder(type);
   }
 
   /**
@@ -134,16 +139,15 @@ public class BorderFactory
    * area uses a brighter shade of the shadaw color.
    *
    * @param type An int specifying either BevelBorder.LOWERED or
-   * BevelBorder.RAISED
+   *     BevelBorder.RAISED
    * @param highlight A Color object for highlights
    * @param shadow A Color object for shadows
    *
    * @return The Border object
-  */ 
-  public static Border createBevelBorder (int type, Color highlight,
-                                          Color shadow)
+   */
+  public static Border createBevelBorder(int type, Color highlight, Color shadow)
   {
-    return new BevelBorder (type, highlight, shadow);
+    return new BevelBorder(type, highlight, shadow);
   }
 
   /**
@@ -151,22 +155,22 @@ public class BorderFactory
    * for the inner and outer highlight and shadow areas.
    *
    * @param type An int specifying either BevelBorder.LOWERED or
-   * BevelBorder.RAISED
+   *     BevelBorder.RAISED
    * @param highlightOuter A Color object for the outer edge of the
-   * highlight area
+   *     highlight area
    * @param highlightInner A Color object for the inner edge of the
-   * highlight area
+   *     highlight area
    * @param shadowOuter A Color object for the outer edge of the shadow area
    * @param shadowInner A Color object for the inner edge of the shadow area
    *
    * @return The Border object
-   */ 
-  public static Border createBevelBorder (int type, Color highlightOuter,
-                                          Color highlightInner,
-                                          Color shadowOuter, Color shadowInner)
+   */
+  public static Border createBevelBorder(int type, Color highlightOuter,
+                                         Color highlightInner,
+                                         Color shadowOuter, Color shadowInner)
   {
-    return new BevelBorder (type, highlightOuter, highlightInner, shadowOuter,
-			    shadowInner);
+    return new BevelBorder(type, highlightOuter, highlightInner, shadowOuter,
+                           shadowInner);
   }
 
   /**
@@ -174,10 +178,10 @@ public class BorderFactory
    * background color for highlighting and shading.
    *
    * @return The Border object
-   */ 
-  public static Border createEtchedBorder ()
+   */
+  public static Border createEtchedBorder()
   {
-    return new EtchedBorder ();
+    return new EtchedBorder();
   }
 
   /**
@@ -185,10 +189,10 @@ public class BorderFactory
    * background color for highlighting and shading.
    *
    * @return The Border object
-   */ 
-  public static Border createEtchedBorder (int etchType)
+   */
+  public static Border createEtchedBorder(int etchType)
   {
-    return new EtchedBorder (etchType);
+    return new EtchedBorder(etchType);
   }
 
   /**
@@ -199,10 +203,10 @@ public class BorderFactory
    * @param shadow A Color object for the border shadows
    *
    * @return The Border object
-   */ 
-  public static Border createEtchedBorder (Color highlight, Color shadow)
+   */
+  public static Border createEtchedBorder(Color highlight, Color shadow)
   {
-    return new EtchedBorder (highlight, shadow);
+    return new EtchedBorder(highlight, shadow);
   }
 
   /**
@@ -213,11 +217,11 @@ public class BorderFactory
    * @param shadow A Color object for the border shadows
    *
    * @return The Border object
-   */ 
-  public static Border createEtchedBorder (int etchType, Color highlight,
-					   Color shadow)
+   */
+  public static Border createEtchedBorder(int etchType, Color highlight,
+                                          Color shadow)
   {
-    return new EtchedBorder (etchType, highlight, shadow);
+    return new EtchedBorder(etchType, highlight, shadow);
   }
 
   /**
@@ -229,10 +233,10 @@ public class BorderFactory
    * @param title A String containing the text of the title
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (String title)
+   */
+  public static TitledBorder createTitledBorder(String title)
   {
-    return new TitledBorder (title);
+    return new TitledBorder(title);
   }
 
   /**
@@ -246,10 +250,10 @@ public class BorderFactory
    * @param border The Border object to add the title to
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (Border border)
+   */
+  public static TitledBorder createTitledBorder(Border border)
   {
-    return new TitledBorder (border);
+    return new TitledBorder(border);
   }
 
   /**
@@ -258,14 +262,14 @@ public class BorderFactory
    * justification (left) and using the default font and text color determined
    * by the current look and feel.
    *
-   * @param order The Border object to add the title to
+   * @param border The Border object to add the title to
    * @param title A String containing the text of the title
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (Border border, String title)
+   */
+  public static TitledBorder createTitledBorder(Border border, String title)
   {
-    return new TitledBorder (border, title);
+    return new TitledBorder(border, title);
   }
 
   /**
@@ -276,21 +280,22 @@ public class BorderFactory
    * @param border The Border object to add the title to
    * @param title A String containing the text of the title
    * @param titleJustification An int specifying the left/right position of
-   * the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
-   * TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
+   *     the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
+   *     TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
    * @param titlePosition An int specifying the vertical position of the text
-   * in relation to the border -- one of: TitledBorder.ABOVE_TOP,
-   * TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
-   * TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
-   * line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION (top).
+   *     in relation to the border -- one of: TitledBorder.ABOVE_TOP,
+   *     TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
+   *     TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
+   *     line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION
+   *     (top).
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (Border border, String title,
+   */
+  public static TitledBorder createTitledBorder(Border border, String title,
                                                 int titleJustification,
                                                 int titlePosition)
   {
-    return new TitledBorder (border, title, titleJustification, titlePosition);
+    return new TitledBorder(border, title, titleJustification, titlePosition);
   }
 
   /**
@@ -301,24 +306,24 @@ public class BorderFactory
    * @param border - the Border object to add the title to
    * @param title - a String containing the text of the title
    * @param titleJustification - an int specifying the left/right position of
-   * the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
-   * TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
+   *     the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
+   *     TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
    * @param titlePosition - an int specifying the vertical position of the
-   * text in relation to the border -- one of: TitledBorder.ABOVE_TOP,
-   * TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
-   * TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
-   * line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION (top).
+   *     text in relation to the border -- one of: TitledBorder.ABOVE_TOP,
+   *     TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
+   *     TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
+   *     line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION (top).
    * @param titleFont - a Font object specifying the title font
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (Border border, String title,
-                                                 int titleJustification,
-                                                 int titlePosition,
-                                                 Font titleFont)
+   */
+  public static TitledBorder createTitledBorder(Border border, String title,
+                                                int titleJustification,
+                                                int titlePosition,
+                                                Font titleFont)
   {
-    return new TitledBorder (border, title, titleJustification, titlePosition,
-			     titleFont);
+    return new TitledBorder(border, title, titleJustification, titlePosition,
+                            titleFont);
   }
 
   /**
@@ -328,27 +333,25 @@ public class BorderFactory
    * @param border - the Border object to add the title to
    * @param title - a String containing the text of the title
    * @param titleJustification - an int specifying the left/right position of
-   * the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
-   * TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
+   *     the title -- one of TitledBorder.LEFT, TitledBorder.CENTER, or
+   *     TitledBorder.RIGHT, TitledBorder.DEFAULT_JUSTIFICATION (left).
    * @param titlePosition - an int specifying the vertical position of the text
-   * in relation to the border -- one of: TitledBorder.ABOVE_TOP,
-   * TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
-   * TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
-   * line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION (top).
+   *     in relation to the border -- one of: TitledBorder.ABOVE_TOP,
+   *     TitledBorder.TOP (sitting on the top line), TitledBorder.BELOW_TOP,
+   *     TitledBorder.ABOVE_BOTTOM, TitledBorder.BOTTOM (sitting on the bottom
+   *     line), TitledBorder.BELOW_BOTTOM, or TitledBorder.DEFAULT_POSITION (top).
    * @param titleFont - a Font object specifying the title font
    * @param titleColor - a Color object specifying the title color
    *
    * @return The TitledBorder object
-   */ 
-  public static TitledBorder createTitledBorder (Border border,
-                                                 String title,
-                                                 int titleJustification,
-                                                 int titlePosition,
-                                                 Font titleFont,
-                                                 Color titleColor)
+   */
+  public static TitledBorder createTitledBorder(Border border, String title,
+                                                int titleJustification,
+                                                int titlePosition,
+                                                Font titleFont, Color titleColor)
   {
-    return new TitledBorder (border, title, titleJustification, titlePosition,
-			     titleFont, titleColor);
+    return new TitledBorder(border, title, titleJustification, titlePosition,
+                            titleFont, titleColor);
   }
 
   /**
@@ -356,10 +359,10 @@ public class BorderFactory
    * bottom, left, and right sides are all zero.)
    *
    * @return The Border object
-   */ 
-  public static Border createEmptyBorder ()
+   */
+  public static Border createEmptyBorder()
   {
-    return new EmptyBorder (0, 0, 0, 0);
+    return new EmptyBorder(0, 0, 0, 0);
   }
 
   /**
@@ -372,21 +375,21 @@ public class BorderFactory
    * @param right An int specifying the width of the bottom in pixels
    *
    * @return The Border object
-   */ 
-  public static Border createEmptyBorder (int top, int left, int bottom,
-					  int right)
+   */
+  public static Border createEmptyBorder(int top, int left, int bottom,
+                                         int right)
   {
-    return new EmptyBorder (top, left, bottom, right);
+    return new EmptyBorder(top, left, bottom, right);
   }
 
   /**
    * Create a compound border with a null inside edge and a null outside edge.
    *
    * @return The CompoundBorder object
-   */ 
-  public static CompoundBorder createCompoundBorder ()
+   */
+  public static CompoundBorder createCompoundBorder()
   {
-    return new CompoundBorder ();
+    return new CompoundBorder();
   }
 
   /**
@@ -394,35 +397,39 @@ public class BorderFactory
    * outside and inside edges.
    *
    * @param outsideBorder A Border object for the outer edge of the
-   * compound border
+   *     compound border
    * @param insideBorder A Border object for the inner edge of the
-   * compound border
+   *     compound border
    *
    * @return The CompoundBorder object
-   */ 
-  public static CompoundBorder createCompoundBorder (Border outsideBorder,
-						     Border insideBorder)
+   */
+  public static CompoundBorder createCompoundBorder(Border outsideBorder,
+                                                    Border insideBorder)
   {
-    return new CompoundBorder (outsideBorder, insideBorder);
+    return new CompoundBorder(outsideBorder, insideBorder);
   }
 
   /**
    * Create a matte-look border using a solid color. (The difference between
-   * this border and a line border is that you can specify the individual
-   * border dimensions.)
-   *
-   * @param top An int specifying the width of the top in pixels
-   * @param left An int specifying the width of the left side in pixels
-   * @param bottom An int specifying the width of the right side in pixels
-   * @param right An int specifying the width of the bottom in pixels
-   * @param color A Color to use for the border
-   *
+   * this border and a line border is that you can specify the individual border
+   * dimensions.)
+   * 
+   * @param top
+   *          An int specifying the width of the top in pixels
+   * @param left
+   *          An int specifying the width of the left side in pixels
+   * @param bottom
+   *          An int specifying the width of the right side in pixels
+   * @param right
+   *          An int specifying the width of the bottom in pixels
+   * @param color
+   *          A Color to use for the border
    * @return The MatteBorder object
-   */ 
-  public static MatteBorder createMatteBorder (int top, int left, int bottom,
-					       int right, Color color)
+   */
+  public static MatteBorder createMatteBorder(int top, int left, int bottom,
+                                              int right, Color color)
   {
-    return new MatteBorder (top, left, bottom, right, color);
+    return new MatteBorder(top, left, bottom, right, color);
   }
 
   /**
@@ -440,10 +447,10 @@ public class BorderFactory
    * @param tileIcon The Icon object used for the border tiles
    *
    * @return The MatteBorder object
-   */ 
-  public static MatteBorder createMatteBorder (int top, int left, int bottom,
-					       int right, Icon tileIcon)
+   */
+  public static MatteBorder createMatteBorder(int top, int left, int bottom,
+                                              int right, Icon tileIcon)
   {
-    return new MatteBorder (top, left, bottom, right, tileIcon);
+    return new MatteBorder(top, left, bottom, right, tileIcon);
   }
 }

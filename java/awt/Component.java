@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -897,9 +897,21 @@ public abstract class Component
     if(!isVisible())
       {
         this.visible = true;
-        if (peer != null)
-          peer.setVisible(true);
-        invalidate();
+        // Avoid NullPointerExceptions by creating a local reference.
+        ComponentPeer currentPeer=peer;
+        if (currentPeer != null)
+            currentPeer.setVisible(true);
+
+        // Invalidate the parent if we have one. The component itself must
+        // not be invalidated. We also avoid NullPointerException with
+        // a local reference here.
+        Container currentParent = parent;
+        if (currentParent != null)
+          {
+            currentParent.invalidate();
+            currentParent.repaint();
+          }
+
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
         getToolkit().getSystemEventQueue().postEvent(ce);
@@ -930,10 +942,23 @@ public abstract class Component
   {
     if (isVisible())
       {
-        if (peer != null)
-          peer.setVisible(false);
+        // Avoid NullPointerExceptions by creating a local reference.
+        ComponentPeer currentPeer=peer;
+        if (currentPeer != null)
+            currentPeer.setVisible(false);
+        
         this.visible = false;
-        invalidate();
+        
+        // Invalidate the parent if we have one. The component itself must
+        // not be invalidated. We also avoid NullPointerException with
+        // a local reference here.
+        Container currentParent = parent;
+        if (currentParent != null)
+          {
+            currentParent.invalidate();
+            currentParent.repaint();
+          }
+
         ComponentEvent ce =
           new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
         getToolkit().getSystemEventQueue().postEvent(ce);
@@ -963,10 +988,12 @@ public abstract class Component
    */
   public void setForeground(Color c)
   {
-    firePropertyChange("foreground", foreground, c);
     if (peer != null)
       peer.setForeground(c);
+    
+    Color previous = foreground;
     foreground = c;
+    firePropertyChange("foreground", previous, c);
   }
 
   /**
@@ -992,7 +1019,7 @@ public abstract class Component
   {
     if (background != null)
       return background;
-    return parent == null ? SystemColor.window : parent.getBackground();
+    return parent == null ? null : parent.getBackground();
   }
 
   /**
@@ -1006,16 +1033,18 @@ public abstract class Component
   public void setBackground(Color c)
   {
     // return if the background is already set to that color.
-    if (background != null && c != null)
-      if (background.equals(c))
-	return;
+    if ((c != null) && c.equals(background))
+      return;
+
     // If c is null, inherit from closest ancestor whose bg is set.
     if (c == null && parent != null)
       c = parent.getBackground();
-    firePropertyChange("background", background, c);
     if (peer != null && c != null)
       peer.setBackground(c);
+    
+    Color previous = background;
     background = c;
+    firePropertyChange("background", previous, c);
   }
 
   /**
@@ -1039,13 +1068,15 @@ public abstract class Component
    */
   public Font getFont()
   {
-    if (font != null)
-      return font;
+    Font f = font;
+    if (f != null)
+      return f;
 
-    if (parent != null)
-      return parent.getFont ();
+    Component p = parent;
+    if (p != null)
+      return p.getFont();
     else
-      return new Font ("Dialog", Font.PLAIN, 12);
+      return new Font("Dialog", Font.PLAIN, 12);
   }
 
   /**
@@ -1058,15 +1089,16 @@ public abstract class Component
    */
   public void setFont(Font newFont)
   {
-    if (font == newFont)
-      return;
-    
-    Font oldFont = font;
-    font = newFont;
-    if (peer != null)
-      peer.setFont(font);
-    firePropertyChange("font", oldFont, newFont);
-    invalidate();
+    if((newFont != null && (font == null || !font.equals(newFont)))
+       || newFont == null)
+      {
+        Font oldFont = font;
+        font = newFont;
+        if (peer != null)
+          peer.setFont(font);
+        firePropertyChange("font", oldFont, newFont);
+        invalidate();
+      }
   }
 
   /**
@@ -3502,9 +3534,9 @@ public abstract class Component
   /**
    * Sets the focus traversal keys for one of the three focus
    * traversal directions supported by Components:
-   * {@link #KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS},
-   * {@link #KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS}, or
-   * {@link #KeyboardFocusManager.UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
+   * {@link KeyboardFocusManager#FORWARD_TRAVERSAL_KEYS},
+   * {@link KeyboardFocusManager#BACKWARD_TRAVERSAL_KEYS}, or
+   * {@link KeyboardFocusManager#UP_CYCLE_TRAVERSAL_KEYS}. Normally, the
    * default values should match the operating system's native
    * choices. To disable a given traversal, use
    * <code>Collections.EMPTY_SET</code>. The event dispatcher will
@@ -4184,6 +4216,10 @@ public abstract class Component
       param.append(",translucent");
     if (isDoubleBuffered())
       param.append(",doublebuffered");
+    if (parent == null)
+      param.append(",parent==null");
+    else
+      param.append(",parent==").append(parent.getName());
     return param.toString();
   }
 

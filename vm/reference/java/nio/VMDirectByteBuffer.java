@@ -1,4 +1,4 @@
-/* VMDirectByteBuffer.java -- 
+/* VMDirectByteBuffer.java --
    Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -55,12 +55,13 @@ final class VMDirectByteBuffer
   }
 
   private static native void init();
-  
+
   static native RawData allocate (int capacity);
   static native void free(RawData address);
   static native byte get(RawData address, int index);
   static native void get(RawData address, int index, byte[] dst, int offset, int length);
   static native void put(RawData address, int index, byte value);
+  static native void put(RawData address, int index, byte[] src, int offset, int length);
   static native RawData adjustAddress(RawData address, int offset);
   static native void shiftDown(RawData address, int dst_offset, int src_offset, int count);
 }

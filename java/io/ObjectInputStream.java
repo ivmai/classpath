@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -82,7 +82,7 @@ public class ObjectInputStream extends InputStream
   public ObjectInputStream(InputStream in)
     throws IOException, StreamCorruptedException
   {
-    if (Configuration.DEBUG)
+    if (DEBUG)
       {
 	String val = System.getProperty("gcj.dumpobjects");
 	if (dump == false && val != null && !val.equals(""))
@@ -780,7 +780,7 @@ public class ObjectInputStream extends InputStream
     if (callersClassLoader == null)
       {
 	callersClassLoader = currentLoader ();
-	if (Configuration.DEBUG && dump)
+	if (DEBUG && dump)
 	  {
 	    dumpElementln ("CallersClassLoader = " + callersClassLoader);
 	  }
@@ -1917,6 +1917,8 @@ public class ObjectInputStream extends InputStream
 
   // The nesting depth for debugging output
   private int depth = 0;
+
+  private static final boolean DEBUG = false;
 
   private void dumpElement (String msg)
   {

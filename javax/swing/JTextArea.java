@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -47,6 +47,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
+import javax.swing.text.View;
 
 /**
  * The <code>JTextArea</code> component provides a multi-line area for displaying
@@ -79,13 +80,13 @@ import javax.swing.text.PlainDocument;
  * @author Michael Koch  (konqueror@gmx.de)
  * @author Andrew John Hughes  (gnu_andrew@member.fsf.org)
  * @see java.awt.TextArea
- * @see javax.swing.JTextComponent
+ * @see javax.swing.text.JTextComponent
  * @see javax.swing.JTextField
  * @see javax.swing.JTextPane
  * @see javax.swing.JEditorPane
  * @see javax.swing.text.Document
- * @see javax.swing.text.DocumentEvent
- * @see javax.swing.text.DocumentListener
+ * @see javax.swing.event.DocumentEvent
+ * @see javax.swing.event.DocumentListener
  */
 
 public class JTextArea extends JTextComponent
@@ -165,7 +166,7 @@ public class JTextArea extends JTextComponent
   /**
    * Creates a new <code>JTextArea</code> object.
    *
-   * @param the document model to use
+   * @param doc the document model to use
    */
   public JTextArea(Document doc)
   {
@@ -175,7 +176,7 @@ public class JTextArea extends JTextComponent
   /**
    * Creates a new <code>JTextArea</code> object.
    *
-   * @param the document model to use
+   * @param doc the document model to use
    * @param text the initial text
    * @param rows the number of rows
    * @param columns the number of cols
@@ -188,7 +189,6 @@ public class JTextArea extends JTextComponent
     setText(text);
     setRows(rows);
     setColumns(columns);
-    setPreferredSize(new Dimension(440, 150));
   }
 
   /**
@@ -235,12 +235,12 @@ public class JTextArea extends JTextComponent
   /**
    * Returns the increment that is needed to expose exactly one new line
    * of text. This is implemented here to return the values of
-   * {@link #getRowHeight} and {@link getColumnWidth}, depending on
+   * {@link #getRowHeight} and {@link #getColumnWidth}, depending on
    * the value of the argument <code>direction</code>.
    *
    * @param visibleRect the view area that is visible in the viewport
-   * @param orientation either {@link SwingConstants.VERTICAL} or
-   *     {@link SwingConstants.HORIZONTAL}
+   * @param orientation either {@link SwingConstants#VERTICAL} or
+   *     {@link SwingConstants#HORIZONTAL}
    * @param direction less than zero for up/left scrolling, greater
    *     than zero for down/right scrolling
    *
@@ -329,7 +329,7 @@ public class JTextArea extends JTextComponent
   /**
    * Sets the number of rows.
    *
-   * @param columns number of columns
+   * @param rows number of rows
    *
    * @exception IllegalArgumentException if rows is negative
    */
@@ -355,7 +355,7 @@ public class JTextArea extends JTextComponent
   /**
    * Enables/disables line wrapping.
    *
-   * @param wrapping <code>true</code> to enable line wrapping,
+   * @param flag <code>true</code> to enable line wrapping,
    * <code>false</code> otherwise
    */
   public void setLineWrap(boolean flag)
@@ -528,5 +528,23 @@ public class JTextArea extends JTextComponent
       {
 	// This cannot happen as we check offset above.
       }
+  }
+
+  /**
+   * Returns the preferred size for the JTextArea. This is the maximum of
+   * the size that is needed to display the content and the requested size
+   * as per {@link #getColumns} and {@link #getRows}.
+   *
+   * @return the preferred size of the JTextArea
+   */
+  public Dimension getPreferredSize()
+  {
+    int reqWidth = getColumns() * getColumnWidth();
+    int reqHeight = getRows() * getRowHeight();
+    View view = getUI().getRootView(this);
+    int neededWidth = (int) view.getPreferredSpan(View.HORIZONTAL);
+    int neededHeight = (int) view.getPreferredSpan(View.VERTICAL);
+    return new Dimension(Math.max(reqWidth, neededWidth),
+                          Math.max(reqHeight, neededHeight));
   }
 }

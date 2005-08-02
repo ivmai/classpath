@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -43,13 +43,20 @@ import java.awt.Toolkit;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.RGBImageFilter;
 
+/**
+ * Produces grayscale images out of colored images. This is used to provide
+ * default disabled icons for buttons.
+ *
+ * @author original author unknown
+ */
 public class GrayFilter extends RGBImageFilter
 {
   private boolean b;
-  private int p;
+  private double p;
 
   /**
-   * Create a GrayFilter. If b is true then brighten. Also, indicate how much gray.
+   * Create a GrayFilter. If b is true then brighten. Also, indicate how much
+   * gray.
    *    
    * @param b if brighten
    * @param p percent of gray, 0 - 100
@@ -57,7 +64,7 @@ public class GrayFilter extends RGBImageFilter
   public GrayFilter(boolean b, int p)
   {
     this.b = b; //FIXME - HANDLE THIS
-    this.p = p;
+    this.p = (1. - (p / 100.)) / 3.;
   }
 
   /**
@@ -71,7 +78,7 @@ public class GrayFilter extends RGBImageFilter
   {
     return (Toolkit.getDefaultToolkit().
 	    createImage(new FilteredImageSource(src.getSource(),
-						new GrayFilter(false, 100))));
+						new GrayFilter(true, 0))));
   }
   
   /**
@@ -79,7 +86,13 @@ public class GrayFilter extends RGBImageFilter
    */
   public int filterRGB(int x, int y, int rgb)
   {
-    return (int) (p * (0.299 * ((0xff0000 & rgb) >> 16)
-		       + 0.587 * ((0xff00 & rgb) >> 8) + 0.114 * (0xff & rgb)));
+    int alpha = 0xff000000 & rgb;
+    int red = (0xff0000 & rgb) >> 16;
+    int green = (0xff00 & rgb) >> 8;
+    int blue = (0xff & rgb);
+    int gray = (int) ((0.299 * red + 0.587 * green + 0.114 * blue) * p);
+    if (b)
+      gray = Math.min(gray + 128, 255);
+    return gray | gray << 8 | gray << 16 | alpha ;
   }
 }

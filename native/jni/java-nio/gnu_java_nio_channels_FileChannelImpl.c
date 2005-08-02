@@ -1,5 +1,5 @@
 /* gnu_java_nio_channels_FileChannelImpl.c -
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -51,6 +51,14 @@ exception statement from your version. */
 #include "target_native_math_int.h"
 
 #include "gnu_java_nio_channels_FileChannelImpl.h"
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
+#ifdef HAVE_SYS_MMAN_H
+#include <sys/mman.h>
+#endif /* HAVE_SYS_MMAN_H */
 
 /* These values must be kept in sync with FileChannelImpl.java.  */
 #define FILECHANNELIMPL_READ   1
@@ -87,6 +95,10 @@ exception statement from your version. */
 #define CONVERT_SSIZE_T_TO_JINT(x) ((jint)(x & 0xFFFFFFFF))
 #define CONVERT_JINT_TO_SSIZE_T(x) (x)
 
+/* Align a value up or down to a multiple of the pagesize. */
+#define ALIGN_DOWN(p,s) ((p) - ((p) % (s)))
+#define ALIGN_UP(p,s) ((p) + ((s) - ((p) % (s))))
+
 /* cached fieldID of gnu.java.nio.channels.FileChannelImpl.fd */
 static jfieldID native_fd_fieldID;
 
@@ -101,12 +113,12 @@ get_native_fd (JNIEnv * env, jobject obj)
  * static initialization.
  */
 JNIEXPORT void JNICALL
-Java_gnu_java_nio_channels_FileChannelImpl_init (JNIEnv * env, jclass clazz)
+Java_gnu_java_nio_channels_FileChannelImpl_init (JNIEnv * env,
+						jclass clazz
+						__attribute__ ((__unused__)))
 {
   jclass clazz_fc;
   jfieldID field;
-  jmethodID constructor;
-  jobject obj;
 
   /* Initialize native_fd_fieldID so we only compute it once! */
   clazz_fc = (*env)->FindClass (env, "gnu/java/nio/channels/FileChannelImpl");
@@ -124,28 +136,6 @@ Java_gnu_java_nio_channels_FileChannelImpl_init (JNIEnv * env, jclass clazz)
     }
 
   native_fd_fieldID = field;
-
-  constructor = (*env)->GetMethodID (env, clazz, "<init>", "(II)V");
-  if (!constructor)
-    return;
-
-#define INIT_FIELD(FIELDNAME, FDVALUE, MODE)				\
-  field = (*env)->GetStaticFieldID (env, clazz, FIELDNAME,		\
-				    "Lgnu/java/nio/channels/FileChannelImpl;");	\
-  if (! field)								\
-    return;								\
-  obj = (*env)->NewObject (env, clazz, constructor, FDVALUE, MODE);	\
-  if (! obj)								\
-    return;								\
-  (*env)->SetStaticObjectField (env, clazz, field, obj);		\
-  if ((*env)->ExceptionOccurred (env))					\
-    return;
-
-  INIT_FIELD ("in", 0, FILECHANNELIMPL_READ);
-  INIT_FIELD ("out", 1, FILECHANNELIMPL_WRITE);
-  INIT_FIELD ("err", 2, FILECHANNELIMPL_WRITE);
-
-#undef INIT_FIELD
 }
 
 /*
@@ -214,17 +204,22 @@ Java_gnu_java_nio_channels_FileChannelImpl_open (JNIEnv * env,
 #endif
 
   TARGET_NATIVE_FILE_OPEN (filename, native_fd, flags, permissions, result);
-  JCL_free_cstring (env, name, filename);
 
   if (result != TARGET_NATIVE_OK)
     {
-      /* We can only throw FileNotFoundException.  */
+      char message[256]; /* Fixed size we don't need to malloc. */
+      char *error_string = TARGET_NATIVE_LAST_ERROR_STRING ();
+
+      snprintf(message, 256, "%s: %s", error_string, filename);
+      /* We are only allowed to throw FileNotFoundException.  */
       JCL_ThrowException (env,
 			  "java/io/FileNotFoundException",
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
+			  message);
+      JCL_free_cstring (env, name, filename);
       return TARGET_NATIVE_MATH_INT_INT64_CONST_MINUS_1;
     }
 
+  JCL_free_cstring (env, name, filename);
   return native_fd;
 }
 
@@ -241,12 +236,19 @@ Java_gnu_java_nio_channels_FileChannelImpl_implCloseChannel (JNIEnv * env,
 
   native_fd = get_native_fd (env, obj);
 
-  TARGET_NATIVE_FILE_CLOSE (native_fd, result);
-  if (result != TARGET_NATIVE_OK)
+  do
     {
-      JCL_ThrowException (env, IO_EXCEPTION,
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
+      TARGET_NATIVE_FILE_CLOSE (native_fd, result);
+      if (result != TARGET_NATIVE_OK
+	  && (TARGET_NATIVE_LAST_ERROR ()
+	      != TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL))
+	{
+	  JCL_ThrowException (env, IO_EXCEPTION,
+			      TARGET_NATIVE_LAST_ERROR_STRING ());
+	  return;
+	}
     }
+  while (result != TARGET_NATIVE_OK);
 }
 
 /*
@@ -263,13 +265,19 @@ Java_gnu_java_nio_channels_FileChannelImpl_available (JNIEnv * env,
 
   native_fd = get_native_fd (env, obj);
 
-  TARGET_NATIVE_FILE_AVAILABLE (native_fd, bytes_available, result);
-  if (result != TARGET_NATIVE_OK)
+  do
     {
-      JCL_ThrowException (env, IO_EXCEPTION,
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
-      return 0;
+      TARGET_NATIVE_FILE_AVAILABLE (native_fd, bytes_available, result);
+      if (result != TARGET_NATIVE_OK
+	  && (TARGET_NATIVE_LAST_ERROR ()
+	      != TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL))
+	{
+	  JCL_ThrowException (env, IO_EXCEPTION,
+			      TARGET_NATIVE_LAST_ERROR_STRING ());
+	  return 0;
+	}
     }
+  while (result != TARGET_NATIVE_OK);
 
   /* FIXME NYI ??? why only jint and not jlong? */
   return TARGET_NATIVE_MATH_INT_INT64_TO_INT32 (bytes_available);
@@ -499,13 +507,125 @@ Java_gnu_java_nio_channels_FileChannelImpl_implTruncate (JNIEnv * env,
 }
 
 JNIEXPORT jobject JNICALL
-Java_gnu_java_nio_channels_FileChannelImpl_mapImpl (JNIEnv * env,
-						    jobject obj
-						    __attribute__ ((__unused__)), jchar mode __attribute__ ((__unused__)), jlong position __attribute__ ((__unused__)), jint size __attribute__ ((__unused__)))
+Java_gnu_java_nio_channels_FileChannelImpl_mapImpl (JNIEnv *env, jobject obj,
+						    jchar mode, jlong position, jint size)
 {
+#ifdef HAVE_MMAP
+  jclass MappedByteBufferImpl_class;
+  jclass RawData_class;
+  jmethodID MappedByteBufferImpl_init = NULL;
+  jmethodID RawData_init = NULL;
+  jobject RawData_instance;
+  volatile jobject buffer;
+  long pagesize;
+  int prot, flags;
+  int fd;
+  void *p;
+  void *address;
+
+  /* FIXME: should we just assume we're on an OS modern enough to
+     have 'sysconf'? And not check for 'getpagesize'? */
+#if defined(HAVE_GETPAGESIZE)
+  pagesize = getpagesize ();
+#elif defined(HAVE_SYSCONF)
+  pagesize = sysconf (_SC_PAGESIZE);
+#else
   JCL_ThrowException (env, IO_EXCEPTION,
-		      "java.nio.FileChannelImpl.nio_mmap_file(): not implemented");
+		      "can't determine memory page size");
+  return NULL;
+#endif /* HAVE_GETPAGESIZE/HAVE_SYSCONF */
+
+#if (SIZEOF_VOID_P == 4)
+  RawData_class = (*env)->FindClass (env, "gnu/classpath/RawData32");
+  if (RawData_class != NULL)
+    {
+      RawData_init = (*env)->GetMethodID (env, RawData_class,
+					  "<init>", "(I)V");
+    }
+#elif (SIZEOF_VOID_P == 8)
+  RawData_class = (*env)->FindClass (env, "gnu/classpath/RawData64");
+  if (RawData_class != NULL)
+    {
+      RawData_init = (*env)->GetMethodID (env, RawData_class,
+					  "<init>", "(J)V");
+    }
+#else
+  JCL_ThrowException (env, IO_EXCEPTION,
+		      "pointer size not supported");
+  return NULL;
+#endif /* SIZEOF_VOID_P */
+
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return NULL;
+    }
+  if (RawData_init == NULL)
+    {
+      JCL_ThrowException (env, "java/lang/InternalError",
+                          "could not get RawData constructor");
+      return NULL;
+    }
+
+  prot = PROT_READ;
+  if (mode == '+')
+    prot |= PROT_WRITE;
+  flags = (mode == 'c' ? MAP_PRIVATE : MAP_SHARED);
+  fd = get_native_fd (env, obj);
+  p = mmap (NULL, (size_t) ALIGN_UP (size, pagesize), prot, flags,
+	    fd, ALIGN_DOWN (position, pagesize));
+  if (p == MAP_FAILED)
+    {
+      JCL_ThrowException (env, IO_EXCEPTION, strerror (errno));
+      return NULL;
+    }
+
+  /* Unalign the mapped value back up, since we aligned offset
+     down to a multiple of the page size. */
+  address = (void *) ((char *) p + (position % pagesize));
+
+#if (SIZEOF_VOID_P == 4)
+  RawData_instance = (*env)->NewObject (env, RawData_class,
+					RawData_init, (jint) address);
+#elif (SIZEOF_VOID_P == 8)
+  RawData_instance = (*env)->NewObject (env, RawData_class,
+					RawData_init, (jlong) address);
+#endif /* SIZEOF_VOID_P */
+
+  MappedByteBufferImpl_class = (*env)->FindClass (env,
+						  "java/nio/MappedByteBufferImpl");
+  if (MappedByteBufferImpl_class != NULL)
+    {
+      MappedByteBufferImpl_init =
+	(*env)->GetMethodID (env, MappedByteBufferImpl_class,
+			     "<init>", "(Lgnu/classpath/RawData;IZ)V");
+    }
+
+  if ((*env)->ExceptionOccurred (env))
+    {
+      munmap (p, ALIGN_UP (size, pagesize));
+      return NULL;
+    }
+  if (MappedByteBufferImpl_init == NULL)
+    {
+      JCL_ThrowException (env, "java/lang/InternalError",
+                          "could not get MappedByteBufferImpl constructor");
+      munmap (p, ALIGN_UP (size, pagesize));
+      return NULL;
+    }
+
+  buffer = (*env)->NewObject (env, MappedByteBufferImpl_class,
+                              MappedByteBufferImpl_init, RawData_instance,
+                              (jint) size, mode == 'r');
+  return buffer;
+#else
+  (void) obj;
+  (void) mode;
+  (void) position;
+  (void) size;
+  JCL_ThrowException (env, IO_EXCEPTION,
+		      "memory-mapped files not implemented");
   return 0;
+#endif /* HAVE_MMAP */
 }
 
 /*
@@ -539,7 +659,7 @@ Java_gnu_java_nio_channels_FileChannelImpl_read__ (JNIEnv * env, jobject obj)
 	  return (-1);
 	}
     }
-  while (bytes_read != 1);
+  while (result != TARGET_NATIVE_OK);
 
   return ((jint) (data & 0xFF));
 }
@@ -567,11 +687,24 @@ Java_gnu_java_nio_channels_FileChannelImpl_read___3BII (JNIEnv * env,
   if (length == 0)
     return 0;
 
+  if (offset < 0)
+    {
+      JCL_ThrowException (env, IO_EXCEPTION, "negative offset");
+      return -1;
+    }
+
   bufptr = (*env)->GetByteArrayElements (env, buffer, 0);
   if (!bufptr)
     {
       JCL_ThrowException (env, IO_EXCEPTION, "Unexpected JNI error");
       return (-1);
+    }
+
+  if (length + offset > (*env)->GetArrayLength (env, buffer))
+    {
+      JCL_ThrowException (env, IO_EXCEPTION,
+			  "length + offset > buffer.length");
+      return -1;
     }
 
   bytes_read = 0;
@@ -596,7 +729,8 @@ Java_gnu_java_nio_channels_FileChannelImpl_read___3BII (JNIEnv * env,
 	  (*env)->ReleaseByteArrayElements (env, buffer, bufptr, 0);
 	  return -1;
 	}
-      bytes_read += n;
+      if (result == TARGET_NATIVE_OK)
+	bytes_read += n;
     }
   while (bytes_read < 1);
 
@@ -630,9 +764,26 @@ Java_gnu_java_nio_channels_FileChannelImpl_write__I (JNIEnv * env,
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
 			      TARGET_NATIVE_LAST_ERROR_STRING ());
+	  return;
 	}
     }
   while (result != TARGET_NATIVE_OK);
+}
+
+/*
+ * Copies all parts of a file to disk.
+ */
+JNIEXPORT void JNICALL
+Java_gnu_java_nio_channels_FileChannelImpl_force (JNIEnv * env,
+						  jobject obj)
+{
+  int native_fd;
+  int result;
+  native_fd = get_native_fd (env, obj);
+  TARGET_NATIVE_FILE_FSYNC (native_fd, result);
+  if (result != TARGET_NATIVE_OK)
+    JCL_ThrowException (env, IO_EXCEPTION,
+			TARGET_NATIVE_LAST_ERROR_STRING ());
 }
 
 /*
@@ -679,35 +830,80 @@ Java_gnu_java_nio_channels_FileChannelImpl_write___3BII (JNIEnv * env,
 	  (*env)->ReleaseByteArrayElements (env, buffer, bufptr, 0);
 	  return;
 	}
-      bytes_written += n;
+      if (result == TARGET_NATIVE_OK)
+	bytes_written += n;
     }
 
   (*env)->ReleaseByteArrayElements (env, buffer, bufptr, 0);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_gnu_java_nio_channels_FileChannelImpl_lock (JNIEnv * env,
-						 jobject obj
-						 __attribute__ ((__unused__)),
-						 jlong position
-						 __attribute__ ((__unused__)),
-						 jlong size
-						 __attribute__ ((__unused__)),
-						 jboolean shared
-						 __attribute__ ((__unused__)),
-						 jboolean wait
-						 __attribute__ ((__unused__)))
+Java_gnu_java_nio_channels_FileChannelImpl_lock (JNIEnv *env, jobject obj,
+                                                 jlong position, jlong size,
+                                                 jboolean shared, jboolean wait)
 {
-  JCL_ThrowException (env, IO_EXCEPTION,
-		      "java.nio.FileChannelImpl.lock(): not implemented");
-  return 0;
+#ifdef HAVE_FCNTL
+  int fd = get_native_fd (env, obj);
+  int cmd = wait ? F_SETLKW : F_SETLK;
+  struct flock flock;
+  int ret;
+
+  flock.l_type = shared ? F_RDLCK : F_WRLCK;
+  flock.l_whence = SEEK_SET;
+  flock.l_start = (off_t) position;
+  flock.l_len = (off_t) size;
+
+  ret = fcntl (fd, cmd, &flock);
+  if (ret)
+    {
+      /* Linux man pages for fcntl state that errno might be either
+         EACCES or EAGAIN if we try F_SETLK, and another process has
+         an overlapping lock. */
+      if (errno != EACCES && errno != EAGAIN)
+        {
+          JCL_ThrowException (env, IO_EXCEPTION, strerror (errno));
+        }
+      return JNI_FALSE;
+    }
+  return JNI_TRUE;
+#else
+  (void) obj;
+  (void) position;
+  (void) size;
+  (void) shared;
+  (void) wait;
+  JCL_ThrowException (env, "java/lang/UnsupportedOperationException",
+                      "file locks not implemented on this platform");
+  return JNI_FALSE;
+#endif /* HAVE_FCNTL */
 }
 
 JNIEXPORT void JNICALL
-Java_gnu_java_nio_channels_FileChannelImpl_unlock (JNIEnv * env,
-						   jobject obj
-						   __attribute__ ((__unused__)), jlong position __attribute__ ((__unused__)), jlong length __attribute__ ((__unused__)))
+Java_gnu_java_nio_channels_FileChannelImpl_unlock (JNIEnv *env,
+                                                   jobject obj,
+                                                   jlong position,
+                                                   jlong length)
 {
-  JCL_ThrowException (env, IO_EXCEPTION,
-		      "java.nio.FileChannelImpl.unlock(): not implemented");
+#ifdef HAVE_FCNTL
+  int fd = get_native_fd (env, obj);
+  struct flock flock;
+  int ret;
+
+  flock.l_type = F_UNLCK;
+  flock.l_whence = SEEK_SET;
+  flock.l_start = (off_t) position;
+  flock.l_len = (off_t) length;
+
+  ret = fcntl (fd, F_SETLK, &flock);
+  if (ret)
+    {
+      JCL_ThrowException (env, IO_EXCEPTION, strerror (errno));
+    }
+#else
+  (void) obj;
+  (void) position;
+  (void) length;
+  JCL_ThrowException (env, "java/lang/UnsupportedOperationException",
+                      "file locks not implemented on this platform");
+#endif /* HAVE_FCNTL */
 }

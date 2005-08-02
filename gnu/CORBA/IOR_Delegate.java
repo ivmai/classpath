@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,7 +40,9 @@ package gnu.CORBA;
 
 import gnu.CORBA.CDR.cdrBufInput;
 import gnu.CORBA.GIOP.ReplyHeader;
+import gnu.CORBA.Poa.activeObjectMap;
 
+import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.ExceptionList;
@@ -56,6 +58,8 @@ import org.omg.CORBA.portable.RemarshalException;
 
 import java.io.IOException;
 
+import java.net.Socket;
+
 /**
  * The Classpath implementation of the {@link Delegate} functionality in the
  * case, when the object was constructed from an IOR object. The IOR can be
@@ -68,6 +72,17 @@ import java.io.IOException;
 public class IOR_Delegate
   extends Simple_delegate
 {
+  /**
+   * True if the current IOR does not map into the local servant.
+   * If false, the IOR is either local or should be checked.
+   */
+  boolean remote_ior;
+
+  /**
+   * If not null, this field contains data about the local servant.
+   */
+  activeObjectMap.Obj local_ior;
+
   /**
    * Contructs an instance of object using the given IOR.
    */
@@ -94,7 +109,7 @@ public class IOR_Delegate
                                 NamedValue returns
                                )
   {
-    gnuRequest request = new gnuRequest();
+    gnuRequest request = getRequestInstance(target);
 
     request.setIor(getIor());
     request.set_target(target);
@@ -125,7 +140,7 @@ public class IOR_Delegate
                                 ContextList ctx_list
                                )
   {
-    gnuRequest request = new gnuRequest();
+    gnuRequest request = getRequestInstance(target);
 
     request.setIor(ior);
     request.set_target(target);
@@ -142,8 +157,19 @@ public class IOR_Delegate
   }
 
   /**
-   * Invoke operation on the given object, writing parameters to the given
-   * output stream.
+   * Get the instance of request.
+   */
+  protected gnuRequest getRequestInstance(org.omg.CORBA.Object target)
+  {
+    return new gnuRequest();
+  }
+
+  /**
+   * Invoke operation on the given object, als handling temproray and permanent
+   * redirections. The ReplyHeader.LOCATION_FORWARD will cause to resend
+   * the request to the new direction. The ReplyHeader.LOCATION_FORWARD_PERM
+   * will cause additionally to remember the new location by this delegate,
+   * so subsequent calls will be immediately delivered to the new target.
    *
    * @param target the target object.
    * @param output the output stream, previously returned by
@@ -211,21 +237,56 @@ public class IOR_Delegate
                 }
               catch (IOException ex)
                 {
-                  MARSHAL t = new MARSHAL("Cant read forwarding info");
+                  MARSHAL t =
+                    new MARSHAL("Cant read forwarding info", 5102,
+                                CompletionStatus.COMPLETED_NO
+                               );
                   t.initCause(ex);
                   throw t;
                 }
 
-              request.request.setIor(forwarded);
+              gnuRequest prev = request.request;
+              gnuRequest r = getRequestInstance(target);
 
-              // If the object has moved permanently, its IOR is replaced.
-              if (moved_permanently)
-                setIor(forwarded);
+              r.m_args = prev.m_args;
+              r.m_context = prev.m_context;
+              r.m_context_list = prev.m_context_list;
+              r.m_environment = prev.m_environment;
+              r.m_exceptions = prev.m_exceptions;
+              r.m_operation = prev.m_operation;
+              r.m_parameter_buffer = prev.m_parameter_buffer;
+              r.m_parameter_buffer.request = r;
+              r.m_result = prev.m_result;
+              r.m_target = prev.m_target;
+              r.oneWay = prev.oneWay;
+              r.setIor(forwarded);
 
-              return invoke(target, request);
+              IOR_contructed_object it =
+                new IOR_contructed_object(orb, forwarded);
+
+              r.m_target = it;
+
+              request.request = r;
+
+              IOR prev_ior = getIor();
+
+              setIor(forwarded);
+
+              try
+                {
+                  return invoke(it, request);
+                }
+              finally
+                {
+                  if (!moved_permanently)
+                    setIor(prev_ior);
+                }
 
             default :
-              throw new MARSHAL("Unknow reply status: " + rh.reply_status);
+              throw new MARSHAL("Unknow reply status: " + rh.reply_status,
+                                8000 + rh.reply_status,
+                                CompletionStatus.COMPLETED_NO
+                               );
           }
       }
     else
@@ -245,7 +306,7 @@ public class IOR_Delegate
    */
   public Request request(org.omg.CORBA.Object target, String operation)
   {
-    gnuRequest request = new gnuRequest();
+    gnuRequest request = getRequestInstance(target);
 
     request.setIor(ior);
     request.set_target(target);
@@ -270,7 +331,7 @@ public class IOR_Delegate
                               boolean response_expected
                              )
   {
-    gnuRequest request = new gnuRequest();
+    gnuRequest request = getRequestInstance(target);
 
     request.setIor(ior);
     request.set_target(target);
@@ -280,5 +341,54 @@ public class IOR_Delegate
     request.setORB(orb);
 
     return request.getParameterStream();
+  }
+
+  /**
+   * If there is an opened cache socket to access this object, close
+   * that socket.
+   *
+   * @param target The target is not used, this delegate requires a
+   * single instance per object.
+   */
+  public void release(org.omg.CORBA.Object target)
+  {
+    String key = ior.Internet.host + ":" + ior.Internet.port;
+
+    Socket socket = SocketRepository.get_socket(key);
+    try
+      {
+        if (socket != null)
+          {
+            socket.close();
+          }
+      }
+    catch (IOException ex)
+      {
+        // do nothing, then.
+      }
+  }
+
+  /**
+   * Reset the remote_ior flag, forcing to check if the object is local
+   * on the next getRequestInstance call.
+   */
+  public void setIor(IOR an_ior)
+  {
+    super.setIor(an_ior);
+    remote_ior = false;
+    local_ior = null;
+  }
+
+  /**
+   * Checks if the ior is local so far it is easy.
+   */
+  public boolean is_local(org.omg.CORBA.Object self)
+  {
+    if (remote_ior)
+      return false;
+    else if (local_ior != null)
+      return true;
+    else
+      return super.is_local(self);
   }
 }

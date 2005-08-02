@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -135,22 +135,6 @@ public class PlainDocument extends AbstractDocument
                                           start, end - len);
         rootElement.replace(i1, i2 - i1, new Element[]{ newEl });
       }
-    else
-      {
-        // otherwise only adjust indices of the element
-        LeafElement el1 = (LeafElement) rootElement.getElement(i1);
-        el1.end -= len;
-      }
-
-    // reindex remaining elements
-    for (int i = rootElement.getElementIndex(p0) + 1;
-         i < rootElement.getElementCount(); i++)
-      {
-        LeafElement el = (LeafElement) rootElement.getElement(i);
-        el.start -= len;
-        el.end -= len;
-      }
-      
   }
 
   public Element getDefaultRootElement()

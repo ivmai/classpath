@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -154,10 +154,9 @@ public class JDesktopPane extends JLayeredPane implements Accessible
 
     // FIXME: Unsupported mode.
     if (mode == OUTLINE_DRAG_MODE)
-      {
-        // throw new IllegalArgumentException("Outline drag modes are unsupported.");
-        mode = LIVE_DRAG_MODE;
-      }
+      // throw new IllegalArgumentException("Outline drag modes are
+      // unsupported.");
+      mode = LIVE_DRAG_MODE;
 
     dragMode = mode;
   }
@@ -241,22 +240,22 @@ public class JDesktopPane extends JLayeredPane implements Accessible
   {
     if (selectedFrame != null)
       {
-	try
-	  {
-	    selectedFrame.setSelected(false);
-	  }
-	catch (PropertyVetoException e)
-	  {
-	  }
+        try
+          {
+            selectedFrame.setSelected(false);
+          }
+        catch (PropertyVetoException e)
+          {
+          }
       }
     selectedFrame = null;
 
     try
       {
-	if (frame != null)
-	  frame.setSelected(true);
+        if (frame != null)
+          frame.setSelected(true);
 
-	selectedFrame = frame;
+        selectedFrame = frame;
       }
     catch (PropertyVetoException e)
       {

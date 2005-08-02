@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -288,7 +288,7 @@ public class Inflater
    * returns 0, you should check, whether needsDictionary(),
    * needsInput() or finished() returns true, to determine why no 
    * further output is produced.
-   * @param buffer the output buffer.
+   * @param buf the output buffer.
    * @return the number of bytes written to the buffer, 0 if no further
    * output can be produced.  
    * @exception DataFormatException if deflated stream is invalid.
@@ -304,7 +304,7 @@ public class Inflater
    * returns 0, you should check, whether needsDictionary(),
    * needsInput() or finished() returns true, to determine why no 
    * further output is produced.
-   * @param buffer the output buffer.
+   * @param buf the output buffer.
    * @param off the offset into buffer where the output should start.
    * @param len the maximum length of the output.
    * @return the number of bytes written to the buffer, 0 if no further
@@ -428,7 +428,7 @@ public class Inflater
   /**
    * Sets the input.  This should only be called, if needsInput()
    * returns true.
-   * @param buffer the input.
+   * @param buf the input.
    * @exception IllegalStateException if no input is needed.
    */
   public void setInput (byte[] buf) 
@@ -439,7 +439,7 @@ public class Inflater
   /**
    * Sets the input.  This should only be called, if needsInput()
    * returns true.
-   * @param buffer the input.
+   * @param buf the input.
    * @param off the offset into buffer where the input starts.
    * @param len the length of the input.  
    * @exception IllegalStateException if no input is needed.

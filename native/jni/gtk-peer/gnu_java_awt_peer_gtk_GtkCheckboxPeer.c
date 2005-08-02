@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,7 +40,22 @@ exception statement from your version. */
 #include "gnu_java_awt_peer_gtk_GtkCheckboxPeer.h"
 #include "gnu_java_awt_peer_gtk_GtkComponentPeer.h"
 
-static void item_toggled (GtkToggleButton *item, jobject peer);
+static jmethodID postItemEventID;
+
+void
+cp_gtk_checkbox_init_jni (void)
+{
+  jclass gtkcheckboxpeer;
+
+  gtkcheckboxpeer = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
+                                             "gnu/java/awt/peer/gtk/GtkCheckboxPeer");
+
+  postItemEventID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkcheckboxpeer,
+                                               "postItemEvent", 
+                                               "(Ljava/lang/Object;I)V");
+}
+
+static void item_toggled_cb (GtkToggleButton *item, jobject peer);
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_create
@@ -48,9 +63,9 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_create
 {
   GtkWidget *button;
 
-  NSA_SET_GLOBAL_REF (env, obj);
-
   gdk_threads_enter ();
+
+  NSA_SET_GLOBAL_REF (env, obj);
 
   if (group == NULL)
     button = gtk_check_button_new_with_label ("");
@@ -66,28 +81,31 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_create
 	}
     }
 
-  gdk_threads_leave ();
-
   NSA_SET_PTR (env, obj, button);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_connectSignals
   (JNIEnv *env, jobject obj)
 {
-  void *ptr = NSA_GET_PTR (env, obj);
-  jobject *gref = NSA_GET_GLOBAL_REF (env, obj);
-  g_assert (gref);
+  void *ptr = NULL;
+  jobject *gref = NULL;
 
   gdk_threads_enter ();
 
+  ptr = NSA_GET_PTR (env, obj);
+  gref = NSA_GET_GLOBAL_REF (env, obj);
+
+  /* Checkbox signals */
   g_signal_connect (G_OBJECT (ptr), "toggled",
-		      GTK_SIGNAL_FUNC (item_toggled), *gref);
+                    G_CALLBACK (item_toggled_cb), *gref);
+
+  /* Component signals */
+  cp_gtk_component_connect_signals (G_OBJECT (ptr), gref);
 
   gdk_threads_leave ();
-
-  /* Connect the superclass signals.  */
-  Java_gnu_java_awt_peer_gtk_GtkComponentPeer_connectSignals (env, obj);
 }
 
 JNIEXPORT void JNICALL 
@@ -97,9 +115,9 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_nativeSetCheckboxGroup
   GtkRadioButton *button;
   void *native_group, *ptr;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   /* FIXME: we can't yet switch between a checkbutton and a
      radiobutton.  However, AWT requires this.  For now we just
@@ -115,8 +133,6 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_nativeSetCheckboxGroup
 				gtk_radio_button_group 
 				(GTK_RADIO_BUTTON (native_group)));
 
-  gdk_threads_leave ();
-
   /* If the native group wasn't set on the new CheckboxGroup, then set
      it now so that the right thing will happen with the next
      radiobutton.  The native state for a CheckboxGroup is a pointer
@@ -126,6 +142,8 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_nativeSetCheckboxGroup
      notified.  */
   if (native_group == NULL)
     NSA_SET_PTR (env, group, native_group);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL
@@ -134,9 +152,9 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkToggleButtonSetActive
 {
   void *ptr;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (ptr), is_active);
 
@@ -153,20 +171,21 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkWidgetModifyFont
   GtkWidget *label;
   PangoFontDescription *font_desc;
 
+  gdk_threads_enter();
+
   ptr = NSA_GET_PTR (env, obj);
 
   button = GTK_WIDGET (ptr);
   label = gtk_bin_get_child (GTK_BIN(button));
 
   if (!label)
-      return;
+    return;
 
   font_name = (*env)->GetStringUTFChars (env, name, NULL);
 
-  gdk_threads_enter();
-
   font_desc = pango_font_description_from_string (font_name);
-  pango_font_description_set_size (font_desc, size * dpi_conversion_factor);
+  pango_font_description_set_size (font_desc,
+                                   size * cp_gtk_dpi_conversion_factor);
 
   if (style & AWT_STYLE_BOLD)
     pango_font_description_set_weight (font_desc, PANGO_WEIGHT_BOLD);
@@ -178,9 +197,9 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkWidgetModifyFont
   
   pango_font_description_free (font_desc);
   
-  gdk_threads_leave();
-  
   (*env)->ReleaseStringUTFChars (env, name, font_name);
+  
+  gdk_threads_leave();
 }
 
 JNIEXPORT void JNICALL
@@ -191,27 +210,31 @@ Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkButtonSetLabel
   GtkWidget *label_widget;
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
   c_label = (*env)->GetStringUTFChars (env, label, NULL);
 
-  gdk_threads_enter ();
-
   label_widget = gtk_bin_get_child (GTK_BIN (ptr));
   gtk_label_set_text (GTK_LABEL (label_widget), c_label);
 
-  gdk_threads_leave ();
-
   (*env)->ReleaseStringUTFChars (env, label, c_label);
+
+  gdk_threads_leave ();
 }
 
 static void
-item_toggled (GtkToggleButton *item, jobject peer)
+item_toggled_cb (GtkToggleButton *item, jobject peer)
 {
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer,
-			      postItemEventID,
-			      peer,
-			      item->active ?
-			      (jint) AWT_ITEM_SELECTED :
-			      (jint) AWT_ITEM_DESELECTED);
+  gdk_threads_leave ();
+
+  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
+                                postItemEventID,
+                                peer,
+                                item->active ?
+                                (jint) AWT_ITEM_SELECTED :
+                                (jint) AWT_ITEM_DESELECTED);
+
+  gdk_threads_enter ();
 }

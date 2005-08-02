@@ -1,5 +1,5 @@
 /* gdkpixbufdecoder.c
-   Copyright (C) 1999, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of GNU Classpath.
    
@@ -15,8 +15,8 @@
    
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
    
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -41,13 +41,26 @@
 #include <gdk-pixbuf/gdk-pixbuf-loader.h>
 
 #include <jni.h>
+#include <jcl.h>
 #include "native_state.h"
 #include "gnu_java_awt_peer_gtk_GdkPixbufDecoder.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-struct state_table *native_pixbufdecoder_state_table;
+static struct state_table *native_pixbufdecoder_state_table;
+
+#define NSA_PB_INIT(env, clazz) \
+  native_pixbufdecoder_state_table = cp_gtk_init_state_table (env, clazz)
+
+#define NSA_GET_PB_PTR(env, obj) \
+  cp_gtk_get_state (env, obj, native_pixbufdecoder_state_table)
+
+#define NSA_SET_PB_PTR(env, obj, ptr) \
+  cp_gtk_set_state (env, obj, native_pixbufdecoder_state_table, (void *)ptr)
+
+#define NSA_DEL_PB_PTR(env, obj) \
+  cp_gtk_remove_state_slot (env, obj, native_pixbufdecoder_state_table)
 
 /* Union used for type punning. */
 union env_union
@@ -64,26 +77,28 @@ static jmethodID dataOutputWriteID;
 static jmethodID registerFormatID;
 
 static void
-area_prepared (GdkPixbufLoader *loader, 
+area_prepared_cb (GdkPixbufLoader *loader, 
 	       jobject *decoder)
 {
-  JNIEnv *env;
+  JNIEnv *env = NULL;
   union env_union e;
-  jint width, height;
+  jint width = 0;
+  jint height = 0;
+  GdkPixbuf *pixbuf = NULL;
 
-  GdkPixbuf *pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-  if (pixbuf == NULL)
-    return;
+  pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+  g_assert (pixbuf != NULL);
 
   width = gdk_pixbuf_get_width (pixbuf); 
   height = gdk_pixbuf_get_height (pixbuf);
-
-  gdk_threads_leave ();
 
   g_assert (decoder != NULL);
 
   e.jni_env = &env;
   (*vm)->GetEnv (vm, e.void_env, JNI_VERSION_1_1);
+
+  gdk_threads_leave ();
+
   (*env)->CallVoidMethod (env,
 			  *decoder,
 			  areaPreparedID,
@@ -93,7 +108,7 @@ area_prepared (GdkPixbufLoader *loader,
 }
 
 static void
-area_updated (GdkPixbufLoader *loader, 
+area_updated_cb (GdkPixbufLoader *loader, 
 	      gint x, gint y, 
 	      gint width, gint height,
 	      jobject *decoder)
@@ -127,7 +142,13 @@ area_updated (GdkPixbufLoader *loader,
 
   e.jni_env = &env;
   (*vm)->GetEnv (vm, e.void_env, JNI_VERSION_1_1);
+
+  gdk_threads_leave ();
+
   jpixels = (*env)->NewIntArray (env, n_pixels);
+
+  gdk_threads_enter ();
+
   java_pixels = (*env)->GetIntArrayElements (env, jpixels, NULL);
 
   memcpy (java_pixels, 
@@ -147,6 +168,7 @@ area_updated (GdkPixbufLoader *loader,
   gdk_threads_leave ();
 
   (*env)->ReleaseIntArrayElements (env, jpixels, java_pixels, 0);
+
   (*env)->CallVoidMethod (env, 
 			  *decoder, 
 			  areaUpdatedID,
@@ -154,12 +176,14 @@ area_updated (GdkPixbufLoader *loader,
 			  (jint) width, (jint) height,
 			  jpixels,
 			  stride_pixels);
+
   (*env)->DeleteLocalRef(env, jpixels);
+
   gdk_threads_enter ();
 }
 
 static void
-closed (GdkPixbufLoader *loader __attribute__((unused)), jobject *decoder)
+closed_cb (GdkPixbufLoader *loader __attribute__((unused)), jobject *decoder)
 {
   JNIEnv *env;
   union env_union e;
@@ -167,8 +191,10 @@ closed (GdkPixbufLoader *loader __attribute__((unused)), jobject *decoder)
   (*vm)->GetEnv (vm, e.void_env, JNI_VERSION_1_1);
 
   gdk_threads_leave ();
+
   (*env)->DeleteGlobalRef (env, *decoder); 
-  free (decoder);
+  g_free (decoder);
+
   gdk_threads_enter ();
 }
 
@@ -181,19 +207,21 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initState
   GdkPixbufLoader *loader = NULL;
   jobject *decoder = NULL;
 
-  decoder = (jobject *) malloc (sizeof (jobject));
+  gdk_threads_enter ();
+
+  decoder = (jobject *) g_malloc (sizeof (jobject));
   g_assert (decoder != NULL);
   *decoder = (*env)->NewGlobalRef (env, obj);
 
-  gdk_threads_enter ();
   loader = gdk_pixbuf_loader_new ();
   g_assert (loader != NULL);  
-  g_signal_connect (loader, "area-prepared", G_CALLBACK (area_prepared), decoder);  
-  g_signal_connect (loader, "area-updated", G_CALLBACK (area_updated), decoder);
-  g_signal_connect (loader, "closed", G_CALLBACK (closed), decoder);
-  gdk_threads_leave ();
+  g_signal_connect (loader, "area-prepared", G_CALLBACK (area_prepared_cb), decoder);  
+  g_signal_connect (loader, "area-updated", G_CALLBACK (area_updated_cb), decoder);
+  g_signal_connect (loader, "closed", G_CALLBACK (closed_cb), decoder);
 
   NSA_SET_PB_PTR (env, obj, loader);
+
+  gdk_threads_leave ();
 }
 
 static void
@@ -299,18 +327,44 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initStaticState
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_finish
-  (JNIEnv *env, jobject obj)
+(JNIEnv *env, jobject obj, jboolean needs_close)
 {
   GdkPixbufLoader *loader = NULL;
+
+  gdk_threads_enter ();
 
   loader = (GdkPixbufLoader *)NSA_DEL_PB_PTR (env, obj);
   if (loader == NULL)
     return;
 
-  gdk_threads_enter ();
-  gdk_pixbuf_loader_close (loader, NULL);
+  if (needs_close)
+    gdk_pixbuf_loader_close (loader, NULL);
   g_object_unref (loader);
+
   gdk_threads_leave (); 
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_pumpDone
+(JNIEnv *env, jobject obj)
+{
+  GError *err = NULL;
+  GdkPixbufLoader *loader = NULL;
+
+  gdk_threads_enter ();
+
+  loader = (GdkPixbufLoader *)NSA_GET_PB_PTR (env, obj);
+  g_assert (loader != NULL);
+
+  gdk_pixbuf_loader_close (loader, &err);
+
+  if (err != NULL)
+    {
+      JCL_ThrowException (env, "java/io/IOException", err->message);
+      g_error_free (err);
+    }
+
+  gdk_threads_leave ();
 }
 
 struct stream_save_request
@@ -331,13 +385,16 @@ save_to_stream(const gchar *buf,
   jbyte *cbuf;
 
   gdk_threads_leave ();
+
   jbuf = (*(ssr->env))->NewByteArray ((ssr->env), count);
   cbuf = (*(ssr->env))->GetByteArrayElements ((ssr->env), jbuf, NULL);
   memcpy (cbuf, buf, count);
   (*(ssr->env))->ReleaseByteArrayElements ((ssr->env), jbuf, cbuf, 0);
   (*(ssr->env))->CallVoidMethod ((ssr->env), *(ssr->stream), 
 				 dataOutputWriteID, jbuf);  
+
   gdk_threads_enter ();
+
   return TRUE;
 }
 
@@ -354,8 +411,10 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_streamImage
   GError *err = NULL;
   const char *enctype;
   int i;
-
   struct stream_save_request ssr;
+
+  gdk_threads_enter ();
+
   ssr.stream = &stream;
   ssr.env = env;
 
@@ -399,7 +458,6 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_streamImage
 	*p++ = a;
     }
 
-  gdk_threads_enter ();
   pixbuf =  gdk_pixbuf_new_from_data (pix,
 				      GDK_COLORSPACE_RGB,
 				      (gboolean) hasAlpha,
@@ -416,12 +474,14 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_streamImage
 
   g_object_unref (pixbuf);
 
-  gdk_threads_leave ();
   g_free(pix);
 
   (*env)->ReleaseStringUTFChars (env, jenctype, enctype);  
   (*env)->ReleaseIntArrayElements (env, jarr, ints, 0);
+
+  gdk_threads_leave ();
 }
+
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_pumpBytes
@@ -429,18 +489,27 @@ Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_pumpBytes
 {
   GdkPixbufLoader *loader = NULL;
   jbyte *bytes = NULL;
+  GError *err = NULL;
 
-  if (len < 1)
-    return;
+  gdk_threads_enter ();
+
+  g_assert (len >= 1);
+  g_assert (jarr != NULL);
 
   bytes = (*env)->GetByteArrayElements (env, jarr, NULL);
   g_assert (bytes != NULL);
   loader = (GdkPixbufLoader *)NSA_GET_PB_PTR (env, obj);
   g_assert (loader != NULL);
 
-  gdk_threads_enter ();
-  gdk_pixbuf_loader_write (loader, (const guchar *) bytes, len, NULL);
-  gdk_threads_leave ();
+  gdk_pixbuf_loader_write (loader, (const guchar *) bytes, len, &err);
 
   (*env)->ReleaseByteArrayElements (env, jarr, bytes, 0);
+
+  if (err != NULL)
+    {
+      JCL_ThrowException (env, "java/io/IOException", err->message);
+      g_error_free (err);
+    }
+
+  gdk_threads_leave ();
 }

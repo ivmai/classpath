@@ -1,5 +1,5 @@
 /* target_generic_network.h - Native methods for network operations.
-   Copyright (C) 1998, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -666,11 +666,22 @@ Systems    : all
 #ifndef TARGET_NATIVE_NETWORK_SOCKET_SET_OPTION_SO_TIMEOUT
   #include <sys/types.h>
   #include <sys/socket.h>
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
   #define TARGET_NATIVE_NETWORK_SOCKET_SET_OPTION_SO_TIMEOUT(socketDescriptor,flag,result) \
     do { \
-      int __value; \
+      struct timeval __value; \
       \
-      __value=flag; \
+      __value.tv_sec = flag / 1000; \
+      __value.tv_usec = (flag % 1000) * 1000; \
       result=(setsockopt(socketDescriptor,SOL_SOCKET,SO_TIMEOUT,&__value,sizeof(__value))==0)?TARGET_NATIVE_OK:TARGET_NATIVE_ERROR; \
     } while (0)
 #endif
@@ -682,7 +693,7 @@ Systems    : all
 *              size             - size of send buffer
 * Output     : result - TARGET_NATIVE_OK if no error occurred, 
 *                       TARGET_NATIVE_ERROR otherwise
-* Return     : -
+* Return     : -
 * Side-effect: unknown
 * Notes      : -
 \***********************************************************************/
@@ -989,7 +1000,7 @@ Systems    : all
   #include <sys/socket.h>
   #define TARGET_NATIVE_NETWORK_SOCKET_GET_OPTION_SO_TIMEOUT(socketDescriptor,flag,result) \
     do { \
-      int       __value; \
+      struct timeval   __value; \
       socklen_t __len; \
       \
       flag=0; \
@@ -998,7 +1009,7 @@ Systems    : all
       result=(getsockopt(socketDescriptor,SOL_SOCKET,SO_TIMEOUT,&__value,&__len)==0)?TARGET_NATIVE_OK:TARGET_NATIVE_ERROR; \
       if (result==TARGET_NATIVE_OK) \
       { \
-        flag=__value; \
+        flag = (__value.tv_sec * 1000LL) + (__value.tv_usec / 1000LL); \
       } \
     } while (0)
 #endif

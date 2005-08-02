@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -113,7 +113,9 @@ public class ParserDelegator
 
     DTD getDTD()
     {
-      return dtd;
+      // Accessing the inherited gnu.javax.swing.text.html.parser.support.Parser
+      // field. super. is a workaround, required to support JDK1.3's javac.
+      return super.dtd;
     }
   }
 
@@ -141,7 +143,7 @@ public class ParserDelegator
    * Parses the HTML document, calling methods of the provided
    * callback. This method must be multithread - safe.
    * @param reader The reader to read the HTML document from
-   * @param callback The callback that is notifyed about the presence
+   * @param a_callback The callback that is notifyed about the presence
    * of HTML elements in the document.
    * @param ignoreCharSet If thrue, any charset changes during parsing
    * are ignored.
@@ -189,7 +191,7 @@ public class ParserDelegator
    * all subsequent calls to the parse(...) . If you need to specify
    * your DTD locally, simply {@link javax.swing.text.html.parser.Parser}
    * instead.
-   * @param dtd The DTD that will be used to parse documents by this class.
+   * @param a_dtd The DTD that will be used to parse documents by this class.
    * @param name The name of this DTD.
    * @return No standard is specified on which instance of DTD must be
    * returned by this method, and it is recommended to leave the returned

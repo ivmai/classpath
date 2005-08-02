@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -216,8 +216,8 @@ public class LineNumberInputStream extends FilterInputStream
    * a single "\n" value which is stored in the buffer.  Only a single
    * byte is counted towards the number of bytes read in this case.
    *
-   * @param buf The array into which the bytes read should be stored
-   * @param offset The offset into the array to start storing bytes
+   * @param b The array into which the bytes read should be stored
+   * @param off The offset into the array to start storing bytes
    * @param len The requested number of bytes to read
    *
    * @return The actual number of bytes read, or -1 if end of stream

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -232,6 +232,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
 	constraints.gridy = i;
 	super.add(items[i], constraints, i);
       }
+    this.setSize(this.getPreferredSize());
   }
 
   /**
@@ -276,6 +277,7 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
 	    super.add(items[i], constraints, i);
 	  }
       }
+    this.setSize(this.getPreferredSize());
   }
 
   /**
@@ -908,13 +910,13 @@ public class JPopupMenu extends JComponent implements Accessible, MenuElement
    */
   private class LightWeightPopup extends Container implements Popup
   {
+    private Component c;
+
     /**
      * Creates a new LightWeightPopup menu
      *
      * @param c Container containing menu items
      */
-    private Component c;
-
     public LightWeightPopup(Container c)
     {
       this.c = c;

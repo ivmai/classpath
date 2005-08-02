@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -43,7 +43,8 @@ import java.util.Vector;
 
 
 /**
- * DefaultComboBoxModel is a data model for JComboBox. This model keeps track
+ * The default implementation of {@link MutableComboBoxModel}.
+ * This model keeps track
  * of elements contained in the JComboBox as well as the current combo box
  * selection. Whenever selection in the JComboBox changes, the ComboBoxModel
  * will fire ListDataEvents to ComboBox's ListDataListeners.
@@ -51,7 +52,6 @@ import java.util.Vector;
  * @author Andrew Selkirk
  * @author Olga Rodimina
  * @author Robert Schuster
- * @version 1.0
  */
 public class DefaultComboBoxModel extends AbstractListModel
   implements MutableComboBoxModel, Serializable
@@ -192,9 +192,8 @@ public class DefaultComboBoxModel extends AbstractListModel
   public void setSelectedItem(Object object)
   {
     
-    /* Updates the selected item only if the given object
-     * is null or in the list (this is how the JDK behaves).
-     */ 
+    // Updates the selected item only if the given object
+    // is null or in the list (this is how the JDK behaves).
     if(object == null || list.contains(object)) {
 	selectedItem = object;
 	fireContentsChanged(this, -1, -1);

@@ -25,7 +25,6 @@ libgtkpeer_la_SOURCES = $(gtk_cairo_c_source_files) \
 			gnu_java_awt_peer_gtk_GtkClipboard.c \
 			gnu_java_awt_peer_gtk_GtkComponentPeer.c \
 			gnu_java_awt_peer_gtk_GtkEmbeddedWindowPeer.c \
-			gnu_java_awt_peer_gtk_GtkEvents.c \
 			gnu_java_awt_peer_gtk_GtkFileDialogPeer.c \
 			gnu_java_awt_peer_gtk_GtkFramePeer.c \
 			gnu_java_awt_peer_gtk_GtkGenericPeer.c \
@@ -38,10 +37,9 @@ libgtkpeer_la_SOURCES = $(gtk_cairo_c_source_files) \
 			gnu_java_awt_peer_gtk_GtkMenuPeer.c \
 			gnu_java_awt_peer_gtk_GtkPanelPeer.c \
 			gnu_java_awt_peer_gtk_GtkPopupMenuPeer.c \
-			gnu_java_awt_peer_gtk_GtkScrollBarPeer.c \
+			gnu_java_awt_peer_gtk_GtkScrollbarPeer.c \
 			gnu_java_awt_peer_gtk_GtkScrollPanePeer.c \
 			gnu_java_awt_peer_gtk_GtkTextAreaPeer.c \
-			gnu_java_awt_peer_gtk_GtkTextComponentPeer.c \
 			gnu_java_awt_peer_gtk_GtkTextFieldPeer.c \
 			gnu_java_awt_peer_gtk_GtkToolkit.c \
 			gnu_java_awt_peer_gtk_GtkWindowPeer.c \
@@ -51,7 +49,8 @@ libgtkpeer_la_SOURCES = $(gtk_cairo_c_source_files) \
 			gtkcairopeer.h \
 			gtkpeer.h
 
-libgtkpeer_la_LIBADD = $(top_builddir)/native/jni/classpath/native_state.lo
+libgtkpeer_la_LIBADD = $(top_builddir)/native/jni/classpath/native_state.lo \
+		       $(top_builddir)/native/jni/classpath/jcl.lo
 
 AM_LDFLAGS = @CLASSPATH_MODULE@ @GTK_LIBS@ @CAIRO_LIBS@ @PANGOFT2_LIBS@ @X_LIBS@ -lXtst
 AM_CPPFLAGS = @CLASSPATH_INCLUDES@

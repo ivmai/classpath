@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -47,9 +47,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.Serializable;
+import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 
 import javax.accessibility.AccessibleAction;
 import javax.accessibility.AccessibleIcon;
@@ -64,18 +65,13 @@ import javax.swing.text.AttributeSet;
 
 
 /**
- * <p>The purpose of this class is to serve as a facade over a number of
- * classes which collectively represent the semantics of a button: the
- * button's model, its listeners, its action, and its look and feel. Some
- * parts of a button's state are stored explicitly in this class, other
- * parts are delegates to the model. Some methods related to buttons are
- * implemented in this class, other methods pass through to the current 
- * model or look and feel.</p>
+ * Provides an abstract implementation of common button behaviour,
+ * data model and look &amp; feel.
  *
- * <p>Furthermore this class is supposed to serve as a base class for
+ * <p>This class is supposed to serve as a base class for
  * several kinds of buttons with similar but non-identical semantics:
- * toggle buttons (radio buttons and checkboxes), simple "push" buttons,
- * menu items.</p>
+ * toggle buttons (radio buttons and checkboxes), simple push buttons,
+ * menu items, etc.</p>
  *
  * <p>Buttons have many properties, some of which are stored in this class
  * while others are delegated to the button's model. The following properties
@@ -199,7 +195,10 @@ public abstract class AbstractButton extends JComponent
   /** The text displayed in the button. */
   String text;
 
-  /** The gap between icon and text, if both icon and text are non-<code>null</code>. */
+  /**
+   * The gap between icon and text, if both icon and text are
+   * non-<code>null</code>.
+   */
   int iconTextGap;
 
   /** The vertical alignment of the button's text and icon. */
@@ -235,8 +234,10 @@ public abstract class AbstractButton extends JComponent
   /** The margin between the button's border and its label. */
   Insets margin;
 
-  /** A hint to the look and feel class, suggesting which character in the
-   * button's label should be underlined when drawing the label. */
+  /**
+   * A hint to the look and feel class, suggesting which character in the
+   * button's label should be underlined when drawing the label.
+   */
   int mnemonicIndex;
 
   /** Listener the button uses to receive ActionEvents from its model.  */
@@ -248,39 +249,66 @@ public abstract class AbstractButton extends JComponent
   /** Listener the button uses to receive ChangeEvents from its model.  */  
   protected ChangeListener changeListener;
 
-  /** The time in miliseconds in which clicks get coalesced into a single
-   * <code>ActionEvent</code>. */
+  /**
+   * The time in miliseconds in which clicks get coalesced into a single
+   * <code>ActionEvent</code>.
+   */
   long multiClickThreshhold;
   
-  /** Listener the button uses to receive PropertyChangeEvents from its
-      Action. */
+  /**
+   * Listener the button uses to receive PropertyChangeEvents from its
+   * Action.
+   */
   PropertyChangeListener actionPropertyChangeListener;
   
   /** ChangeEvent that is fired to button's ChangeEventListeners  */  
   protected ChangeEvent changeEvent = new ChangeEvent(this);
   
-  /** Fired in a PropertyChangeEvent when the "borderPainted" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "borderPainted" property changes.
+   */
   public static final String BORDER_PAINTED_CHANGED_PROPERTY = "borderPainted";
   
-  /** Fired in a PropertyChangeEvent when the "contentAreaFilled" property changes. */
-  public static final String CONTENT_AREA_FILLED_CHANGED_PROPERTY = "contentAreaFilled";
+  /**
+   * Fired in a PropertyChangeEvent when the "contentAreaFilled" property
+   * changes.
+   */
+  public static final String CONTENT_AREA_FILLED_CHANGED_PROPERTY =
+    "contentAreaFilled";
   
-  /** Fired in a PropertyChangeEvent when the "disabledIcon" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "disabledIcon" property changes.
+   */
   public static final String DISABLED_ICON_CHANGED_PROPERTY = "disabledIcon";
   
-  /** Fired in a PropertyChangeEvent when the "disabledSelectedIcon" property changes. */
-  public static final String DISABLED_SELECTED_ICON_CHANGED_PROPERTY = "disabledSelectedIcon";
+  /**
+   * Fired in a PropertyChangeEvent when the "disabledSelectedIcon" property
+   * changes.
+   */
+  public static final String DISABLED_SELECTED_ICON_CHANGED_PROPERTY =
+    "disabledSelectedIcon";
   
-  /** Fired in a PropertyChangeEvent when the "focusPainted" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "focusPainted" property changes.
+   */
   public static final String FOCUS_PAINTED_CHANGED_PROPERTY = "focusPainted";
 
-  /** Fired in a PropertyChangeEvent when the "horizontalAlignment" property changes. */
-  public static final String HORIZONTAL_ALIGNMENT_CHANGED_PROPERTY = "horizontalAlignment";
+  /**
+   * Fired in a PropertyChangeEvent when the "horizontalAlignment" property
+   * changes.
+   */
+  public static final String HORIZONTAL_ALIGNMENT_CHANGED_PROPERTY =
+    "horizontalAlignment";
 
-  /** Fired in a PropertyChangeEvent when the "horizontalTextPosition" property changes. */
-  public static final String HORIZONTAL_TEXT_POSITION_CHANGED_PROPERTY = "horizontalTextPosition";
+  /**
+   * Fired in a PropertyChangeEvent when the "horizontalTextPosition" property
+   * changes.
+   */
+  public static final String HORIZONTAL_TEXT_POSITION_CHANGED_PROPERTY =
+    "horizontalTextPosition";
 
-  /** Fired in a PropertyChangeEvent when the "icon" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "icon" property changes. */
   public static final String ICON_CHANGED_PROPERTY = "icon";
 
   /** Fired in a PropertyChangeEvent when the "margin" property changes. */
@@ -295,26 +323,46 @@ public abstract class AbstractButton extends JComponent
   /** Fired in a PropertyChangeEvent when the "pressedIcon" property changes. */
   public static final String PRESSED_ICON_CHANGED_PROPERTY = "pressedIcon";
 
-  /** Fired in a PropertyChangeEvent when the "rolloverEnabled" property changes. */
-  public static final String ROLLOVER_ENABLED_CHANGED_PROPERTY = "rolloverEnabled";
+  /**
+   * Fired in a PropertyChangeEvent when the "rolloverEnabled" property
+   * changes.
+   */
+  public static final String ROLLOVER_ENABLED_CHANGED_PROPERTY =
+    "rolloverEnabled";
 
-  /** Fired in a PropertyChangeEvent when the "rolloverIcon" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "rolloverIcon" property changes.
+   */
   public static final String ROLLOVER_ICON_CHANGED_PROPERTY = "rolloverIcon";
   
-  /** Fired in a PropertyChangeEvent when the "rolloverSelectedIcon" property changes. */
-  public static final String ROLLOVER_SELECTED_ICON_CHANGED_PROPERTY = "rolloverSelectedIcon";
+  /**
+   * Fired in a PropertyChangeEvent when the "rolloverSelectedIcon" property
+   * changes.
+   */
+  public static final String ROLLOVER_SELECTED_ICON_CHANGED_PROPERTY =
+    "rolloverSelectedIcon";
   
-  /** Fired in a PropertyChangeEvent when the "selectedIcon" property changes. */
+  /**
+   * Fired in a PropertyChangeEvent when the "selectedIcon" property changes.
+   */
   public static final String SELECTED_ICON_CHANGED_PROPERTY = "selectedIcon";
 
   /** Fired in a PropertyChangeEvent when the "text" property changes. */
   public static final String TEXT_CHANGED_PROPERTY = "text";
 
-  /** Fired in a PropertyChangeEvent when the "verticalAlignment" property changes. */
-  public static final String VERTICAL_ALIGNMENT_CHANGED_PROPERTY = "verticalAlignment";
+  /**
+   * Fired in a PropertyChangeEvent when the "verticalAlignment" property
+   * changes.
+   */
+  public static final String VERTICAL_ALIGNMENT_CHANGED_PROPERTY =
+    "verticalAlignment";
 
-  /** Fired in a PropertyChangeEvent when the "verticalTextPosition" property changes. */
-  public static final String VERTICAL_TEXT_POSITION_CHANGED_PROPERTY = "verticalTextPosition";
+  /**
+   * Fired in a PropertyChangeEvent when the "verticalTextPosition" property
+   * changes.
+   */
+  public static final String VERTICAL_TEXT_POSITION_CHANGED_PROPERTY =
+    "verticalTextPosition";
 
   /**
    * A Java Accessibility extension of the AbstractButton.
@@ -465,18 +513,7 @@ public abstract class AbstractButton extends JComponent
    */
   public AbstractButton()
   {
-    this("",null);
-  }
-
-  /**
-   * Creates a new AbstractButton object.
-   *
-   * @param txt Value to use for the button's "text" property
-   * @param icon Value to use for the button's "defaultIcon" property
-   */
-  AbstractButton(String txt, Icon icon)
-  {
-    init (txt, icon);
+    init("", null);
     updateUI();
   }
 
@@ -523,8 +560,16 @@ public abstract class AbstractButton extends JComponent
 
  protected void init(String text, Icon icon) 
  {
-    this.text = text;
-    default_icon = icon;
+    // If text is null, we fall back to the empty
+    // string (which is set using AbstractButton's
+    // constructor).
+    // This way the behavior of the JDK is matched.
+    if(text != null)
+        this.text = text;
+
+    if (icon != null)
+      default_icon = icon;
+
     actionListener = createActionListener();
     changeListener = createChangeListener();
     itemListener = createItemListener();
@@ -546,24 +591,31 @@ public abstract class AbstractButton extends JComponent
  }
  
   /**
-   * Get the action command string for this button's model.
+   * <p>Returns the action command string for this button's model.</p>
+   *
+   * <p>If the action command was set to <code>null</code>, the button's
+   * text (label) is returned instead.</p>
    *
    * @return The current action command string from the button's model
    */
   public String getActionCommand()
   {
-    return getModel().getActionCommand();
+    String ac = model.getActionCommand();
+    if (ac != null)
+      return ac;
+    else
+      return text;
   }
 
   /**
-   * Set the action command string for this button's model.
+   * Sets the action command string for this button's model.
    *
-   * @param aCommand The new action command string to set in the button's
+   * @param actionCommand The new action command string to set in the button's
    * model.
    */
-  public void setActionCommand(String aCommand)
+  public void setActionCommand(String actionCommand)
   {
-    getModel().setActionCommand(aCommand);
+    model.setActionCommand(actionCommand);
   }
 
   /**
@@ -670,7 +722,7 @@ public abstract class AbstractButton extends JComponent
   }
 
   /**
-   * Calls {@link ItemListener.itemStateChanged} on each ItemListener in
+   * Calls {@link ItemListener#itemStateChanged} on each ItemListener in
    * the button's listener list.
    *
    * @param e The event signifying that the button's model changed state
@@ -685,22 +737,30 @@ public abstract class AbstractButton extends JComponent
   }
 
   /**
-   * Calls {@link ActionListener.actionPerformed} on each {@link
+   * Calls {@link ActionListener#actionPerformed} on each {@link
    * ActionListener} in the button's listener list.
    *
    * @param e The event signifying that the button's model was clicked
    */
   protected void fireActionPerformed(ActionEvent e)
   {
-    e.setSource(this);
+	// Dispatch a copy of the given ActionEvent in order to
+	// set the source and action command correctly.
+    ActionEvent ae = new ActionEvent(
+        this,
+        e.getID(),
+        getActionCommand(),
+        e.getWhen(),
+        e.getModifiers());
+
     ActionListener[] listeners = getActionListeners();
     
     for (int i = 0; i < listeners.length; i++)
-      listeners[i].actionPerformed(e);
+      listeners[i].actionPerformed(ae);
   }
 
   /**
-   * Calls {@link ChangeEvent.stateChanged} on each {@link ChangeListener}
+   * Calls {@link ChangeListener#stateChanged} on each {@link ChangeListener}
    * in the button's listener list.
    */
   protected void fireStateChanged()
@@ -754,22 +814,22 @@ public abstract class AbstractButton extends JComponent
 
     if (old != mne)
       {
-	getModel().setMnemonic(mne);
+        getModel().setMnemonic(mne);
 
-	if (text != null && ! text.equals(""))
-	  {
-	    // Since lower case char = upper case char for 
-	    // mnemonic, we will convert both text and mnemonic 
-	    // to upper case before checking if mnemonic character occurs
-	    // in the menu item text. 
-	    int upperCaseMne = Character.toUpperCase((char) mne);
-	    String upperCaseText = text.toUpperCase();
-	    setDisplayedMnemonicIndex(upperCaseText.indexOf(upperCaseMne));
-	  }
+        if (text != null && !text.equals(""))
+          {
+            // Since lower case char = upper case char for
+            // mnemonic, we will convert both text and mnemonic
+            // to upper case before checking if mnemonic character occurs
+            // in the menu item text.
+            int upperCaseMne = Character.toUpperCase((char) mne);
+            String upperCaseText = text.toUpperCase();
+            setDisplayedMnemonicIndex(upperCaseText.indexOf(upperCaseMne));
+          }
 
-	firePropertyChange(MNEMONIC_CHANGED_PROPERTY, old, mne);
-	revalidate();
-	repaint();
+        firePropertyChange(MNEMONIC_CHANGED_PROPERTY, old, mne);
+        revalidate();
+        repaint();
       }
   }
 
@@ -1068,7 +1128,7 @@ public abstract class AbstractButton extends JComponent
    * PropertyChangeListener.</p>
    *
    * <p>This method also configures several of the button's properties from
-   * the Action, by calling {@link configurePropertiesFromAction}, and
+   * the Action, by calling {@link #configurePropertiesFromAction}, and
    * subscribes the button to the Action as a PropertyChangeListener.
    * Subsequent changes to the Action will thus reconfigure the button 
    * automatically.</p>
@@ -1284,9 +1344,12 @@ public abstract class AbstractButton extends JComponent
    */
   public Icon getDisabledIcon()
   {
-    if (disabeldIcon == null
-	&& default_icon instanceof ImageIcon)
-      disabeldIcon = new ImageIcon(GrayFilter.createDisabledImage(((ImageIcon) default_icon).getImage()));
+    if (disabeldIcon == null && default_icon instanceof ImageIcon)
+      {
+        Image iconImage = ((ImageIcon) default_icon).getImage();
+        Image grayImage = GrayFilter.createDisabledImage(iconImage);
+        disabeldIcon = new ImageIcon(grayImage);
+      }
       
     return disabeldIcon;
   }
@@ -1298,7 +1361,7 @@ public abstract class AbstractButton extends JComponent
    * <code>null</code>, in which case an icon is constructed, based on the
    * default icon.
    *
-   * @param disabledIcon The new "disabledIcon" property
+   * @param d The new "disabledIcon" property
    */
   public void setDisabledIcon(Icon d)
   {
@@ -1328,7 +1391,7 @@ public abstract class AbstractButton extends JComponent
    * focused, but no special decoration is painted to indicate the presence
    * of focus.
    *
-   * @param b The new "paintFocus" property
+   * @param p The new "paintFocus" property
    */
   public void setFocusPainted(boolean p)
   {
@@ -1356,8 +1419,8 @@ public abstract class AbstractButton extends JComponent
    *
    * @throws IllegalArgumentException If key is not one of the valid constants
    *
-   * @see setHorizontalTextPosition()
-   * @see setHorizontalAlignment()
+   * @see #setHorizontalTextPosition(int)
+   * @see #setHorizontalAlignment(int)
    */
   protected  int checkHorizontalKey(int key, String exception)
   {
@@ -1388,8 +1451,8 @@ public abstract class AbstractButton extends JComponent
    *
    * @throws IllegalArgumentException If key is not one of the valid constants
    *
-   * @see setVerticalTextPosition()
-   * @see setVerticalAlignment()
+   * @see #setVerticalTextPosition(int)
+   * @see #setVerticalAlignment(int)
    */
   protected  int checkVerticalKey(int key, String exception)
   {
@@ -1431,7 +1494,7 @@ public abstract class AbstractButton extends JComponent
    *
    * @param a An Action to configure the button from
    */
-  protected  void configurePropertiesFromAction(Action a)
+  protected void configurePropertiesFromAction(Action a)
   {
     if (a == null)
       {
@@ -1442,19 +1505,19 @@ public abstract class AbstractButton extends JComponent
       }
     else
       {
-        setText((String)(a.getValue(Action.NAME)));
-        setIcon((Icon)(a.getValue(Action.SMALL_ICON)));
+        setText((String) (a.getValue(Action.NAME)));
+        setIcon((Icon) (a.getValue(Action.SMALL_ICON)));
         setEnabled(a.isEnabled());
-        setToolTipText((String)(a.getValue(Action.SHORT_DESCRIPTION)));
-	if (a.getValue(Action.MNEMONIC_KEY) != null)
-          setMnemonic(((Integer)(a.getValue(Action.MNEMONIC_KEY))).intValue());
-        String actionCommand = (String)(a.getValue(Action.ACTION_COMMAND_KEY));
+        setToolTipText((String) (a.getValue(Action.SHORT_DESCRIPTION)));
+        if (a.getValue(Action.MNEMONIC_KEY) != null)
+          setMnemonic(((Integer) (a.getValue(Action.MNEMONIC_KEY))).intValue());
+        String actionCommand = (String) (a.getValue(Action.ACTION_COMMAND_KEY));
 
         // Set actionCommand to button's text by default if it is not specified
         if (actionCommand != null)
-	   setActionCommand((String)(a.getValue(Action.ACTION_COMMAND_KEY)));
-	 else
-	   setActionCommand(getText());
+          setActionCommand((String) (a.getValue(Action.ACTION_COMMAND_KEY)));
+        else
+          setActionCommand(getText());
       }
   }
 
@@ -1462,7 +1525,7 @@ public abstract class AbstractButton extends JComponent
    * <p>A factory method which should return an {@link ActionListener} that
    * propagates events from the button's {@link ButtonModel} to any of the
    * button's ActionListeners. By default, this is an inner class which
-   * calls {@link AbstractButton.fireActionPerformed} with a modified copy
+   * calls {@link AbstractButton#fireActionPerformed} with a modified copy
    * of the incoming model {@link ActionEvent}.</p>
    *
    * <p>The button calls this method during construction, stores the
@@ -1488,10 +1551,10 @@ public abstract class AbstractButton extends JComponent
    * <p>A factory method which should return a {@link PropertyChangeListener}
    * that accepts changes to the specified {@link Action} and reconfigure
    * the {@link AbstractButton}, by default using the {@link
-   * configurePropertiesFromAction} method.</p>
+   * #configurePropertiesFromAction} method.</p>
    *
    * <p>The button calls this method whenever a new Action is assigned to
-   * the button's "action" property, via {@link setAction}, and stores the
+   * the button's "action" property, via {@link #setAction}, and stores the
    * resulting PropertyChangeListener in its
    * <code>actionPropertyChangeListener</code> member field. The button
    * then subscribes the listener to the button's new action. If the
@@ -1510,21 +1573,22 @@ public abstract class AbstractButton extends JComponent
       {
         public void propertyChange(PropertyChangeEvent e)
         {
-          Action act = (Action) (e.getSource());	
-	  if (e.getPropertyName().equals("enabled"))
-	    setEnabled(act.isEnabled());
-	  else if (e.getPropertyName().equals(Action.NAME))
-            setText((String)(act.getValue(Action.NAME)));
-	  else if (e.getPropertyName().equals(Action.SMALL_ICON))
-	    setIcon((Icon)(act.getValue(Action.SMALL_ICON)));
-	  else if (e.getPropertyName().equals(Action.SHORT_DESCRIPTION))
-            setToolTipText((String)(act.getValue(Action.SHORT_DESCRIPTION)));
-	  else if (e.getPropertyName().equals(Action.MNEMONIC_KEY))
+          Action act = (Action) (e.getSource());
+          if (e.getPropertyName().equals("enabled"))
+            setEnabled(act.isEnabled());
+          else if (e.getPropertyName().equals(Action.NAME))
+            setText((String) (act.getValue(Action.NAME)));
+          else if (e.getPropertyName().equals(Action.SMALL_ICON))
+            setIcon((Icon) (act.getValue(Action.SMALL_ICON)));
+          else if (e.getPropertyName().equals(Action.SHORT_DESCRIPTION))
+            setToolTipText((String) (act.getValue(Action.SHORT_DESCRIPTION)));
+          else if (e.getPropertyName().equals(Action.MNEMONIC_KEY))
             if (act.getValue(Action.MNEMONIC_KEY) != null)
-              setMnemonic(((Integer)(act.getValue(Action.MNEMONIC_KEY))).intValue());
-	  else if (e.getPropertyName().equals(Action.ACTION_COMMAND_KEY))
-            setActionCommand((String)(act.getValue(Action.ACTION_COMMAND_KEY)));
-	}
+              setMnemonic(((Integer) (act.getValue(Action.MNEMONIC_KEY)))
+                          .intValue());
+          else if (e.getPropertyName().equals(Action.ACTION_COMMAND_KEY))
+            setActionCommand((String) (act.getValue(Action.ACTION_COMMAND_KEY)));
+        }
       };
   }
 
@@ -1534,7 +1598,7 @@ public abstract class AbstractButton extends JComponent
    * AbstractButton may wish to override the listener used to subscribe to
    * such ChangeEvents. By default, the listener just propagates the
    * {@link ChangeEvent} to the button's ChangeListeners, via the {@link
-   * AbstractButton.fireStateChanged} method.</p>
+   * AbstractButton#fireStateChanged} method.</p>
    *
    * <p>The button calls this method during construction, stores the
    * resulting ChangeListener in its <code>changeListener</code> member
@@ -1562,7 +1626,7 @@ public abstract class AbstractButton extends JComponent
    * AbstractButton may wish to override the listener used to subscribe to
    * such ItemEvents. By default, the listener just propagates the
    * {@link ItemEvent} to the button's ItemListeners, via the {@link
-   * AbstractButton.fireItemStateChanged} method.</p>
+   * AbstractButton#fireItemStateChanged} method.</p>
    *
    * <p>The button calls this method during construction, stores the
    * resulting ItemListener in its <code>changeListener</code> member
@@ -1671,7 +1735,7 @@ public abstract class AbstractButton extends JComponent
    * paint this icon when the "rolloverEnabled" property of the button is
    * <code>true</code> and the mouse rolls over the button.
    *
-   * @param rolloverIcon The new rollover icon
+   * @param r The new rollover icon
    */
   public void setRolloverIcon(Icon r)
   {
@@ -1704,7 +1768,7 @@ public abstract class AbstractButton extends JComponent
    * is <code>true</code>, the "selected" property of the button's model is
    * <code>true</code>, and the mouse rolls over the button.
    *
-   * @param rolloverSelectedIcon The new rollover selected icon
+   * @param r The new rollover selected icon
    */
   public void setRolloverSelectedIcon(Icon r)
   {
@@ -1739,7 +1803,7 @@ public abstract class AbstractButton extends JComponent
    * button is <code>false</code> or the mouse is not currently rolled
    * over the button.
    *
-   * @param selectedIcon The new selected icon
+   * @param s The new selected icon
    */
   public void setSelectedIcon(Icon s)
   {
@@ -1769,7 +1833,7 @@ public abstract class AbstractButton extends JComponent
         return objs;
       }
     else
-     {
+      {
         return null;
       }
   }
@@ -1778,15 +1842,15 @@ public abstract class AbstractButton extends JComponent
    * Called when image data becomes available for one of the button's icons.
    *
    * @param img The image being updated
-   * @param infoflags One of the constant codes in {@link ImageObserver} used to describe
-   * updated portions of an image.
+   * @param infoflags One of the constant codes in {@link ImageObserver} used
+   *     to describe updated portions of an image.
    * @param x X coordinate of the region being updated
    * @param y Y coordinate of the region being updated
    * @param w Width of the region beign updated
    * @param h Height of the region being updated
    *
-   * @return <code>true</code> if img is equal to the button's current
-   * icon, otherwise <code>false</code>
+   * @return <code>true</code> if img is equal to the button's current icon,
+   *     otherwise <code>false</code>
    */
   public boolean imageUpdate(Image img, int infoflags, int x, int y, int w,
                              int h)
@@ -1825,8 +1889,9 @@ public abstract class AbstractButton extends JComponent
     boolean old = contentAreaFilled;
     contentAreaFilled = b;
     firePropertyChange(CONTENT_AREA_FILLED_CHANGED_PROPERTY, old, b);
-    revalidate();
-    repaint();
+    // The JDK sets the opaque property to the value of the contentAreaFilled
+    // property, so should we do.
+    setOpaque(b);
    }
 
   /**

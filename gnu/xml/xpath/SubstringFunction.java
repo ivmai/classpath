@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,6 +38,7 @@ exception statement from your version. */
 package gnu.xml.xpath;
 
 import java.util.List;
+import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
 /**
@@ -111,6 +112,12 @@ final class SubstringFunction
   {
     return new SubstringFunction(arg1.clone(context), arg2.clone(context),
                                  (arg3 == null) ? null : arg3.clone(context));
+  }
+
+  public boolean references(QName var)
+  {
+    return (arg1.references(var) || arg2.references(var) ||
+            (arg3 == null) ? false : arg3.references(var));
   }
 
   public String toString()

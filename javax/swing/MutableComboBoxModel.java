@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,14 +38,13 @@ exception statement from your version. */
 package javax.swing;
 
 /**
- * MutableComboBoxModel is interface for data model that keeps track of the
+ * A data model used in {@link JComboBox}es that keeps track of the
  * components data and provides methods to insert and remove elements from
- * it. The Classes implementing this interface should  fire appropriate
- * events indicating the undergoing change in the data model.
+ * it. The classes implementing this interface should
+ * fire appropriate events indicating the undergoing change in the data model.
  *
  * @author Andrew Selkirk
  * @author Olga Rodimina
- * @version 1.0
  */
 public interface MutableComboBoxModel extends ComboBoxModel
 {

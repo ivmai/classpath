@@ -15,8 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with GNU Classpath; see the file COPYING.  If not, write to the
-   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.
+   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA.
 
    Linking this library statically or dynamically with other modules is
    making a combined work based on this library.  Thus, the terms and
@@ -38,10 +38,6 @@
 #include "gtkpeer.h"
 #include "gnu_java_awt_peer_gtk_GtkFramePeer.h"
 
-/* lives in GtkImage.c */
-GdkPixbuf *gnu_java_awt_peer_gtk_GtkImage_getPixbuf(JNIEnv *env, jobject obj);
-jboolean gnu_java_awt_peer_gtk_GtkImage_isOffScreen(JNIEnv *env, jobject obj);
-
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkFramePeer_removeMenuBarPeer
   (JNIEnv *env, jobject obj)
@@ -51,9 +47,9 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_removeMenuBarPeer
   void *fixed;
   GList* children;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   fixed = gtk_container_get_children (GTK_CONTAINER (ptr))->data;
   children = gtk_container_get_children (GTK_CONTAINER (fixed));
@@ -86,10 +82,10 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_setMenuBarPeer
   void *mptr;
   void *fixed;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
   mptr = NSA_GET_PTR (env, menubar);
-
-  gdk_threads_enter ();
 
   fixed = gtk_container_get_children (GTK_CONTAINER (ptr))->data;
   gtk_fixed_put (GTK_FIXED (fixed), mptr, 0, 0);
@@ -105,9 +101,9 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_getMenuBarHeight
   GtkWidget *ptr;
   GtkRequisition requisition;
 
-  ptr = NSA_GET_PTR (env, menubar);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, menubar);
 
   gtk_widget_size_request (ptr, &requisition);
 
@@ -123,9 +119,9 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_setMenuBarWidth
   GtkWidget *ptr;
   GtkRequisition natural_req;
 
-  ptr = NSA_GET_PTR (env, menubar);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, menubar);
 
   /* Get the menubar's natural size request. */
   gtk_widget_set_size_request (GTK_WIDGET (ptr), -1, -1);
@@ -145,9 +141,9 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_gtkFixedSetVisible
   void *ptr;
   void *fixed;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   fixed = gtk_container_get_children (GTK_CONTAINER (ptr))->data;
 
@@ -164,22 +160,21 @@ Java_gnu_java_awt_peer_gtk_GtkFramePeer_nativeSetIconImage
   (JNIEnv *env, jobject obj, jobject gtkimage)
 {
   void *ptr;
-  GdkPixbuf *pixbuf = gnu_java_awt_peer_gtk_GtkImage_getPixbuf(env, gtkimage);
+  GdkPixbuf *pixbuf = NULL;
 
+  gdk_threads_enter ();
+
+  pixbuf = cp_gtk_image_get_pixbuf (env, gtkimage);
   g_assert (pixbuf != NULL);
 
   ptr = NSA_GET_PTR (env, obj);
-
-  gdk_threads_enter ();
 
   gtk_window_set_icon (GTK_WINDOW (ptr), pixbuf);
 
   /* if the GtkImage is offscreen, this is a temporary pixbuf which should 
    be thrown out. */
-  if(gnu_java_awt_peer_gtk_GtkImage_isOffScreen(env, gtkimage) == JNI_TRUE)
+  if(cp_gtk_image_is_offscreen (env, gtkimage) == JNI_TRUE)
     gdk_pixbuf_unref (pixbuf);
 
   gdk_threads_leave ();
 }
-
-

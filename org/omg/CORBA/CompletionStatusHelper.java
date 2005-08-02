@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,9 +38,8 @@ exception statement from your version. */
 
 package org.omg.CORBA;
 
-import gnu.CORBA.primitiveArrayTypeCode;
+import gnu.CORBA.Restricted_ORB;
 
-import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
@@ -52,6 +51,11 @@ import org.omg.CORBA.portable.OutputStream;
  */
 public abstract class CompletionStatusHelper
 {
+  /**
+   * The cached typecode value, computed once.
+   */
+  private static TypeCode typeCode;
+
   /**
    * Extract the {@link CompletionStatus} from the
    * given {@link Any}. This implementation expects
@@ -68,7 +72,7 @@ public abstract class CompletionStatusHelper
   }
 
   /**
-   * Returns the agreed Id. 
+   * Returns the agreed Id.
    * @return <code>IDL:omg.org/CORBA/CompletionStatus:1.0</code>, always.
    */
   public static String id()
@@ -112,5 +116,25 @@ public abstract class CompletionStatusHelper
   public static void write(OutputStream output, CompletionStatus status)
   {
     output.write_long(status.value());
+  }
+
+  /**
+   * Get the parameter mode typecode (enumeration, named "CompletionStatus").
+   * The typecode states that the enumeration can obtain one of
+   * the following values:  COMPLETED_YES ,COMPLETED_NO or COMPLETED_MAYBE .
+   */
+  public static TypeCode type()
+  {
+    if (typeCode == null)
+      {
+        String[] members =
+          new String[] { "COMPLETED_YES", "COMPLETED_NO", "COMPLETED_MAYBE" };
+
+        typeCode =
+          Restricted_ORB.Singleton.create_enum_tc(id(), "CompletionStatus",
+                                                  members
+                                                 );
+      }
+    return typeCode;
   }
 }

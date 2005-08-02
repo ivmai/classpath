@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,7 +39,22 @@ exception statement from your version. */
 #include "gtkpeer.h"
 #include "gnu_java_awt_peer_gtk_GtkChoicePeer.h"
 
-static void selection_changed (GtkComboBox *combobox, jobject peer);
+static jmethodID postChoiceItemEventID;
+
+void
+cp_gtk_choice_init_jni (void)
+{
+  jclass gtkchoicepeer;
+
+  gtkchoicepeer = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
+                                        "gnu/java/awt/peer/gtk/GtkChoicePeer");
+
+  postChoiceItemEventID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkchoicepeer,
+                                               "postChoiceItemEvent",
+                                               "(Ljava/lang/String;I)V");
+}
+
+static void selection_changed_cb (GtkComboBox *combobox, jobject peer);
 
 JNIEXPORT void JNICALL 
 Java_gnu_java_awt_peer_gtk_GtkChoicePeer_create 
@@ -48,19 +63,38 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_create
   GtkWidget *combobox;
   jobject *gref;
 
+  gdk_threads_enter ();
+  
   NSA_SET_GLOBAL_REF (env, obj);
   gref = NSA_GET_GLOBAL_REF (env, obj);
 
-  gdk_threads_enter ();
-  
   combobox = gtk_combo_box_new_text ();
 
-  g_signal_connect (combobox, "changed",
-                    G_CALLBACK (selection_changed), *gref);
+  NSA_SET_PTR (env, obj, combobox);
 
   gdk_threads_leave ();
+}
 
-  NSA_SET_PTR (env, obj, combobox);
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_GtkChoicePeer_connectSignals
+  (JNIEnv *env, jobject obj)
+{
+  void *ptr = NULL;
+  jobject *gref = NULL;
+
+  gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
+  gref = NSA_GET_GLOBAL_REF (env, obj);
+
+  /* Choice signals */
+  g_signal_connect (G_OBJECT (ptr), "changed",
+                    G_CALLBACK (selection_changed_cb), *gref);
+
+  /* Component signals */
+  cp_gtk_component_connect_signals (G_OBJECT (ptr), gref);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL 
@@ -70,9 +104,9 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_append
   gpointer ptr;
   jsize count, i;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   count = (*env)->GetArrayLength (env, items);
 
@@ -99,15 +133,17 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_nativeAdd
   void *ptr;
   const char *label;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
   
   label = (*env)->GetStringUTFChars (env, item, 0);      
 
-  gdk_threads_enter ();
   gtk_combo_box_insert_text (GTK_COMBO_BOX (ptr), index, label);
-  gdk_threads_leave ();
 
   (*env)->ReleaseStringUTFChars (env, item, label);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL 
@@ -116,10 +152,12 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_nativeRemove
 {
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
-  gdk_threads_enter ();
   gtk_combo_box_remove_text (GTK_COMBO_BOX (ptr), index);
+
   gdk_threads_leave ();
 }
 
@@ -131,9 +169,9 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_nativeRemoveAll
   GtkTreeModel *model;
   gint count, i;
 
-  ptr = NSA_GET_PTR (env, obj);
-
   gdk_threads_enter ();
+
+  ptr = NSA_GET_PTR (env, obj);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (ptr));
   count = gtk_tree_model_iter_n_children (model, NULL);
@@ -154,10 +192,12 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_select
 {
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
-  gdk_threads_enter ();
   gtk_combo_box_set_active (GTK_COMBO_BOX (ptr), index);
+
   gdk_threads_leave ();
 }
 
@@ -168,16 +208,18 @@ Java_gnu_java_awt_peer_gtk_GtkChoicePeer_nativeGetSelected
   void *ptr;
   int index;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
-  gdk_threads_enter ();
   index = gtk_combo_box_get_active (GTK_COMBO_BOX (ptr));
+
   gdk_threads_leave ();
 
   return index;
 }
 
-static void selection_changed (GtkComboBox *combobox, jobject peer)
+static void selection_changed_cb (GtkComboBox *combobox, jobject peer)
 {
   jstring label;
   GtkTreeModel *model;
@@ -190,18 +232,17 @@ static void selection_changed (GtkComboBox *combobox, jobject peer)
   if (index >= 0)
     {
       model = gtk_combo_box_get_model (combobox);
-
       gtk_combo_box_get_active_iter (combobox, &iter);
-
       gtk_tree_model_get (model, &iter, 0, &selected, -1);
+      label = (*cp_gtk_gdk_env())->NewStringUTF (cp_gtk_gdk_env(), selected);
 
       gdk_threads_leave ();
 
-      label = (*gdk_env())->NewStringUTF (gdk_env(), selected);
-      (*gdk_env())->CallVoidMethod (gdk_env(), peer,
-			          choicePostItemEventID,
-			          label,
-			          (jint) AWT_ITEM_SELECTED);
+      (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
+                                    postChoiceItemEventID,
+                                    label,
+                                    (jint) AWT_ITEM_SELECTED);
+
       gdk_threads_enter ();
     }
 }

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -149,6 +149,31 @@ final class SortKey
           "lower-first".equals(co) ? LOWER_FIRST :
           DEFAULT;
       }
+  }
+
+  boolean references(QName var)
+  {
+    if (select != null && select.references(var))
+      {
+        return true;
+      }
+    if (langTemplate != null && langTemplate.references(var))
+      {
+        return true;
+      }
+    if (dataTypeTemplate != null && dataTypeTemplate.references(var))
+      {
+        return true;
+      }
+    if (orderTemplate != null && orderTemplate.references(var))
+      {
+        return true;
+      }
+    if (caseOrderTemplate != null && caseOrderTemplate.references(var))
+      {
+        return true;
+      }
+    return false;
   }
 
 }

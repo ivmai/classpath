@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -201,7 +201,7 @@ public class GdkGraphics2D extends Graphics2D
     initState(width, height);
 
     setColor(Color.black);
-    setBackground(Color.black);
+    setBackground(new Color(0, 0, 0, 0));
     setPaint(getColor());
     setFont(new Font("SansSerif", Font.PLAIN, 12));
     setTransform(new AffineTransform());
@@ -255,7 +255,7 @@ public class GdkGraphics2D extends Graphics2D
     initState(this.pixelBuffer, bimage.getWidth(), bimage.getHeight());
 
     setColor(Color.black);
-    setBackground(Color.black);
+    setBackground(new Color(0, 0, 0, 0));
     setPaint(getColor());
     setFont(new Font("SansSerif", Font.PLAIN, 12));
     setTransform(new AffineTransform());
@@ -290,8 +290,8 @@ public class GdkGraphics2D extends Graphics2D
   private native void cairoRestore();
   private native void cairoSetMatrix(double[] m);
   private native void cairoSetOperator(int cairoOperator);
-  private native void cairoSetRGBColor(double red, double green, double blue);
-  private native void cairoSetAlpha(double alpha);
+  private native void cairoSetRGBAColor(double red, double green,
+                                        double blue, double alpha);
   private native void cairoSetFillRule(int cairoFillRule);
   private native void cairoSetLineWidth(double width);
   private native void cairoSetLineCap(int cairoLineCap);
@@ -498,9 +498,10 @@ public class GdkGraphics2D extends Graphics2D
       {
         int height = bimage.getHeight();
         int width = bimage.getWidth();
+        int index = 0;
         for (int y = 0; y < height; ++y)
           for (int x = 0; x < width; ++x)
-            bimage.setRGB(x, y, pixelBuffer[y*width+height]);
+            bimage.setRGB(x, y, pixelBuffer[index++]);
       }
   }
 
@@ -544,7 +545,7 @@ public class GdkGraphics2D extends Graphics2D
 		// draw an image which has actually been loaded 
 		// into memory fully
 		BufferedImage b = (BufferedImage) img;
-		return drawRaster(b.getColorModel(), b.getData(),
+		return drawRaster(b.getColorModel(), b.getTile(0, 0),
 		                  invertedXform, bgcolor);
 	      }
 	    else
@@ -807,9 +808,8 @@ public class GdkGraphics2D extends Graphics2D
 
     fg = c;
     paint = c;
-    cairoSetRGBColor(fg.getRed() / 255.0, fg.getGreen() / 255.0,
-                     fg.getBlue() / 255.0);
-    cairoSetAlpha((fg.getAlpha() & 255) / 255.0);
+    cairoSetRGBAColor(fg.getRed() / 255.0, fg.getGreen() / 255.0,
+                      fg.getBlue() / 255.0, fg.getAlpha() / 255.0);
   }
 
   public Color getColor()
@@ -914,9 +914,8 @@ public class GdkGraphics2D extends Graphics2D
 
   public void clearRect(int x, int y, int width, int height)
   {
-    cairoSetRGBColor(bg.getRed() / 255.0, bg.getGreen() / 255.0,
-                     bg.getBlue() / 255.0);
-    cairoSetAlpha(1.0);
+    cairoSetRGBAColor(bg.getRed() / 255.0, bg.getGreen() / 255.0,
+                      bg.getBlue() / 255.0, 1.0);
     cairoNewPath();
     cairoRectangle(x, y, width, height);
     cairoFill();

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -38,11 +38,15 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
+import java.awt.Color;
 import java.util.HashMap;
 
 import javax.swing.JComponent;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
 
 public class MetalSplitPaneUI
   extends BasicSplitPaneUI
@@ -82,5 +86,21 @@ public class MetalSplitPaneUI
       instance = (MetalSplitPaneUI) o;
 
     return instance;
+  }
+
+  /**
+   * Returns the divider that is used by the <code>JSplitPane</code>.
+   *
+   * The divider returned by this method is a {@link BasicSplitPaneDivider}
+   * that is drawn using the Metal look.
+   *
+   * @return the default divider to use for <code>JSplitPane</code>s. 
+   */
+  public BasicSplitPaneDivider createDefaultDivider()
+  {
+    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    Color light = defaults.getColor("SplitPane.highlight");
+    Color dark = defaults.getColor("SplitPane.darkShadow");
+    return new MetalSplitPaneDivider(this, light, dark);
   }
 }

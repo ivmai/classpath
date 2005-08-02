@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -48,7 +48,7 @@ import java.util.ArrayList;
   * Media objects are tracked by assigning them an ID. It is possible
   * to assign the same ID to mutliple objects, effectivly grouping them
   * together. In this case the status flags ({@link #statusID}) and error flag
-  * (@link #isErrorID} and {@link #getErrorId}) are ORed together. This
+  * (@link #isErrorID} and {@link #getErrorsID}) are ORed together. This
   * means that you cannot say exactly which media object has which status,
   * at most you can say that there <em>are</em> certain media objects with
   * some certain status.
@@ -123,7 +123,7 @@ public class MediaTracker implements java.io.Serializable
      * @return <code>true</code> if more data is needed, <code>false</code>
      *         otherwise
      *
-     * @see {@link java.awt.image.ImageObserver}
+     * @see java.awt.image.ImageObserver
      */
     public boolean imageUpdate(Image img, int flags, int x, int y, 
                                int width, int height)
@@ -241,15 +241,24 @@ public class MediaTracker implements java.io.Serializable
           {
             if (load && ((e.status & LOADING) == 0))
               {
-                e.status = LOADING;
-                result = false;
-                boolean complete = target.prepareImage(e.image, e);
-                if (complete)
-                  {
-                    e.status = COMPLETE;
-                    result = true;
-                  }
-              }
+		if (target.prepareImage(e.image, e))
+		  e.status = COMPLETE;
+		else
+		  {
+		    e.status = LOADING;
+		    int flags = target.checkImage(e.image, e);
+		    if ((flags & ImageObserver.ABORT) != 0)
+		      e.status = ABORTED;
+		    else if ((flags & ImageObserver.ERROR) != 0)
+		      e.status = ERRORED;
+		    else if ((flags & ImageObserver.ALLBITS) != 0)
+		      e.status = COMPLETE;
+		  }
+		boolean complete = (e.status
+				    & (COMPLETE | ABORTED | ERRORED)) != 0;
+		if (!complete)
+		  result = false;
+	      }
             else
               result = false;
           }
@@ -373,11 +382,19 @@ public class MediaTracker implements java.io.Serializable
       {
         if (load && e.status == 0)
           {
-            boolean complete = target.prepareImage(e.image, e);
-            if (complete)
+            if (target.prepareImage(e.image, e))
               e.status = COMPLETE;
             else
-              e.status = LOADING;
+	      {
+                e.status = LOADING;
+                int flags = target.checkImage(e.image, e);
+		if ((flags & ImageObserver.ABORT) != 0)
+		  e.status = ABORTED;
+		else if ((flags & ImageObserver.ERROR) != 0)
+		  e.status = ERRORED;
+		else if ((flags & ImageObserver.ALLBITS) != 0)
+		  e.status = COMPLETE;
+	      }
           }
         result |= e.status;
         e = e.next;
@@ -422,13 +439,22 @@ public class MediaTracker implements java.io.Serializable
             if (load && ((e.status & LOADING) == 0))
               {
                 e.status = LOADING;
-                result = false;
-                boolean complete = target.prepareImage(e.image, e);
-                if (complete)
-                  {
-                    e.status = COMPLETE;
-                    result = true;
-                  }
+		if (target.prepareImage(e.image, e))
+		  e.status = COMPLETE;
+		else
+		  {
+		    int flags = target.checkImage(e.image, e);
+		    if ((flags & ImageObserver.ABORT) != 0)
+		      e.status = ABORTED;
+		    else if ((flags & ImageObserver.ERROR) != 0)
+		      e.status = ERRORED;
+		    else if ((flags & ImageObserver.ALLBITS) != 0)
+		      e.status = COMPLETE;
+		  }
+		boolean complete = (e.status
+				    & (COMPLETE | ABORTED | ERRORED)) != 0;
+		if (!complete)
+		  result = false;
               }
             else
               result = false;
@@ -567,11 +593,19 @@ public class MediaTracker implements java.io.Serializable
           {
             if (load && e.status == 0)
               {
-                boolean complete = target.prepareImage(e.image, e);
-                if (complete)
+		if (target.prepareImage(e.image, e))
                   e.status = COMPLETE;
-                else
-                  e.status = LOADING;
+		else
+		  {
+		    e.status = LOADING;
+		    int flags = target.checkImage(e.image, e);
+		    if ((flags & ImageObserver.ABORT) != 0)
+		      e.status = ABORTED;
+		    else if ((flags & ImageObserver.ERROR) != 0)
+		      e.status = ERRORED;
+		    else if ((flags & ImageObserver.ALLBITS) != 0)
+		      e.status = COMPLETE;
+		  }
               }
             result |= e.status;
           }

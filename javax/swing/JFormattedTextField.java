@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -42,7 +42,10 @@ import java.awt.event.FocusEvent;
 import java.io.Serializable;
 import java.text.Format;
 import java.text.ParseException;
+import java.util.Date;
 
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.NavigationFilter;
@@ -197,7 +200,8 @@ public class JFormattedTextField extends JTextField
 
   public Action[] getActions ()
   {
-    throw new InternalError ("not implemented");
+    // FIXME: Add JFormattedTextField specific actions
+    return super.getActions();
   }
 
   public int getFocusLostBehavior()
@@ -240,7 +244,10 @@ public class JFormattedTextField extends JTextField
 
   protected void processFocusEvent (FocusEvent evt)
   {
-    throw new InternalError ("not implemented");
+    // it's safe to simply call super for now, until it gets clear
+    // what this method is supposed to do
+    // throw new InternalError ("not implemented");
+    super.processFocusEvent(evt);
   }
 
   public void setDocument(Document newDocument)
@@ -292,9 +299,49 @@ public class JFormattedTextField extends JTextField
   {
     if (value == newValue)
       return;
-    
+
+    // format value
+    AbstractFormatter formatter = createFormatter(newValue);
+    try
+      {
+        setText(formatter.valueToString(newValue));
+      }
+    catch (ParseException ex)
+      {
+        // TODO: what should we do with this?
+      }
+
     Object oldValue = value;
     value = newValue;
     firePropertyChange("value", oldValue, newValue);
+  }
+
+  /**
+   * A helper method that attempts to create a formatter that is suitable
+   * to format objects of the type like <code>value</code>.
+   *
+   * If <code>formatterFactory</code> is not null and the returned formatter
+   * is also not <code>null</code> then this formatter is used. Otherwise we
+   * try to create one based on the type of <code>value</code>.
+   *
+   * @param value an object which should be formatted by the formatter
+   *
+   * @return a formatter able to format objects of the class of
+   *     <code>value</code>
+   */
+  AbstractFormatter createFormatter(Object value)
+  {
+    AbstractFormatter formatter = null;
+    if (formatterFactory != null
+        && formatterFactory.getFormatter(this) != null)
+     formatter = formatterFactory.getFormatter(this);
+   else
+     {
+       if (value instanceof Date)
+         formatter = new DateFormatter();
+       else
+         formatter = new DefaultFormatter();
+     }
+    return formatter;
   }
 }

@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -43,113 +43,126 @@ import java.awt.event.KeyEvent;
 import java.util.Stack;
 
 /**
- * DefaultFocusManager
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class has been obsoleted by the new
+ * {@link java.awt.KeyboardFocusManager} and
+ * {@link java.awt.DefaultKeyboardFocusManager} API.
+ *
+ * @author Andrew Selkirk
  */
 public class DefaultFocusManager extends FocusManager {
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+	/**
+   * historyStack
+   */
+  private Stack historyStack;
+
+  /**
+   * Constructor DefaultFocusManager
+   */
+  public DefaultFocusManager()
+  {
+    // TODO
+  } // DefaultFocusManager()
 
 	/**
-	 * historyStack
-	 */
-	private Stack historyStack;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Constructor DefaultFocusManager
-	 */
-	public DefaultFocusManager() {
-		// TODO
-	} // DefaultFocusManager()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+   * processKeyEvent
+   * 
+   * @param component
+   *          TODO
+   * @param event
+   *          TODO
+   */
+  public void processKeyEvent(Component component, KeyEvent event)
+  {
+    // TODO
+  } // processKeyEvent()
 
 	/**
-	 * processKeyEvent
-	 * @param component TODO
-	 * @param event TODO
-	 */
-	public void processKeyEvent(Component component, KeyEvent event) {
-		// TODO
-	} // processKeyEvent()
+   * focusNextComponent
+   * 
+   * @param component
+   *          TODO
+   */
+  public void focusNextComponent(Component component)
+  {
+    // TODO
+  } // focusNextComponent()
 
 	/**
-	 * focusNextComponent
-	 * @param component TODO
-	 */
-	public void focusNextComponent(Component component) {
-		// TODO
-	} // focusNextComponent()
+   * focusPreviousComponent
+   * 
+   * @param component
+   *          TODO
+   */
+  public void focusPreviousComponent(Component component)
+  {
+    // TODO
+  } // focusPreviousComponent()
 
 	/**
-	 * focusPreviousComponent
-	 * @param component TODO
-	 */
-	public void focusPreviousComponent(Component component) {
-		// TODO
-	} // focusPreviousComponent()
+   * getFirstComponent
+   * 
+   * @param container
+   *          TODO
+   * @returns Component
+   */
+  public Component getFirstComponent(Container container)
+  {
+    return null; // TODO
+  } // getFirstComponent()
 
 	/**
-	 * getFirstComponent
-	 * @param container TODO
-	 * @returns Component
-	 */
-	public Component getFirstComponent(Container container) {
-		return null; // TODO
-	} // getFirstComponent()
+   * getLastComponent
+   * 
+   * @param container
+   *          TODO
+   * @returns Component
+   */
+  public Component getLastComponent(Container container)
+  {
+    return null; // TODO
+  } // getLastComponent()
 
 	/**
-	 * getLastComponent
-	 * @param container TODO
-	 * @returns Component
-	 */
-	public Component getLastComponent(Container container) {
-		return null; // TODO
-	} // getLastComponent()
+   * getComponentBefore
+   * 
+   * @param container
+   *          TODO
+   * @param component
+   *          TODO
+   * @returns Component
+   */
+  public Component getComponentBefore(Container container, Component component)
+  {
+    return null; // TODO
+  } // getComponentBefore()
 
 	/**
-	 * getComponentBefore
-	 * @param container TODO
-	 * @param component TODO
-	 * @returns Component
-	 */
-	public Component getComponentBefore(Container container,
-			Component component) {
-		return null; // TODO
-	} // getComponentBefore()
+   * getComponentAfter
+   * 
+   * @param container
+   *          TODO
+   * @param component
+   *          TODO
+   * @returns Component
+   */
+  public Component getComponentAfter(Container container, Component component)
+  {
+    return null; // TODO
+  } // getComponentAfter()
 
 	/**
-	 * getComponentAfter
-	 * @param container TODO
-	 * @param component TODO
-	 * @returns Component
-	 */
-	public Component getComponentAfter(Container container, 
-			Component component) {
-		return null; // TODO
-	} // getComponentAfter()
-
-	/**
-	 * compareTabOrder
-	 * @param component1 TODO
-	 * @param component2 TODO
-	 * @returns boolean
-	 */
-	public boolean compareTabOrder(Component component1,
-			Component component2) {
-		return false; // TODO
-	} // compareTabOrder()
-
+   * compareTabOrder
+   * 
+   * @param component1
+   *          TODO
+   * @param component2
+   *          TODO
+   * @returns boolean
+   */
+  public boolean compareTabOrder(Component component1, Component component2)
+  {
+    return false; // TODO
+  } // compareTabOrder()
 
 } // DefaultFocusManager

@@ -153,13 +153,13 @@ send other questions to
 <A HREF="mailto:gnu@gnu.org"><EM>gnu@gnu.org</EM></A>.
 <P>
 Copyright (C) 1999-2003 Free Software Foundation, Inc.,
-59 Temple Place - Suite 330, Boston, MA  02111,  USA
+51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 <P>
 Verbatim copying and distribution of this entire article is
 permitted in any medium, provided this notice is preserved.<P>
 Updated:
 </en>
-$Date: 2005-01-15 17:01:38 $ $Author: gnu_andrew $
+$Date: 2005-08-02 20:12:07 $ $Author: gnu_andrew $
 <!--
 <preserve info>
 <set-var info=<get-file-properties <__file__>>>

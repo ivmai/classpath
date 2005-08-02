@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -124,12 +124,12 @@ import java.util.StringTokenizer;
 public abstract class ClassLoader
 {
   /**
-   * All classes loaded by this classloader. VM's may choose to implement
-   * this cache natively; but it is here available for use if necessary. It
-   * is not private in order to allow native code (and trusted subclasses)
-   * access to this field.
+   * All classes loaded by this classloader. If the VM's chooses to implement
+   * this cache natively this field will be null.
+   * It is not private in order to allow VMClassLoader access to this field.
    */
-  final HashMap<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
+  final HashMap<String, Class<?>> loadedClasses = 
+    VMClassLoader.USE_VM_CACHE ? null : new HashMap<String, Class<?>>();
 
   /**
    * All packages defined by this classloader. It is not private in order to
@@ -479,7 +479,8 @@ public abstract class ClassLoader
 
     Class<?> retval = VMClassLoader.defineClass(this, name, data,
 						offset, len, domain);
-    loadedClasses.put(retval.getName(), retval);
+    if (! VMClassLoader.USE_VM_CACHE)
+      loadedClasses.put(retval.getName(), retval);
     return retval;
   }
 
@@ -565,9 +566,7 @@ public abstract class ClassLoader
    */
   protected final synchronized Class<?> findLoadedClass(String name)
   {
-    // NOTE: If the VM is keeping its own cache, it may make sense to have
-    // this method be native.
-    return loadedClasses.get(name);
+    return VMClassLoader.findLoadedClass(this, name);
   }
 
   /**

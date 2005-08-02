@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -78,33 +78,6 @@ public interface Configuration
    * not require additional shared libraries to be loaded.
    */
   boolean INIT_LOAD_LIBRARY = @INIT_LOAD_LIBRARY@;
-
-  /**
-   * Set to true if the VM provides a native method to implement
-   * Proxy.getProxyClass completely, including argument verification.
-   * If this is true, HAVE_NATIVE_GET_PROXY_DATA and
-   * HAVE_NATIVE_GENERATE_PROXY_CLASS should be false.
-   * @see java.lang.reflect.Proxy
-   */
-  boolean HAVE_NATIVE_GET_PROXY_CLASS = false;
-
-  /**
-   * Set to true if the VM provides a native method to implement
-   * the first part of Proxy.getProxyClass: generation of the array
-   * of methods to convert, and verification of the arguments.
-   * If this is true, HAVE_NATIVE_GET_PROXY_CLASS should be false.
-   * @see java.lang.reflect.Proxy
-   */
-  boolean HAVE_NATIVE_GET_PROXY_DATA = false;
-
-  /**
-   * Set to true if the VM provides a native method to implement
-   * the second part of Proxy.getProxyClass: conversion of an array of
-   * methods into an actual proxy class.
-   * If this is true, HAVE_NATIVE_GET_PROXY_CLASS should be false.
-   * @see java.lang.reflect.Proxy
-   */
-  boolean HAVE_NATIVE_GENERATE_PROXY_CLASS = false;
 
   /**
    * Name of default AWT peer library.

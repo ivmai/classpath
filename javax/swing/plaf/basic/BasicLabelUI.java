@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -92,7 +92,8 @@ public class BasicLabelUI extends LabelUI implements PropertyChangeListener
 
   /**
    * Returns the preferred size of this component as calculated by the
-   * {@link layoutCL} method.
+   * {@link #layoutCL(JLabel, FontMetrics, String, Icon, Rectangle, Rectangle, 
+   * Rectangle)} method.
    *
    * @param c This {@link JComponent} to get a preferred size for.
    *
@@ -350,8 +351,6 @@ public class BasicLabelUI extends LabelUI implements PropertyChangeListener
     c.setForeground(defaults.getColor("Label.foreground"));
     c.setBackground(defaults.getColor("Label.background"));
     c.setFont(defaults.getFont("Label.font"));
-    c.setBorder(defaults.getBorder("Label.border"));
-    c.setOpaque(true);
     //XXX: There are properties we don't use called disabledForeground
     //and disabledShadow.
   }
@@ -367,7 +366,6 @@ public class BasicLabelUI extends LabelUI implements PropertyChangeListener
     c.setForeground(null);
     c.setBackground(null);
     c.setFont(null);
-    c.setBorder(null);
   }
 
   /**

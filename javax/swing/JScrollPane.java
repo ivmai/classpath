@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -54,6 +54,9 @@ import javax.swing.plaf.ScrollPaneUI;
 import javax.swing.plaf.UIResource;
 
 /**
+ * A component that embeds another component and enables it to be scrolled
+ * both in horizontal and vertical direction.
+ *
  * <table>
  * <tr><th>Property                    </th><th>Stored in       </th><th>Bound?</th></tr>
  * <tr><td>columnHeader                </td><td>scrollPane      </td><td>yes   </td></tr>
@@ -564,11 +567,23 @@ public class JScrollPane
   }
 
 
+  /**
+   * Creates a new <code>JScrollPane</code> without a view. The scrollbar
+   * policy is set to {@link #VERTICAL_SCROLLBAR_AS_NEEDED} and
+   * {@link #HORIZONTAL_SCROLLBAR_AS_NEEDED}.
+   */
   public JScrollPane() 
   {
     this(null);
   }
-    
+
+  /**
+   * Creates a new <code>JScrollPane</code> that embeds the specified
+   * <code>view</code> component, displaying vertical and horizontal scrollbars
+   * as needed.
+   *
+   * @param view the component that is embedded inside the JScrollPane
+   */
   public JScrollPane(Component view) 
   {
     this(view, 
@@ -576,11 +591,40 @@ public class JScrollPane
          HORIZONTAL_SCROLLBAR_AS_NEEDED);
   }
 
+  /**
+   * Creates a new <code>JScrollPane</code> without a view; The scrollbar
+   * policies are set to <code>vsbPolicy</code> and <code>hsbPolicy</code>.
+   *
+   * @param vsbPolicy the vertical scrollbar policy to set
+   * @param hsbPolicy the vertical scrollbar policy to set
+   *
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_ALWAYS
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_AS_NEEDED
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_NEVER
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_ALWAYS
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_AS_NEEDED
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_NEVER
+   */
   public JScrollPane(int vsbPolicy, int hsbPolicy) 
   {
     this(null, vsbPolicy, hsbPolicy);
   }
 
+  /**
+   * Creates a new <code>JScrollPane</code> that embeds the specified
+   * <code>view</code> component; The scrollbar
+   * policies are set to <code>vsbPolicy</code> and <code>hsbPolicy</code>.
+   *
+   * @param vsbPolicy the vertical scrollbar policy to set
+   * @param hsbPolicy the vertical scrollbar policy to set
+   *
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_ALWAYS
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_AS_NEEDED
+   * @see ScrollPaneConstants#HORIZONTAL_SCROLLBAR_NEVER
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_ALWAYS
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_AS_NEEDED
+   * @see ScrollPaneConstants#VERTICAL_SCROLLBAR_NEVER
+   */
   public JScrollPane(Component view, int vsbPolicy, int hsbPolicy) 
   {
     scrollListener = createScrollListener();
@@ -588,7 +632,11 @@ public class JScrollPane
     setVerticalScrollBar(createVerticalScrollBar());
     setHorizontalScrollBarPolicy(hsbPolicy);
     setHorizontalScrollBar(createHorizontalScrollBar());
-    setViewportView(view);
+    viewport = createViewport();
+    if (view != null)
+      getViewport().setView(view);
+    viewport.addChangeListener(scrollListener);
+    add(viewport,0);
     setLayout(new ScrollPaneLayout());
     setOpaque(false);
     updateUI();

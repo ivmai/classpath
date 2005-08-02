@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -402,7 +402,7 @@ public class HTTPConnection
    * Retrieves the socket associated with this connection.
    * This creates the socket if necessary.
    */
-  protected Socket getSocket()
+  protected synchronized Socket getSocket()
     throws IOException
   {
     if (socket == null)
@@ -489,7 +489,7 @@ public class HTTPConnection
     sslSocketFactory = factory;
   }
 
-  protected InputStream getInputStream()
+  protected synchronized InputStream getInputStream()
     throws IOException
   {
     if (socket == null)
@@ -499,7 +499,7 @@ public class HTTPConnection
     return in;
   }
 
-  protected OutputStream getOutputStream()
+  protected synchronized OutputStream getOutputStream()
     throws IOException
   {
     if (socket == null)
@@ -512,7 +512,7 @@ public class HTTPConnection
   /**
    * Closes the underlying socket, if any.
    */
-  protected void closeConnection()
+  protected synchronized void closeConnection()
     throws IOException
   {
     if (socket != null)

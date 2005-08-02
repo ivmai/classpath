@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -42,6 +42,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.VolatileImage;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -72,7 +73,7 @@ public class RepaintManager
    * typically only one of these objects active at any time. When the
    * {@link RepaintManager} is told to queue a repaint, it checks to see if
    * a {@link RepaintWorker} is "live" in the system event queue, and if
-   * not it inserts one using {@link SwingUtilities.invokeLater}.</p>
+   * not it inserts one using {@link SwingUtilities#invokeLater}.</p>
    *
    * <p>When the {@link RepaintWorker} comes to the head of the system
    * event queue, its {@link RepaintWorker#run} method is executed by the
@@ -235,7 +236,7 @@ public class RepaintManager
    *
    * @param manager The new value of the shared instance
    *
-   * @see #currentManager
+   * @see #currentManager(JComponent)
    */
   public static void setCurrentManager(RepaintManager manager)
   {
@@ -501,7 +502,7 @@ public class RepaintManager
    *
    * @since 1.4
    *
-   * @see {@link VolatileImage}
+   * @see VolatileImage
    */
   public Image getVolatileOffscreenBuffer(Component comp, int proposedWidth,
                                           int proposedHeight)
@@ -542,7 +543,7 @@ public class RepaintManager
    *
    * @param buffer The new value of the property
    *
-   * @see #getDoubleBufferingEnabled
+   * @see #isDoubleBufferingEnabled
    */
   public void setDoubleBufferingEnabled(boolean buffer)
   {

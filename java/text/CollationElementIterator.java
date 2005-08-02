@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -177,9 +177,11 @@ public final class CollationElementIterator
    * This method returns the primary order value for the given collation
    * value.
    *
-   * @param value The collation value returned from <code>next()</code> or <code>previous()</code>.
+   * @param order The collation value returned from <code>next()</code> or 
+   *              <code>previous()</code>.
    *
-   * @return The primary order value of the specified collation value.  This is the high 16 bits.
+   * @return The primary order value of the specified collation value.  This is
+   *         the high 16 bits.
    */
   public static int primaryOrder(int order)
   {
@@ -201,9 +203,11 @@ public final class CollationElementIterator
    * This method returns the secondary order value for the given collation
    * value.
    *
-   * @param value The collation value returned from <code>next()</code> or <code>previous()</code>.
+   * @param order The collation value returned from <code>next()</code> or 
+   *              <code>previous()</code>.
    *
-   * @return The secondary order value of the specified collation value.  This is the bits 8-15.
+   * @return The secondary order value of the specified collation value.  This 
+   *         is the bits 8-15.
    */
   public static short secondaryOrder(int order)
   {
@@ -215,9 +219,11 @@ public final class CollationElementIterator
    * This method returns the tertiary order value for the given collation
    * value.
    *
-   * @param value The collation value returned from <code>next()</code> or <code>previous()</code>.
+   * @param order The collation value returned from <code>next()</code> or 
+   *              <code>previous()</code>.
    *
-   * @return The tertiary order value of the specified collation value.  This is the low eight bits.
+   * @return The tertiary order value of the specified collation value.  This 
+   *         is the low eight bits.
    */
   public static short tertiaryOrder(int order)
   {
@@ -458,7 +464,7 @@ public final class CollationElementIterator
    *
    * @param value The collation order value
    *
-   * @param The maximum length of an expansion sequence.
+   * @return The maximum length of an expansion sequence.
    */
   public int getMaxExpansion(int value)
   {

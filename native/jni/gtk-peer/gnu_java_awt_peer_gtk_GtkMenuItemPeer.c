@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,8 +40,24 @@ exception statement from your version. */
 #include "gnu_java_awt_peer_gtk_GtkMenuItemPeer.h"
 #include "gnu_java_awt_peer_gtk_GtkComponentPeer.h"
 
-static void item_activate (GtkMenuItem *item __attribute__((unused)),
-                           jobject peer_obj);
+static jmethodID postMenuActionEventID;
+
+void
+cp_gtk_menuitem_init_jni (void)
+{
+  jclass gtkmenuitempeer;
+
+  gtkmenuitempeer = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
+                                      "gnu/java/awt/peer/gtk/GtkMenuItemPeer");
+
+  postMenuActionEventID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(),
+                                                     gtkmenuitempeer,
+                                                     "postMenuActionEvent",
+                                                     "()V");
+}
+
+static void item_activate_cb (GtkMenuItem *item __attribute__((unused)),
+                              jobject peer_obj);
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_create
@@ -50,11 +66,11 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_create
   GtkWidget *widget;
   const char *str;
 
+  gdk_threads_enter ();
+
   NSA_SET_GLOBAL_REF (env, obj);
 
   str = (*env)->GetStringUTFChars (env, label, NULL);
-
-  gdk_threads_enter ();
 
   /* "-" signals that we need a separator. */
   if (strcmp (str, "-") == 0)
@@ -64,25 +80,27 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_create
 
   gtk_widget_show (widget);
 
-  gdk_threads_leave ();
-
   (*env)->ReleaseStringUTFChars (env, label, str);
 
   NSA_SET_PTR (env, obj, widget);
+
+  gdk_threads_leave ();
 }
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_connectSignals
   (JNIEnv *env, jobject obj)
 {
-  void *ptr = NSA_GET_PTR (env, obj);
-  jobject *gref = NSA_GET_GLOBAL_REF (env, obj);
-  g_assert (gref);
+  void *ptr;
+  jobject *gref;
   
   gdk_threads_enter ();
   
+  ptr = NSA_GET_PTR (env, obj);
+  gref = NSA_GET_GLOBAL_REF (env, obj);
+
   g_signal_connect (G_OBJECT (ptr), "activate",
-                    G_CALLBACK (item_activate), *gref);
+                    G_CALLBACK (item_activate_cb), *gref);
 
   gdk_threads_leave ();
 }
@@ -96,18 +114,19 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_gtkWidgetModifyFont
   GtkWidget *label;
   PangoFontDescription *font_desc;
 
+  gdk_threads_enter();
+
   ptr = NSA_GET_PTR (env, obj);
 
   font_name = (*env)->GetStringUTFChars (env, name, NULL);
-
-  gdk_threads_enter();
 
   label = gtk_bin_get_child (GTK_BIN (ptr));
 
   if (label)
     {
       font_desc = pango_font_description_from_string (font_name);
-      pango_font_description_set_size (font_desc, size * dpi_conversion_factor);
+      pango_font_description_set_size (font_desc,
+                                   size * cp_gtk_dpi_conversion_factor);
 
       if (style & AWT_STYLE_BOLD)
         pango_font_description_set_weight (font_desc, PANGO_WEIGHT_BOLD);
@@ -120,9 +139,9 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_gtkWidgetModifyFont
       pango_font_description_free (font_desc);
     }
 
-  gdk_threads_leave();
-
   (*env)->ReleaseStringUTFChars (env, name, font_name);
+
+  gdk_threads_leave();
 }
 
 JNIEXPORT void JNICALL
@@ -131,10 +150,12 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_setEnabled
 {
   void *ptr;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
-  gdk_threads_enter ();
   gtk_widget_set_sensitive (GTK_WIDGET (ptr), enabled);
+
   gdk_threads_leave ();
 }
 
@@ -146,25 +167,27 @@ Java_gnu_java_awt_peer_gtk_GtkMenuItemPeer_setLabel
   const char *str;
   GtkAccelLabel *accel_label;
 
+  gdk_threads_enter ();
+
   ptr = NSA_GET_PTR (env, obj);
 
   str = (*env)->GetStringUTFChars (env, label, NULL);
-
-  gdk_threads_enter ();
 
   accel_label = GTK_ACCEL_LABEL (GTK_BIN (ptr)->child);
 
   gtk_label_set_text (GTK_LABEL (accel_label), str);
   gtk_accel_label_refetch (accel_label);
 
-  gdk_threads_leave ();
-
   (*env)->ReleaseStringUTFChars (env, label, str);
+
+  gdk_threads_leave ();
 }
 
 static void
-item_activate (GtkMenuItem *item __attribute__((unused)), jobject peer_obj)
+item_activate_cb (GtkMenuItem *item __attribute__((unused)), jobject peer_obj)
 {
-  (*gdk_env())->CallVoidMethod (gdk_env(), peer_obj,
-			      postMenuActionEventID);
+  gdk_threads_leave ();
+  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer_obj,
+                                postMenuActionEventID);
+  gdk_threads_enter ();
 }

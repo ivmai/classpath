@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -125,7 +125,7 @@ public interface AccessibleText
    * Returns the section of text at the index, or null if the index or part
    * is invalid.
    *
-   * @param part {@link CHARACTER}, {@link WORD}, or {@link SENTENCE}
+   * @param part {@link #CHARACTER}, {@link #WORD}, or {@link #SENTENCE}
    * @param index the 0-based character index
    * @return the selection of text at that index, or null
    */
@@ -135,7 +135,7 @@ public interface AccessibleText
    * Returns the section of text after the index, or null if the index or part
    * is invalid.
    *
-   * @param part {@link CHARACTER}, {@link WORD}, or {@link SENTENCE}
+   * @param part {@link #CHARACTER}, {@link #WORD}, or {@link #SENTENCE}
    * @param index the 0-based character index
    * @return the selection of text after that index, or null
    */
@@ -145,7 +145,7 @@ public interface AccessibleText
    * Returns the section of text before the index, or null if the index or part
    * is invalid.
    *
-   * @param part {@link CHARACTER}, {@link WORD}, or {@link SENTENCE}
+   * @param part {@link #CHARACTER}, {@link #WORD}, or {@link #SENTENCE}
    * @param index the 0-based character index
    * @return the selection of text before that index, or null
    */

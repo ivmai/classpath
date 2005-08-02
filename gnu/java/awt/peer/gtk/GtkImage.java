@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -100,6 +100,11 @@ public class GtkImage extends Image
   boolean offScreen;
 
   /**
+   * Error flag for loading.
+   */
+  boolean errorLoading;
+
+  /**
    * Original source, if created from an ImageProducer.
    */
   ImageProducer source;
@@ -176,6 +181,7 @@ public class GtkImage extends Image
     isLoaded = false;
     observers = new Vector();
     source = producer;
+    errorLoading = false;
     source.startProduction(new GtkImageConsumer(this, source));
     offScreen = false;
   }
@@ -243,6 +249,13 @@ public class GtkImage extends Image
     this.width = width;
     this.height = height;
     props = (properties != null) ? properties : new Hashtable();
+
+    if (width <= 0 || height <= 0 || pixels == null)
+      {
+	errorLoading = true;
+	return;
+      }
+
     isLoaded = true;
     deliver();
     createPixmap();
@@ -281,6 +294,8 @@ public class GtkImage extends Image
    */
   public ImageProducer getSource ()
   {
+    if (!isLoaded)
+      return null;
     return new MemoryImageSource(width, height, nativeModel, getPixels(), 
 				 0, width);
   }
@@ -344,7 +359,12 @@ public class GtkImage extends Image
   public int checkImage (ImageObserver observer)
   {
     if (addObserver(observer))
-      return 0;
+      {
+	if (errorLoading == true)
+	  return ImageObserver.ERROR;
+	else
+	  return 0;
+      }
 
     return ImageObserver.ALLBITS | ImageObserver.WIDTH | ImageObserver.HEIGHT;
   }
@@ -373,18 +393,33 @@ public class GtkImage extends Image
     int dstY = (dy1 < dy2) ? dy1 : dy2;
 
     // Clipping. This requires the dst to be scaled as well, 
+    if (srcWidth > width)
+      {
+	dstWidth = (int)((double)dstWidth*((double)width/(double)srcWidth));
+	srcWidth = width - srcX;
+      }
+
+    if (srcHeight > height) 
+      {
+	dstHeight = (int)((double)dstHeight*((double)height/(double)srcHeight));
+	srcHeight = height - srcY;
+      }
+
     if (srcWidth + srcX > width)
       {
 	dstWidth = (int)((double)dstWidth * (double)(width - srcX)/(double)srcWidth);
 	srcWidth = width - srcX;
-    }
+      }
 
     if (srcHeight + srcY > height)
       {
 	dstHeight = (int)((double)dstHeight * (double)(width - srcY)/(double)srcHeight);
 	srcHeight = height - srcY;
       }
-    
+
+    if ( srcWidth <= 0 || srcHeight <= 0 || dstWidth <= 0 || dstHeight <= 0)
+      return true;
+
     if(bgcolor != null)
       drawPixelsScaledFlipped (g, bgcolor.getRed (), bgcolor.getGreen (), 
 			       bgcolor.getBlue (), 
@@ -433,7 +468,8 @@ public class GtkImage extends Image
       ImageObserver.PROPERTIES |
       ImageObserver.ALLBITS;
 
-    for(int i=0; i < observers.size(); i++)
+    if (observers != null)
+      for(int i=0; i < observers.size(); i++)
 	((ImageObserver)observers.elementAt(i)).
 	  imageUpdate(this, flags, 0, 0, width, height);
 

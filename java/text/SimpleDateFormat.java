@@ -17,8 +17,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -73,14 +73,16 @@ public class SimpleDateFormat extends DateFormat
   private class CompiledField
   {
     /**
-     * The ID of the field within the local pattern characters,
+     * The ID of the field within the local pattern characters.
+     * Package private for use in out class.
      */
-    private int field;
+    int field;
 
     /**
      * The size of the character sequence.
+     * Package private for use in out class.
      */
-    private int size;
+    int size;
 
     /**
      * The character used.
@@ -178,8 +180,8 @@ public class SimpleDateFormat extends DateFormat
    * years to be interpreted as representing
    * the years between 2004 and 2104.
    *
-   * @see get2DigitYearStart()
-   * @see set2DigitYearStart(java.util.Date)
+   * @see #get2DigitYearStart()
+   * @see #set2DigitYearStart(java.util.Date)
    * @see Date
    * @serial The start date of the century for parsing two digit years.
    *         May not be null.
@@ -190,8 +192,8 @@ public class SimpleDateFormat extends DateFormat
    * The year at which interpretation of two
    * digit years starts.
    *
-   * @see get2DigitYearStart()
-   * @see set2DigitYearStart(java.util.Date)
+   * @see #get2DigitYearStart()
+   * @see #set2DigitYearStart(java.util.Date)
    * @serial Ignored.
    */
   private transient int defaultCentury;
@@ -202,10 +204,10 @@ public class SimpleDateFormat extends DateFormat
    * stored in standardChars.  Localized patterns
    * are translated to this form.
    *
-   * @see applyPattern(String)
-   * @see applyLocalizedPattern(String)
-   * @see toPattern()
-   * @see toLocalizedPattern()
+   * @see #applyPattern(String)
+   * @see #applyLocalizedPattern(String)
+   * @see #toPattern()
+   * @see #toLocalizedPattern()
    * @serial The non-localized pattern string.  May not be null.
    */
   private String pattern;
@@ -609,7 +611,7 @@ public class SimpleDateFormat extends DateFormat
    * <li>Is using the same century for two digit years.</li>
    * </ul>
    *
-   * @param obj The object to compare for equality against.
+   * @param o The object to compare for equality against.
    *
    * @return <code>true</code> if the specified object is equal to this object,
    * <code>false</code> otherwise.

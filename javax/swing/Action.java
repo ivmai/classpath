@@ -1,5 +1,5 @@
 /* Action.java --
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -41,98 +41,113 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 
 /**
- * Action
+ * Provides a convenient central point of control for some task
+ * that can be triggered by more than one control in a Swing user interface
+ * (for example, a menu item and a toolbar button).
+ * 
+ * @see AbstractButton#setAction(Action)
+ * 
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  * @author Andrew Selkirk
  */
 public interface Action extends ActionListener {
 
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * A key to access the default property for the action (this is not used).
+   */
+  String DEFAULT = "Default";
 
-	/**
-	 * DEFAULT
-	 */
-	String	DEFAULT				= "Default";
+  /**
+   * A key to access the long description for the action.
+   */
+  String LONG_DESCRIPTION = "LongDescription";
 
-	/**
-	 * LONG_DESCRIPTION
-	 */
-	String	LONG_DESCRIPTION	= "LongDescription";
+  /**
+   * A key to access the name for the action.
+   */
+  String NAME = "Name";
 
-	/**
-	 * NAME
-	 */
-	String	NAME				= "Name";
+  /**
+   * A key to access the short description for the action (the short
+   * description is typically used as the tool tip text).
+   */
+  String SHORT_DESCRIPTION = "ShortDescription";
 
-	/**
-	 * SHORT_DESCRIPTION
-	 */
-	String	SHORT_DESCRIPTION	= "ShortDescription";
+  /**
+   * A key to access the icon for the action.
+   */
+  String SMALL_ICON = "SmallIcon";
 
-	/**
-	 * SMALL_ICON
-	 */
-	String	SMALL_ICON			= "SmallIcon";
+  /**
+   * A key to access the {@link KeyStroke} used as the accelerator for the
+   * action.
+   */
+  String ACCELERATOR_KEY = "AcceleratorKey";
 
-	/**
-	 * ACCELERATOR_KEY
-	 */
-	String ACCELERATOR_KEY = "AcceleratorKey";
+  /**
+   * A key to access the action command string for the action.
+   */
+  String ACTION_COMMAND_KEY = "ActionCommandKey";
 
-	/**
-	 * ACTION_COMMAND_KEY
-	 */
-	String ACTION_COMMAND_KEY = "ActionCommandKey";
+  /**
+   * A key to access the mnemonic for the action.
+   */
+  String MNEMONIC_KEY = "MnemonicKey";
 
-	/**
-	 * MNEMONIC_KEY
-	 */
-	String MNEMONIC_KEY = "MnemonicKey";
+  /**
+   * Returns the value associated with the specified key.
+   * 
+   * @param key  the key (not <code>null</code>).
+   * 
+   * @return The value associated with the specified key, or 
+   *         <code>null</code> if the key is not found.
+   */
+  Object getValue(String key);
 
+  /**
+   * Sets the value associated with the specified key and sends a 
+   * {@link java.beans.PropertyChangeEvent} to all registered listeners.  
+   * The standard keys are defined in this interface: {@link #NAME}, 
+   * {@link #SHORT_DESCRIPTION}, {@link #LONG_DESCRIPTION}, 
+   * {@link #SMALL_ICON}, {@link #ACTION_COMMAND_KEY}, 
+   * {@link #ACCELERATOR_KEY} and {@link #MNEMONIC_KEY}. Any existing value 
+   * associated with the key will be overwritten.  
+   * 
+   * @param key  the key (not <code>null</code>).
+   * @param value  the value (<code>null</code> permitted).
+   */
+  void putValue(String key, Object value);
 
-	//-------------------------------------------------------------
-	// Interface: Action ------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Returns the flag that indicates whether or not this action is enabled.
+   * 
+   * @return The flag.
+   */
+  boolean isEnabled();
 
-	/**
-	 * getValue
-	 * @param key TODO
-	 * @returns TODO
-	 */
-	Object getValue(String key);
+  /**
+   * Sets the flag that indicates whether or not this action is enabled.  If
+   * the value changes, a {@link java.beans.PropertyChangeEvent} is sent to 
+   * all registered listeners.
+   * 
+   * @param b  the new value of the flag.
+   */
+  void setEnabled(boolean b);
 
-	/**
-	 * setValue
-	 * @param key TODO
-	 * @param value TODO
-	 */
-	void putValue(String key, Object value);
+  /**
+   * Registers a listener to receive notification whenever one of the
+   * action's properties is modified.
+   * 
+   * @param listener  the listener.
+   */
+  void addPropertyChangeListener(PropertyChangeListener listener);
 
-	/**
-	 * isEnabled
-	 * @returns TODO
-	 */
-	boolean isEnabled();
-
-	/**
-	 * setEnabled
-	 * @param b TODO
-	 */
-	void setEnabled(boolean b);
-
-	/**
-	 * addPropertyChangeListener
-	 * @param listener TODO
-	 */
-	void addPropertyChangeListener(PropertyChangeListener listener);
-
-	/**
-	 * removePropertyChangeListener
-	 * @param listener TODO
-	 */
-	void removePropertyChangeListener(PropertyChangeListener listener);
-
+  /**
+   * Deregisters a listener so that it no longer receives notification of
+   * changes to the action's properties. 
+   * 
+   * @param listener  the listener.
+   */
+  void removePropertyChangeListener(PropertyChangeListener listener);
 
 } // Action

@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -40,20 +40,24 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.java.lang.CharData;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
+import java.text.Collator;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Strings represent an immutable set of characters.  All String literals
@@ -848,7 +852,7 @@ public final class String
    * @param ignoreCase true if case should be ignored in comparision
    * @param toffset index to start comparison at for this String
    * @param other String to compare region to this String
-   * @param oofset index to start comparison at for other
+   * @param ooffset index to start comparison at for other
    * @param len number of characters to compare
    * @return true if regions match, false otherwise
    * @throws NullPointerException if other is null
@@ -1094,8 +1098,8 @@ public final class String
    * Creates a substring of this String, starting at a specified index
    * and ending at one character before a specified index.
    *
-   * @param begin index to start substring (inclusive, base 0)
-   * @param end index to end at (exclusive)
+   * @param beginIndex index to start substring (inclusive, base 0)
+   * @param endIndex index to end at (exclusive)
    * @return new String which is a substring of this String
    * @throws IndexOutOfBoundsException if begin &lt; 0 || end &gt; length()
    *         || begin &gt; end (while unspecified, this is a
@@ -1444,7 +1448,7 @@ public final class String
    * Trims all characters less than or equal to <code>'\u0020'</code>
    * (<code>' '</code>) from the beginning and end of this String. This
    * includes many, but not all, ASCII control characters, and all
-   * {@link Character#whitespace(char)}.
+   * {@link Character#isWhitespace(char)}.
    *
    * @return new trimmed String, or this if nothing trimmed
    */
@@ -1482,10 +1486,9 @@ public final class String
    */
   public char[] toCharArray()
   {
-    // XXX ORP 1.0.9 crashes on (char[]) clone() during bootstrap, so we
-    // omit this optimization for now.
-    // if (count == value.length)
-    //   return (char[]) value.clone();
+    if (count == value.length)
+      return (char[]) value.clone();
+
     char[] copy = new char[count];
     VMSystem.arraycopy(value, offset, copy, 0, count);
     return copy;

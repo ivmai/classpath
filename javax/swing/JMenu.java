@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -328,7 +328,64 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
    */
   public boolean isSelected()
   {
-    return super.isArmed();
+    return super.isSelected();
+  }
+
+  /**
+   * A helper method to handle setSelected calls from both mouse events and 
+   * direct calls to setSelected.  Direct calls shouldn't expand the popup
+   * menu and should select the JMenu even if it is disabled.  Mouse events
+   * only select the JMenu if it is enabled and should expand the popup menu
+   * associated with this JMenu.
+   * @param selected whether or not the JMenu was selected
+   * @param menuEnabled whether or not selecting the menu is "enabled".  This
+   * is always true for direct calls, and is set to isEnabled() for mouse 
+   * based calls.
+   * @param showMenu whether or not to show the popup menu
+   */
+  private void setSelectedHelper(boolean selected, boolean menuEnabled, boolean showMenu)
+  {
+    // If menu is selected and enabled, activates the menu and 
+    // displays associated popup.	
+    if (selected && menuEnabled)
+      {
+	super.setArmed(true);
+	super.setSelected(true);
+
+        // FIXME: The popup menu should be shown on the screen after certain
+        // number of seconds pass. The 'delay' property of this menu indicates
+        // this amount of seconds. 'delay' property is 0 by default.
+	if (isShowing())
+	  {
+	    fireMenuSelected();
+            
+	    int x = 0;
+	    int y = 0;
+            if (showMenu)
+              if (menuLocation == null)
+                {
+                  // Calculate correct position of the popup. Note that location of the popup 
+                  // passed to show() should be relative to the popup's invoker
+                  if (isTopLevelMenu())
+                    y = this.getHeight();
+                  else
+                    x = this.getWidth();
+                  getPopupMenu().show(this, x, y);
+                }
+              else
+                {
+                  getPopupMenu().show(this, menuLocation.x, menuLocation.y);
+                }
+	  }
+      }
+    
+    else
+      {
+	super.setSelected(false);
+	super.setArmed(false);
+	fireMenuDeselected();
+	popupMenu.setVisible(false);
+      }
   }
 
   /**
@@ -339,46 +396,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
    */
   public void setSelected(boolean selected)
   {
-    // if this menu selection is true, then activate this menu and 
-    // display popup associated with this menu	
-    if (selected)
-      {
-	super.setArmed(true);
-	super.setSelected(true);
-
-	// FIXME: The popup menu should be shown on the screen after certain
-	// number of seconds pass. The 'delay' property of this menu indicates
-	// this amount of seconds. 'delay' property is 0 by default.
-	if (this.isShowing())
-	  {
-	    fireMenuSelected();
-
-	    int x = 0;
-	    int y = 0;
-
-	    if (menuLocation == null)
-	      {
-		// Calculate correct position of the popup. Note that location of the popup 
-		// passed to show() should be relative to the popup's invoker
-		if (isTopLevelMenu())
-		  y = this.getHeight();
-		else
-		  x = this.getWidth();
-
-		getPopupMenu().show(this, x, y);
-	      }
-	    else
-	      getPopupMenu().show(this, menuLocation.x, menuLocation.y);
-	  }
-      }
-
-    else
-      {
-	super.setSelected(false);
-	super.setArmed(false);
-	fireMenuDeselected();
-	popupMenu.setVisible(false);
-      }
+    setSelectedHelper(selected, true, false); 
   }
 
   /**
@@ -709,7 +727,7 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
   {
     // if this menu selection is true, then activate this menu and 
     // display popup associated with this menu
-    setSelected(changed);
+    setSelectedHelper(changed, isEnabled(), true);
   }
 
   /**
@@ -893,4 +911,5 @@ public class JMenu extends JMenuItem implements Accessible, MenuElement
       // FIXME: Need to implement
     }
   }
+
 }

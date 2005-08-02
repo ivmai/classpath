@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
@@ -63,11 +64,9 @@ final class ApplyTemplatesNode
   final List withParams;
   final boolean isDefault;
 
-  ApplyTemplatesNode(TemplateNode children, TemplateNode next,
-                     Expr select, QName mode,
+  ApplyTemplatesNode(Expr select, QName mode,
                      List sortKeys, List withParams, boolean isDefault)
   {
-    super(children, next);
     this.select = select;
     this.mode = mode;
     this.sortKeys = sortKeys;
@@ -89,12 +88,18 @@ final class ApplyTemplatesNode
       {
         withParams2.add(((WithParam) withParams.get(i)).clone(stylesheet));
       }
-    return new ApplyTemplatesNode((children == null) ? null :
-                                  children.clone(stylesheet),
-                                  (next == null) ? null :
-                                  next.clone(stylesheet),
-                                  select.clone(stylesheet),
-                                  mode, sortKeys2, withParams2, isDefault);
+    TemplateNode ret = new ApplyTemplatesNode(select.clone(stylesheet),
+                                              mode, sortKeys2, withParams2,
+                                              isDefault);
+    if (children != null)
+      {
+        ret.children = children.clone(stylesheet);
+      }
+    if (next != null)
+      {
+        ret.next = next.clone(stylesheet);
+      }
+    return ret;
   }
 
   void doApply(Stylesheet stylesheet, QName mode,
@@ -107,14 +112,26 @@ final class ApplyTemplatesNode
       {
         if (withParams != null)
           {
-            // push the parameter context
-            stylesheet.bindings.push(false);
-            // set the parameters
+            // compute the parameter values
+            LinkedList values = new LinkedList();
             for (Iterator i = withParams.iterator(); i.hasNext(); )
               {
                 WithParam p = (WithParam) i.next();
                 Object value = p.getValue(stylesheet, mode, context, pos, len);
-                stylesheet.bindings.set(p.name, value, false);
+                Object[] pair = new Object[2];
+                pair[0] = p.name;
+                pair[1] = value;
+                values.add(pair);
+              }
+            // push the parameter context
+            stylesheet.bindings.push(Bindings.WITH_PARAM);
+            // set the parameters
+            for (Iterator i = values.iterator(); i.hasNext(); )
+              {
+                Object[] pair = (Object[]) i.next();
+                QName name = (QName) pair[0];
+                Object value = pair[1];
+                stylesheet.bindings.set(name, value, Bindings.WITH_PARAM);
               }
           }
         Collection ns = (Collection) ret;
@@ -142,10 +159,6 @@ final class ApplyTemplatesNode
                                                     false);
             if (t != null)
               {
-                if (stylesheet.debug)
-                  {
-                    System.err.println("Applying " + t);
-                  }
                 stylesheet.current = node;
                 t.apply(stylesheet, effectiveMode, node, i + 1, l,
                         parent, nextSibling);
@@ -154,7 +167,7 @@ final class ApplyTemplatesNode
         if (withParams != null)
           {
             // pop the variable context
-            stylesheet.bindings.pop(false);
+            stylesheet.bindings.pop(Bindings.WITH_PARAM);
           }
       }
     // apply-templates doesn't have processable children
@@ -164,6 +177,35 @@ final class ApplyTemplatesNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+
+  public boolean references(QName var)
+  {
+    if (select != null && select.references(var))
+      {
+        return true;
+      }
+    if (withParams != null)
+      {
+        for (Iterator i = withParams.iterator(); i.hasNext(); )
+          {
+            if (((WithParam) i.next()).references(var))
+              {
+                return true;
+              }
+          }
+      }
+    if (sortKeys != null)
+      {
+        for (Iterator i = sortKeys.iterator(); i.hasNext(); )
+          {
+            if (((SortKey) i.next()).references(var))
+              {
+                return true;
+              }
+          }
+      }
+    return super.references(var);
   }
   
   public String toString()

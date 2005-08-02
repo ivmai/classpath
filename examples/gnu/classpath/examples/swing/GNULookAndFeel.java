@@ -15,16 +15,18 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 */
 
 package gnu.classpath.examples.swing;
 
 import java.awt.Color;
 
+import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
 public class GNULookAndFeel extends BasicLookAndFeel
@@ -39,6 +41,8 @@ public class GNULookAndFeel extends BasicLookAndFeel
   public String getName()                 { return "GNU"; }
 
   static UIDefaults LAF_defaults;
+
+  private final static String iconspath = "/gnu/javax/swing/plaf/gtk/icons/";
 
   public UIDefaults getDefaults()
   {
@@ -59,7 +63,20 @@ public class GNULookAndFeel extends BasicLookAndFeel
           "Menu.background", new ColorUIResource(blueGray),
           "MenuBar.background", new ColorUIResource(blueGray),
           "MenuItem.background", new ColorUIResource(blueGray),
-          "ScrollBar.background", new ColorUIResource(blueGray)
+          "ScrollBar.background", new ColorUIResource(blueGray),
+
+	  "Tree.closedIcon",
+	  new IconUIResource(new ImageIcon
+			     (getClass().getResource
+			      (iconspath + "TreeClosed.png"))),
+	  "Tree.leafIcon",
+	  new IconUIResource(new ImageIcon
+			     (getClass().getResource
+			      (iconspath + "TreeLeaf.png"))),
+	  "Tree.openIcon",
+	  new IconUIResource(new ImageIcon
+			     (getClass().getResource
+			      (iconspath + "TreeOpen.png"))),
         };
         LAF_defaults.putDefaults(myDefaults);
       }
