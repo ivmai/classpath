@@ -1,5 +1,5 @@
-/* RawData32.java -- 32 bit Pointer
-   Copyright (C) 2004  Free Software Foundation
+/* Pointer.java -- Pointer to VM specific data
+   Copyright (C) 1999, 2000, 2004  Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -35,18 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+/* This file is originally part of libgcj. */
+
 package gnu.classpath;
 
-/**
- * A type used to indicate special data used by native code that should not 
- * be marked by the garbage collector.
- */
-public final class RawData32 extends RawData
+/** A type used to indicate special data used by native code that should not 
+    be marked by the garbage collector. */
+
+public abstract class Pointer
 {
-   final int data;
-   
-   public RawData32(int data)
-   {
-     this.data = data;
-   }
 }

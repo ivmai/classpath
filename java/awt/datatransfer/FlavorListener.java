@@ -1,5 +1,5 @@
-/* RawData64.java -- 64 bit Pointer
-   Copyright (C) 2004  Free Software Foundation
+/* FlavorListener -- Interface for tagging an interest in FlavorEvents. 
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,18 +35,20 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.classpath;
+
+package java.awt.datatransfer;
+
+import java.util.EventListener;
 
 /**
- * A type used to indicate special data used by native code that should not 
- * be marked by the garbage collector.
+ * Interface for tagging an interest in FlavorEvents by a class.  The
+ * flavorsChanged() method will be called with a FlavorEvent pointing
+ * to the Clipboard which has content in different Flavors available.
+ *
+ * @author Mark J. Wielaard (mark@klomp.org)
  */
-public final class RawData64 extends RawData
+public interface FlavorListener
+  extends EventListener
 {
-   final long data;
-   
-   public RawData64(long data)
-   {
-     this.data = data;
-   }
+  void flavorsChanged(FlavorEvent event);
 }
