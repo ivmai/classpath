@@ -1,5 +1,12 @@
 2005-08-13  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/Timer.java (Timer(String)): New constructor.
+	(Timer(String,boolean)): Likewise.
+	(purge): New method.
+	(TaskQueue.purge): Likewise.
+
+2005-08-13  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/FormattableFlags.java: New file.
 
 2005-08-13  Tom Tromey  <tromey@redhat.com>
