@@ -1151,6 +1151,33 @@ public class Collections
   }
 
   /**
+   * Get a comparator that implements the reverse of the ordering
+   * specified by the given Comparator. If the Comparator is null,
+   * this is equivalent to {@link #reverseOrder()}.  The return value
+   * of this method is Serializable, if the specified Comparator is
+   * either Serializable or null.
+   *
+   * @param c the comparator to invert
+   * @return a comparator that imposes reverse ordering
+   * @see Comparable
+   * @see Serializable
+   *
+   * @since 1.5
+   */
+  public static <T> Comparator<T> reverseOrder(final Comparator<T> c)
+  {
+    if (c == null)
+      return (Comparator<T>) rcInstance;
+    return new ReverseComparator<T> ()
+    {
+      public int compare(T a, T b)
+      {
+	return - c.compare(a, b);
+      }
+    };
+  }
+
+  /**
    * Get a comparator that implements the reverse of natural ordering. In
    * other words, this sorts Comparable objects opposite of how their
    * compareTo method would sort. This makes it easy to sort into reverse
@@ -1177,7 +1204,7 @@ public class Collections
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
-  private static final class ReverseComparator<T>
+  private static class ReverseComparator<T>
     implements Comparator<T>, Serializable
   {
     /**
@@ -1375,6 +1402,17 @@ public class Collections
       }
   }
 
+  /** @since 1.5 */
+  public static int frequency (Collection<?> c, Object o)
+  {
+    int result = 0;
+    for (Object v : c)
+      {
+	if (AbstractCollection.equals(o, v))
+	  ++result;
+      }
+    return result;
+  }
 
   /**
    * Obtain an immutable Set consisting of a single element. The return value
