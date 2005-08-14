@@ -1,5 +1,9 @@
 2005-08-13  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/FormattableFlags.java: New file.
+
+2005-08-13  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/UnknownFormatConversionException.java
 	(serialVersionUID): New field.
 	(s): Renamed from 'conv' for serialization.
