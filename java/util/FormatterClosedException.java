@@ -41,6 +41,8 @@ package java.util;
 /** @since 1.5 */
 public class FormatterClosedException extends IllegalStateException
 {
+  private static final long serialVersionUID = 1811216L;
+
   public FormatterClosedException()
   {
   }

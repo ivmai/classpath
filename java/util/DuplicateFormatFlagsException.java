@@ -41,6 +41,9 @@ package java.util;
 /** @since 1.5 */
 public class DuplicateFormatFlagsException extends IllegalFormatException
 {
+  private static final long serialVersionUID = 18890531L;
+
+  // Note: name fixed by serialization.
   private String flags;
 
   public DuplicateFormatFlagsException(String flags)

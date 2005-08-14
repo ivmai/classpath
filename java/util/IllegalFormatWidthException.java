@@ -41,16 +41,19 @@ package java.util;
 /** @since 1.5 */
 public class IllegalFormatWidthException extends IllegalFormatException
 {
-  private int width;
+  private static final long serialVersionUID = 16660902L;
 
-  public IllegalFormatWidthException(int width)
+  // Note: name fixed by serialization.
+  private int w;
+
+  public IllegalFormatWidthException(int w)
   {
     super();
-    this.width = width;
+    this.w = w;
   }
 
   public int getWidth()
   {
-    return width;
+    return w;
   }
 }

@@ -1,4 +1,4 @@
-/* IllegalFormatFlagsException.java
+/* InvalidPropertiesFormatException.java
    Copyright (C) 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -38,22 +38,20 @@ exception statement from your version. */
 
 package java.util;
 
+import java.io.IOException;
+
+// FIXME: serialization methods should throw NotSerializableException
 /** @since 1.5 */
-public class IllegalFormatFlagsException extends IllegalFormatException
+public class InvalidPropertiesFormatException extends IOException
 {
-  private static final long serialVersionUID = 790824L;
-
-  // Note: name fixed by serialization.
-  private String flags;
-
-  public IllegalFormatFlagsException(String flags)
+  public InvalidPropertiesFormatException(String message)
   {
-    super();
-    this.flags = flags;
+    super(message);
   }
 
-  public String getFlags()
+  public InvalidPropertiesFormatException(Throwable cause)
   {
-    return flags;
+    super();
+    initCause(cause);
   }
 }

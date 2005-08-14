@@ -42,22 +42,26 @@ package java.util;
 public class FormatFlagsConversionMismatchException
   extends IllegalFormatException
 {
-  private String flags;
-  private char conversion;
+  private static final long serialVersionUID = 19120414L;
 
-  public FormatFlagsConversionMismatchException(String flags, char conversion)
+  // Note: name fixed by serialization.
+  private String f;
+  // Note: name fixed by serialization.
+  private char c;
+
+  public FormatFlagsConversionMismatchException(String f, char c)
   {
-    this.flags = flags;
-    this.conversion = conversion;
+    this.f = f;
+    this.c = c;
   }
 
   public char getConversion()
   {
-    return conversion;
+    return c;
   }
 
   public String getFlags()
   {
-    return flags;
+    return f;
   }
 }

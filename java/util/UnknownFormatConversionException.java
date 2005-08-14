@@ -41,15 +41,18 @@ package java.util;
 /** @since 1.5 */
 public class UnknownFormatConversionException extends IllegalFormatException
 {
-  private String conv;
+  private static final long serialVersionUID = 19060418L;
+
+  // Note: name fixed by serialization.
+  private String s;
 
   public UnknownFormatConversionException(String s)
   {
-    this.conv = s;
+    this.s = s;
   }
 
   public String getConversion()
   {
-    return conv;
+    return s;
   }
 }

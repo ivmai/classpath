@@ -41,22 +41,26 @@ package java.util;
 /** @since 1.5 */
 public class IllegalFormatConversionException extends IllegalFormatException
 {
-  char conv;
-  Class<?> argClass;
+  private static final long serialVersionUID = 17000126L;
 
-  public IllegalFormatConversionException(char conv, Class<?> argClass)
+  // Note: name fixed by serialization.
+  char c;
+  // Note: name fixed by serialization.
+  Class<?> arg;
+
+  public IllegalFormatConversionException(char c, Class<?> arg)
   {
-    this.conv = conv;
-    this.argClass = argClass;
+    this.c = c;
+    this.arg = arg;
   }
 
   public char getConversion()
   {
-    return conv;
+    return c;
   }
 
   public Class<?> getArgumentClass()
   {
-    return argClass;
+    return arg;
   }
 }

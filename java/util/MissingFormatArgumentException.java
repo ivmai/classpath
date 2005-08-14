@@ -41,15 +41,18 @@ package java.util;
 /** @since 1.5 */
 public class MissingFormatArgumentException extends IllegalFormatException
 {
-  private String spec;
+  private static final long serialVersionUID = 19190115L;
+
+  // Note: name fixed by serialization.
+  private String s;
 
   public MissingFormatArgumentException(String s)
   {
-    this.spec = s;
+    this.s = s;
   }
 
   public String getFormatSpecifier()
   {
-    return spec;
+    return s;
   }
 }

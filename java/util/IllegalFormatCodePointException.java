@@ -41,15 +41,18 @@ package java.util;
 /** @since 1.5 */
 public class IllegalFormatCodePointException extends IllegalFormatException
 {
-  int codepoint;
+  private static final long serialVersionUID = 19080630L;
+
+  // Note: name fixed by serialization.
+  int c;
 
   public IllegalFormatCodePointException(int c)
   {
-    this.codepoint = c;
+    this.c = c;
   }
 
   public int getCodePoint()
   {
-    return codepoint;
+    return c;
   }
 }

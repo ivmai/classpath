@@ -41,16 +41,19 @@ package java.util;
 /** @since 1.5 */
 public class IllegalFormatPrecisionException extends IllegalFormatException
 {
-  private int precision;
+  private static final long serialVersionUID = 18711008L;
 
-  public IllegalFormatPrecisionException(int precision)
+  // Note: name fixed by serialization.
+  private int p;
+
+  public IllegalFormatPrecisionException(int p)
   {
     super();
-    this.precision = precision;
+    this.p = p;
   }
 
   public int getPrecision()
   {
-    return precision;
+    return p;
   }
 }

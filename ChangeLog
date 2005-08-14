@@ -1,3 +1,41 @@
+2005-08-13  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/UnknownFormatConversionException.java
+	(serialVersionUID): New field.
+	(s): Renamed from 'conv' for serialization.
+	* java/util/MissingFormatWidthException.java (serialVersionUID):
+	New field.
+	(s): Renamed from 'width' for serialization.
+	* java/util/MissingFormatArgumentException.java
+	(serialVersionUID): New field.
+	(s): Renamed from 'spec' for serialization.
+	* java/util/IllegalFormatWidthException.java (serialVersionUID):
+	New field.
+	(w): Renamed from 'width' for serialization.
+	* java/util/IllegalFormatPrecisionException.java
+	(serialVersionUID): New field.
+	(p): Renamed from 'precision' for serialization.
+	* java/util/IllegalFormatFlagsException.java (serialVersionUID):
+	New field.
+	* java/util/IllegalFormatConversionException.java
+	(serialVersionUID): New field.
+	(c): Renamed from 'conv' for serialization.
+	(arg): Renamed from 'argClass' for serialization.
+	* java/util/IllegalFormatCodePointException.java
+	(serialVersionUID): New field.
+	(c): Renamed from 'codepoint' for serialization.
+	* java/util/FormatFlagsConversionMismatchException.java
+	(serialVersionUID): New field.
+	(f): Renamed from 'flags' for serialization.
+	(c): Renamed from 'conversion' for serialization.
+	* java/util/DuplicateFormatFlagsException.java (serialVersionUID):
+	New field.
+	* java/util/IllegalFormatException.java (serialVersionUID): New
+	field.
+	* java/util/FormatterClosedException.java (serialVersionUID): New
+	field.
+	* java/util/InvalidPropertiesFormatException.java: New file.
+
 2005-08-05  Lillian Angel  <langel@redhat.com>
 	
 	* javax/swing/plaf/basic/BasicTreeUI.java:
