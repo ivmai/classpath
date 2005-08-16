@@ -508,8 +508,7 @@ public class ObjectInputStream extends InputStream
 						  flags, fields);
     assignNewHandle(osc);
 
-    if (callersClassLoader == null)
-      callersClassLoader = currentLoader();
+    ClassLoader callersClassLoader = currentLoader();
 	      
     for (int i = 0; i < field_count; i++)
       {
@@ -535,36 +534,7 @@ public class ObjectInputStream extends InputStream
 	      
     /* Now that fields have been read we may resolve the class
      * (and read annotation if needed). */
-    Class clazz;
-    try
-      {
-	clazz = resolveClass(osc);
-      }
-    catch (ClassNotFoundException cnfe)
-      {
-	// Maybe it was an primitive class?
-	if (name.equals("void"))
-	  clazz = Void.TYPE;
-	else if (name.equals("boolean"))
-	  clazz = Boolean.TYPE;
-	else if (name.equals("byte"))
-	  clazz = Byte.TYPE;
-	else if (name.equals("short"))
-	  clazz = Short.TYPE;
-	else if (name.equals("char"))
-	  clazz = Character.TYPE;
-	else if (name.equals("int"))
-	  clazz = Integer.TYPE;
-	else if (name.equals("long"))
-	  clazz = Long.TYPE;
-	else if (name.equals("float"))
-	  clazz = Float.TYPE;
-	else if (name.equals("double"))
-	  clazz = Double.TYPE;
-	else
-	  throw cnfe;
-      }
-
+    Class clazz = resolveClass(osc);
     boolean oldmode = setBlockDataMode(true);
     osc.setClass(clazz, lookupClass(clazz.getSuperclass()));
     classLookupTable.put(clazz, osc);
@@ -777,16 +747,34 @@ public class ObjectInputStream extends InputStream
   protected Class resolveClass(ObjectStreamClass osc)
     throws ClassNotFoundException, IOException
   {
-    if (callersClassLoader == null)
+    String name = osc.getName();
+    try
       {
-	callersClassLoader = currentLoader ();
-	if (DEBUG && dump)
-	  {
-	    dumpElementln ("CallersClassLoader = " + callersClassLoader);
-	  }
+        return Class.forName(name, true, currentLoader());
       }
-
-    return Class.forName(osc.getName(), true, callersClassLoader);
+    catch(ClassNotFoundException x)
+      {
+        if (name.equals("void"))
+          return Void.TYPE;
+        else if (name.equals("boolean"))
+          return Boolean.TYPE;
+        else if (name.equals("byte"))
+          return Byte.TYPE;
+        else if (name.equals("char"))
+          return Character.TYPE;
+        else if (name.equals("short"))
+          return Short.TYPE;
+        else if (name.equals("int"))
+          return Integer.TYPE;
+        else if (name.equals("long"))
+          return Long.TYPE;
+        else if (name.equals("float"))
+          return Float.TYPE;
+        else if (name.equals("double"))
+          return Double.TYPE;
+        else
+          throw x;
+      }
   }
 
   /**
@@ -1282,7 +1270,7 @@ public class ObjectInputStream extends InputStream
 	    }
 	  catch (NoSuchFieldException e)
 	    {
-	      throw new IllegalArgumentException(e.getMessage());
+	      throw new IllegalArgumentException(e);
 	    }
 	}
 
@@ -1427,6 +1415,7 @@ public class ObjectInputStream extends InputStream
 	  ObjectStreamField field = clazz.getField(name);
 	  boolean illegal = false;
 
+          // XXX This code is horrible and needs to be rewritten!
 	  try
 	    {
 	      try
@@ -1486,7 +1475,7 @@ public class ObjectInputStream extends InputStream
 	      catch (NoSuchFieldException e)
 		{
 		  if (field == null)
-		    throw new IllegalArgumentException(e.getMessage());
+		    throw new IllegalArgumentException(e);
 		}
 	       
 	    }
@@ -1830,8 +1819,8 @@ public class ObjectInputStream extends InputStream
       }
     catch (InstantiationException e)
       {
-        throw new ClassNotFoundException
-		("Instance of " + real_class + " could not be created");
+        throw (ClassNotFoundException) new ClassNotFoundException
+          ("Instance of " + real_class + " could not be created").initCause(e);
       }
   }
 
@@ -1872,13 +1861,13 @@ public class ObjectInputStream extends InputStream
         if (exception instanceof ClassNotFoundException)
           throw (ClassNotFoundException) exception;
 
-	throw new IOException("Exception thrown from readObject() on " +
-			       klass + ": " + exception.getClass().getName());
+	throw (IOException) new IOException(
+	  "Exception thrown from readObject() on " + klass).initCause(x);
       }
     catch (Exception x)
       {
-	throw new IOException("Failure invoking readObject() on " +
-			       klass + ": " + x.getClass().getName());
+	throw (IOException) new IOException(
+	  "Failure invoking readObject() on " + klass).initCause(x);
       }
 
     // Invalidate fields which has been read through readFields.
@@ -1906,7 +1895,6 @@ public class ObjectInputStream extends InputStream
   private Hashtable<Class,ObjectStreamClass> classLookupTable;
   private GetField prereadFields;
 
-  private ClassLoader callersClassLoader;
   private static boolean dump;
 
   // The nesting depth for debugging output

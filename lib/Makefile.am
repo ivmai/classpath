@@ -17,10 +17,9 @@ if FOUND_ECJ
 JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
 else
 if FOUND_GCJ
-# Since we don't feed all classes at once gcj needs to know where to find
-# the generated classes (in top_builddir).
-JAVAC = $(srcdir)/split-for-gcj.sh && $(MAKE) -f $(srcdir)/Makefile.gcj \
-    GCJ='$(GCJ)' compile_classpath='$(top_builddir):$(compile_classpath)'
+## This should never be used when gcj is the compiler.
+## See the compile-classes target.
+JAVAC = exit 1
 else
 if FOUND_JIKES
 JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F $(JIKESENCODING) -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
@@ -123,13 +122,22 @@ endif # REGEN_PARSER
 
 $(JAVA_DEPEND): genclasses
 
+if FOUND_GCJ
+## When building with gcj, we do a recursive make.  We split this rule
+## out specially, rather than simply defining JAVAC, so that GNU make
+## will see the recursive make invocation and still allow parallel
+## builds.
+compile-classes: classes $(JAVA_SRCS) Makefile
+	$(MAKE) -f $(srcdir)/Makefile.gcj \
+	  GCJ='$(GCJ)' compile_classpath='$(top_builddir):$(compile_classpath)'
+else
 compile-classes: classes $(JAVA_SRCS) Makefile
 	$(JAVAC)
 	touch compile-classes
+endif
 
 EXTRA_DIST = standard.omit mkcollections.pl.in Makefile.gcj split-for-gcj.sh
 CLEANFILES = compile-classes resources classes \
-	classes.standard classes.awt classes.standardx classes.xml \
 	glibj.zip classes.1 \
 	$(top_builddir)/java/util/LocaleData.java \
 	$(JAVA_DEPEND)

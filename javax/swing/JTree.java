@@ -775,16 +775,17 @@ public class JTree
 	{
 		if (treeModel == model)
 			return;
-
-		TreeModel oldValue = treeModel;
-		treeModel = model;
-
-		firePropertyChange(TREE_MODEL_PROPERTY, oldValue, model);
-
+    
 		// add treeModelListener to the new model
 		if (treeModelListener == null)
 			treeModelListener = createTreeModelListener();
-		model.addTreeModelListener(treeModelListener);
+		if (model != null) // as setModel(null) is allowed
+			model.addTreeModelListener(treeModelListener);
+    
+    TreeModel oldValue = treeModel;
+    treeModel = model;
+
+    firePropertyChange(TREE_MODEL_PROPERTY, oldValue, model);
 	}
 
 	/**
@@ -1296,7 +1297,7 @@ public class JTree
 		// Don't expand if last path component is a leaf node.
 		if ((path == null) || (treeModel.isLeaf(path.getLastPathComponent())))
 			return;
-		
+
 		setExpandedState(path, true);
 	}
 
@@ -1502,21 +1503,9 @@ public class JTree
 		return null;
 	}
 
-	private void checkExpandParents(TreePath path) throws ExpandVetoException
-	{
-
-		TreePath parent = path.getParentPath();
-
-		if (parent != null)
-			checkExpandParents(parent);
-
-		fireTreeWillExpand(path);
-	}
-
 	private void doExpandParents(TreePath path, boolean state)
 	{
-		TreePath parent = path.getParentPath();
-		
+		TreePath parent = path.getParentPath();		
 		if (isExpanded(parent))
 		{
 			nodeStates.put(path, state ? EXPANDED : COLLAPSED);
@@ -1535,17 +1524,6 @@ public class JTree
 			return;
 
 		TreePath parent = path.getParentPath();
-
-		try
-		{
-			if (parent != null)
-				checkExpandParents(parent);
-		} 
-		catch (ExpandVetoException e)
-		{
-			// Expansion vetoed.
-			return;
-		}
 
 		doExpandParents(path, state);
 	}
