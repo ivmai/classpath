@@ -233,19 +233,19 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
     {
       if (block)
         {
-	  // Only need to check it if it's block scrolling
-	  // We only block scroll if the click occurs
-	  // in the track.
-	  if (! trackListener.shouldScroll(direction))
-	    {
-	      trackHighlight = NO_HIGHLIGHT;
-	      scrollbar.repaint();
-	      return;
-	    }
-	  scrollByBlock(direction);
+          // Only need to check it if it's block scrolling
+          // We only block scroll if the click occurs
+          // in the track.
+          if (!trackListener.shouldScroll(direction))
+            {
+              trackHighlight = NO_HIGHLIGHT;
+              scrollbar.repaint();
+              return;
+            }
+          scrollByBlock(direction);
         }
       else
-	scrollByUnit(direction);
+        scrollByUnit(direction);
     }
   }
 
@@ -659,7 +659,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	height = Math.max(incrButton.getPreferredSize().height,
 	                  decrButton.getPreferredSize().height);
 	height = Math.max(getMinimumThumbSize().height, height);
-	height = Math.max(20, height);
 	height = Math.min(getMaximumThumbSize().height, height);
       }
     else
@@ -672,7 +671,6 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	width = Math.max(incrButton.getPreferredSize().width,
 	                 decrButton.getPreferredSize().width);
 	width = Math.max(getMinimumThumbSize().width, width);
-	width = Math.max(20, width);
 	width = Math.min(getMaximumThumbSize().width, width);
       }
 
@@ -875,7 +873,7 @@ public class BasicScrollBarUI extends ScrollBarUI implements LayoutManager,
 	trackRect = new Rectangle();
 	thumbRect = new Rectangle();
 
-	scrollTimer = new Timer(200, null);
+	scrollTimer = new Timer(50, null);
 	scrollTimer.setRepeats(true);
 
 	installComponents();

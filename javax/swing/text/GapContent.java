@@ -114,7 +114,7 @@ public class GapContent
      */
     public int getOffset()
     {
-      if (mark <= gapStart)
+      if (mark <= gapEnd)
         return mark;
       else
         return mark - (gapEnd - gapStart);
@@ -274,8 +274,23 @@ public class GapContent
   public String getString(int where, int len) throws BadLocationException
   {
     Segment seg = new Segment();
-    getChars(where, len, seg);
-    return new String(seg.array, seg.offset, seg.count);
+    try
+      {
+        getChars(where, len, seg);
+        return new String(seg.array, seg.offset, seg.count);
+      }
+    catch (StringIndexOutOfBoundsException ex)
+      {
+        int invalid = 0;
+        if (seg.offset < 0 || seg.offset >= seg.array.length)
+          invalid = seg.offset;
+        else
+          invalid = seg.offset + seg.count;
+        throw new BadLocationException("Illegal location: array.length = "
+                                       + seg.array.length + ", offset = "
+                                       + seg.offset + ", count = "
+                                       + seg.count, invalid);
+      }
   }
 
   /**
@@ -357,7 +372,7 @@ public class GapContent
     if (index < 0)
       index = -(index + 1);
     positions.add(index, pos);
-
+    
     return pos;
   }
 

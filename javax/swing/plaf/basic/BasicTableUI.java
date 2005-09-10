@@ -46,6 +46,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
@@ -54,6 +55,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
 import javax.swing.InputMap;
@@ -68,6 +70,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -203,14 +206,44 @@ public class BasicTableUI
     return new MouseInputHandler();
   }
 
+  /**
+   * Return the maximum size of the table. The maximum height is the row 
+    * height times the number of rows. The maximum width is the sum of 
+    * the maximum widths of each column.
+    * 
+    *  @param comp the component whose maximum size is being queried,
+    *  this is ignored.
+    *  @return a Dimension object representing the maximum size of the table,
+    *  or null if the table has no elements.
+   */
   public Dimension getMaximumSize(JComponent comp) 
   {
-    return getPreferredSize(comp);
+    int maxTotalColumnWidth = 0;
+    for (int i = 0; i < table.getColumnCount(); i++)
+      maxTotalColumnWidth += table.getColumnModel().getColumn(i).getMaxWidth();
+    if (maxTotalColumnWidth == 0 || table.getRowCount() == 0)
+      return null;
+    return new Dimension(maxTotalColumnWidth, table.getRowCount()*table.getRowHeight());
   }
 
+  /**
+   * Return the minimum size of the table. The minimum height is the row 
+    * height times the number of rows. The minimum width is the sum of 
+    * the minimum widths of each column.
+    * 
+    *  @param comp the component whose minimum size is being queried,
+    *  this is ignored.
+    *  @return a Dimension object representing the minimum size of the table,
+    *  or null if the table has no elements.
+   */
   public Dimension getMinimumSize(JComponent comp) 
   {
-    return getPreferredSize(comp);
+    int minTotalColumnWidth = 0;
+    for (int i = 0; i < table.getColumnCount(); i++)
+      minTotalColumnWidth += table.getColumnModel().getColumn(i).getMinWidth();
+    if (minTotalColumnWidth == 0 || table.getRowCount() == 0)
+      return null;
+    return new Dimension(minTotalColumnWidth, table.getRowCount()*table.getRowHeight());
   }
 
   public Dimension getPreferredSize(JComponent comp) 
@@ -269,23 +302,70 @@ public class BasicTableUI
   {
     UIDefaults defaults = UIManager.getLookAndFeelDefaults();
     InputMap ancestorMap = (InputMap)defaults.get("Table.ancestorInputMap");
+    InputMapUIResource parentInputMap = new InputMapUIResource();
+    // FIXME: The JDK uses a LazyActionMap for parentActionMap
+    ActionMap parentActionMap = new ActionMap();
     action = new TableAction();
     Object keys[] = ancestorMap.allKeys();
-    // Register the key bindings with the JTable.
+    // Register key bindings in the UI InputMap-ActionMap pair
     // Note that we register key bindings with both the old and new modifier
     // masks: InputEvent.SHIFT_MASK and InputEvent.SHIFT_DOWN_MASK and so on.
     for (int i = 0; i < keys.length; i++)
       {
-        table.registerKeyboardAction(action,(String)ancestorMap.get((KeyStroke)keys[i]), 
-                                     KeyStroke.getKeyStroke
-                                     (((KeyStroke)keys[i]).getKeyCode(), convertModifiers(((KeyStroke)keys[i]).getModifiers())), 
-                                     JComponent.WHEN_FOCUSED);
+        parentInputMap.put(KeyStroke.getKeyStroke
+                      (((KeyStroke)keys[i]).getKeyCode(), convertModifiers
+                       (((KeyStroke)keys[i]).getModifiers())),
+                           (String)ancestorMap.get((KeyStroke)keys[i]));
 
-        table.registerKeyboardAction(action,(String)ancestorMap.get((KeyStroke)keys[i]), 
-                                     KeyStroke.getKeyStroke
-                                     (((KeyStroke)keys[i]).getKeyCode(), ((KeyStroke)keys[i]).getModifiers()), 
-                                     JComponent.WHEN_FOCUSED);
+        parentInputMap.put(KeyStroke.getKeyStroke
+                      (((KeyStroke)keys[i]).getKeyCode(), 
+                       ((KeyStroke)keys[i]).getModifiers()),
+                           (String)ancestorMap.get((KeyStroke)keys[i]));
+
+        parentActionMap.put
+          ((String)ancestorMap.get((KeyStroke)keys[i]), new ActionListenerProxy
+           (action, (String)ancestorMap.get((KeyStroke)keys[i])));
+
       }
+    // Set the UI InputMap-ActionMap pair to be the parents of the
+    // JTable's InputMap-ActionMap pair
+    parentInputMap.setParent
+      (table.getInputMap
+       (JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).getParent());
+    parentActionMap.setParent(table.getActionMap().getParent());
+    table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).
+      setParent(parentInputMap);
+    table.getActionMap().setParent(parentActionMap);
+  }
+
+  /**
+   * This class is used to mimmic the behaviour of the JDK when registering
+   * keyboard actions.  It is the same as the private class used in JComponent
+   * for the same reason.  This class receives an action event and dispatches
+   * it to the true receiver after altering the actionCommand property of the
+   * event.
+   */
+  private static class ActionListenerProxy
+    extends AbstractAction
+  {
+    ActionListener target;
+    String bindingCommandName;
+
+    public ActionListenerProxy(ActionListener li, 
+                               String cmd)
+    {
+      target = li;
+      bindingCommandName = cmd;
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+      ActionEvent derivedEvent = new ActionEvent(e.getSource(),
+                                                 e.getID(),
+                                                 bindingCommandName,
+                                                 e.getModifiers());
+      target.actionPerformed(derivedEvent);
+    }
   }
 
   /**
@@ -305,7 +385,7 @@ public class BasicTableUI
     {
       ListSelectionModel rowModel = table.getSelectionModel();
       ListSelectionModel colModel = table.getColumnModel().getSelectionModel();
-      
+
       int rowLead = rowModel.getLeadSelectionIndex();
       int rowMax = table.getModel().getRowCount() - 1;
       
@@ -519,8 +599,6 @@ public class BasicTableUI
                                      colModel, colMinSelected, colMaxSelected, 
                                      (e.getActionCommand().equals 
                                       ("selectPreviousRowCell")), false);
-          
-          table.repaint();
         }
       else if (e.getActionCommand().equals("selectNextColumn"))
         {
@@ -608,6 +686,10 @@ public class BasicTableUI
           // to a keyboard input but we either want to ignore that input
           // or we just haven't implemented its action yet.
         }
+
+      if (table.isEditing() && e.getActionCommand() != "startEditing")
+        table.editingCanceled(new ChangeEvent("update"));
+      table.repaint();
       
       table.scrollRectToVisible
         (table.getCellRect(rowModel.getLeadSelectionIndex(), 

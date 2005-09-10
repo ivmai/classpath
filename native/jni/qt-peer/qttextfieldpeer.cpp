@@ -35,11 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QLineEdit>
 #include <QWidget>
 #include <gnu_java_awt_peer_qt_QtTextFieldPeer.h>
 #include "qtcomponent.h"
 #include "qtstrings.h"
+#include "slotcallbacks.h"
 #include "mainthreadinterface.h"
 
 class TFEchoChar : public AWTEvent {
@@ -146,6 +148,7 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtTextFieldPeer_init
   assert( line );
   
   setNativeObject( env, obj, line );
+  connectLineEdit(line, env, obj);
 }
 
 

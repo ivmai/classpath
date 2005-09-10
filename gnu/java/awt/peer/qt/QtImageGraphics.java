@@ -69,14 +69,17 @@ public class QtImageGraphics extends QtGraphics
       {
 	w = ((QtImage)image).width; 
 	h = ((QtImage)image).height; 
+	initImage((QtImage) image );
+	((QtImage)image).putPainter( this );
       } 
     else
       {
 	w = ((QtVolatileImage)image).width; 
 	h = ((QtVolatileImage)image).height; 
+	initVolatileImage((QtVolatileImage) image );
+	((QtVolatileImage)image).putPainter( this );
       }
 
-    initImage( image );
     parentImage = image;
     initialClip = new Rectangle( 0, 0, w, h );
     setClip( initialClip );
@@ -93,19 +96,20 @@ public class QtImageGraphics extends QtGraphics
   {
     super( g ); 
     parentImage = g.parentImage;
-    if( g.topParent == null )
-      topParent = g;
+    if(parentImage instanceof QtImage)
+      ((QtImage)parentImage).putPainter( this );
     else
-      topParent = g.topParent;
-    topParent.owners.push( this );
+      ((QtVolatileImage)parentImage).putPainter( this );
   }
 
   public void dispose()
   {
-    while(!owners.empty())
-      ((QtImageGraphics)owners.pop()).delete();
+    delete();
+    if( parentImage instanceof QtImage )
+      ((QtImage)parentImage).removePainter( this );
+    else
+      ((QtVolatileImage)parentImage).removePainter( this );
   }
-
 
   /**
    * Create a copy of this context.

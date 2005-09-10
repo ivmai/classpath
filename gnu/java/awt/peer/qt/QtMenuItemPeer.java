@@ -71,11 +71,13 @@ public class QtMenuItemPeer extends QtMenuComponentPeer
 
   public native void dispose();
 
-  private void fireClick()
+  private void fireClick(int modifiers)
   {
     ActionEvent e = new ActionEvent(owner,
 				    ActionEvent.ACTION_PERFORMED,
-				    ((MenuItem)owner).getActionCommand());
+				    ((MenuItem)owner).getActionCommand(),
+				    System.currentTimeMillis(),
+				    (modifiers & 0x2FF));
     QtToolkit.eventQueue.postEvent(e);
   }
 
@@ -97,4 +99,10 @@ public class QtMenuItemPeer extends QtMenuComponentPeer
 
   public native void setState(boolean state);
 }
+
+
+
+
+
+
 

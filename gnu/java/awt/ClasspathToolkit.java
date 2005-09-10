@@ -1,5 +1,5 @@
 /* ClasspathToolkit.java -- Abstract superclass for Classpath toolkits.
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,11 +42,12 @@ import gnu.java.awt.EmbeddedWindow;
 import gnu.java.awt.peer.ClasspathFontPeer;
 import gnu.java.awt.peer.EmbeddedWindowPeer;
 import gnu.java.awt.peer.ClasspathTextLayoutPeer;
+import gnu.java.security.action.SetAccessibleAction;
 
 import java.awt.AWTException;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GraphicsDevice;
@@ -59,11 +60,14 @@ import java.awt.image.ImageProducer;
 import java.awt.peer.RobotPeer;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.Map;
+import java.security.AccessController;
 
 import javax.imageio.spi.IIORegistry;
 
@@ -130,7 +134,35 @@ public abstract class ClasspathToolkit
    */
   public Font getFont (String name, Map attrs) 
   {
-    return new Font (name, attrs);
+    Font f = null;
+
+    // Circumvent the package-privateness of the
+    // java.awt.Font.Font(String,Map) constructor.
+    try
+      {
+        Constructor fontConstructor = Font.class.getDeclaredConstructor
+          (new Class[] { String.class, Map.class });
+        AccessController.doPrivileged
+          (new SetAccessibleAction(fontConstructor));
+        f = (Font) fontConstructor.newInstance(new Object[] { name, attrs });
+      }
+    catch (IllegalAccessException e)
+      {
+        throw new AssertionError(e);
+      }
+    catch (NoSuchMethodException e)
+      {
+        throw new AssertionError(e);
+      }
+    catch (InstantiationException e)
+      {
+        throw new AssertionError(e);
+      }
+    catch (InvocationTargetException e)
+      {
+        throw new AssertionError(e);
+      }
+    return f;
   }
 
   /**
@@ -172,8 +204,10 @@ public abstract class ClasspathToolkit
    */
   public abstract EmbeddedWindowPeer createEmbeddedWindow (EmbeddedWindow w);
 
-  public abstract boolean nativeQueueEmpty();
-  public abstract void wakeNativeQueue();  
-  public abstract void iterateNativeQueue(EventQueue locked, boolean block);
+  /**
+   * Used to register ImageIO SPIs provided by the toolkit.
+   */
+   public void registerImageIOSpis(IIORegistry reg)
+   {
+   }
 }
-

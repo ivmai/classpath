@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QFont>
@@ -60,7 +61,7 @@ public:
   }
 #define I_KNOW_WHAT_IM_DOING
 #define PARENT QPushButton
-#include "eventmethods.cpp"
+#include "eventmethods.h"
 };
 
 /**

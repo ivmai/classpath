@@ -35,12 +35,14 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QWidget>
 #include <QListWidget>
 #include <gnu_java_awt_peer_qt_QtListPeer.h>
 #include "qtcomponent.h"
 #include "qtstrings.h"
 #include "mainthreadinterface.h"
+#include "slotcallbacks.h"
 
 class ListInsert : public AWTEvent {
   
@@ -118,6 +120,7 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtListPeer_init
   assert( list );
       
   setNativeObject( env, obj, list );
+  connectList(list, env, obj);
 }
 
 /*

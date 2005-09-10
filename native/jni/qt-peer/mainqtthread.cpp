@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <jni.h>
 #include <QApplication>
 #include <QThread>
@@ -44,11 +45,15 @@ exception statement from your version. */
 MainThreadInterface *mainThread;
 QApplication *qApplication;
 
+#if defined(Q_WS_X11)
+extern void qt_x11_set_global_double_buffer( bool );
+#endif
+
 /**
  * Starts up a QApplication
  */
 JNIEXPORT jlong JNICALL Java_gnu_java_awt_peer_qt_MainQtThread_init
-(JNIEnv *env, jobject obj, jstring theme)
+(JNIEnv *env, jobject obj, jstring theme, jboolean doublebuffer)
 {
   int *argc;
   char **argv;
@@ -86,6 +91,11 @@ JNIEXPORT jlong JNICALL Java_gnu_java_awt_peer_qt_MainQtThread_init
   jclass cls = env->GetObjectClass(obj);
   jfieldID nofid = env->GetFieldID( cls, "mainThreadInterface", "J" );
   env->SetLongField( obj, nofid, (jlong)mainThread );
+
+#if defined(Q_WS_X11)
+  // turn off double-buffering.
+  qt_x11_set_global_double_buffer( (doublebuffer == JNI_TRUE) );
+#endif
 
   return (jlong)qtApp;
 }

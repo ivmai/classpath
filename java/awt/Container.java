@@ -403,10 +403,10 @@ public class Container extends Component
                                                    ContainerEvent.COMPONENT_ADDED,
                                                    comp);
             getToolkit().getSystemEventQueue().postEvent(ce);
-          }
 
-        // Repaint this container.
-        repaint();
+            // Repaint this container.
+            repaint();
+          }
       }
   }
 
@@ -441,10 +441,10 @@ public class Container extends Component
                                                    ContainerEvent.COMPONENT_REMOVED,
                                                    r);
             getToolkit().getSystemEventQueue().postEvent(ce);
-          }
 
-        // Repaint this container.
-        repaint();
+            // Repaint this container.
+            repaint();
+          }
       }
   }
 

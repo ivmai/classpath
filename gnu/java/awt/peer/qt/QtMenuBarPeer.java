@@ -80,7 +80,7 @@ public class QtMenuBarPeer extends QtMenuComponentPeer implements MenuBarPeer
   public void addMenu( Menu m )
   {
     if (m.getPeer() == null)
-      return; // throw null pointer exception? illegalstateexception?
+      m.addNotify();
     ((QtMenuPeer)m.getPeer()).addItems();
     addMenu( (QtMenuPeer)m.getPeer() );
   }
@@ -88,7 +88,7 @@ public class QtMenuBarPeer extends QtMenuComponentPeer implements MenuBarPeer
   public void addHelpMenu( Menu m )
   {
     if (m.getPeer() == null)
-      return;
+      m.addNotify();
     ((QtMenuPeer)m.getPeer()).addItems();
     addHelpMenu( (QtMenuPeer)m.getPeer() );
   }

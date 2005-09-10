@@ -2,6 +2,7 @@
 #define CALLBACKEVENT_H
 
 #include <jni.h>
+#include <QWidget>
 #include <QEvent>
 #include <QColor>
 #include <QCursor>
@@ -36,7 +37,8 @@ class AWTDestroyEvent : public AWTEvent {
 
   void runEvent()
   {
-    delete widget;
+    if( widget != NULL ) 
+      delete widget;
   }
 };
 
@@ -158,45 +160,43 @@ class AWTReqFocusEvent : public AWTEvent {
 class AWTGetOriginEvent : public AWTEvent {
   
  private:
+  JavaVM* vm;
+  jobject target;
   QWidget *widget;
-  QPoint **origin;
 
  public:
-  AWTGetOriginEvent(QWidget *w, QPoint **o) : AWTEvent()
-    { 
-      widget = w; 
-      origin = o;
-    }
-  void runEvent()
-  {
-    *origin = new QPoint( widget->mapToGlobal( QPoint(0, 0) ) );
-  }
+  AWTGetOriginEvent(QWidget *w, JNIEnv *env, jobject obj);
+  void runEvent();
 };
 
-class AWTGetSizeEvent : public AWTEvent {
+class GetSizeEvent : public AWTEvent {
+  
+ private:
+  JavaVM* vm;
+  jobject target;
+  QWidget *widget;
+  bool pref;
+
+ public:
+  GetSizeEvent(QWidget *w, JNIEnv *env, jobject obj, bool p);
+  void runEvent();
+};
+
+class AWTReparent : public AWTEvent {
   
  private:
   QWidget *widget;
-  bool preferred;
+  QWidget *parent;
 
  public:
-
-  QSize **size;
-
-  AWTGetSizeEvent(QWidget *w, QSize **s, bool pref) : AWTEvent()
+  AWTReparent(QWidget *w, QWidget *p) : AWTEvent()
     { 
       widget = w; 
-      preferred = pref;
-      size = s;
+      parent = p;
     }
   void runEvent()
   {
-    QSize s;
-    if( preferred )
-      s = widget->sizeHint();
-    else
-      s = widget->minimumSizeHint();
-    *size = new QSize( s.width(), s.height() );
+    widget->setParent( parent );
   }
 };
 

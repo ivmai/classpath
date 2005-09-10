@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <qwidget.h>
 #include <gnu_java_awt_peer_qt_QtPanelPeer.h>
 #include "qtcomponent.h"
@@ -55,11 +56,14 @@ public:
 
 #define I_KNOW_WHAT_IM_DOING
 #define PARENT QWidget
-#include "eventmethods.cpp"
+#include "eventmethods.h"
 #undef I_KNOW_WHAT_IM_DOING
 #undef PARENT
 };
 
+/**
+ * Init
+ */
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtPanelPeer_init
 (JNIEnv *env, jobject obj)
 {

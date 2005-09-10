@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,15 +39,13 @@ exception statement from your version. */
 
 package gnu.classpath.jdwp.processor;
 
-import gnu.classpath.jdwp.VMFrame;
-import gnu.classpath.jdwp.IVirtualMachine;
-import gnu.classpath.jdwp.Jdwp;
 import gnu.classpath.jdwp.JdwpConstants;
+import gnu.classpath.jdwp.VMFrame;
+import gnu.classpath.jdwp.VMVirtualMachine;
 import gnu.classpath.jdwp.exception.InvalidObjectException;
 import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.exception.JdwpInternalErrorException;
 import gnu.classpath.jdwp.exception.NotImplementedException;
-import gnu.classpath.jdwp.id.IdManager;
 import gnu.classpath.jdwp.id.ObjectId;
 import gnu.classpath.jdwp.id.ThreadId;
 import gnu.classpath.jdwp.util.JdwpString;
@@ -63,14 +61,9 @@ import java.util.ArrayList;
  * 
  * @author Aaron Luchko <aluchko@redhat.com>
  */
-public class ThreadReferenceCommandSet implements CommandSet
+public class ThreadReferenceCommandSet
+  extends CommandSet
 {
-  // Our hook into the jvm
-  private final IVirtualMachine vm = Jdwp.getIVirtualMachine();
-
-  // Manages all the different ids that are assigned by jdwp
-  private final IdManager idMan = Jdwp.getIdManager();
-
   public boolean runCommand(ByteBuffer bb, DataOutputStream os, byte command)
       throws JdwpException
   {
@@ -131,59 +124,59 @@ public class ThreadReferenceCommandSet implements CommandSet
   private void executeName(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
     JdwpString.writeString(os, thread.getName());
   }
 
   private void executeSuspend(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
-    vm.suspendThread(thread);
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
+    VMVirtualMachine.suspendThread(thread);
   }
 
   private void executeResume(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
-    vm.suspendThread(thread);
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
+    VMVirtualMachine.suspendThread(thread);
   }
 
   private void executeStatus(ByteBuffer bb, DataOutputStream os)
-      throws InvalidObjectException, IOException
+      throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
-    int threadStatus = vm.getThreadStatus(thread);
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
+    int threadStatus = VMVirtualMachine.getThreadStatus(thread);
     // There's only one possible SuspendStatus...
-    int suspendStatus = JdwpConstants.SuspendStatus.SUSPEND_STATUS_SUSPENDED;
+    int suspendStatus = JdwpConstants.SuspendStatus.SUSPENDED;
 
     os.writeInt(threadStatus);
     os.writeInt(suspendStatus);
   }
 
   private void executeThreadGroup(ByteBuffer bb, DataOutputStream os)
-      throws InvalidObjectException, IOException
+      throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
     ThreadGroup group = thread.getThreadGroup();
-    ObjectId groupId = idMan.getId(group);
+    ObjectId groupId = idMan.getObjectId(group);
     groupId.write(os);
   }
 
   private void executeFrames(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
     int startFrame = bb.getInt();
     int length = bb.getInt();
 
-    ArrayList frames = vm.getVMFrames(thread, startFrame, length);
+    ArrayList frames = VMVirtualMachine.getFrames(thread, startFrame, length);
     os.writeInt(frames.size());
     for (int i = 0; i < frames.size(); i++)
       {
@@ -197,10 +190,10 @@ public class ThreadReferenceCommandSet implements CommandSet
   private void executeFrameCount(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
 
-    int frameCount = vm.getFrameCount(thread);
+    int frameCount = VMVirtualMachine.getFrameCount(thread);
     os.writeInt(frameCount);
   }
 
@@ -226,26 +219,27 @@ public class ThreadReferenceCommandSet implements CommandSet
   private void executeStop(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
-    ObjectId exception = idMan.readId(bb);
-    vm.stopThread(thread, (Exception) exception.getObject());
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
+    ObjectId exception = idMan.readObjectId(bb);
+    Throwable throwable = (Throwable) exception.getObject();
+    thread.stop (throwable);
   }
 
   private void executeInterrupt(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
     thread.interrupt();
   }
 
   private void executeSuspendCount(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ThreadId tid = (ThreadId) idMan.readId(bb);
-    Thread thread = (Thread) tid.getObject();
-    int suspendCount = vm.getSuspendCount(thread);
+    ThreadId tid = (ThreadId) idMan.readObjectId(bb);
+    Thread thread = tid.getThread();
+    int suspendCount = VMVirtualMachine.getSuspendCount(thread);
     os.writeInt(suspendCount);
   }
 }

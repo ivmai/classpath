@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QWidget>
 #include <gnu_java_awt_peer_qt_QtMenuComponentPeer.h>
 #include "nativewrapper.h"
@@ -49,7 +50,6 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtMenuComponentPeer_callInit
 {
   mainThread->postEventToMain( new AWTInitEvent( env, obj ) );
   // wait for the thing to be created.
-  while(getNativeObject(env, obj) == 0);
 }
 
 /*

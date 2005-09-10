@@ -39,9 +39,8 @@ exception statement from your version. */
 #include "gtkpeer.h"
 #include "gnu_java_awt_peer_gtk_GtkButtonPeer.h"
 
-static jmethodID beginNativeRepaintID;
-static jmethodID endNativeRepaintID;
- 
+static jmethodID postActionEventID;
+
 void
 cp_gtk_button_init_jni (void)
 {
@@ -50,16 +49,13 @@ cp_gtk_button_init_jni (void)
   gtkbuttonpeer = (*cp_gtk_gdk_env())->FindClass (cp_gtk_gdk_env(),
                                            "gnu/java/awt/peer/gtk/GtkButtonPeer");
 
-  beginNativeRepaintID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkbuttonpeer,
-                                                    "beginNativeRepaint",
-                                                    "()V");
-
-  endNativeRepaintID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(), gtkbuttonpeer,
-                                                  "endNativeRepaint", "()V");
+  postActionEventID = (*cp_gtk_gdk_env())->GetMethodID (cp_gtk_gdk_env(),
+							gtkbuttonpeer,
+                                                  "postActionEvent", "(I)V");
 }
 
-static void block_expose_event_cb (GtkWidget *widget,
-                                   jobject peer);
+static void clicked_cb (GtkButton *button,
+			jobject peer);
 
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_GtkButtonPeer_create
@@ -152,11 +148,8 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_connectSignals
   button = gtk_bin_get_child (GTK_BIN (ptr));
 
   /* Button signals */
-  g_signal_connect_after (G_OBJECT (button), "pressed",
-                          G_CALLBACK (block_expose_event_cb), *gref);
-
-  g_signal_connect_after (G_OBJECT (button), "released",
-                          G_CALLBACK (block_expose_event_cb), *gref);
+  g_signal_connect (G_OBJECT (button), "clicked",
+		    G_CALLBACK (clicked_cb), *gref);
 
   /* Component signals */
   cp_gtk_component_connect_signals (G_OBJECT (button), gref);
@@ -368,21 +361,17 @@ Java_gnu_java_awt_peer_gtk_GtkButtonPeer_setNativeBounds
 }
 
 static void
-block_expose_event_cb (GtkWidget *widget, jobject peer)
+clicked_cb (GtkButton* button __attribute__((unused)),
+	    jobject peer)
 {
-  gdk_threads_leave ();
+  GdkEventButton* event;
+
+  event = (GdkEventButton*) gtk_get_current_event ();
+  g_assert (event);
 
   (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-                                beginNativeRepaintID);
+				       postActionEventID,
+				       cp_gtk_state_to_awt_mods (event->state));
 
-  gdk_threads_enter ();
-
-  gdk_window_process_updates (widget->window, TRUE);
-
-  gdk_threads_leave ();
-
-  (*cp_gtk_gdk_env())->CallVoidMethod (cp_gtk_gdk_env(), peer,
-                              endNativeRepaintID);
-
-  gdk_threads_enter ();
+  gdk_event_free ((GdkEvent*) event);
 }

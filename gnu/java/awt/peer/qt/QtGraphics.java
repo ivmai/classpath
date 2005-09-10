@@ -143,7 +143,10 @@ public abstract class QtGraphics extends Graphics2D
   }
 
   public synchronized native void delete();
-  public synchronized native void dispose();
+
+  public void dispose()
+  {
+  }
 
   // ********************** etc *******************************
 
@@ -155,8 +158,8 @@ public abstract class QtGraphics extends Graphics2D
     setTransform( current );
   }
 
-  // NOTE: Image here must be a QImage or wrapper!
-  protected native void initImage(Image image);  
+  protected native void initImage(QtImage image);  
+  protected native void initVolatileImage(QtVolatileImage image);  
 
   // Creates a new native QPainter object on the same context.
   private native void cloneNativeContext( QtGraphics parent );
@@ -179,7 +182,7 @@ public abstract class QtGraphics extends Graphics2D
   private native void setFontNative(QtFontPeer font);
   private native QPainterPath getClipNative();
 
-  private void setAlpha(double alpha)
+  void setAlpha(double alpha)
   {
     currentAlpha = alpha;
     setAlphaNative(currentAlpha);
@@ -205,7 +208,9 @@ public abstract class QtGraphics extends Graphics2D
 
   public void setColor(Color c)
   {
-    this.color = c;
+    if( c == null )
+      c = Color.white;
+    this.color = c; 
     int alpha = (int)(c.getAlpha() * currentAlpha);
     setColor(c.getRed(), c.getGreen(), c.getBlue(), alpha);
   }
@@ -249,6 +254,8 @@ public abstract class QtGraphics extends Graphics2D
 
   public void setFont(Font font)
   {
+    if( font == null )
+      return;
     this.font = font;
     if(font.getPeer() != null && font.getPeer() instanceof QtFontPeer)
       setFontNative( (QtFontPeer)font.getPeer() );

@@ -35,13 +35,13 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QColor>
 #include <QCursor>
-#include <QPoint>
 #include <QWidget>
 #include <gnu_java_awt_peer_qt_QtComponentPeer.h>
 #include "qtcomponent.h"
@@ -73,15 +73,6 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_callInit
 (JNIEnv *env, jobject obj)
 {
   mainThread->postEventToMain( new AWTInitEvent( env, obj ) );
-
-  // wait for the thing to be created.
-  void *p = NULL;
-  do 
-    {
-      env->MonitorEnter( obj );
-      p = getNativeObject(env, obj);
-      env->MonitorExit( obj );
-    } while( p == NULL);
 }
 
 /*
@@ -91,64 +82,32 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_disposeNative
 (JNIEnv *env, jobject obj)
 {
   QWidget *widget = (QWidget *) getNativeObject( env, obj );
-  if( widget )
-    {
-      setNativeObject(env, obj, NULL);
-      mainThread->postEventToMain( new AWTDestroyEvent( widget ) );
-    }
+  setNativeObject(env, obj, NULL);
+  mainThread->postEventToMain( new AWTDestroyEvent( widget ) );
 }
 
 /**
  * Returns the on-screen location of the component.
  */
-JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getLocationOnScreen
-(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getLocationOnScreenNative
+(JNIEnv *env, jobject obj, jobject point)
 {
   QWidget *widget = (QWidget *) getNativeObject( env, obj );
   assert( widget );
-  QPoint *p = NULL;
-  mainThread->postEventToMain( new AWTGetOriginEvent( widget, &p) );
-  while (p == NULL); // wait for the thing to be retrived.
-
-  return makePoint(env, *p);
+  mainThread->postEventToMain( new AWTGetOriginEvent( widget, env, point) );
 }
 
 /*
- * Get the minimum size
+ * Get the preferred/minimum size of the widget
  */
-JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getMinimumSizeNative
-(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getSizeNative
+(JNIEnv *env, jobject obj, jobject size, jboolean preferred)
 {
   QWidget *widget = (QWidget *) getNativeObject( env, obj );
   assert( widget );
-  QSize *size = NULL;
 
-  AWTGetSizeEvent *e = new AWTGetSizeEvent( widget, &size, false );
-  mainThread->postEventToMain( e );
-  while(size == NULL);
-  return makeDimension(env, size);
-
-  delete size;
-}
-
-/*
- * Get the preferred size of the widget
- */
-JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getPreferredSizeNative
-
-(JNIEnv *env, jobject obj)
-{
-  QWidget *widget = (QWidget *) getNativeObject( env, obj );
-  assert( widget );
-  QSize *size = NULL;
-
-  AWTGetSizeEvent *e = new AWTGetSizeEvent( widget, &size, true );
-  mainThread->postEventToMain( e );
-  while(size == NULL);
-
-  return makeDimension(env, size);
-
-  delete size;
+  mainThread->postEventToMain
+    (new GetSizeEvent( widget, env, size, (preferred == JNI_TRUE)));
 }
 
 /*
@@ -201,14 +160,8 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_setBoundsNative
 {
   QWidget *widget = (QWidget *) getNativeObject( env, obj );
   assert( widget );
-
-  QRect g = widget->geometry();
-  if(g.x() != x || g.y() != y || 
-     g.width() != width || g.height() != height)
-    {
-      mainThread->postEventToMain
-	(new AWTResizeEvent( widget, x, y, width, height ) );
-    }
+  mainThread->postEventToMain
+    (new AWTResizeEvent( widget, x, y, width, height ) );
 }
 
 /*
@@ -388,4 +341,44 @@ JNIEXPORT jint JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_whichScreen
   QWidget *widget = (QWidget *) getNativeObject( env, obj );
   assert( widget );
   return (jint) qApplication->desktop()->screenNumber( widget );
+}
+
+/*
+ * Reparents the widget.
+ */
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_reparentNative
+(JNIEnv *env, jobject obj, jobject newparent)
+{
+  QWidget *widget = (QWidget *) getNativeObject( env, obj );
+  assert( widget );
+  QWidget *parentWidget = (QWidget *) getNativeObject( env, newparent );
+  assert( parentWidget );
+  mainThread->postEventToMain( new AWTReparent(widget, parentWidget ) );
+}
+
+/*
+ * Get the preferred size of the widget
+ */
+JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtComponentPeer_getBounds
+
+(JNIEnv *env, jobject obj)
+{
+  QWidget *widget = (QWidget *) getNativeObject( env, obj );
+  assert( widget );
+
+  int x, y, w, h;
+  widget->geometry().getRect(&x, &y, &w, &h);    
+
+  jclass cls = env->FindClass("java/awt/Rectangle");
+  assert( cls != NULL);
+  jmethodID mid = env->GetMethodID(cls, "<init>", "(IIII)V");
+  assert( mid != NULL);
+  jvalue values[4];
+
+  values[0].i = (jint) x;
+  values[1].i = (jint) y;
+  values[2].i = (jint) w;
+  values[3].i = (jint) h;
+
+  return env->NewObjectA(cls, mid, values);
 }

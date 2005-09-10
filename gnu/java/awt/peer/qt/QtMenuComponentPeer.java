@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.qt;
 
+import java.awt.Font;
 import java.awt.MenuComponent;
 import java.awt.peer.MenuComponentPeer;
 
@@ -51,7 +52,17 @@ public class QtMenuComponentPeer extends NativeWrapper
     this.toolkit = kit;
     this.owner = owner;
     nativeObject = 0;
-    callInit();
+    synchronized(this) 
+      {
+	callInit(); // Calls the init method FROM THE MAIN THREAD.
+	try
+	  {	
+	    wait(); // Wait for the thing to be created.
+	  }
+	catch(InterruptedException e)
+	  {
+	  }
+      }
     setup();
   }
 
@@ -73,5 +84,11 @@ public class QtMenuComponentPeer extends NativeWrapper
   // ************ Public methods *********************
 
   public native void dispose();
+
+  public void setFont(Font font)
+  {
+    // TODO Auto-generated method stub
+    
+  }
 
 }

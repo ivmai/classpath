@@ -156,6 +156,14 @@ JNIEnv *cp_gtk_gdk_env(void);
 extern double cp_gtk_dpi_conversion_factor;
 extern GtkWindowGroup *cp_gtk_global_window_group;
 
+/* Shared global clipboard for GtkClipboard and GtkSelection. */
+extern GtkClipboard *cp_gtk_clipboard;
+
+/* Standard target (strings) for GtkClipboard and GtkSelection. */
+extern jstring cp_gtk_stringTarget;
+extern jstring cp_gtk_imageTarget;
+extern jstring cp_gtk_filesTarget;
+
 /* Union used for type punning. */
 union widget_union
 {
@@ -163,8 +171,9 @@ union widget_union
   GtkWidget **widget;
 };
 
-/* Keycode helpers */
+/* Constant conversion helpers */
 guint cp_gtk_awt_keycode_to_keysym (jint keyCode, jint keyLocation);
+jint cp_gtk_state_to_awt_mods (guint state);
 
 /* Image helpers */
 GdkPixbuf *cp_gtk_image_get_pixbuf (JNIEnv *env, jobject obj);
@@ -180,6 +189,7 @@ void cp_gtk_button_init_jni (void);
 void cp_gtk_checkbox_init_jni (void);
 void cp_gtk_choice_init_jni (void);
 void cp_gtk_component_init_jni (void);
+void cp_gtk_filedialog_init_jni (void);
 void cp_gtk_list_init_jni (void);
 void cp_gtk_menuitem_init_jni (void);
 void cp_gtk_scrollbar_init_jni (void);
@@ -195,6 +205,8 @@ void cp_gtk_textcomponent_connect_signals (GObject *ptr, jobject *gref);
 
 /* Debugging */
 void cp_gtk_print_current_thread (void);
+
+#define SYNCHRONIZE_GDK 0
 
 #define DEBUG_LOCKING 0
 

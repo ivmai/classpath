@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package gnu.java.awt.peer.qt;
 
+import java.awt.Container;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.peer.ContainerPeer;
@@ -60,6 +61,7 @@ public class QtContainerPeer extends QtComponentPeer implements ContainerPeer
   // ************ Public methods *********************
   public void beginLayout()
   {
+    // FIXME 
   }
 
   public void beginValidate()
@@ -68,7 +70,6 @@ public class QtContainerPeer extends QtComponentPeer implements ContainerPeer
    
   public void endLayout()
   {
-    // FIXME 
     QtUpdate();
   }
 
@@ -90,6 +91,24 @@ public class QtContainerPeer extends QtComponentPeer implements ContainerPeer
   {
     // FIXME etc.
     return false;
+  }
+
+  public boolean isRestackSupported()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  public void cancelPendingPaint(int x, int y, int width, int height)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void restack()
+  {
+    // TODO Auto-generated method stub
+    
   }
 }
 

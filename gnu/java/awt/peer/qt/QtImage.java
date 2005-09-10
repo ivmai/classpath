@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.WeakHashMap;
 import java.util.Vector;
 
 /**
@@ -100,6 +101,15 @@ public class QtImage extends Image
 						       0x0000FF00,
 						       0x000000FF,
 						       0xFF000000);
+  /**
+   * HashMap of Graphics objects painting on this Image.
+   */
+  WeakHashMap painters;
+
+  /**
+   * Flags if this image is to be destroyed.
+   */
+  boolean killFlag;
 
   /**
    * Clears the image to RGBA 0
@@ -164,21 +174,22 @@ public class QtImage extends Image
   /**
    * Draws the image scaled flipped and optionally composited.
    */
-  private native void drawPixelsScaledFlipped (QtGraphics gc, 
-					       int bg_red, int bg_green, 
-					       int bg_blue, 
-					       boolean flipX, boolean flipY,
-					       int srcX, int srcY,
-					       int srcWidth, int srcHeight,
-					       int dstX, int dstY,
-					       int dstWidth, int dstHeight,
-					       boolean composite);
+  native void drawPixelsScaledFlipped (QtGraphics gc, 
+				       int bg_red, int bg_green, 
+				       int bg_blue, 
+				       boolean flipX, boolean flipY,
+				       int srcX, int srcY,
+				       int srcWidth, int srcHeight,
+				       int dstX, int dstY,
+				       int dstWidth, int dstHeight,
+				       boolean composite);
 
   /**
    * Creates the image from an ImageProducer. May result in an error image.
    */
   public QtImage (ImageProducer producer)
   {
+    killFlag = false;
     isLoaded = false;
     observers = new Vector();
     source = producer;
@@ -192,9 +203,12 @@ public class QtImage extends Image
    */
   public QtImage (URL url)
   {
+    killFlag = false;
     isLoaded = false;
     observers = new Vector();
     errorLoading = false;
+    if( url == null)
+      return;
     ByteArrayOutputStream baos = new ByteArrayOutputStream( 5000 );
     try
       {
@@ -226,6 +240,7 @@ public class QtImage extends Image
    */
   public QtImage (String filename)
   {
+    killFlag = false;
     File f = new File(filename);
     observers = null;
     props = new Hashtable();
@@ -245,7 +260,6 @@ public class QtImage extends Image
 	isLoaded = false;
 	return;
       }
-
     errorLoading = false;
     isLoaded = true;
   }
@@ -260,6 +274,7 @@ public class QtImage extends Image
     if (loadImageFromData(data) != true)
       throw new IllegalArgumentException("Couldn't load image.");
 
+    killFlag = false;
     isLoaded = true;
     observers = null;
     errorLoading = false;
@@ -275,6 +290,7 @@ public class QtImage extends Image
     this.height = height;
     props = new Hashtable();
     isLoaded = true;
+    killFlag = false;
     observers = null;
     errorLoading = false;
     createImage();
@@ -290,6 +306,7 @@ public class QtImage extends Image
     this.height = height;
     props = new Hashtable();
     isLoaded = true;
+    killFlag = false;
     observers = null;
     errorLoading = false;
 
@@ -356,15 +373,40 @@ public class QtImage extends Image
 				 0, width);
   }
 
+  void putPainter(QtImageGraphics g)
+  {
+    if( painters == null )
+      painters = new WeakHashMap();
+    painters.put( g, "dummy" );
+  }
+
+  void removePainter(QtImageGraphics g)
+  {
+    painters.remove( g );
+    if( killFlag && painters.isEmpty() )
+      freeImage();
+  }
+
   /**
    * Creates a Graphics context for this image.
    */
   public Graphics getGraphics ()
   {
-    if (!isLoaded) 
+    if (!isLoaded || killFlag) 
       return null;
 
     return new QtImageGraphics(this);
+  }
+
+  /**
+   * Creates a Graphics context for this image.
+   */
+  Graphics getDirectGraphics(QtComponentPeer peer)
+  {
+    if (!isLoaded) 
+      return null;
+
+    return new QtImageDirectGraphics(this, peer);
   }
   
   /**
@@ -402,13 +444,19 @@ public class QtImage extends Image
 
   public void finalize()
   {
-    if (isLoaded)
-      freeImage();
+    dispose();
   }
 
   public void dispose()
   {
-    finalize();
+    if (isLoaded)
+      {
+	if( painters == null || painters.isEmpty() )
+	  freeImage();
+	else
+	  killFlag = true; // can't destroy image yet. 
+	// Do so when all painters are gone.
+      }
   }
 
   /**
@@ -584,5 +632,11 @@ public class QtImage extends Image
 	return true;
       }
     return false;
+  }
+
+  public String toString()
+  {
+    return "QtImage [isLoaded="+isLoaded+", width="+width+", height="+height
+      +"]";
   }
 }

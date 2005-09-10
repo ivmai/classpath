@@ -15,8 +15,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 
 Linking this library statically or dynamically with other modules is
 making a combined work based on this library.  Thus, the terms and
@@ -39,14 +39,12 @@ exception statement from your version. */
 
 package gnu.classpath.jdwp.processor;
 
-import gnu.classpath.jdwp.VMFrame;
-import gnu.classpath.jdwp.IVirtualMachine;
-import gnu.classpath.jdwp.Jdwp;
 import gnu.classpath.jdwp.JdwpConstants;
+import gnu.classpath.jdwp.VMFrame;
+import gnu.classpath.jdwp.VMVirtualMachine;
 import gnu.classpath.jdwp.exception.JdwpException;
 import gnu.classpath.jdwp.exception.JdwpInternalErrorException;
 import gnu.classpath.jdwp.exception.NotImplementedException;
-import gnu.classpath.jdwp.id.IdManager;
 import gnu.classpath.jdwp.id.ObjectId;
 import gnu.classpath.jdwp.util.Value;
 
@@ -59,14 +57,9 @@ import java.nio.ByteBuffer;
  * 
  * @author Aaron Luchko <aluchko@redhat.com>
  */
-public class StackFrameCommandSet implements CommandSet
+public class StackFrameCommandSet
+  extends CommandSet
 {
-  // Our hook into the jvm
-  private final IVirtualMachine vm = Jdwp.getIVirtualMachine();
-
-  // Manages all the different ids that are assigned by jdwp
-  private final IdManager idMan = Jdwp.getIdManager();
-
   public boolean runCommand(ByteBuffer bb, DataOutputStream os, byte command)
       throws JdwpException
   {
@@ -104,7 +97,7 @@ public class StackFrameCommandSet implements CommandSet
   private void executeGetValues(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ObjectId tId = idMan.readId(bb);
+    ObjectId tId = idMan.readObjectId(bb);
     Thread thread = (Thread) tId.getObject();
 
     // Although Frames look like other ids they are not. First they are not
@@ -113,7 +106,7 @@ public class StackFrameCommandSet implements CommandSet
     // has a reference to them. Furthermore they are not ReferenceTypeIds since
     // these are held permanently and we want these to be held only as long as
     // the Thread is suspended.
-    VMFrame frame = vm.getVMFrame(thread, bb);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
     int slots = bb.getInt();
     os.writeInt(slots); // Looks pointless but this is the protocol
     for (int i = 0; i < slots; i++)
@@ -128,10 +121,10 @@ public class StackFrameCommandSet implements CommandSet
   private void executeSetValues(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ObjectId tId = idMan.readId(bb);
+    ObjectId tId = idMan.readObjectId(bb);
     Thread thread = (Thread) tId.getObject();
 
-    VMFrame frame = vm.getVMFrame(thread, bb);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
 
     int slots = bb.getInt();
     for (int i = 0; i < slots; i++)
@@ -145,10 +138,10 @@ public class StackFrameCommandSet implements CommandSet
   private void executeThisObject(ByteBuffer bb, DataOutputStream os)
       throws JdwpException, IOException
   {
-    ObjectId tId = idMan.readId(bb);
+    ObjectId tId = idMan.readObjectId(bb);
     Thread thread = (Thread) tId.getObject();
 
-    VMFrame frame = vm.getVMFrame(thread, bb);
+    VMFrame frame = VMVirtualMachine.getFrame(thread, bb);
 
     Object thisObject = frame.getObject();
     Value.writeTaggedValue(os, thisObject);

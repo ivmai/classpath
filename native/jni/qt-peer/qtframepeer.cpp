@@ -35,14 +35,18 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QApplication>
+#include <QIcon>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QPixmap>
 #include <QToolBar>
 #include <QThread>
 #include <gnu_java_awt_peer_qt_QtFramePeer.h>
 #include "qtcomponent.h"
 #include "qtstrings.h"
+#include "qtimage.h"
 #include "containers.h"
 #include "keybindings.h"
 #include "mainthreadinterface.h"
@@ -52,22 +56,22 @@ exception statement from your version. */
 /*
  * Our QMainWindow subclass
  */
-class MyWindow : public QMainWindow
+class MyFrame : public QMainWindow
 {
 public:
-  MyWindow(JNIEnv *env, jobject obj) : QMainWindow(0, Qt::Window )
+  MyFrame(JNIEnv *env, jobject obj) : QMainWindow(0, Qt::Window )
   {
     setup(env, obj);
   }
 
-  ~MyWindow()
+  ~MyFrame()
   {
     destroy();
   }
 
 #define I_KNOW_WHAT_IM_DOING
 #define PARENT QMainWindow
-#include "eventmethods.cpp"
+#include "eventmethods.h"
 };
 
 /**
@@ -97,37 +101,6 @@ class FrameMenuEvent : public AWTEvent {
 };
 
 /**
- * Event wrapper for getting the menu bar height
- */
-class FrameGetMenuHeightEvent : public AWTEvent {
-  
-private:
-  QMainWindow *frame;
-  int *value;
-  
-public:
-  FrameGetMenuHeightEvent(QMainWindow *w, int *v) : AWTEvent()
-  {
-    frame = w;
-    value = v;
-  }
-
-  void runEvent()
-  {
-    QMenuBar *mb = frame->menuBar();
-    assert( mb );
-    int v;
-    if( mb->isVisible() )
-      v = mb->size().height();
-
-    if(v <= 0 || v >= 0xFFFFF )  // Work around for strange values.
-      v = MenuSizeDefault; 
-
-    *value = v;
-  }
-};
-
-/**
  * Returns the child widget for the frame (the centralWidget in qt terms)
  */
 QWidget *frameChildWidget( JNIEnv *env, jobject component )
@@ -138,11 +111,14 @@ QWidget *frameChildWidget( JNIEnv *env, jobject component )
 					   "getPeer",
 					   "()Ljava/awt/peer/ComponentPeer;" );
   assert(getPeerMID);
+
   jobject framepeerobj = env->CallObjectMethod( component, getPeerMID, 0);
+  if( framepeerobj == NULL )
+    return (QWidget *)NULL;
 
-  QMainWindow *window = (QMainWindow *)getNativeObject(env, framepeerobj);
-
-  return window->centralWidget();
+  MyFrame *window = (MyFrame *)getNativeObject(env, framepeerobj);
+  assert( window );
+  return window;
 }
 
 /*
@@ -151,14 +127,36 @@ QWidget *frameChildWidget( JNIEnv *env, jobject component )
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtFramePeer_init
 (JNIEnv *env, jobject obj)
 {
-  MyWindow *frame = new MyWindow(env, obj);
+  MyFrame *frame = new MyFrame(env, obj);
+  assert( frame );
+  frame->addToolBarBreak ( Qt::BottomToolBarArea );
+  setNativeObject( env, obj, frame );
+}
+
+/**
+ * Sets the icon image.
+ */
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtFramePeer_setIcon
+(JNIEnv *env, jobject obj, jobject image)
+{
+  QMainWindow *frame = (QMainWindow *) getNativeObject( env, obj );
   assert( frame );
 
-  QWidget *central = new QWidget( frame );
-  assert( central );
-
-  frame->setCentralWidget( central );
-  setNativeObject( env, obj, frame );
+  QIcon *i;
+  if( image == NULL )
+    {
+      // remove icon
+      i = new QIcon();
+    }
+  else
+    {
+      // set icon
+      QImage *img = getQtImage( env, image );
+      assert( img );
+      i = new QIcon( QPixmap::fromImage( *img ) );
+    }
+  frame->setWindowIcon( *i );
+  delete i;
 }
 
 /**
@@ -170,13 +168,9 @@ JNIEXPORT jint JNICALL Java_gnu_java_awt_peer_qt_QtFramePeer_menuBarHeight
   QMainWindow *frame = (QMainWindow *) getNativeObject( env, obj );
   assert( frame );
 
-  int value = 0;
-  mainThread->postEventToMain( new FrameGetMenuHeightEvent( frame, &value ) );
+  QMenuBar *mb = frame->menuBar();
 
-  while(value == 0); // (Busy) wait for the value to
-  // get set by the main thread.
-
-  return (jint)value;
+  return ( mb != NULL ) ? mb->sizeHint().height() : 0 ;
 }
 
 /*
@@ -199,4 +193,13 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtFramePeer_setMenu
   mainThread->postEventToMain( new FrameMenuEvent( frame, menubar ) );
 }
 
+/**
+ * Set the bounds of the maximized frame
+ */
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtFramePeer_setMaximizedBounds (JNIEnv *env, jobject obj, jint w, jint h)
+{
+  QMainWindow *frame = (QMainWindow *) getNativeObject( env, obj );
+  assert( frame );
+  // FIXME
+}
 

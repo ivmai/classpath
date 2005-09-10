@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <jni.h>
 #include <QPainter>
 #include <QBrush>
@@ -112,12 +113,34 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_initImage
 (JNIEnv *env, jobject obj, jobject image)
 {
   QImage *im = getQtImage( env, image );
+  assert( im );
   QPainter *painter = new GraphicsPainter( im );
   assert( painter );
   setNativePtr(env, obj, painter);
   painter->setRenderHint(QPainter::TextAntialiasing);
+  painter->setRenderHint(QPainter::Antialiasing);
+  painter->setRenderHint(QPainter::SmoothPixmapTransform);
 }
 
+/*
+ * Start of JNI methods 
+ */
+JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_initVolatileImage
+(JNIEnv *env, jobject obj, jobject image)
+{
+  QPixmap *im = getQtVolatileImage( env, image );
+  assert( im );
+  QPainter *painter = new GraphicsPainter( im );
+  assert( painter );
+  setNativePtr(env, obj, painter);
+  painter->setRenderHint(QPainter::TextAntialiasing);
+  painter->setRenderHint(QPainter::Antialiasing);
+  painter->setRenderHint(QPainter::SmoothPixmapTransform);
+}
+
+/**
+ * Deletes the QPainter
+ */
 JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_delete
 (JNIEnv *env, jobject obj)
 {
@@ -129,19 +152,6 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_delete
  	painter->end();
       delete painter;
     }
-}
-
-JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_dispose
-(JNIEnv *env, jobject obj)
-{
-//   GraphicsPainter *painter = (GraphicsPainter *)getPainter( env, obj );
-//   setNativePtr( env, obj, NULL );
-//   if( painter )
-//     {
-//       if( painter->isActive() )
-// 	painter->end();
-//       delete painter;
-//     }
 }
 
 ///////////////////////////////////////////////////////////
@@ -220,7 +230,6 @@ JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_getClipBounds
 {
   QPainter *painter = getPainter( env, obj );
   assert( painter );
-
   qreal x, y, w, h;
   painter->clipPath().boundingRect().getRect(&x, &y, &w, &h);    
 
@@ -409,11 +418,6 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_setNativeComposite
       break;
     }
   painter->setCompositionMode( mode );
-}
-
-JNIEXPORT jobject JNICALL Java_gnu_java_awt_peer_qt_QtGraphics_getFontMetrics
-(JNIEnv *env, jobject obj, jobject font)
-{
 }
 
 /**

@@ -18,6 +18,8 @@ along with GNU Classpath; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA. */
 
+package gnu.classpath.examples.jawt;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -28,17 +30,25 @@ public class DemoJAWT extends Canvas
     System.loadLibrary ("DemoJAWT");
   }
 
-  public native void paint (Graphics g);
+  public native void paintIt (Graphics g, boolean on);
+
+  public void paint (Graphics g)
+  {
+    paintIt (g, on);
+  }
+
+  private boolean on;
 
   public static void main (String[] args)
   {
-    Frame f = new Frame ();
+    Frame f = new Frame ("GNU Classpath JAWT Demo");
 
     f.setBounds (0, 0, 300, 300);
 
     f.setResizable (false);
 
-    f.add (new DemoJAWT ());
+    DemoJAWT jawtDemo = new DemoJAWT ();
+    f.add (jawtDemo);
 
     f.addWindowListener (new WindowAdapter ()
       {
@@ -49,5 +59,19 @@ public class DemoJAWT extends Canvas
       });
 
     f.show ();
+
+    while (true)
+    {
+      try
+	{
+	  Thread.sleep (500);
+	}
+      catch (InterruptedException ie)
+	{
+	  // ignored
+	}
+      jawtDemo.on = ! jawtDemo.on;
+      f.repaint();
+    }
   }
 }

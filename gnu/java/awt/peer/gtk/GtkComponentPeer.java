@@ -70,6 +70,7 @@ import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.VolatileImage;
 import java.awt.peer.ComponentPeer;
+import java.awt.peer.ContainerPeer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -99,6 +100,7 @@ public class GtkComponentPeer extends GtkGenericPeer
   native void gtkWidgetGetPreferredDimensions (int[] dim);
   native void gtkWidgetGetLocationOnScreen (int[] point);
   native void gtkWidgetSetCursor (int type);
+  native void gtkWidgetSetCursorUnlocked (int type);
   native void gtkWidgetSetBackground (int red, int green, int blue);
   native void gtkWidgetSetForeground (int red, int green, int blue);
   native void gtkWidgetSetSensitive (boolean sensitive);
@@ -422,6 +424,7 @@ public class GtkComponentPeer extends GtkGenericPeer
     int new_y = y;
 
     Component parent = awtComponent.getParent ();
+    Component next_parent;
 
     // Heavyweight components that are children of one or more
     // lightweight containers have to be handled specially.  Because
@@ -439,12 +442,22 @@ public class GtkComponentPeer extends GtkGenericPeer
       {
 	lightweightChild = true;
 
+        next_parent = parent.getParent ();
+
 	i = ((Container) parent).getInsets ();
 
-	new_x += parent.getX () + i.left;
-	new_y += parent.getY () + i.top;
+        if (next_parent instanceof Window)
+          {
+            new_x += i.left;
+            new_y += i.top;
+          }
+        else
+          {
+            new_x += parent.getX () + i.left;
+            new_y += parent.getY () + i.top;
+          }
 
-	parent = parent.getParent ();
+	parent = next_parent;
       }
 
     // We only need to convert from Java to GTK coordinates if we're
@@ -476,7 +489,10 @@ public class GtkComponentPeer extends GtkGenericPeer
 
   public void setCursor (Cursor cursor) 
   {
-    gtkWidgetSetCursor (cursor.getType ());
+    if (Thread.currentThread() == GtkToolkit.mainThread)
+      gtkWidgetSetCursorUnlocked (cursor.getType ());
+    else
+      gtkWidgetSetCursor (cursor.getType ());
   }
 
   public void setEnabled (boolean b)
@@ -509,16 +525,26 @@ public class GtkComponentPeer extends GtkGenericPeer
     return new Color (rgb[0], rgb[1], rgb[2]);
   }
 
+  public native void setVisibleNative (boolean b);
+  public native void setVisibleNativeUnlocked (boolean b);
+
   public void setVisible (boolean b)
   {
-    if (b)
-      show ();
+    if (Thread.currentThread() == GtkToolkit.mainThread)
+      setVisibleNativeUnlocked (b);
     else
-      hide ();
+      setVisibleNative (b);
   }
 
-  public native void hide ();
-  public native void show ();
+  public void hide ()
+  {
+    setVisible (false);
+  }
+
+  public void show ()
+  {
+    setVisible (true);
+  }
 
   protected void postMouseEvent(int id, long when, int mods, int x, int y, 
 				int clickCount, boolean popupTrigger) 
@@ -682,5 +708,32 @@ public class GtkComponentPeer extends GtkGenericPeer
   public String toString ()
   {
     return "peer of " + awtComponent.toString();
+  }
+  public Rectangle getBounds()
+  {
+      // FIXME: implement
+    return null;
+  }
+  public void reparent(ContainerPeer parent)
+  {
+    // FIXME: implement
+  
+  }
+  public void setBounds(int x, int y, int width, int height, int z)
+  {
+    // FIXME: implement
+      setBounds (x, y, width, height);
+   
+  }
+  public boolean isReparentSupported()
+  {
+    // FIXME: implement
+
+    return false;
+  }
+  public void layout()
+  {
+    // FIXME: implement
+ 
   }
 }

@@ -2993,4 +2993,118 @@ public final class Character implements Serializable, Comparable<Character>
   {
     return (char) (((val >> 8) & 0xff) | ((val << 8) & 0xff00));
   }
+
+  /**
+   * Converts a unicode code point to a UTF-16 representation of that
+   * code point.
+   * 
+   * @param codePoint the unicode code point
+   *
+   * @return the UTF-16 representation of that code point
+   *
+   * @throws IllegalArgumentException if the code point is not a valid
+   *         unicode code point
+   *
+   * @since 1.5
+   */
+  public static char[] toChars(int codePoint)
+  {
+    char[] result = new char[charCount(codePoint)];
+    int ignore = toChars(codePoint, result, 0);
+    return result;
+  }
+
+  /**
+   * Converts a unicode code point to its UTF-16 representation.
+   *
+   * @param codePoint the unicode code point
+   * @param dst the target char array
+   * @param dstIndex the start index for the target
+   *
+   * @return number of characters written to <code>dst</code>
+   *
+   * @throws IllegalArgumentException if <code>codePoint</code> is not a
+   *         valid unicode code point
+   * @throws NullPointerException if <code>dst</code> is <code>null</code>
+   * @throws IndexOutOfBoundsException if <code>dstIndex</code> is not valid
+   *         in <code>dst</code> or if the UTF-16 representation does not
+   *         fit into <code>dst</code>
+   *
+   * @since 1.5
+   */
+  public static int toChars(int codePoint, char[] dst, int dstIndex)
+  {
+    if (!isValidCodePoint(codePoint))
+      {
+        throw new IllegalArgumentException("not a valid code point: "
+                                           + codePoint);
+      }
+
+    int result;
+    if (isSupplementaryCodePoint(codePoint))
+      {
+        // Write second char first to cause IndexOutOfBoundsException
+        // immediately.
+        dst[dstIndex + 1] = (char) ((codePoint & 0x3ff)
+                                    + (int) MIN_LOW_SURROGATE );
+        dst[dstIndex] = (char) ((codePoint >> 10) + (int) MIN_HIGH_SURROGATE);
+        result = 2;
+    }
+    else
+      {
+        dst[dstIndex] = (char) codePoint;
+        result = 1; 
+      }
+    return result;
+  }
+
+  /**
+   * Return number of 16-bit characters required to represent the given
+   * code point.
+   *
+   * @param codePoint a unicode code point
+   *
+   * @return 2 if codePoint >= 0x10000, 1 otherwise.
+   *
+   * @since 1.5
+   */
+  public static int charCount(int codePoint)
+  {
+    return 
+      (codePoint >= MIN_SUPPLEMENTARY_CODE_POINT) 
+      ? 2 
+      : 1;
+  }
+
+  /**
+   * Determines whether the specified code point is
+   * in the range 0x10000 .. 0x10FFFF, i.e. the character is within the Unicode
+   * supplementary character range.
+   *
+   * @param codePoint a Unicode code point
+   *
+   * @return <code>true</code> if code point is in supplementary range
+   *
+   * @since 1.5
+   */
+  public static boolean isSupplementaryCodePoint(int codePoint)
+  {
+    return codePoint >= MIN_SUPPLEMENTARY_CODE_POINT
+      && codePoint <= MAX_CODE_POINT;
+  }
+
+  /**
+   * Determines whether the specified code point is
+   * in the range 0x0000 .. 0x10FFFF, i.e. it is a valid Unicode code point.
+   *
+   * @param codePoint a Unicode code point
+   *
+   * @return <code>true</code> if code point is valid
+   *
+   * @since 1.5
+   */
+  public static boolean isValidCodePoint(int codePoint)
+  {
+    return codePoint >= MIN_CODE_POINT && codePoint <= MAX_CODE_POINT;
+  }
 } // class Character

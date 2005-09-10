@@ -35,6 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+#include <assert.h>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <gnu_java_awt_peer_qt_QtScrollPanePeer.h>
@@ -65,7 +66,7 @@ public:
 
 #define I_KNOW_WHAT_IM_DOING
 #define PARENT QScrollArea
-#include "eventmethods.cpp"
+#include "eventmethods.h"
 };
 
 
@@ -130,6 +131,8 @@ JNIEXPORT void JNICALL Java_gnu_java_awt_peer_qt_QtScrollPanePeer_childResized
 
   QWidget *child = view->viewport();
   assert( child );
+  //  child->setGeometry( 0, 0, w, h );
+//   child->update();
   mainThread->postEventToMain( new AWTResizeEvent(child, 0, 0, w, h) );
 }
 
