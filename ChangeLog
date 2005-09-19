@@ -1,3 +1,33 @@
+2005-09-19  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/Collections.java:
+	Fixes Bug #PR22921.
+	(emptySet()): Implemented.
+	(emptyList()): Implemented.
+	(emptyMap()): Implemented.
+	(rotate(List<?>,int)): Fixed signature.
+	(shuffle(List<?>)): Fixed signature.
+	(shuffle(List<?>,Random)): Fixed signature.
+	(frequency(Collection<?>,Object)): Documented.
+	(addAll(Collection<? super T>, T... a)): Implemented.
+	(disjoint(Collection<?>,Collection<?>)): Implemented.
+	(swap(List<?>,int,int)): Fixed signature.
+	(checkedCollection(Collection<E>,Class<E>)): Implemented.
+	(Collections.CheckedCollection): New inner class.
+	(Collections.CheckedIterator): New inner class.
+	(checkedList(List<E>, Class<E>)): Implemented.
+	(Collections.CheckedList): New inner class.
+	(Collections.CheckedRandomAccessList): New inner class.
+	(Collections.CheckedListIterator): New inner class.
+	(checkedMap(Map<K,V>,Class<K>,Class<V>)): Implemented.
+	(Collections.CheckedMap): New inner class.
+	(checkedSet(Set<E>,Class<E>)): Implemented.
+	(Collections.CheckedSet): New inner class.
+	(checkedSortedMap(SortedMap<K,V>,Class<K>,Class<V>)): Implemented.
+	(Collections.CheckedSortedMap): New inner class.
+	(checkedSortedSet(SortedSet<E>,Class<E>)): Implemented.
+	(Collections.CheckedSortedSet): New inner class.
+	
 2005-09-15  Tom Tromey  <tromey@redhat.com>
 
 	* java/lang/EnumConstantNotPresentException.java: New file.
