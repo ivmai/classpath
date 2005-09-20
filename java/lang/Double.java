@@ -38,7 +38,6 @@ exception statement from your version. */
 
 package java.lang;
 
-import gnu.classpath.Configuration;
 
 /**
  * Instances of class <code>Double</code> represent primitive
@@ -91,17 +90,17 @@ public final class Double extends Number implements Comparable<Double>
   public static final double NaN = 0.0 / 0.0;
 
   /**
+   * The number of bits needed to represent a <code>double</code>.
+   * @since 1.5
+   */
+  public static final int SIZE = 64;
+
+ /**
    * The primitive type <code>double</code> is represented by this
    * <code>Class</code> object.
    * @since 1.1
    */
   public static final Class<Double> TYPE = (Class<Double>) VMClassLoader.getPrimitiveClass('D');
-
-  /**
-   * The number of bits needed to represent a <code>double</code>.
-   * @since 1.5
-   */
-  public static final int SIZE = 64;
 
   /**
    * The immutable value of this Double.
@@ -176,6 +175,21 @@ public final class Double extends Number implements Comparable<Double>
   }
 
   /**
+   * Returns a <code>Double</code> object wrapping the value.
+   * In contrast to the <code>Double</code> constructor, this method
+   * may cache some values.  It is used by boxing conversion.
+   *
+   * @param val the value to wrap
+   * @return the <code>Double</code>
+   * @since 1.5
+   */
+  public static Double valueOf(double val)
+  {
+    // We don't actually cache, but we could.
+    return new Double(val);
+  }
+
+ /**
    * Create a new <code>Double</code> object using the <code>String</code>.
    *
    * @param s the <code>String</code> to convert
@@ -188,20 +202,6 @@ public final class Double extends Number implements Comparable<Double>
   public static Double valueOf(String s)
   {
     return new Double(parseDouble(s));
-  }
-
-  /**
-   * Returns a <code>Double</code> object wrapping the value.
-   * In contrast to the <code>Double</code> constructor, this method
-   * may cache some values.  It is used by boxing conversion.
-   *
-   * @param val the value to wrap
-   * @return the <code>Double</code>
-   */
-  public static Double valueOf(double val)
-  {
-    // We don't actually cache, but we could.
-    return new Double(val);
   }
 
   /**

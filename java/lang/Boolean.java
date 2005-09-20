@@ -223,6 +223,16 @@ public final class Boolean implements Serializable, Comparable<Boolean>
   }
 
   /**
+   * This implements the comparison contract specified by Comparable.
+   * @see Comparable
+   * @since 1.5
+   */
+  public int compareTo(Boolean other)
+  {
+    return value == other.value ? 0 : (value ? 1 : -1);
+  }
+
+  /**
    * If the String argument is "true", ignoring case, return true.
    * Otherwise, return false.
    *
@@ -232,15 +242,5 @@ public final class Boolean implements Serializable, Comparable<Boolean>
   public static boolean parseBoolean(String b)
   {
     return "true".equalsIgnoreCase(b) ? true : false;
-  }
-
-  /**
-   * This implements the comparison contract specified by Comparable.
-   * @see Comparable
-   * @since 1.5
-   */
-  public int compareTo(Boolean other)
-  {
-    return value == other.value ? 0 : (value ? 1 : -1);
   }
 }

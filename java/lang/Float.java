@@ -206,6 +206,7 @@ public final class Float extends Number implements Comparable<Float>
    *
    * @param val the value to wrap
    * @return the <code>Float</code>
+   * @since 1.5
    */
   public static Float valueOf(float val)
   {

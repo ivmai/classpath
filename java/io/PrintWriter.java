@@ -70,6 +70,11 @@ public class PrintWriter extends Writer
    * on this stream.
    */
   private boolean error;
+  
+  /**
+   * Indicates whether or not the stream has been closed.
+   */
+  private boolean closed;
 
   /**
    * This is the underlying <code>Writer</code> we are sending output
@@ -138,32 +143,66 @@ public class PrintWriter extends Writer
     this.autoflush = autoflush;
   }
 
-  /** @since 1.5 */
-  public PrintWriter(String path)
-    throws FileNotFoundException
+  /**
+   * This initializes a new PrintWriter object to write to the specified
+   * file.  It creates a FileOutputStream object and wraps it in an
+   * OutputStreamWriter using the default encoding.
+   * @param file name of the file to write to
+   * @throws FileNotFoundException if the file cannot be written or created
+   * 
+   * @since 1.5
+   */
+  public PrintWriter(String file) throws FileNotFoundException
   {
-    this(new OutputStreamWriter(new FileOutputStream(path)));
+    this(new FileOutputStream(file));
   }
 
-  /** @since 1.5 */
-  public PrintWriter(String path, String encoding)
+  /**
+   * This initializes a new PrintWriter object to write to the specified
+   * file.  It creates a FileOutputStream object and wraps it in an
+   * OutputStreamWriter using the specified encoding.
+   * @param file name of the file to write to
+   * @param enc the encoding to use
+   * @throws FileNotFoundException if the file cannot be written or created
+   * @throws UnsupportedEncodingException if the encoding is not supported
+   * 
+   * @since 1.5
+   */
+  public PrintWriter(String file, String enc) 
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this(new OutputStreamWriter(new FileOutputStream(path), encoding));
+    this(new OutputStreamWriter(new FileOutputStream(file), enc));
   }
 
-  /** @since 1.5 */
-  public PrintWriter(File path)
-    throws FileNotFoundException
+  /**
+   * This initializes a new PrintWriter object to write to the specified
+   * file.  It creates a FileOutputStream object and wraps it in an
+   * OutputStreamWriter using the default encoding.
+   * @param file the file to write to
+   * @throws FileNotFoundException if the file cannot be written or created
+   * 
+   * @since 1.5
+   */
+  public PrintWriter(File file) throws FileNotFoundException
   {
-    this(new OutputStreamWriter(new FileOutputStream(path)));
+    this(new FileOutputStream(file));
   }
 
-  /** @since 1.5 */
-  public PrintWriter(File path, String encoding)
+  /**
+   * This initializes a new PrintWriter object to write to the specified
+   * file.  It creates a FileOutputStream object and wraps it in an
+   * OutputStreamWriter using the specified encoding.
+   * @param file the file to write to
+   * @param enc the encoding to use
+   * @throws FileNotFoundException if the file cannot be written or created
+   * @throws UnsupportedEncodingException if the encoding is not supported
+   * 
+   * @since 1.5
+   */
+  public PrintWriter(File file, String enc) 
     throws FileNotFoundException, UnsupportedEncodingException
   {
-    this(new OutputStreamWriter(new FileOutputStream(path), encoding));
+    this(new OutputStreamWriter(new FileOutputStream(file), enc));
   }
 
   /**
@@ -186,7 +225,8 @@ public class PrintWriter extends Writer
    */
   public boolean checkError()
   {
-    flush();
+    if (! closed)
+      flush();
     return error;
   }
 
@@ -213,7 +253,8 @@ public class PrintWriter extends Writer
   {
     try
       {
-	out.close();
+        out.close();
+        closed = true;
       }
     catch (IOException ex)
       {

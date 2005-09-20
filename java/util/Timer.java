@@ -474,13 +474,25 @@ public class Timer
     this(daemon, Thread.NORM_PRIORITY);
   }
 
-  /** @since 1.5 */
+  /** 
+   * Create a new Timer whose Thread has the indicated name.  It will have 
+   * normal priority and will not be a daemon thread. 
+   * @param name the name of the Thread
+   * @since 1.5 
+   */
   public Timer(String name)
   {
     this(false, Thread.NORM_PRIORITY, name);
   }
 
-  /** @since 1.5 */
+  /**
+   * Create a new Timer whose Thread has the indicated name.  It will have 
+   * normal priority.  The boolean argument controls whether or not it
+   * will be a daemon thread.
+   * @param name the name of the Thread
+   * @param daemon true if the Thread should be a daemon thread
+   * @since 1.5
+   */
   public Timer(String name, boolean daemon)
   {
     this(daemon, Thread.NORM_PRIORITY, name);
@@ -680,7 +692,11 @@ public class Timer
     queue.setNullOnEmpty(true);
   }
 
-  /** @since 1.5 */
+  /**
+   * Removes all cancelled tasks from the queue.
+   * @return the number of tasks removed
+   * @since 1.5
+   */
   public int purge()
   {
     return queue.purge();

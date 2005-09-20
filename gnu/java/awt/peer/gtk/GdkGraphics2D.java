@@ -101,7 +101,7 @@ public class GdkGraphics2D extends Graphics2D
   static 
   {
     if (! Configuration.GTK_CAIRO_ENABLED)
-      throw new Error("Grahics2D not implemented. "
+      throw new Error("Graphics2D not implemented. "
 		      + "Cairo was not found or disabled at configure time");
 
     if (Configuration.INIT_LOAD_LIBRARY)
@@ -157,8 +157,19 @@ public class GdkGraphics2D extends Graphics2D
     return new GdkGraphics2D(width, height);
   }
 
+  private void fail_g2d ()
+  {
+    System.err.println ("Attempted to instantiate GdkGraphics2D"
+			+ " but Graphics2D not enabled.  Try again with"
+			+ " -Dgnu.java.awt.peer.gtk.Graphics=Graphics2D");
+    System.exit (1);
+  }
+
   GdkGraphics2D(GdkGraphics2D g)
   {
+    if (!GtkToolkit.useGraphics2D ())
+      fail_g2d ();
+
     paint = g.paint;
     stroke = g.stroke;
     setRenderingHints(g.hints);
@@ -200,6 +211,9 @@ public class GdkGraphics2D extends Graphics2D
 
   GdkGraphics2D(int width, int height)
   {
+    if (!GtkToolkit.useGraphics2D ())
+      fail_g2d ();
+
     initState(width, height);
 
     setColor(Color.black);
@@ -215,6 +229,9 @@ public class GdkGraphics2D extends Graphics2D
 
   GdkGraphics2D(GtkComponentPeer component)
   {
+    if (!GtkToolkit.useGraphics2D ())
+      fail_g2d ();
+
     this.component = component;
     
     if (component.isRealized())
@@ -992,8 +1009,11 @@ public class GdkGraphics2D extends Graphics2D
     if (clip == null)
       {
 	// Reset clipping.
-	Dimension d = component.awtComponent.getSize();
-	setClip(0, 0, d.width, d.height);
+        if (component != null)
+          {
+            Dimension d = component.awtComponent.getSize();
+            setClip(0, 0, d.width, d.height);
+          }
       }
     else
       {

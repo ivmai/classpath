@@ -44,17 +44,20 @@ import java.awt.Graphics;
 import java.awt.Insets;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicBorders;
+import javax.swing.text.JTextComponent;
 
 
 /**
@@ -69,11 +72,22 @@ public class MetalBorders
   /** The shared instance for getButtonBorder(). */
   private static Border buttonBorder;
 
+  /** The shared instance for getToggleButtonBorder(). */
+  private static Border toggleButtonBorder;
+
+  /** The shared instance for getDesktopIconBorder(). */
+  private static Border desktopIconBorder;
+
   /** The shared instance for getRolloverButtonBorder(). */
   private static Border toolbarButtonBorder;
 
   /** The shared instance for getTextFieldBorder(). */
   private static Border textFieldBorder;
+
+  /**
+   * The shared instance for getTextBorder().
+   */
+  private static Border textBorder;
 
   /**
    * A MarginBorder that gets shared by multiple components.
@@ -122,37 +136,46 @@ public class MetalBorders
       Color light = MetalLookAndFeel.getWhite();
       Color middle = MetalLookAndFeel.getControl();
 
-      // draw dark border
-      g.setColor(darkShadow);
-      g.drawRect(x, y, w - 2, h - 2);
+      if (c.isEnabled())
+      {
+        // draw dark border
+        g.setColor(darkShadow);
+        g.drawRect(x, y, w - 2, h - 2);
 
-      if (!bmodel.isPressed())
+        if (!bmodel.isPressed())
+          {
+            // draw light border
+            g.setColor(light);
+            g.drawRect(x + 1, y + 1, w - 2, h - 2);
+
+            // draw crossing pixels of both borders
+            g.setColor(middle);
+            g.drawRect(x + 1, y + h - 2, 0, 0);
+            g.drawRect(x + w - 2, y + 1, 0, 0);
+          }
+        else
+          {
+            // draw light border
+            g.setColor(light);
+            g.drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
+            g.drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
+
+            // draw shadow border
+            g.setColor(middle);
+            g.drawLine(x + 1, y + 1, x + w - 2, y + 1);
+            g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
+ 
+            // draw crossing pixels of both borders
+            g.setColor(shadow);
+            g.drawRect(x + 1, y + h - 2, 0, 0);
+            g.drawRect(x + w - 2, y + 1, 0, 0);
+          }
+      }
+      else 
         {
-          // draw light border
-          g.setColor(light);
-          g.drawRect(x + 1, y + 1, w - 2, h - 2);
-
-          // draw crossing pixels of both borders
-          g.setColor(middle);
-          g.drawRect(x + 1, y + h - 2, 0, 0);
-          g.drawRect(x + w - 2, y + 1, 0, 0);
-        }
-      else
-        {
-          // draw light border
-          g.setColor(light);
-          g.drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
-          g.drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
-
-          // draw shadow border
-          g.setColor(middle);
-          g.drawLine(x + 1, y + 1, x + w - 2, y + 1);
-          g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
-
-          // draw crossing pixels of both borders
-          g.setColor(shadow);
-          g.drawRect(x + 1, y + h - 2, 0, 0);
-          g.drawRect(x + w - 2, y + 1, 0, 0);
+          // draw disabled border
+          g.setColor(MetalLookAndFeel.getInactiveControlTextColor());
+          g.drawRect(x, y, w - 2, h - 2);          
         }
     }
 
@@ -188,6 +211,70 @@ public class MetalBorders
       newInsets.top = borderInsets.top;
       return newInsets;
     }
+  }
+
+  /**
+   * A border used when painting {@link JInternalFrame} instances.
+   */
+  static class DesktopIconBorder extends AbstractBorder
+    implements UIResource
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public DesktopIconBorder()
+    {
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * 
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return getBorderInsets(c, null);
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c, Insets newInsets)
+    {
+      if (newInsets == null)
+        newInsets = new Insets(3, 3, 2, 3);
+      else
+        {
+          newInsets.top = 3;
+          newInsets.left = 3;
+          newInsets.bottom = 2;
+          newInsets.right = 3;
+        }
+      return newInsets;  
+    }
+    
+    /**
+     * Paints the border for the specified component.
+     * 
+     * @param c  the component.
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+        int h)
+    {
+      g.setColor(MetalLookAndFeel.getControlDarkShadow());      
+      g.drawRect(x, y, w - 1, h - 1); 
+    }
+    
   }
 
   /**
@@ -262,6 +349,88 @@ public class MetalBorders
   }
     
   /**
+   * A border used for a {@link JInternalFrame} when it is being used as a 
+   * palette.
+   * 
+   * @since 1.3
+   */
+  public static class PaletteBorder
+    extends AbstractBorder
+    implements UIResource
+  {
+    /**
+     * Creates a new <code>PaletteBorder</code>.
+     */
+    public PaletteBorder()
+    {
+    }
+    
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * 
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return getBorderInsets(c, null);
+    }
+
+    /**
+     * Returns the border insets.
+     * 
+     * @param c  the component (ignored).
+     * @param newInsets  the insets object that, if non-<code>null</code>, will 
+     *                   be populated with the result from this method.
+     * 
+     * @return The border insets.
+     */
+    public Insets getBorderInsets(Component c, Insets newInsets)
+    {        
+      if (newInsets == null)
+        newInsets = new Insets(1, 1, 1, 1);
+      else
+        {
+          newInsets.top = 1;
+          newInsets.left = 1;
+          newInsets.bottom = 1;
+          newInsets.right = 1;
+        }
+      return newInsets;  
+    }
+    
+    /**
+     * Paints the border for the specified component.
+     * 
+     * @param c  the component (ignored).
+     * @param g  the graphics device.
+     * @param x  the x-coordinate.
+     * @param y  the y-coordinate.
+     * @param w  the width.
+     * @param h  the height.
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, 
+            int h)
+    {
+      Color savedColor = g.getColor();
+      
+      // draw the outline
+      g.setColor(MetalLookAndFeel.getPrimaryControlDarkShadow());
+      g.drawRect(x, y, w - 1, h - 1);
+      
+      // put a dot in each corner
+      g.setColor(MetalLookAndFeel.getControl());
+      g.fillRect(x, y, 1, 1);
+      g.fillRect(x + w - 1, y, 1, 1);
+      g.fillRect(x + w - 1, y + h - 1, 1, 1);
+      g.fillRect(x, y + h - 1, 1, 1);      
+      g.setColor(savedColor);
+    }
+
+  }
+    
+  /**
    * A border used for the {@link JTextField} component.
    */
   public static class TextFieldBorder extends Flush3DBorder
@@ -286,8 +455,9 @@ public class MetalBorders
      */
     public void paintBorder(Component c, Graphics g, int x, int y, int w, 
         int h)
-    {        
-      if (c.isEnabled())
+    {
+      JTextComponent tc = (JTextComponent) c;
+      if (tc.isEnabled() && tc.isEditable())
         super.paintBorder(c, g, x, y, w, h);
       else
         {
@@ -386,7 +556,10 @@ public class MetalBorders
       g.drawLine(x + w - 3, y + 14, x + w - 3, y + h - 15);
       
       // draw the line highlights
-      g.setColor(MetalLookAndFeel.getControl());
+      if (f.isSelected())
+        g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
+      else 
+        g.setColor(MetalLookAndFeel.getControlShadow());
       g.drawLine(x + 15, y + 3, x + w - 14, y + 3);
       g.drawLine(x + 15, y + h - 2, x + w - 14, y + h - 2);
       g.drawLine(x + 3, y + 15, x + 3, y + h - 14);
@@ -770,6 +943,156 @@ public class MetalBorders
   }
 
   /**
+   * A border used for {@link JToggleButton} components.
+   * 
+   * @since 1.3
+   */
+  public static class ToggleButtonBorder
+    extends ButtonBorder 
+  {
+    /**
+     * Creates a new border instance.
+     */
+    public ToggleButtonBorder()
+    {
+    }
+    
+    /**
+     * Paints the toggle button border.
+     *
+     * @param c the component for which we paint the border
+     * @param g the Graphics context to use
+     * @param x the X coordinate of the upper left corner of c
+     * @param y the Y coordinate of the upper left corner of c
+     * @param w the width of c
+     * @param h the height of c
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w,
+                            int h)
+    {
+      ButtonModel bmodel = null;
+      
+      if (c instanceof AbstractButton)
+        bmodel = ((AbstractButton) c).getModel();
+
+      Color darkShadow = MetalLookAndFeel.getControlDarkShadow();
+      Color shadow = MetalLookAndFeel.getControlShadow();
+      Color light = MetalLookAndFeel.getWhite();
+      Color middle = MetalLookAndFeel.getControl();
+
+      if (c.isEnabled())
+        {
+          // draw dark border
+          g.setColor(darkShadow);
+          g.drawRect(x, y, w - 2, h - 2);
+
+          if (!bmodel.isArmed())
+            {
+              // draw light border
+              g.setColor(light);
+              g.drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
+              g.drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
+              if (bmodel.isSelected())
+                g.setColor(middle);
+              g.drawLine(x + 1, y + 1, x + w - 3, y + 1);
+              g.drawLine(x + 1, y + 1, x + 1, y + h - 3);
+
+              // draw crossing pixels of both borders
+              g.setColor(shadow);
+              g.drawLine(x + 1, y + h - 2, x + 1, y + h - 2);
+              g.drawLine(x + w - 2, y + 1, x + w - 2, y + 1);
+            }
+          else
+            {
+              // draw light border
+              g.setColor(light);
+              g.drawLine(x + w - 1, y + 1, x + w - 1, y + h - 1);
+              g.drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
+
+              // draw shadow border
+              g.setColor(shadow);
+              g.drawLine(x + 1, y + 1, x + w - 2, y + 1);
+              g.drawLine(x + 1, y + 1, x + 1, y + h - 2);
+ 
+              // draw crossing pixels of both borders
+              g.setColor(shadow);
+              g.drawLine(x + 1, y + h - 2, x + 1, y + h - 2);
+              g.drawLine(x + w - 2, y + 1, x + w - 2, y + 1);
+              
+            }
+          // draw corners
+          g.setColor(middle);
+          g.drawLine(x, y + h - 1, x, y + h - 1);
+          g.drawLine(x + w - 1, y, x + w - 1, y);
+        }
+      else 
+        {
+          // draw disabled border
+          g.setColor(MetalLookAndFeel.getControlDisabled());
+          g.drawRect(x, y, w - 2, h - 2);          
+        }
+    }
+  }
+
+  /**
+   * A border for table header cells.
+   *
+   * @since 1.3
+   */
+  public static class TableHeaderBorder extends AbstractBorder
+  {
+    /**
+     * The insets of this border.
+     */
+    // TODO: According to tests that I have done, this is really the border
+    // that should be returned by getBorderInsets(). However, the name
+    // is very distracting. Is there any deeper meaning in it?
+    protected Insets editorBorderInsets;
+
+    /**
+     * Creates a new instance of <code>TableHeaderBorder</code>.
+     */
+    public TableHeaderBorder()
+    {
+      editorBorderInsets = new Insets(1, 1, 1, 1);
+    }
+
+    /**
+     * Return the insets of this border.
+     *
+     * @return the insets of this border
+     */
+    public Insets getBorderInsets(Component c)
+    {
+      return editorBorderInsets;
+    }
+
+    /**
+     * Paints the border.
+     *
+     * @param c the component for which to paint the border
+     * @param g the graphics context to use
+     * @param x the x cooridinate of the border rectangle
+     * @param y the y cooridinate of the border rectangle
+     * @param w the width of the border rectangle
+     * @param h the height of the border rectangle
+     */
+    public void paintBorder(Component c, Graphics g, int x, int y, int w, int h)
+    {
+      Color dark = MetalLookAndFeel.getControlDarkShadow();
+      Color light = MetalLookAndFeel.getWhite();
+      Color old = g.getColor();
+      g.setColor(light);
+      g.drawLine(x, y, x + w - 2, y);
+      g.drawLine(x, y, x, y + h - 2);
+      g.setColor(dark);
+      g.drawLine(x + w - 1, y, x + w - 1, y + h - 1);
+      g.drawLine(x + 1, y + h - 1, x + w - 1, y + h - 1);
+      g.setColor(old);
+    }
+  }
+
+  /**
    * Returns a border for Swing buttons in the Metal Look &amp; Feel.
    *
    * @return a border for Swing buttons in the Metal Look &amp; Feel
@@ -785,6 +1108,40 @@ public class MetalBorders
       }
     return buttonBorder;
   }
+  
+  /**
+   * Returns a border for use with {@link JToggleButton} components.
+   *
+   * @return A border.
+   * 
+   * @since 1.3
+   */
+  public static Border getToggleButtonBorder()
+  {
+    if (toggleButtonBorder == null)
+      {
+        Border outer = new ToggleButtonBorder();
+        Border inner = getMarginBorder();
+        toggleButtonBorder = new BorderUIResource.CompoundBorderUIResource
+            (outer, inner);
+      }
+    return toggleButtonBorder;
+  }
+
+  /**
+   * Returns a border instance that is used with a {@link JInternalFrame} when
+   * it is in the iconified state.
+   * 
+   * @return A border.
+   * 
+   * @since 1.3
+   */
+  public static Border getDesktopIconBorder()
+  {
+    if (desktopIconBorder == null)
+      desktopIconBorder = new DesktopIconBorder();
+    return desktopIconBorder;      
+  }
 
   /**
    * Returns a border for use by the {@link JTextField} component.
@@ -796,8 +1153,32 @@ public class MetalBorders
   public static Border getTextFieldBorder()
   {
     if (textFieldBorder == null)
-      textFieldBorder = new TextFieldBorder();
+      {
+        Border inner = getMarginBorder();
+        Border outer = new TextFieldBorder();
+        textFieldBorder = BorderFactory.createCompoundBorder(outer, inner);
+      }
     return textFieldBorder;
+  }
+
+  /**
+   * Returns the border that is used for text components (except text fields,
+   * which use {@link #getTextFieldBorder}.
+   *
+   * @return the border that is used for text components
+   *
+   * @since 1.3
+   */
+  public static Border getTextBorder()
+  {
+    if (textBorder == null)
+      {
+        Border inner = getMarginBorder();
+        Border outer = new Flush3DBorder();
+        textBorder =
+          new BorderUIResource.CompoundBorderUIResource(outer, inner);
+      }
+    return textBorder;
   }
 
   /**

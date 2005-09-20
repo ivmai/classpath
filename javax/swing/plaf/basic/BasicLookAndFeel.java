@@ -362,7 +362,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "HOME",  "homePassThrough",
         "END",  "endPassThrough"
       }),
-      "ComboBox.background", new ColorUIResource(light),
+      "ComboBox.background", new ColorUIResource(Color.white),
       "ComboBox.buttonBackground", new ColorUIResource(light),
       "ComboBox.buttonDarkShadow", new ColorUIResource(shadow),
       "ComboBox.buttonHighlight", new ColorUIResource(highLight),
@@ -371,7 +371,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "ComboBox.disabledForeground", new ColorUIResource(Color.gray),
       "ComboBox.font", new FontUIResource("SansSerif", Font.PLAIN, 12),
       "ComboBox.foreground", new ColorUIResource(Color.black),
-      "ComboBox.selectionBackground", new ColorUIResource(Color.black),
+      "ComboBox.selectionBackground", new ColorUIResource(0, 0, 128),
       "ComboBox.selectionForeground", new ColorUIResource(Color.white),
       "Desktop.ancestorInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "KP_LEFT", "left",
@@ -397,7 +397,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "DesktopIcon.border", new BorderUIResource.CompoundBorderUIResource(null,
                                                                           null),
       "EditorPane.background", new ColorUIResource(Color.white),
-      "EditorPane.border", new BasicBorders.MarginBorder(),
+      "EditorPane.border",
+      new BorderUIResource(BasicBorders.getMarginBorder()),
       "EditorPane.caretBlinkRate", new Integer(500),
       "EditorPane.caretForeground", new ColorUIResource(Color.black),
       "EditorPane.font", new FontUIResource("Serif", Font.PLAIN, 12),
@@ -528,7 +529,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "Label.disabledShadow", new ColorUIResource(shadow),
       "Label.font", new FontUIResource("Dialog", Font.PLAIN, 12),
       "Label.foreground", new ColorUIResource(darkShadow),
-      "List.background", new ColorUIResource(light),
+      "List.background", new ColorUIResource(Color.white),
       "List.border", new BasicBorders.MarginBorder(),
       "List.focusInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "PAGE_UP", "scrollUp",
@@ -550,8 +551,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
         "shift PAGE_UP","scrollUpExtendSelection",
         "KP_DOWN", "selectNextRow"
       }),
-      "List.foreground", new ColorUIResource(darkShadow),
-      "List.selectionBackground", new ColorUIResource(Color.black),
+      "List.foreground", new ColorUIResource(Color.black),
+      "List.selectionBackground", new ColorUIResource(0, 0, 128),
       "List.selectionForeground", new ColorUIResource(Color.white),
       "List.focusCellHighlightBorder",
       new BorderUIResource.
@@ -742,6 +743,7 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "ScrollBar.thumbShadow", new ColorUIResource(shadow),
       "ScrollBar.track", new ColorUIResource(light),
       "ScrollBar.trackHighlight", new ColorUIResource(shadow),
+      "ScrollBar.width", new Integer(16),
       "ScrollPane.ancestorInputMap", new UIDefaults.LazyInputMap(new Object[] {
         "PAGE_UP", "scrollUp",
         "KP_LEFT", "unitScrollLeft",
@@ -914,10 +916,11 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TableHeader.foreground", new ColorUIResource(darkShadow),
 
             "TextArea.background", new ColorUIResource(light),
-      "TextArea.border", new BasicBorders.MarginBorder(),
+      "TextArea.border",
+      new BorderUIResource(BasicBorders.getMarginBorder()),
       "TextArea.caretBlinkRate", new Integer(500),
       "TextArea.caretForeground", new ColorUIResource(Color.black),
-      "TextArea.font", new FontUIResource("MonoSpaced", Font.PLAIN, 12),
+      "TextArea.font", new FontUIResource("Monospaced", Font.PLAIN, 12),
       "TextArea.foreground", new ColorUIResource(Color.black),
       "TextArea.inactiveForeground", new ColorUIResource(Color.gray),
       "TextArea.keyBindings", new JTextComponent.KeyBinding[] {
@@ -945,8 +948,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TextField.font", new FontUIResource("SansSerif", Font.PLAIN, 12),
       "TextField.foreground", new ColorUIResource(Color.black),
       "TextField.highlight", new ColorUIResource(highLight),
-      "TextField.inactiveBackground", new ColorUIResource(light),
-      "TextField.inactiveForeground", new ColorUIResource(Color.gray),
+      "TextField.inactiveBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "TextField.inactiveForeground", new ColorUIResource(Color.GRAY),
       "TextField.light", new ColorUIResource(highLight),
       "TextField.highlight", new ColorUIResource(light),
       "TextField.keyBindings", new JTextComponent.KeyBinding[] {
@@ -964,7 +967,8 @@ public abstract class BasicLookAndFeel extends LookAndFeel
       "TextField.selectionBackground", new ColorUIResource(Color.black),
       "TextField.selectionForeground", new ColorUIResource(Color.white),
       "TextPane.background", new ColorUIResource(Color.white),
-      "TextPane.border", new BasicBorders.MarginBorder(),
+      "TextPane.border",
+      new BorderUIResource(BasicBorders.getMarginBorder()),
       "TextPane.caretBlinkRate", new Integer(500),
       "TextPane.caretForeground", new ColorUIResource(Color.black),
       "TextPane.font", new FontUIResource("Serif", Font.PLAIN, 12),

@@ -294,6 +294,7 @@ public final class Long extends Number implements Comparable<Long>
    *
    * @param val the value to wrap
    * @return the <code>Long</code>
+   * @since 1.5
    */
   public static synchronized Long valueOf(long val)
   {
@@ -641,9 +642,9 @@ public final class Long extends Number implements Comparable<Long>
    */
   public static long reverse(long val)
   {
-    int hi = Integer.reverse((int) val);
-    int lo = Integer.reverse((int) (val >>> 32));
-    return (((long) hi) << 32) | lo;
+    long hi = Integer.reverse((int) val) & 0xffffffffL;
+    long lo = Integer.reverse((int) (val >>> 32)) & 0xffffffffL;
+    return (hi << 32) | lo;
   }
 
   /**

@@ -210,6 +210,7 @@ public final class Short extends Number implements Comparable<Short>
    *
    * @param val the value to wrap
    * @return the <code>Short</code>
+   * @since 1.5
    */
   public static Short valueOf(short val)
   {
