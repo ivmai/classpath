@@ -1,4 +1,4 @@
-/* RunTimeOperations.java --
+/* InvalidPolicy.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,22 +36,74 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.SendingContext;
+package org.omg.PortableServer.POAPackage;
 
+import org.omg.CORBA.UserException;
+import org.omg.CORBA.portable.IDLEntity;
+
+import java.io.Serializable;
 
 /**
- * Defines the operations, applicable for Sending Context. The sending
- * context provides access to information about the originator of a
- * GIOP message. For example, when a value type is sent in a GIOP
- * Request, the receiver may need to ask the sender about
- * the CodeBase for the implementation of the value type.
+ * Raised if any of the policy objects specified is not supported by this
+ * ORB implementation, if conflicting policy objects are specified,
+ * or if any of the specified policy objects require prior administrative
+ * action that has not been performed.
  *
- * Unfortunately, no public operations are defined up till 1.4 inclusive.
- *
- * @since 1.3
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface RunTimeOperations
+public class InvalidPolicy
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = 3204212102282117205L;
+
+  /**
+   * The index in the policies parameter value of the first offending
+   * policy object.
+   */
+  public short index;
+
+  /**
+   * Create InvalidPolicy with no explaining
+   * message and leaving {@link index} with default 0 value.
+   */
+  public InvalidPolicy()
+  {
+  }
+
+  /**
+   * Create the InvalidPolicy with explaining
+   * message and initialisintg {@link index} to the passed value.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   * @param a_index a value for index.
+   */
+  public InvalidPolicy(String why, short a_index)
+  {
+    super(why);
+    this.index = a_index;
+  }
+
+  /**
+   * Create the InvalidPolicy without explaining
+   * message and initialisintg {@link index} to the passed value.
+   *
+   * @param a_index a value for index.
+   */
+  public InvalidPolicy(short a_index)
+  {
+    this.index = a_index;
+  }
+
+  /**
+   * Adds {@link #index} to the super.getMessage().
+   */
+  public String getMessage()
+  {
+    return super.getMessage() + " at index " + index;
+  }
 }

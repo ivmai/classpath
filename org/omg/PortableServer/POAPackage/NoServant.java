@@ -1,4 +1,4 @@
-/* RunTime.java --
+/* NoServant.java --
    Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,25 +36,44 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package org.omg.SendingContext;
+package org.omg.PortableServer.POAPackage;
 
-import org.omg.CORBA.Object;
+import org.omg.CORBA.UserException;
 import org.omg.CORBA.portable.IDLEntity;
 
 import java.io.Serializable;
 
 /**
- * Defines the base class that represents the Sending Context. The sending
- * context provides access to information about the originator of a
- * GIOP message. For example, when a value type is sent in a GIOP
- * Request, the receiver may need to ask the sender about
- * the CodeBase for the implementation of the value type.
- *
- * @since 1.3
+ * Raised when trying to get the default servant, when no default servant
+ * has been associated with POA.
  *
  * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
  */
-public interface RunTime
-  extends IDLEntity, Object, RunTimeOperations, Serializable
+public class NoServant
+  extends UserException
+  implements IDLEntity, Serializable
 {
+  /**
+   * Use serialVersionUID (v1.4) for interoperability.
+   */
+  private static final long serialVersionUID = -5893773687270266061L;
+
+  /**
+   * Create NoServant with no explaining
+   * message.
+   */
+  public NoServant()
+  {
+  }
+
+  /**
+   * Create the NoServant with explaining
+   * message.
+   *
+   * @param why a string, explaining, why this exception has been thrown.
+   */
+  public NoServant(String why)
+  {
+    super(why);
+  }
 }
