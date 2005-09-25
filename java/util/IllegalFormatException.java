@@ -46,4 +46,9 @@ public class IllegalFormatException extends IllegalArgumentException
   IllegalFormatException()
   {
   }
+
+  IllegalFormatException(String msg)
+  {
+    super(msg);
+  }
 }

@@ -1,5 +1,5 @@
-/* FormatterClosedException.java
-   Copyright (C) 2005  Free Software Foundation, Inc.
+/* Formattable.java -- Objects which can be passed to a Formatter
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -7,7 +7,7 @@ GNU Classpath is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
-
+ 
 GNU Classpath is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -39,11 +39,8 @@ exception statement from your version. */
 package java.util;
 
 /** @since 1.5 */
-public class FormatterClosedException extends IllegalStateException
+public interface Formattable
 {
-  private static final long serialVersionUID = 18111216L;
-
-  public FormatterClosedException()
-  {
-  }
+  public void formatTo(Formatter formatter, int flags, int width,
+		       int precision);
 }

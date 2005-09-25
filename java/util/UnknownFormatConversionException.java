@@ -48,6 +48,7 @@ public class UnknownFormatConversionException extends IllegalFormatException
 
   public UnknownFormatConversionException(String s)
   {
+    super("unknown format conversion: " + s);
     this.s = s;
   }
 

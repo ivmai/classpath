@@ -39,6 +39,9 @@ exception statement from your version. */
 
 package java.io;
 
+import java.util.Locale;
+import java.util.Formatter;
+
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
  * "The Java Language Specification", ISBN 0-201-63451-1
  * Status:  Believed complete and correct to 1.3
@@ -597,6 +600,32 @@ public class PrintStream extends FilterOutputStream implements Appendable
   public PrintStream append(CharSequence cs, int start, int end)
   {
     print(cs == null ? "null" : cs.subSequence(start, end).toString());
+    return this;
+  }
+
+  /** @since 1.5 */
+  public PrintStream printf(String format, Object... args)
+  {
+    return format(format, args);
+  }
+
+  /** @since 1.5 */
+  public PrintStream printf(Locale locale, String format, Object... args)
+  {
+    return format(locale, format, args);
+  }
+
+  /** @since 1.5 */
+  public PrintStream format(String format, Object... args)
+  {
+    return format(Locale.getDefault(), format, args);
+  }
+
+  /** @since 1.5 */
+  public PrintStream format(Locale locale, String format, Object... args)
+  {
+    Formatter f = new Formatter(this, locale);
+    f.format(format, args);
     return this;
   }
 } // class PrintStream

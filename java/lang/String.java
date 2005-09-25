@@ -54,6 +54,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.Collator;
 import java.util.Comparator;
+import java.util.Formatter;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1706,6 +1707,20 @@ public final class String
   public static String valueOf(double d)
   {
     return Double.toString(d);
+  }
+
+
+  /** @since 1.5 */
+  public static String format(Locale locale, String format, Object... args)
+  {
+    Formatter f = new Formatter(locale);
+    return f.format(format, args).toString();
+  }
+
+  /** @since 1.5 */
+  public static String format(String format, Object... args)
+  {
+    return format(Locale.getDefault(), format, args);
   }
 
   /**

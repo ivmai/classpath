@@ -51,6 +51,7 @@ public class FormatFlagsConversionMismatchException
 
   public FormatFlagsConversionMismatchException(String f, char c)
   {
+    super("invalid flag " + f + " for conversion " + c);
     this.f = f;
     this.c = c;
   }

@@ -45,6 +45,14 @@ public class FormattableFlags
   public static final int UPPERCASE = 2;
   public static final int ALTERNATE = 4;
 
+  // Used internally by Formatter.
+  // Changes here must be reflected in the FLAGS string there.
+  static final int PLUS = 8;
+  static final int SPACE = 16;
+  static final int ZERO = 32;
+  static final int COMMA = 64;
+  static final int PAREN = 128;
+
   // Not instantiable.
   private FormattableFlags()
   {
