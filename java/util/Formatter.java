@@ -50,6 +50,8 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
+import gnu.classpath.SystemProperties;
+
 /** @since 1.5 */
 public class Formatter implements Closeable, Flushable
 {
@@ -71,7 +73,7 @@ public class Formatter implements Closeable, Flushable
   private static final String FLAGS = "--#+ 0,(";
 
   private static final String lineSeparator
-    = System.getProperty("line.separator");
+    = SystemProperties.getProperty("line.separator");
 
   public enum BigDecimalLayoutForm
   {

@@ -1,3 +1,7 @@
+2005-09-25  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/Formatter.java (lineSeparator): Use SystemProperties.
+
 2005-09-24  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/FormattableFlags.java (PLUS, SPACE, ZERO, COMMA,
