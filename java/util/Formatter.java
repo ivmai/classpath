@@ -49,6 +49,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.text.DateFormatSymbols;
+import java.text.DecimalFormatSymbols;
 
 import gnu.classpath.SystemProperties;
 
@@ -226,22 +228,82 @@ public class Formatter implements Closeable, Flushable
   }
 
   /**
+   * Apply the numeric localization algorithm to a StringBuilder.
+   */
+  private void applyLocalization(StringBuilder builder, int flags, int width,
+				 boolean isNegative)
+  {
+    DecimalFormatSymbols dfsyms;
+    if (fmtLocale == null)
+      dfsyms = new DecimalFormatSymbols();
+    else
+      dfsyms = new DecimalFormatSymbols(fmtLocale);
+
+    // First replace each digit.
+    char zeroDigit = dfsyms.getZeroDigit();
+    int decimalOffset = -1;
+    for (int i = builder.length() - 1; i >= 0; --i)
+      {
+	char c = builder.charAt(i);
+	if (c >= '0' && c <= '9')
+	  builder.setCharAt(i, (char) (c - '0' + zeroDigit));
+	else if (c == '.')
+	  {
+	    assert decimalOffset == -1;
+	    decimalOffset = i;
+	  }
+      }
+
+    // Localize the decimal separator.
+    if (decimalOffset != -1)
+      {
+	builder.deleteCharAt(decimalOffset);
+	builder.insert(decimalOffset, dfsyms.getDecimalSeparator());
+      }
+	
+    // Insert the grouping separators.
+    if ((flags & FormattableFlags.COMMA) != 0)
+      {
+	char groupSeparator = dfsyms.getGroupingSeparator();
+	int groupSize = 3;	// FIXME
+	int offset = (decimalOffset == -1) ? builder.length() : decimalOffset;
+	// We use '>' because we don't want to insert a separator
+	// before the first digit.
+	for (int i = offset - groupSize; i > 0; i -= groupSize)
+	  builder.insert(i, groupSeparator);
+      }
+
+    if ((flags & FormattableFlags.ZERO) != 0)
+      {
+	// Zero fill.  Note that according to the algorithm we do not
+	// insert grouping separators here.
+	for (int i = width - builder.length(); i > 0; --i)
+	  builder.insert(0, zeroDigit);
+      }
+
+    if (isNegative)
+      {
+	if ((flags & FormattableFlags.PAREN) != 0)
+	  {
+	    builder.insert(0, '(');
+	    builder.append(')');
+	  }
+	else
+	  builder.insert(0, '-');
+      }
+    else if ((flags & FormattableFlags.PLUS) != 0)
+      builder.insert(0, '+');
+    else if ((flags & FormattableFlags.SPACE) != 0)
+      builder.insert(0, ' ');
+  }
+
+  /**
    * A helper method that handles emitting a String after applying
    * precision, width, justification, and upper case flags.
    */
   private void genericFormat(String arg, int flags, int width, int precision)
     throws IOException
   {
-    if (precision >= 0 && arg.length() > precision)
-      arg = arg.substring(0, precision);
-    boolean left = (flags & FormattableFlags.LEFT_JUSTIFY) != 0;
-    if (left && width == -1)
-      throw new MissingFormatWidthException("fixme");
-    if (! left && arg.length() < width)
-      {
-	for (int i = arg.length() - width; i >= 0; --i)
-	  out.append(' ');
-      }
     if ((flags & FormattableFlags.UPPERCASE) != 0)
       {
 	if (fmtLocale == null)
@@ -249,10 +311,22 @@ public class Formatter implements Closeable, Flushable
 	else
 	  arg = arg.toUpperCase(fmtLocale);
       }
-    out.append(arg);
-    if (left && arg.length() < width)
+
+    if (precision >= 0 && arg.length() > precision)
+      arg = arg.substring(0, precision);
+
+    boolean leftJustify = (flags & FormattableFlags.LEFT_JUSTIFY) != 0;
+    if (leftJustify && width == -1)
+      throw new MissingFormatWidthException("fixme");
+    if (! leftJustify && arg.length() < width)
       {
-	for (int i = arg.length() - width; i >= 0; --i)
+	for (int i = width - arg.length(); i > 0; --i)
+	  out.append(' ');
+      }
+    out.append(arg);
+    if (leftJustify && arg.length() < width)
+      {
+	for (int i = width - arg.length(); i > 0; --i)
 	  out.append(' ');
       }
   }
@@ -359,13 +433,15 @@ public class Formatter implements Closeable, Flushable
     genericFormat(lineSeparator, flags, width, precision);
   }
 
-  /** Emit a hex or octal value.  */
-  private void hexOrOctalConversion(Object arg, int flags, int width,
-				    int precision, int radix,
-				    char conversion)
-    throws IOException
+  /**
+   * Helper method to do initial formatting and checking for integral
+   * conversions.
+   */
+  private StringBuilder basicIntegralConversion(Object arg, int flags,
+						int width, int precision,
+						int radix, char conversion)
   {
-    assert radix == 8 || radix == 16;
+    assert radix == 8 || radix == 10 || radix == 16;
     noPrecision(precision);
 
     // Some error checking.
@@ -373,7 +449,7 @@ public class Formatter implements Closeable, Flushable
 	&& (flags & FormattableFlags.LEFT_JUSTIFY) == 0)
       throw new IllegalFormatFlagsException(getName(flags));
     if ((flags & FormattableFlags.PLUS) != 0
-	&& (flags & FormattableFlags.SPACE) == 0)
+	&& (flags & FormattableFlags.SPACE) != 0)
       throw new IllegalFormatFlagsException(getName(flags));
 
     if ((flags & FormattableFlags.LEFT_JUSTIFY) != 0 && width == -1)
@@ -381,17 +457,25 @@ public class Formatter implements Closeable, Flushable
 
     // Do the base translation of the value to a string.
     String result;
+    int basicFlags = (FormattableFlags.LEFT_JUSTIFY
+		      // We already handled any possible error when
+		      // parsing.
+		      | FormattableFlags.UPPERCASE
+		      | FormattableFlags.ZERO);
+    if (radix == 10)
+      basicFlags |= (FormattableFlags.PLUS
+		     | FormattableFlags.SPACE
+		     | FormattableFlags.COMMA
+		     | FormattableFlags.PAREN);
+    else
+      basicFlags |= FormattableFlags.ALTERNATE;
+
     if (arg instanceof BigInteger)
       {
 	checkFlags(flags,
-		   (FormattableFlags.LEFT_JUSTIFY
-		    // We already handled any possible error when
-		    // parsing.
-		    | FormattableFlags.UPPERCASE
-		    | FormattableFlags.ALTERNATE
+		   (basicFlags
 		    | FormattableFlags.PLUS
 		    | FormattableFlags.SPACE
-		    | FormattableFlags.ZERO
 		    | FormattableFlags.PAREN),
 		   conversion);
 	BigInteger bi = (BigInteger) arg;
@@ -401,23 +485,32 @@ public class Formatter implements Closeable, Flushable
 	     && ! (arg instanceof Float)
 	     && ! (arg instanceof Double))
       {
-	checkFlags(flags,
-		   (FormattableFlags.LEFT_JUSTIFY
-		    // We already handled any possible error when
-		    // parsing.
-		    | FormattableFlags.UPPERCASE
-		    | FormattableFlags.ALTERNATE
-		    | FormattableFlags.ZERO),
-		   conversion);
+	checkFlags(flags, basicFlags, conversion);
 	long value = ((Number) arg).longValue ();
-	result = (radix == 8 ? Long.toOctalString(value)
-		  : Long.toHexString(value));
+	if (radix == 8)
+	  result = Long.toOctalString(value);
+	else if (radix == 16)
+	  result = Long.toHexString(value);
+	else
+	  result = Long.toString(value);
       }
     else
       throw new IllegalFormatConversionException(conversion, arg.getClass());
 
-    // We use a string builder to do further manipulations.
-    StringBuilder builder = new StringBuilder(result);
+    return new StringBuilder(result);
+  }
+
+  /** Emit a hex or octal value.  */
+  private void hexOrOctalConversion(Object arg, int flags, int width,
+				    int precision, int radix,
+				    char conversion)
+    throws IOException
+  {
+    assert radix == 8 || radix == 16;
+
+    StringBuilder builder = basicIntegralConversion(arg, flags, width,
+						    precision, radix,
+						    conversion);
     int insertPoint = 0;
 
     // Insert the sign.
@@ -447,25 +540,27 @@ public class Formatter implements Closeable, Flushable
       }
 
     // Now justify the result.
-    int resultWidth = result.length();
+    int resultWidth = builder.length();
     if (resultWidth < width)
       {
 	char fill = ((flags & FormattableFlags.ZERO) != 0) ? '0' : ' ';
-	if ((flags & FormattableFlags.LEFT_JUSTIFY) == 0)
+	if ((flags & FormattableFlags.LEFT_JUSTIFY) != 0)
 	  {
-	    // Right justify.
-	    insertPoint = builder.length();
+	    // Left justify.  
+	    if (fill == ' ')
+	      insertPoint = builder.length();
 	  }
-	else if (fill == ' ')
+	else
 	  {
-	    // Insert spaces before the radix prefix and sign.
+	    // Right justify.  Insert spaces before the radix prefix
+	    // and sign.
 	    insertPoint = 0;
 	  }
 	while (resultWidth++ < width)
 	  builder.insert(insertPoint, fill);
       }
 
-    result = builder.toString();
+    String result = builder.toString();
     if ((flags & FormattableFlags.UPPERCASE) != 0)
       {
 	if (fmtLocale == null)
@@ -477,6 +572,253 @@ public class Formatter implements Closeable, Flushable
     out.append(result);
   }
 
+  /** Emit a decimal value.  */
+  private void decimalConversion(Object arg, int flags, int width,
+				 int precision, char conversion)
+    throws IOException
+  {
+    StringBuilder builder = basicIntegralConversion(arg, flags, width,
+						    precision, 10,
+						    conversion);
+    boolean isNegative = false;
+    if (builder.charAt(0) == '-')
+      {
+	// Sign handling is done during localization.
+	builder.deleteCharAt(0);
+	isNegative = true;
+      }
+
+    applyLocalization(builder, flags, width, isNegative);
+    genericFormat(builder.toString(), flags, width, precision);
+  }
+
+  /** Emit a single date or time conversion to a StringBuilder.  */
+  private void singleDateTimeConversion(StringBuilder builder, Calendar cal,
+					char conversion,
+					DateFormatSymbols syms)
+  {
+    int oldLen = builder.length();
+    int digits = -1;
+    switch (conversion)
+      {
+      case 'H':
+	builder.append(cal.get(Calendar.HOUR_OF_DAY));
+	digits = 2;
+	break;
+      case 'I':
+	builder.append(cal.get(Calendar.HOUR));
+	digits = 2;
+	break;
+      case 'k':
+	builder.append(cal.get(Calendar.HOUR_OF_DAY));
+	break;
+      case 'l':
+	builder.append(cal.get(Calendar.HOUR));
+	break;
+      case 'M':
+	builder.append(cal.get(Calendar.MINUTE));
+	digits = 2;
+	break;
+      case 'S':
+	builder.append(cal.get(Calendar.SECOND));
+	digits = 2;
+	break;
+      case 'N':
+	// FIXME: nanosecond ...
+	digits = 9;
+	break;
+      case 'p':
+	{
+	  int ampm = cal.get(Calendar.AM_PM);
+	  builder.append(syms.getAmPmStrings()[ampm]);
+	}
+	break;
+      case 'z':
+	{
+	  int zone = cal.get(Calendar.ZONE_OFFSET) / (1000 * 60);
+	  builder.append(zone);
+	  digits = 4;
+	  // Skip the '-' sign.
+	  if (zone < 0)
+	    ++oldLen;
+	}
+	break;
+      case 'Z':
+	{
+	  // FIXME: DST?
+	  int zone = cal.get(Calendar.ZONE_OFFSET) / (1000 * 60 * 60);
+	  String[][] zs = syms.getZoneStrings();
+	  builder.append(zs[zone + 12][1]);
+	}
+	break;
+      case 's':
+	{
+	  long val = cal.getTime().getTime();
+	  builder.append(val / 1000);
+	}
+	break;
+      case 'Q':
+	{
+	  long val = cal.getTime().getTime();
+	  builder.append(val);
+	}
+	break;
+      case 'B':
+	{
+	  int month = cal.get(Calendar.MONTH);
+	  builder.append(syms.getMonths()[month]);
+	}
+	break;
+      case 'b':
+      case 'h':
+	{
+	  int month = cal.get(Calendar.MONTH);
+	  builder.append(syms.getShortMonths()[month]);
+	}
+	break;
+      case 'A':
+	{
+	  int day = cal.get(Calendar.DAY_OF_WEEK);
+	  builder.append(syms.getWeekdays()[day]);
+	}
+	break;
+      case 'a':
+	{
+	  int day = cal.get(Calendar.DAY_OF_WEEK);
+	  builder.append(syms.getShortWeekdays()[day]);
+	}
+	break;
+      case 'C':
+	builder.append(cal.get(Calendar.YEAR) / 100);
+	digits = 2;
+	break;
+      case 'Y':
+	builder.append(cal.get(Calendar.YEAR));
+	digits = 4;
+	break;
+      case 'y':
+	builder.append(cal.get(Calendar.YEAR) % 100);
+	digits = 2;
+	break;
+      case 'j':
+	builder.append(cal.get(Calendar.DAY_OF_YEAR));
+	digits = 3;
+	break;
+      case 'm':
+	builder.append(cal.get(Calendar.MONTH) + 1);
+	digits = 2;
+	break;
+      case 'd':
+	builder.append(cal.get(Calendar.DAY_OF_MONTH));
+	digits = 2;
+	break;
+      case 'e':
+	builder.append(cal.get(Calendar.DAY_OF_MONTH));
+	break;
+      case 'R':
+	singleDateTimeConversion(builder, cal, 'H', syms);
+	builder.append(':');
+	singleDateTimeConversion(builder, cal, 'M', syms);
+	break;
+      case 'T':
+	singleDateTimeConversion(builder, cal, 'H', syms);
+	builder.append(':');
+	singleDateTimeConversion(builder, cal, 'M', syms);
+	builder.append(':');
+	singleDateTimeConversion(builder, cal, 'S', syms);
+	break;
+      case 'r':
+	singleDateTimeConversion(builder, cal, 'I', syms);
+	builder.append(':');
+	singleDateTimeConversion(builder, cal, 'M', syms);
+	builder.append(':');
+	singleDateTimeConversion(builder, cal, 'S', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'p', syms);
+	break;
+      case 'D':
+	singleDateTimeConversion(builder, cal, 'm', syms);
+	builder.append('/');
+    	singleDateTimeConversion(builder, cal, 'd', syms);
+	builder.append('/');
+	singleDateTimeConversion(builder, cal, 'y', syms);
+	break;
+      case 'F':
+	singleDateTimeConversion(builder, cal, 'Y', syms);
+	builder.append('-');
+	singleDateTimeConversion(builder, cal, 'm', syms);
+	builder.append('-');
+	singleDateTimeConversion(builder, cal, 'd', syms);
+	break;
+      case 'c':
+	singleDateTimeConversion(builder, cal, 'a', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'b', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'd', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'T', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'Z', syms);
+	builder.append(' ');
+	singleDateTimeConversion(builder, cal, 'Y', syms);
+	break;
+      default:
+	throw new UnknownFormatConversionException(String.valueOf(conversion));
+      }
+
+    if (digits > 0)
+      {
+	int newLen = builder.length();
+	int delta = newLen - oldLen;
+	while (delta++ < digits)
+	  builder.insert(oldLen, '0');
+      }
+  }
+
+  /** Emit a date or time value.  */
+  private void dateTimeConversion(Object arg, int flags, int width,
+				  int precision, char conversion,
+				  char subConversion)
+    throws IOException
+  {
+    noPrecision(precision);
+    checkFlags(flags,
+	       FormattableFlags.LEFT_JUSTIFY | FormattableFlags.UPPERCASE,
+	       conversion);
+
+    Calendar cal;
+    if (arg instanceof Calendar)
+      cal = (Calendar) arg;
+    else
+      {
+	Date date;
+	if (arg instanceof Date)
+	  date = (Date) arg;
+	else if (arg instanceof Long)
+	  date = new Date(((Long) arg).longValue());
+	else
+	  throw new IllegalFormatConversionException(conversion,
+						     arg.getClass());
+	if (fmtLocale == null)
+	  cal = Calendar.getInstance();
+	else
+	  cal = Calendar.getInstance(fmtLocale);
+	cal.setTime(date);
+      }
+
+    // We could try to be more efficient by computing this lazily.
+    DateFormatSymbols syms;
+    if (fmtLocale == null)
+      syms = new DateFormatSymbols();
+    else
+      syms = new DateFormatSymbols(fmtLocale);
+
+    StringBuilder result = new StringBuilder();
+    singleDateTimeConversion(result, cal, subConversion, syms);
+
+    genericFormat(result.toString(), flags, width, precision);
+  }
 
   /**
    * Advance the internal parsing index, and throw an exception
@@ -595,6 +937,7 @@ public class Formatter implements Closeable, Flushable
 
     try
       {
+	fmtLocale = loc;
 	format = fmt;
 	length = format.length();
 	for (index = 0; index < length; ++index)
@@ -666,7 +1009,9 @@ public class Formatter implements Closeable, Flushable
 				origConversion);
 		break;
 	      case 'd':
-		// decimalFormat();
+		checkFlags(flags & FormattableFlags.UPPERCASE, 0, 'd');
+		decimalConversion(argument, flags, width, precision,
+				  origConversion);
 		break;
 	      case 'o':
 		checkFlags(flags & FormattableFlags.UPPERCASE, 0, 'o');
@@ -689,8 +1034,10 @@ public class Formatter implements Closeable, Flushable
 		// hexFloatingConversion();
 		break;
 	      case 't':
-// 		char format = parseDateTimeFormat();
-// 		timeDateFormat();
+		advance();
+		char subConversion = format.charAt(index);
+		dateTimeConversion(argument, flags, width, precision,
+				   origConversion, subConversion);
 		break;
 	      case '%':
 		percentFormat(flags, width, precision);

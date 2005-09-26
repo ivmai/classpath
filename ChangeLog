@@ -1,3 +1,15 @@
+2005-09-26  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/Formatter.java (format): Set fmtLocale.
+	(applyLocalization): New method.
+	(basicIntegralConversion): Likewise.
+	(hexOrOctalConversion): Use it.
+	(decimalConversion): New method.
+	(format): Use decimalConversion, dateTimeConversion.
+	(genericFormat): Upper-case earlier.  Justify correctly.
+	(singleDateTimeConversion): New method.
+	(dateTimeConversion): Likewise.
+
 2005-09-25  Jeroen Frijters  <jeroen@frijters.net>
 
 	* gnu/java/lang/reflect/ClassSignatureParser.java,
