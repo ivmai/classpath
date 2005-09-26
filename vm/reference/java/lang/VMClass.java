@@ -325,7 +325,7 @@ final class VMClass
    * @param klass the class whose simple name should be returned. 
    * @return the simple name for this class.
    */
-  static String getSimpleName(Class<?> klass)
+  static String getSimpleName(Class klass)
   {
     if (isArray(klass))
       {
@@ -387,7 +387,7 @@ final class VMClass
    * @return the annotations directly defined by the specified class.
    * @since 1.5
    */
-  static native Annotation[] getDeclaredAnnotations(Class<?> klass);
+  static native Annotation[] getDeclaredAnnotations(Class klass);
 
   /**
    * <p>
@@ -424,7 +424,7 @@ final class VMClass
    *         class doesn't have a canonical name.
    * @since 1.5
    */
-  static String getCanonicalName(Class<?> klass)
+  static String getCanonicalName(Class klass)
   {
     if (isArray(klass))
       {
@@ -452,7 +452,7 @@ final class VMClass
    *         a top-level class.
    * @since 1.5
    */
-  static native Class<?> getEnclosingClass(Class<?> klass);
+  static native Class getEnclosingClass(Class klass);
 
   /**
    * Returns the constructor which immediately encloses the specified class.
@@ -466,7 +466,7 @@ final class VMClass
    *         is returned.
    * @since 1.5
    */
-  static native Constructor<?> getEnclosingConstructor(Class<?> klass);
+  static native Constructor getEnclosingConstructor(Class klass);
 
   /**
    * Returns the method which immediately encloses the specified class.  If
@@ -480,92 +480,18 @@ final class VMClass
    *         is returned.
    * @since 1.5
    */
-  static native Method getEnclosingMethod(Class<?> klass);
+  static native Method getEnclosingMethod(Class klass);
 
   /**
-   * <p>
-   * Returns an array of <code>Type</code> objects which represent the
-   * interfaces directly implemented by the specified class or extended by the
-   * specified interface.
-   * </p>
-   * <p>
-   * If one of the superinterfaces is a parameterized type, then the
-   * object returned for this interface reflects the actual type
-   * parameters used in the source code.  Type parameters are created
-   * using the semantics specified by the <code>ParameterizedType</code>
-   * interface, and only if an instance has not already been created.
-   * </p>
-   * <p>
-   * The order of the interfaces in the array matches the order in which
-   * the interfaces are declared.  For classes which represent an array,
-   * an array of two interfaces, <code>Cloneable</code> and
-   * <code>Serializable</code>, is always returned, with the objects in
-   * that order.  A class representing a primitive type or void always
-   * returns an array of zero size.
-   * </p>
+   * Returns the class signature as specified in Class File Format
+   * chapter in the VM specification, or null if the class is not
+   * generic.
    *
-   * @param klass the class whose generic interfaces should be retrieved.
-   * @return an array of interfaces implemented or extended by the specified
-   *         class.
-   * @throws GenericSignatureFormatError if the generic signature of one
-   *         of the interfaces does not comply with that specified by the Java
-   *         Virtual Machine specification, 3rd edition.
-   * @throws TypeNotPresentException if any of the superinterfaces refers
-   *         to a non-existant type.
-   * @throws MalformedParameterizedTypeException if any of the interfaces
-   *         refer to a parameterized type that can not be instantiated for
-   *         some reason.
-   * @since 1.5
-   * @see java.lang.reflect.ParameterizedType
-   */
-  static native Type[] getGenericInterfaces(Class<?> klass);
-
-  /**
-   * <p>
-   * Returns a <code>Type</code> object representing the direct superclass,
-   * whether class, interface, primitive type or void, of the specified class.
-   * If the class is an array class, then a class instance representing
-   * the <code>Object</code> class is returned.  If the class is primitive,
-   * an interface, or a representation of either the <code>Object</code>
-   * class or void, then <code>null</code> is returned.
-   * </p>
-   * <p>
-   * If the superclass is a parameterized type, then the
-   * object returned for this interface reflects the actual type
-   * parameters used in the source code.  Type parameters are created
-   * using the semantics specified by the <code>ParameterizedType</code>
-   * interface, and only if an instance has not already been created.
-   * </p>
-   *
-   * @param klass the class whose generic superclass should be obtained.
-   * @return the superclass of the specified class.
-   * @throws GenericSignatureFormatError if the generic signature of the
-   *         class does not comply with that specified by the Java
-   *         Virtual Machine specification, 3rd edition.
-   * @throws TypeNotPresentException if the superclass refers
-   *         to a non-existant type.
-   * @throws MalformedParameterizedTypeException if the superclass
-   *         refers to a parameterized type that can not be instantiated for
-   *         some reason.
-   * @since 1.5
-   * @see java.lang.reflect.ParameterizedType
-   */
-  static native Type getGenericSuperclass(Class<?> klass);
-
-  /**
-   * Returns an array of <code>TypeVariable</code> objects that represents
-   * the type variables declared by the specified class, in declaration order.
-   * An array of size zero is returned if the specified class has no type
-   * variables.
-   *
-   * @param klass the class whose type variables should be returned.
-   * @return the type variables associated with this class. 
-   * @throws GenericSignatureFormatError if the generic signature does
-   *         not conform to the format specified in the Virtual Machine
-   *         specification, version 3.
+   * @param klass the klass to test.
+   * @return a ClassSignature string.
    * @since 1.5
    */
-  static native <T> TypeVariable<Class<T>>[] getTypeParameters(Class<T> klass);
+  static native String getClassSignature(Class klass);
 
   /**
    * Returns true if the specified class represents an anonymous class.
@@ -574,7 +500,7 @@ final class VMClass
    * @return true if the specified class represents an anonymous class.
    * @since 1.5
    */
-  static native boolean isAnonymousClass(Class<?> klass);
+  static native boolean isAnonymousClass(Class klass);
 
   /**
    * Returns true if the specified class represents an local class.
@@ -583,7 +509,7 @@ final class VMClass
    * @return true if the specified class represents an local class.
    * @since 1.5
    */
-  static native boolean isLocalClass(Class<?> klass);
+  static native boolean isLocalClass(Class klass);
 
   /**
    * Returns true if the specified class represents an member class.
@@ -592,6 +518,6 @@ final class VMClass
    * @return true if the specified class represents an member class.
    * @since 1.5
    */
-  static native boolean isMemberClass(Class<?> klass);
+  static native boolean isMemberClass(Class klass);
 
 } // class VMClass

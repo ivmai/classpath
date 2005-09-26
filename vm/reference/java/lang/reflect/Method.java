@@ -1,5 +1,5 @@
 /* java.lang.reflect.Method - reflection of Java methods
-   Copyright (C) 1998, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import gnu.java.lang.reflect.MethodSignatureParser;
 import java.util.Arrays;
 
 /**
@@ -74,7 +75,7 @@ import java.util.Arrays;
  * @status updated to 1.4
  */
 public final class Method
-extends AccessibleObject implements Member
+extends AccessibleObject implements Member, GenericDeclaration
 {
   Class declaringClass;
   String name;
@@ -329,11 +330,28 @@ extends AccessibleObject implements Member
     return invokeNative(o, args, declaringClass, slot);
   }
 
-  /*
-   * NATIVE HELPERS
-   */
-
   private native Object invokeNative(Object o, Object[] args,
                                      Class declaringClass, int slot)
     throws IllegalAccessException, InvocationTargetException;
+
+  /**
+   * Returns an array of <code>TypeVariable</code> objects that represents
+   * the type variables declared by this constructor, in declaration order.
+   * An array of size zero is returned if this class has no type
+   * variables.
+   *
+   * @return the type variables associated with this class. 
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
+   * @since 1.5
+   */
+  public TypeVariable<?>[] getTypeParameters()
+  {
+    String sig = getSignature();
+    MethodSignatureParser p = new MethodSignatureParser(this, sig);
+    return p.getTypeParameters();
+  }
+
+  private native String getSignature();
 }

@@ -39,6 +39,7 @@ exception statement from your version. */
 package java.lang;
 
 import gnu.classpath.VMStackWalker;
+import gnu.java.lang.reflect.ClassSignatureParser;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -124,7 +125,7 @@ public final class Class<T>
   final transient Object vmdata;
 
   /** newInstance() caches the default constructor */
-  private transient Constructor constructor;
+  private transient Constructor<T> constructor;
 
   /**
    * Class is non-instantiable from Java code; only the VM can create
@@ -1298,7 +1299,7 @@ public final class Class<T>
    */
   public T cast(Object obj)
   {
-    return VMClass.cast(obj, this);
+    return (T)VMClass.cast(obj, this);
   }
 
   /**
@@ -1368,7 +1369,7 @@ public final class Class<T>
    */
   public T[] getEnumConstants()
   {
-    return VMClass.getEnumConstants(this);
+    return (T[])VMClass.getEnumConstants(this);
   }
 
   /**
@@ -1602,7 +1603,15 @@ public final class Class<T>
    */
   public Type[] getGenericInterfaces()
   {
-    return VMClass.getGenericInterfaces(this);
+    if (isPrimitive())
+      return new Type[0];
+
+    String sig = VMClass.getClassSignature(this);
+    if (sig == null)
+      return getInterfaces();
+
+    ClassSignatureParser p = new ClassSignatureParser(this, sig);
+    return p.getInterfaceTypes();
   }
 
   /**
@@ -1636,7 +1645,18 @@ public final class Class<T>
    */
   public Type getGenericSuperclass()
   {
-    return VMClass.getGenericSuperclass(this);
+    if (isArray())
+      return Object.class;
+
+    if (isPrimitive() || isInterface() || this == Object.class)
+      return null;
+
+    String sig = VMClass.getClassSignature(this);
+    if (sig == null)
+      return getSuperclass();
+
+    ClassSignatureParser p = new ClassSignatureParser(this, sig);
+    return p.getSuperclassType();
   }
 
   /**
@@ -1653,7 +1673,12 @@ public final class Class<T>
    */
   public TypeVariable<Class<T>>[] getTypeParameters()
   {
-    return VMClass.getTypeParameters(this);
+    String sig = VMClass.getClassSignature(this);
+    if (sig == null)
+      return (TypeVariable<Class<T>>[])new TypeVariable[0];
+
+    ClassSignatureParser p = new ClassSignatureParser(this, sig);
+    return p.getTypeParameters();
   }
 
   /**
