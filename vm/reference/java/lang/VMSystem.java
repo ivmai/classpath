@@ -143,7 +143,7 @@ final class VMSystem
    *
    * @return a list of 'name=value' pairs.
    */
-  static native List<String> environ();
+  static native List environ();
 
   /**
    * Gets the value of an environment variable from the current

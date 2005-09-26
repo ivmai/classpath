@@ -495,7 +495,7 @@ public final class System
       sm.checkPermission(new RuntimePermission("getenv.*"));
     if (environmentMap == null)
       {
-	List<String> environ = VMSystem.environ();
+	List<String> environ = (List<String>)VMSystem.environ();
 	Map<String,String> variables = new EnvironmentMap();
 	for (String pair : environ)
 	  {

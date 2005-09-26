@@ -1,5 +1,11 @@
 2005-09-25  Jeroen Frijters  <jeroen@frijters.net>
 
+	* java/lang/System.java,
+	vm/reference/java/lang/VMSystem.java: Removed generic type
+	from VMSystem.environ() signature.
+
+2005-09-25  Jeroen Frijters  <jeroen@frijters.net>
+
 	* java/lang/MalformedParameterizedTypeException.java: Removed.
 
 2005-09-25  Tom Tromey  <tromey@redhat.com>
