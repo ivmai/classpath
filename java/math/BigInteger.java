@@ -57,7 +57,7 @@ import java.util.Random;
  * @date December 20, 1999.
  * @status believed complete and correct.
  */
-public class BigInteger extends Number implements Comparable
+public class BigInteger extends Number implements Comparable<BigInteger>
 {
   /** All integers are stored in 2's-complement form.
    * If words == null, the ival is the value of this BigInteger.
@@ -368,14 +368,7 @@ public class BigInteger extends Number implements Comparable
     return MPN.cmp(x.words, y.words, x_len);
   }
 
-  // JDK1.2
-  public int compareTo(Object obj)
-  {
-    if (obj instanceof BigInteger)
-      return compareTo(this, (BigInteger) obj);
-    throw new ClassCastException();
-  }
-
+  /** @since 1.2 */
   public int compareTo(BigInteger val)
   {
     return compareTo(this, val);

@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package java.math;
 
-public class BigDecimal extends Number implements Comparable
+public class BigDecimal extends Number implements Comparable<BigDecimal>
 {
   private BigInteger intVal;
   private int scale;
@@ -369,11 +369,6 @@ public class BigDecimal extends Number implements Comparable
 
     // and compare them
     return thisParts[1].compareTo (valParts[1]);
-  }
-
-  public int compareTo (Object val) 
-  {
-    return(compareTo((BigDecimal)val));
   }
 
   public boolean equals (Object o) 

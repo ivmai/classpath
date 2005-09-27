@@ -60,7 +60,7 @@ import java.util.Enumeration;
  * @author Anthony Green (green@redhat.com)
  * @author Mark Wielaard (mark@klomp.org)
  */
-public interface Name extends Cloneable, Serializable, Comparable
+public interface Name extends Cloneable, Serializable, Comparable<Object>
 {
   long serialVersionUID = -3617482732056931635L;
 

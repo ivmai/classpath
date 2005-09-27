@@ -1,5 +1,26 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/sql/Timestamp.java (compareTo(Date)): Changed argument type
+	from Object.
+	* javax/naming/Name.java (Name): Implements Comparable<Object>.
+	* java/util/Date.java (Date): Implements Comparable<Date>.
+	(compareTo(Object)): Removed.
+	* java/text/CollationKey.java (CollationKey): Implements
+	Comparable<CollationKey>.
+	(compareTo(Object)): Removed.
+	* java/net/URI.java (URI): Implements Comparable<URI>.
+	(compareTo): Updated argument type.
+	* java/math/BigDecimal.java (BigInteger): Implements
+	Comparable<BigDecimal>.
+	(compareTo(Object)): Removed.
+	* java/math/BigInteger.java (BigInteger): Implements
+	Comparable<BigInteger>.
+	(compareTo(Object)): Removed.
+	* java/io/File.java (File): Implements Comparable<File>.
+	(compareTo(Object)): Removed.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/nio/charset/spi/CharsetProvider.java (charsets): Changed
 	return type.
 	* java/nio/charset/Charset.java (aliases): Changed return type.
