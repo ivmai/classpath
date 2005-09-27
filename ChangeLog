@@ -1,5 +1,16 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/nio/charset/spi/CharsetProvider.java (charsets): Changed
+	return type.
+	* java/nio/charset/Charset.java (aliases): Changed return type.
+	(availableCharsets): Likewise.
+	* java/nio/channels/spi/AbstractSelector.java (cancelledKeys):
+	Changed type.
+	(AbstractSelector): Updated.
+	(cancelledKeys): Updated.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/logging/LogManager.java (loggers): Genericized type.
 	(LogManager): Updated.
 	(addLogger): Likewise.
