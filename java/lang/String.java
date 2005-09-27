@@ -148,7 +148,7 @@ public final class String
    * compatibility with Sun's JDK.
    */
   private static final class CaseInsensitiveComparator
-    implements Comparator, Serializable
+    implements Comparator<String>, Serializable
   {
     /**
      * Compatible with JDK 1.2.
@@ -172,9 +172,9 @@ public final class String
      * @throws ClassCastException if either argument is not a String
      * @see #compareToIgnoreCase(String)
      */
-    public int compare(Object o1, Object o2)
+    public int compare(String o1, String o2)
     {
-      return ((String) o1).compareToIgnoreCase((String) o2);
+      return o1.compareToIgnoreCase(o2);
     }
   } // class CaseInsensitiveComparator
 
@@ -186,7 +186,7 @@ public final class String
    * @see Collator#compare(String, String)
    * @since 1.2
    */
-  public static final Comparator CASE_INSENSITIVE_ORDER
+  public static final Comparator<String> CASE_INSENSITIVE_ORDER
     = new CaseInsensitiveComparator();
 
   /**
