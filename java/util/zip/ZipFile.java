@@ -84,7 +84,7 @@ public class ZipFile implements ZipConstants
   private final RandomAccessFile raf;
 
   // The entries of this zip file when initialized and not yet closed.
-  private HashMap entries;
+  private HashMap<String, ZipEntry> entries;
 
   private boolean closed = false;
 
@@ -268,7 +268,7 @@ public class ZipFile implements ZipConstants
       throw new EOFException(name);
     int centralOffset = readLeInt(raf, ebs);
 
-    entries = new HashMap(count+count/2);
+    entries = new HashMap<String, ZipEntry> (count+count/2);
     raf.seek(centralOffset);
     
     byte[] buffer = new byte[16];
@@ -368,7 +368,7 @@ public class ZipFile implements ZipConstants
    *
    * @exception IllegalStateException when the ZipFile has already been closed
    */
-  public Enumeration entries()
+  public Enumeration<ZipEntry> entries()
   {
     checkClosed();
     
@@ -388,7 +388,7 @@ public class ZipFile implements ZipConstants
    * @exception IllegalStateException when the ZipFile has already been closed.
    * @exception IOException when the entries could not be read.
    */
-  private HashMap getEntries() throws IOException
+  private HashMap<String, ZipEntry> getEntries() throws IOException
   {
     synchronized(raf)
       {
@@ -416,11 +416,11 @@ public class ZipFile implements ZipConstants
 
     try
       {
-	HashMap entries = getEntries();
-	ZipEntry entry = (ZipEntry) entries.get(name);
+	HashMap<String, ZipEntry> entries = getEntries();
+	ZipEntry entry = entries.get(name);
         // If we didn't find it, maybe it's a directory.
         if (entry == null && !name.endsWith("/"))
-            entry = (ZipEntry) entries.get(name + '/');
+	  entry = entries.get(name + '/');
 	return entry != null ? new ZipEntry(entry, name) : null;
       }
     catch (IOException ioe)
@@ -491,9 +491,9 @@ public class ZipFile implements ZipConstants
   {
     checkClosed();
 
-    HashMap entries = getEntries();
+    HashMap<String, ZipEntry> entries = getEntries();
     String name = entry.getName();
-    ZipEntry zipEntry = (ZipEntry) entries.get(name);
+    ZipEntry zipEntry = entries.get(name);
     if (zipEntry == null)
       return null;
 
@@ -539,11 +539,11 @@ public class ZipFile implements ZipConstants
       }
   }
   
-  private static class ZipEntryEnumeration implements Enumeration
+  private static class ZipEntryEnumeration implements Enumeration<ZipEntry>
   {
-    private final Iterator elements;
+    private final Iterator<ZipEntry> elements;
 
-    public ZipEntryEnumeration(Iterator elements)
+    public ZipEntryEnumeration(Iterator<ZipEntry> elements)
     {
       this.elements = elements;
     }
@@ -553,12 +553,12 @@ public class ZipFile implements ZipConstants
       return elements.hasNext();
     }
 
-    public Object nextElement()
+    public ZipEntry nextElement()
     {
       /* We return a clone, just to be safe that the user doesn't
        * change the entry.  
        */
-      return ((ZipEntry)elements.next()).clone();
+      return (ZipEntry) (elements.next().clone());
     }
   }
 

@@ -1,5 +1,16 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/zip/ZipFile.java (entries): Updated return type.
+	(ZipEntryEnumeration): Updated 'implements' type.
+	(entries): Updated type.
+	(ZipEntryEnumeration.elements): Likewise.
+	(readEntries): Updated.
+	(getEntries): Likewise.
+	(getEntry): Likewise.
+	(getInputStream): Likewise.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/Compiler.java (compileClass): Updated argument type.
 
 2005-09-27  Tom Tromey  <tromey@redhat.com>
