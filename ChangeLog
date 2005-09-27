@@ -1,5 +1,15 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/logging/LogManager.java (loggers): Genericized type.
+	(LogManager): Updated.
+	(addLogger): Likewise.
+	(findAncestor): Likewise.
+	(getLogger): Likewise.
+	(getLoggerNames): Fixed return type.
+	(reset): Updated.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/zip/ZipFile.java (entries): Updated return type.
 	(ZipEntryEnumeration): Updated 'implements' type.
 	(entries): Updated type.
