@@ -1,5 +1,9 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/Compiler.java (compileClass): Updated argument type.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/awt/im/InputMethodHighlight.java (InputMethodHighlight):
 	Updated argument types.
 	(getStyle): Updated return type.
