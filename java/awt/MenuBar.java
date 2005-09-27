@@ -313,10 +313,10 @@ removeNotify()
   *
   * @return A list of all shortcuts for the menus in this menu bar.
   */
-public synchronized Enumeration
+public synchronized Enumeration<MenuShortcut>
 shortcuts()
 {
-  Vector shortcuts = new Vector();
+  Vector<MenuShortcut> shortcuts = new Vector<MenuShortcut>();
   Enumeration e = menus.elements();
 
   while (e.hasMoreElements())

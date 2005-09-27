@@ -1,5 +1,14 @@
 2005-09-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/awt/im/InputMethodHighlight.java (InputMethodHighlight):
+	Updated argument types.
+	(getStyle): Updated return type.
+	* java/awt/MenuBar.java (shortcuts): Updated return type.
+	* java/awt/Window.java (hide): Now deprecated.
+	(show): Likewise.
+
+2005-09-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/String.java (CASE_INSENSITIVE_ORDER): Now a
 	Comparator<String>.
 	(CaseInsensitiveComparator): Updated.
