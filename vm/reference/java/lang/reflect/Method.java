@@ -96,7 +96,7 @@ extends AccessibleObject implements Member, GenericDeclaration
    * is a non-inherited member.
    * @return the class that declared this member
    */
-  public Class getDeclaringClass()
+  public Class<?> getDeclaringClass()
   {
     return declaringClass;
   }
@@ -133,7 +133,7 @@ extends AccessibleObject implements Member, GenericDeclaration
    *
    * @return a list of the types of the method's parameters
    */
-  public native Class[] getParameterTypes();
+  public native Class<?>[] getParameterTypes();
 
   /**
    * Get the exception types this method says it throws, in no particular
@@ -142,7 +142,7 @@ extends AccessibleObject implements Member, GenericDeclaration
    *
    * @return a list of the types in the method's throws clause
    */
-  public native Class[] getExceptionTypes();
+  public native Class<?>[] getExceptionTypes();
 
   /**
    * Compare two objects to see if they are semantically equivalent.

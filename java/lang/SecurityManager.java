@@ -986,7 +986,7 @@ public class SecurityManager
    * @see Member#PUBLIC
    * @since 1.1
    */
-  public void checkMemberAccess(Class c, int memberType)
+  public void checkMemberAccess(Class<?> c, int memberType)
   {
     if (c == null)
       throw new NullPointerException();

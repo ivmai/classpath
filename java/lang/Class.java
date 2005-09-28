@@ -523,7 +523,7 @@ public final class Class<T>
    * @return the declaring class of this class
    * @since 1.1
    */
-  public Class getDeclaringClass()
+  public Class<?> getDeclaringClass()
   {
     return VMClass.getDeclaringClass (this);
   }

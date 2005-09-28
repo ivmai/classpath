@@ -44,6 +44,7 @@ import gnu.java.awt.peer.ClasspathFontPeer;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.font.LineMetrics;
+import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -51,7 +52,7 @@ import java.awt.peer.FontPeer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.text.AttributedCharacterIterator;
+import static java.text.AttributedCharacterIterator.Attribute;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
@@ -348,7 +349,7 @@ private static final long serialVersionUID = -4206021311591459213L;
     this.peer = getPeerFromToolkit (name, attrs);
   }
 
-  public Font (Map attrs)
+  public Font (Map<? extends Attribute, ?> attrs)
   {
     this(null, attrs);
   }
@@ -769,7 +770,7 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @since 1.2
   */
-  public Font deriveFont (Map attributes)
+  public Font deriveFont (Map<? extends Attribute, ?> attributes)
 {
     return peer.deriveFont (this, attributes);
 }
@@ -783,9 +784,9 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see java.text.AttributedCharacterIterator.Attribute
   * @see java.awt.font.TextAttribute
   */
-  public Map getAttributes ()
+  public Map<TextAttribute,?> getAttributes ()
 {
-    return peer.getAttributes (this);
+  return peer.getAttributes (this);
 }
 
 /**
@@ -797,7 +798,7 @@ private static final long serialVersionUID = -4206021311591459213L;
   * @see java.text.AttributedCharacterIterator.Attribute
   * @see java.awt.font.TextAttribute
   */
-  public AttributedCharacterIterator.Attribute[] getAvailableAttributes()
+  public Attribute[] getAvailableAttributes()
 {
     return peer.getAvailableAttributes (this);
 }
@@ -862,7 +863,7 @@ private static final long serialVersionUID = -4206021311591459213L;
   *
   * @see java.awt.font.TextAttribute  
   */
-  public static Font getFont (Map attributes)
+  public static Font getFont (Map<? extends Attribute, ?> attributes)
 {
     return getFontFromToolkit (null, attributes);
 }

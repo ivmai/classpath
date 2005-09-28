@@ -93,7 +93,7 @@ extends AccessibleObject implements Member
    * is a non-inherited member.
    * @return the class that declared this member
    */
-  public Class getDeclaringClass()
+  public Class<?> getDeclaringClass()
   {
     return declaringClass;
   }
@@ -122,7 +122,7 @@ extends AccessibleObject implements Member
    * Gets the type of this field.
    * @return the type of this field
    */
-  public native Class getType();
+  public native Class<?> getType();
 
   /**
    * Compare two objects to see if they are semantically equivalent.

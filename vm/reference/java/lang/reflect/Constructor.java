@@ -261,7 +261,7 @@ public final class Constructor<T>
    *         specification, version 3.
    * @since 1.5
    */
-  public TypeVariable<?>[] getTypeParameters()
+  public TypeVariable<Constructor<T>>[] getTypeParameters()
   {
     String sig = getSignature();
     MethodSignatureParser p = new MethodSignatureParser(this, sig);

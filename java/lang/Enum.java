@@ -69,7 +69,7 @@ public abstract class Enum<T extends Enum<T>>
    * the enum etype.
    */
   @SuppressWarnings("unchecked")
-  public static <S extends Enum<S>> Enum valueOf(Class<S> etype, String s)
+  public static <S extends Enum<S>> S valueOf(Class<S> etype, String s)
   {
     if (etype == null || s == null)
       throw new NullPointerException();
