@@ -1,4 +1,4 @@
-/* Class.java -- Representation of a Java class.
+/* MethodSignatureParser.java
    Copyright (C) 2005
    Free Software Foundation
 
@@ -58,13 +58,18 @@ public class MethodSignatureParser extends GenericSignatureParser
         this(method, method.getDeclaringClass().getClassLoader(), signature);
     }
 
-    private MethodSignatureParser(GenericDeclaration wrapper, ClassLoader loader, String signature)
+    private MethodSignatureParser(GenericDeclaration wrapper,
+        ClassLoader loader, String signature)
     {
         super(wrapper, loader, signature);
 
         if (peekChar() == '<')
         {
             typeParameters = readFormalTypeParameters();
+        }
+        else
+        {
+            typeParameters = new TypeVariable[0];
         }
         consume('(');
         ArrayList<Type> args = new ArrayList<Type>();
@@ -91,25 +96,30 @@ public class MethodSignatureParser extends GenericSignatureParser
         }
         this.throwsSigs = new Type[throwsSigs.size()];
         throwsSigs.toArray(this.throwsSigs);
+        end();
     }
 
     public TypeVariable[] getTypeParameters()
     {
+        TypeImpl.resolve(typeParameters);
         return typeParameters;
     }
 
     public Type[] getGenericParameterTypes()
     {
+        TypeImpl.resolve(argTypes);
         return argTypes;
     }
 
     public Type getGenericReturnType()
     {
+        retType = TypeImpl.resolve(retType);
         return retType;
     }
 
     public Type[] getGenericExceptionTypes()
     {
+        TypeImpl.resolve(throwsSigs);
         return throwsSigs;
     }
 
@@ -147,6 +157,9 @@ public class MethodSignatureParser extends GenericSignatureParser
             case 'D':
                 consume('D');
                 return double.class;
+            case 'V':
+                consume('V');
+                return void.class;
             default:
                 throw new GenericSignatureFormatError();
         }

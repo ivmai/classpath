@@ -1,4 +1,4 @@
-/* Class.java -- Representation of a Java class.
+/* GenericSignatureParser.java
    Copyright (C) 2005
    Free Software Foundation
 
@@ -40,16 +40,31 @@ package gnu.java.lang.reflect;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-class TypeImpl implements Type
+abstract class TypeImpl implements Type
 {
-    Type resolve()
+    abstract Type resolve();
+
+    static void resolve(Type[] types)
     {
-        return this;
+        for (int i = 0; i < types.length; i++)
+        {
+            types[i] = resolve(types[i]);
+        }
+    }
+
+    static Type resolve(Type type)
+    {
+        if (type instanceof TypeImpl)
+        {
+            type = ((TypeImpl) type).resolve();
+        }
+        return type;
     }
 }
 
-class TypeVariableImpl extends TypeImpl implements TypeVariable
+final class TypeVariableImpl extends TypeImpl implements TypeVariable
 {
     private GenericDeclaration decl;
     private Type[] bounds;
@@ -62,8 +77,14 @@ class TypeVariableImpl extends TypeImpl implements TypeVariable
         this.name = name;
     }
 
+    Type resolve()
+    {
+        return this;
+    }
+
     public Type[] getBounds()
     {
+        resolve(bounds);
         return bounds.clone();
     }
 
@@ -77,31 +98,72 @@ class TypeVariableImpl extends TypeImpl implements TypeVariable
         return name;
     }
 
-    // TODO implement equals/hashCode
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof TypeVariableImpl)
+        {
+            TypeVariableImpl other = (TypeVariableImpl)obj;
+            return decl.equals(other.decl) && name.equals(other.name);
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return 0x5f4d5156 ^ decl.hashCode() ^ name.hashCode();
+    }
+
+    public String toString()
+    {
+        return name;
+    }
 }
 
-class ParameterizedTypeImpl extends TypeImpl implements ParameterizedType
+final class ParameterizedTypeImpl extends TypeImpl implements ParameterizedType
 {
-    private Type rawType;
+    private String rawTypeName;
+    private ClassLoader loader;
+    private Class rawType;
     private Type owner;
     private Type[] typeArgs;
 
-    ParameterizedTypeImpl(Type rawType, Type owner, Type[] typeArgs)
+    ParameterizedTypeImpl(String rawTypeName, ClassLoader loader, Type owner,
+        Type[] typeArgs)
     {
-        this.rawType = rawType;
+        this.rawTypeName = rawTypeName;
+        this.loader = loader;
         this.owner = owner;
         this.typeArgs = typeArgs;
     }
 
-    public Type[] getActualTypeArguments()
+    Type resolve()
     {
-        for (int i = 0; i < typeArgs.length; i++)
+        if (rawType == null)
         {
-            if (typeArgs[i] instanceof TypeImpl)
+            try
             {
-                typeArgs[i] = ((TypeImpl)typeArgs[i]).resolve();
+                rawType = Class.forName(rawTypeName, false, loader);
+            }
+            catch (ClassNotFoundException x)
+            {
+                throw new TypeNotPresentException(rawTypeName, x);
             }
         }
+        if (typeArgs == null)
+        {
+            if (owner == null)
+            {
+                return rawType;
+            }
+            typeArgs = new Type[0];
+        }
+        resolve(typeArgs);
+        owner = resolve(owner);
+        return this;
+    }
+
+    public Type[] getActualTypeArguments()
+    {
         return typeArgs.clone();
     }
 
@@ -115,10 +177,69 @@ class ParameterizedTypeImpl extends TypeImpl implements ParameterizedType
         return owner;
     }
 
-    // TODO implement equals/hashCode
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof ParameterizedTypeImpl)
+        {
+            ParameterizedTypeImpl other = (ParameterizedTypeImpl)obj;
+            return rawType.equals(other.rawType)
+                && ((owner == null && other.owner == null)
+                    || owner.equals(other.owner))
+                && Arrays.deepEquals(typeArgs, other.typeArgs);
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        int h = 0x58158970 ^ rawType.hashCode();
+        if (owner != null)
+        {
+            h ^= Integer.reverse(owner.hashCode());
+        }
+        for (int i = 0; i < typeArgs.length; i++)
+        {
+            h ^= Integer.rotateLeft(typeArgs[i].hashCode(), i);
+        }
+        return h;
+    }
+
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        if (owner != null)
+        {
+            sb.append(owner);
+            sb.append('.');
+            sb.append(rawType.getSimpleName());
+        }
+        else
+        {
+            sb.append(rawTypeName);
+        }
+        if (typeArgs.length > 0)
+        {
+            sb.append('<');
+            for (int i = 0; i < typeArgs.length; i++)
+            {
+                if (i > 0)
+                    sb.append(", ");
+                if (typeArgs[i] instanceof Class)
+                {
+                    sb.append(((Class)typeArgs[i]).getName());
+                }
+                else
+                {
+                    sb.append(typeArgs[i]);
+                }
+            }
+            sb.append('>');
+        }
+        return sb.toString();
+    }
 }
 
-class GenericArrayTypeImpl extends TypeImpl  implements GenericArrayType
+final class GenericArrayTypeImpl extends TypeImpl implements GenericArrayType
 {
     private Type componentType;
 
@@ -127,15 +248,39 @@ class GenericArrayTypeImpl extends TypeImpl  implements GenericArrayType
         this.componentType = componentType;
     }
 
+    Type resolve()
+    {
+        componentType = resolve(componentType);
+        return this;
+    }
+
     public Type getGenericComponentType()
     {
         return componentType;
     }
 
-    // TODO implement equals/hashCode
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof GenericArrayTypeImpl)
+        {
+            GenericArrayTypeImpl other = (GenericArrayTypeImpl)obj;
+            return componentType.equals(other.componentType);
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return 0x4be37a7f ^ componentType.hashCode();
+    }
+
+    public String toString()
+    {
+        return componentType + "[]";
+    }
 }
 
-class UnresolvedTypeVariable extends TypeImpl  implements Type
+final class UnresolvedTypeVariable extends TypeImpl implements Type
 {
     private GenericDeclaration decl;
     private String name;
@@ -195,6 +340,81 @@ class UnresolvedTypeVariable extends TypeImpl  implements Type
     }
 }
 
+final class WildcardTypeImpl extends TypeImpl implements WildcardType
+{
+    private Type lower;
+    private Type upper;
+
+    WildcardTypeImpl(Type lower, Type upper)
+    {
+        this.lower = lower;
+        this.upper = upper;
+    }
+
+    Type resolve()
+    {
+        upper = resolve(upper);
+        lower = resolve(lower);
+        return this;
+    }
+
+    public Type[] getUpperBounds()
+    {
+        if (upper == null)
+        {
+            return new Type[0];
+        }
+        return new Type[] { upper };
+    }
+
+    public Type[] getLowerBounds()
+    {
+        if (lower == null)
+        {
+            return new Type[0];
+        }
+        return new Type[] { lower };
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof WildcardTypeImpl)
+        {
+            WildcardTypeImpl other = (WildcardTypeImpl)obj;
+            return Arrays.deepEquals(getUpperBounds(), other.getUpperBounds())
+                && Arrays.deepEquals(getLowerBounds(), other.getLowerBounds());
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        int h = 0x75d074fd;
+        if (upper != null)
+        {
+            h ^= upper.hashCode();
+        }
+        if (lower != null)
+        {
+            h ^= lower.hashCode();
+        }
+        return h;
+    }
+
+    public String toString()
+    {
+        if (lower != null)
+        {
+            return "? super " + lower;
+        }
+        if (upper == java.lang.Object.class)
+        {
+            return "?";
+        }
+        return "? extends " + upper;
+    }
+}
+
 class GenericSignatureParser
 {
     private ClassLoader loader;
@@ -202,7 +422,8 @@ class GenericSignatureParser
     private String signature;
     private int pos;
 
-    GenericSignatureParser(GenericDeclaration container, ClassLoader loader, String signature)
+    GenericSignatureParser(GenericDeclaration container, ClassLoader loader,
+        String signature)
     {
         this.container = container;
         this.loader = loader;
@@ -233,16 +454,14 @@ class GenericSignatureParser
         {
             bounds.add(readFieldTypeSignature());
         }
-        else
-        {
-            bounds.add(java.lang.Object.class);
-        }
         while (peekChar() == ':')
         {
             consume(':');
             bounds.add(readFieldTypeSignature());
         }
-        return new TypeVariableImpl(container, bounds.toArray(new Type[bounds.size()]), identifier);
+        Type[] b = new Type[bounds.size()];
+        bounds.toArray(b);
+        return new TypeVariableImpl(container, b, identifier);
     }
 
     Type readFieldTypeSignature()
@@ -257,18 +476,6 @@ class GenericSignatureParser
                 return readTypeVariableSignature();
             default:
                 throw new GenericSignatureFormatError();
-        }
-    }
-
-    private Class resolveClass(String className)
-    {
-        try
-        {
-            return Class.forName(className, false, loader);
-        }
-        catch (ClassNotFoundException x)
-        {
-            throw new TypeNotPresentException(className, x);
         }
     }
 
@@ -292,24 +499,22 @@ class GenericSignatureParser
         {
             typeArguments = readTypeArguments();
         }
+        Type type = new ParameterizedTypeImpl(className, loader, null,
+                                              typeArguments);
         while (peekChar() == '.')
         {
             consume('.');
-            // TODO
-            readIdentifier();
+            className += "$" + readIdentifier();
+            typeArguments = null;
             if (peekChar() == '<')
             {
-                // TODO
-                readTypeArguments();
+                typeArguments = readTypeArguments();
             }
+            type = new ParameterizedTypeImpl(className, loader, type,
+                                             typeArguments);
         }
         consume(';');
-        if (typeArguments == null || typeArguments.length == 0)
-        {
-            return resolveClass(className);
-        }
-        // TODO get the owner
-        return new ParameterizedTypeImpl(resolveClass(className), null, typeArguments);
+        return type;
     }
 
     private Type[] readTypeArguments()
@@ -329,17 +534,21 @@ class GenericSignatureParser
     private Type readTypeArgument()
     {
         char c = peekChar();
-        if (c == '+' || c == '-')
+        if (c == '+')
         {
-            readChar();
-            // FIXME add wildcard indicator
-            return readFieldTypeSignature();
+            consume('+');
+            return new WildcardTypeImpl(null, readFieldTypeSignature());
+        }
+        else if (c == '-')
+        {
+            consume('-');
+            return new WildcardTypeImpl(readFieldTypeSignature(),
+                java.lang.Object.class);
         }
         else if (c == '*')
         {
-            // FIXME what does this mean?
             consume('*');
-            return java.lang.Object.class;
+            return new WildcardTypeImpl(null, java.lang.Object.class);
         }
         else
         {
@@ -357,20 +566,28 @@ class GenericSignatureParser
             case 'T':
                 return new GenericArrayTypeImpl(readFieldTypeSignature());
             case 'Z':
+                consume('Z');
                 return boolean[].class;
             case 'B':
+                consume('B');
                 return byte[].class;
             case 'S':
+                consume('S');
                 return short[].class;
             case 'C':
+                consume('C');
                 return char[].class;
             case 'I':
+                consume('I');
                 return int[].class;
             case 'F':
+                consume('F');
                 return float[].class;
             case 'J':
+                consume('J');
                 return long[].class;
             case 'D':
+                consume('D');
                 return double[].class;
             default:
                 throw new GenericSignatureFormatError();
@@ -413,6 +630,12 @@ class GenericSignatureParser
     final void consume(char c)
     {
         if (readChar() != c)
+            throw new GenericSignatureFormatError();
+    }
+
+    final void end()
+    {
+        if (pos != signature.length())
             throw new GenericSignatureFormatError();
     }
 }

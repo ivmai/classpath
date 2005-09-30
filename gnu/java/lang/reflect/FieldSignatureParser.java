@@ -1,4 +1,4 @@
-/* ClassSignatureParser.java
+/* FieldSignatureParser.java
    Copyright (C) 2005
    Free Software Foundation
 
@@ -38,55 +38,66 @@ exception statement from your version. */
 
 package gnu.java.lang.reflect;
 
-import java.lang.reflect.*;
-import java.util.ArrayList;
+import java.lang.reflect.GenericSignatureFormatError;
+import java.lang.reflect.Type;
 
-public class ClassSignatureParser extends GenericSignatureParser
+public final class FieldSignatureParser extends GenericSignatureParser
 {
-    private TypeVariable[] typeParameters;
-    private Type superclassType;
-    private Type[] interfaceTypes;
+    private Type type;
 
-    public ClassSignatureParser(Class c, String signature)
+    public FieldSignatureParser(Class container, String signature)
     {
-        super(c, c.getClassLoader(), signature);
+        super(container, container.getClassLoader(), signature);
 
-        if (peekChar() == '<')
+        switch (peekChar())
         {
-            typeParameters = readFormalTypeParameters();
+            case 'L':
+            case '[':
+            case 'T':
+                type = readFieldTypeSignature();
+                break;
+            case 'Z':
+                consume('Z');
+                type = boolean.class;
+                break;
+            case 'B':
+                consume('B');
+                type = byte.class;
+                break;
+            case 'S':
+                consume('S');
+                type = short.class;
+                break;
+            case 'C':
+                consume('C');
+                type = char.class;
+                break;
+            case 'I':
+                consume('I');
+                type = int.class;
+                break;
+            case 'F':
+                consume('F');
+                type = float.class;
+                break;
+            case 'J':
+                consume('J');
+                type = long.class;
+                break;
+            case 'D':
+                consume('D');
+                type = double.class;
+                break;
+            default:
+                throw new GenericSignatureFormatError();
         }
-        else
-        {
-            typeParameters = new TypeVariable[0];
-        }
-        // SuperclassSignature
-        superclassType = readClassTypeSignature();
-        ArrayList<Type> interfaces = new ArrayList<Type>();
-        while (peekChar() == 'L')
-        {
-            // SuperinterfaceSignature
-            interfaces.add(readClassTypeSignature());
-        }
-        interfaceTypes = new Type[interfaces.size()];
-        interfaces.toArray(interfaceTypes);
+
         end();
     }
 
-    public TypeVariable[] getTypeParameters()
+    public Type getFieldType()
     {
-        TypeImpl.resolve(typeParameters);
-        return typeParameters;
-    }
-
-    public Type getSuperclassType()
-    {
-        superclassType = TypeImpl.resolve(superclassType);
-        return superclassType;
-    }
-
-    public Type[] getInterfaceTypes()
-    {
-        TypeImpl.resolve(interfaceTypes);
-        return interfaceTypes;
+        type = TypeImpl.resolve(type);
+        return type;
     }
 }
