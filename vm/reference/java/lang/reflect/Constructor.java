@@ -252,10 +252,10 @@ public final class Constructor<T>
   /**
    * Returns an array of <code>TypeVariable</code> objects that represents
    * the type variables declared by this constructor, in declaration order.
-   * An array of size zero is returned if this class has no type
+   * An array of size zero is returned if this constructor has no type
    * variables.
    *
-   * @return the type variables associated with this class. 
+   * @return the type variables associated with this constructor.
    * @throws GenericSignatureFormatError if the generic signature does
    *         not conform to the format specified in the Virtual Machine
    *         specification, version 3.
@@ -268,5 +268,51 @@ public final class Constructor<T>
     return p.getTypeParameters();
   }
 
+  /**
+   * Return the String in the Signature attribute for this constructor. If there
+   * is no Signature attribute, return null.
+   */
   private native String getSignature();
+
+  /**
+   * Returns an array of <code>Type</code> objects that represents
+   * the exception types declared by this constructor, in declaration order.
+   * An array of size zero is returned if this constructor declares no
+   * exceptions.
+   *
+   * @return the exception types declared by this constructor. 
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
+   * @since 1.5
+   */
+  public Type[] getGenericExceptionTypes()
+  {
+    String sig = getSignature();
+    if (sig == null)
+      return getExceptionTypes();
+    MethodSignatureParser p = new MethodSignatureParser(this, sig);
+    return p.getGenericExceptionTypes();
+  }
+
+  /**
+   * Returns an array of <code>Type</code> objects that represents
+   * the parameter list for this constructor, in declaration order.
+   * An array of size zero is returned if this constructor takes no
+   * parameters.
+   *
+   * @return a list of the types of the constructor's parameters
+   * @throws GenericSignatureFormatError if the generic signature does
+   *         not conform to the format specified in the Virtual Machine
+   *         specification, version 3.
+   * @since 1.5
+   */
+  public Type[] getGenericParameterTypes()
+  {
+    String sig = getSignature();
+    if (sig == null)
+      return getParameterTypes();
+    MethodSignatureParser p = new MethodSignatureParser(this, sig);
+    return p.getGenericParameterTypes();
+  }
 }
