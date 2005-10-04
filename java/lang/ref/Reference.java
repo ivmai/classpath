@@ -91,7 +91,7 @@ public abstract class Reference<T>
    * (not to null, that value is used to mark a not enqueued
    * reference).  
    */
-  Reference<T> nextOnQueue;
+  Reference nextOnQueue;
 
   /**
    * This lock should be taken by the garbage collector, before

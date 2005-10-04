@@ -1,3 +1,8 @@
+2005-10-04  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/ref/Reference.java (nextOnQueue): Changed type.
+	* java/lang/ref/ReferenceQueue.java (first): Changed type.
+
 2005-10-01  Jeroen Frijters  <jeroen@frijters.net>
 
 	* vm/reference/java/lang/reflect/Constructor.java
