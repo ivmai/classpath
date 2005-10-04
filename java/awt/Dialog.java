@@ -400,7 +400,9 @@ addNotify()
   *  return until the dialog is hidden by someone calling hide or dispose.
   * If this is the event dispatching thread we must ensure that another event
   *  thread runs while the one which invoked this method is blocked. 
+  * @specnote Deprecated starting in 1.5.
   */
+@Deprecated
 public synchronized void
 show()
 {
@@ -446,8 +448,9 @@ show()
 /**
   * Hides the Dialog and then
   * causes show() to return if it is currently blocked.
+  * @specnote Deprecated starting in 1.5
   */
-
+@Deprecated
 public synchronized void 
 hide ()
 {

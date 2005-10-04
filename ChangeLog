@@ -1,5 +1,10 @@
 2005-10-04  Tom Tromey  <tromey@redhat.com>
 
+	* java/awt/Dialog.java (show): Now deprecated.
+	(hide): Likewise.
+
+2005-10-04  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/ref/Reference.java (nextOnQueue): Changed type.
 	* java/lang/ref/ReferenceQueue.java (first): Changed type.
 
