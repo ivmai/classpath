@@ -242,7 +242,7 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences systemNodeForPackage(Class c)
+    public static Preferences systemNodeForPackage(Class<?> c)
             throws SecurityException
     {
         return nodeForPackage(c, systemRoot());
@@ -261,7 +261,7 @@ public abstract class Preferences {
      * @exception SecurityException when a security manager is installed and
      * the caller does not have <code>RuntimePermission("preferences")</code>.
      */
-    public static Preferences userNodeForPackage(Class c)
+    public static Preferences userNodeForPackage(Class<?> c)
             throws SecurityException
     {
         return nodeForPackage(c, userRoot());

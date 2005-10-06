@@ -1,5 +1,10 @@
 2005-10-05  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/prefs/Preferences.java (systemNodeForPackage): Genericized.
+	(userNodeForPackage): Likewise.
+
+2005-10-05  Tom Tromey  <tromey@redhat.com>
+
 	* javax/swing/tree/DefaultTreeSelectionModel.java (getListeners):
 	Genericized.
 	* javax/swing/tree/DefaultTreeModel.java (getListeners): Genericized.
