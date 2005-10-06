@@ -105,7 +105,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @return the entry set
    * @see Map.Entry
    */
-  public abstract Set entrySet();
+  public abstract Set<Map.Entry<K, V>> entrySet();
 
   /**
    * Remove all entries from this Map (optional operation). This default
@@ -134,7 +134,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    */
   protected Object clone() throws CloneNotSupportedException
   {
-    AbstractMap copy = (AbstractMap) super.clone();
+    AbstractMap<K, V> copy = (AbstractMap<K, V>) super.clone();
     // Clear out the caches; they are stale.
     copy.keys = null;
     copy.values = null;
@@ -201,7 +201,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
   {
     return (o == this
 	    || (o instanceof Map
-		&& entrySet().equals(((Map) o).entrySet())));
+		&& entrySet().equals(((Map<K, V>) o).entrySet())));
   }
 
   /**
@@ -310,7 +310,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 */
         public Iterator<K> iterator()
         {
-          return new Iterator()
+          return new Iterator<K>()
           {
 	    /**
 	     * The iterator returned by <code>entrySet()</code>.
@@ -400,11 +400,14 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    */
   public void putAll(Map<? extends K, ? extends V> m)
   {
-    Iterator<Map.Entry<K, V>> entries = ((Map<K,V>) m).entrySet().iterator();
+    // FIXME: bogus circumlocution.
+    Iterator entries2 = m.entrySet().iterator();
+    Iterator<Map.Entry<? extends K, ? extends V>> entries
+      = (Iterator<Map.Entry<? extends K, ? extends V>>) entries2;
     int pos = m.size();
     while (--pos >= 0)
       {
-        Map.Entry<K, V> entry = entries.next();
+        Map.Entry<? extends K, ? extends V> entry = entries.next();
         put(entry.getKey(), entry.getValue());
       }
   }
@@ -543,7 +546,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 */
         public Iterator<V> iterator()
         {
-          return new Iterator()
+          return new Iterator<V>()
           {
 	    /**
 	     * The iterator returned by <code>entrySet()</code>.

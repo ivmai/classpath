@@ -1,3 +1,24 @@
+2005-10-06  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/ListResourceBundle.java (getKeys): Fixed return type.
+	* java/util/ResourceBundle.java (getKeys): Fixed return type.
+	* java/util/AbstractMap.java (entrySet): Fixed return type.
+	(clone): Updated.
+	(equals): Likewise.
+	(iterator): Likewise.
+	* java/util/Collections.java (fill): Fixed argument type.
+	(reverse): Likewise.
+	(unmodifiableCollection): Likewise.
+	(UnmodifiableCollection): Likewise.
+	(UnmodifiableIterator): Likewise.
+	(unmodifiableSet): Likewise.
+	(UnmodifiableSet): Likewise.
+	(unmodifiableList): Likewise.
+	* java/util/TreeSet.java (TreeSet(SortedSet<T>)): Fixed argument
+	type.
+	(headSet): Fixed return type.
+	* java/util/StringTokenizer.java: Implements Enumeration<Object>.
+
 2005-10-05  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/jar/Attributes.java: Implements Map<Object,Object>.

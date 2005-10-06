@@ -820,9 +820,9 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation.
    */
-  public static <T> void fill(List<T> l, T val)
+  public static <T> void fill(List<? super T> l, T val)
   {
-    ListIterator<T> itr = l.listIterator();
+    ListIterator<? super T> itr = l.listIterator();
     for (int i = l.size() - 1; i >= 0; --i)
       {
 	itr.next();
@@ -1178,17 +1178,18 @@ public class Collections
    * @throws UnsupportedOperationException if l.listIterator() does not
    *         support the set operation
    */
-  public static <T> void reverse(List<T> l)
+  public static void reverse(List<?> l)
   {
-    ListIterator<T> i1 = l.listIterator();
+    ListIterator i1 = l.listIterator();
     int pos1 = 1;
     int pos2 = l.size();
-    ListIterator<T> i2 = l.listIterator(pos2);
+    ListIterator i2 = l.listIterator(pos2);
     while (pos1 < pos2)
       {
-	T o = i1.next();
-	i1.set(i2.previous());
-	i2.set(o);
+	Object o1 = i1.next();
+    Object o2 = i2.previous();
+	i1.set(o2);
+	i2.set(o1);
 	++pos1;
 	--pos2;
       }
@@ -4183,7 +4184,7 @@ public class Collections
    * @return a read-only view of the collection
    * @see Serializable
    */
-  public static <T> Collection<T> unmodifiableCollection(Collection<T> c)
+  public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> c)
   {
     return new UnmodifiableCollection<T>(c);
   }
@@ -4206,14 +4207,14 @@ public class Collections
      * The wrapped collection. Package visible for use by subclasses.
      * @serial the real collection
      */
-    final Collection<T> c;
+    final Collection<? extends T> c;
 
     /**
      * Wrap a given collection.
      * @param c the collection to wrap
      * @throws NullPointerException if c is null
      */
-    UnmodifiableCollection(Collection<T> c)
+    UnmodifiableCollection(Collection<? extends T> c)
     {
       this.c = c;
       if (c == null)
@@ -4430,13 +4431,13 @@ public class Collections
     /**
      * The wrapped iterator.
      */
-    private final Iterator<T> i;
+    private final Iterator<? extends T> i;
 
     /**
      * Only trusted code creates a wrapper.
      * @param i the wrapped iterator
      */
-    UnmodifiableIterator(Iterator<T> i)
+    UnmodifiableIterator(Iterator<? extends T> i)
     {
       this.i = i;
     }
@@ -5266,7 +5267,7 @@ public class Collections
    * @return a read-only view of the set
    * @see Serializable
    */
-  public static <T> Set<T> unmodifiableSet(Set<T> s)
+  public static <T> Set<T> unmodifiableSet(Set<? extends T> s)
   {
     return new UnmodifiableSet<T>(s);
   }
@@ -5290,7 +5291,7 @@ public class Collections
      * @param s the set to wrap
      * @throws NullPointerException if s is null
      */
-    UnmodifiableSet(Set<T> s)
+    UnmodifiableSet(Set<? extends T> s)
     {
       super(s);
     }
