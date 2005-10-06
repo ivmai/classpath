@@ -368,7 +368,7 @@ public class ZipFile implements ZipConstants
    *
    * @exception IllegalStateException when the ZipFile has already been closed
    */
-  public Enumeration<ZipEntry> entries()
+  public Enumeration<? extends ZipEntry> entries()
   {
     checkClosed();
     

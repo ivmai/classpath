@@ -1,5 +1,9 @@
 2005-10-05  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/zip/ZipFile.java (entries): Fixed return type.
+
+2005-10-05  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/prefs/Preferences.java (systemNodeForPackage): Genericized.
 	(userNodeForPackage): Likewise.
 
