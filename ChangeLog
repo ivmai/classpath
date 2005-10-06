@@ -1,5 +1,24 @@
 2005-10-05  Tom Tromey  <tromey@redhat.com>
 
+	* java/awt/datatransfer/SystemFlavorMap.java (getNativesForFlavors):
+	Genericized.
+	(getFlavorsForNatives): Likewise.
+	(getFlavorsForNative): Likewise.
+	(getNativesForFlavor): Likewise.
+	* java/awt/datatransfer/DataFlavor.java (DataFlavor): Genericized.
+	(getDefaultRepresentationClass): Likewise.
+	(getRepresentationClass): Likewise.
+	(tryToLoadClass): Likewise.
+	(representationClass): Likewise.
+	* java/awt/datatransfer/FlavorTable.java (getNativesForFlavor):
+	Genericized.
+	(getFlavorsForNative): Likewise.
+	* java/awt/datatransfer/FlavorMap.java (getFlavorsForNatives):
+	Genericized.
+	(getNativesForFlavors): Likewise.
+
+2005-10-05  Tom Tromey  <tromey@redhat.com>
+
 	* java/util/zip/ZipFile.java (entries): Fixed return type.
 
 2005-10-05  Tom Tromey  <tromey@redhat.com>

@@ -76,9 +76,9 @@ public final class SystemFlavorMap implements FlavorMap, FlavorTable
    *
    * @return A <code>Map</code> of native data types to data flavors.
    */
-  public Map getNativesForFlavors (DataFlavor[] flavors)
+  public Map<DataFlavor, String> getNativesForFlavors (DataFlavor[] flavors)
   {
-    return new HashMap();
+    return new HashMap<DataFlavor, String>();
   }
 
   /**
@@ -92,9 +92,9 @@ public final class SystemFlavorMap implements FlavorMap, FlavorTable
    *
    * @return A <code>Map</code> of data flavors to native type names.
    */
-  public Map getFlavorsForNatives (String[] natives)
+  public Map<String, DataFlavor> getFlavorsForNatives (String[] natives)
   { 
-    return new HashMap();
+    return new HashMap<String, DataFlavor>();
   }
 
   /**
@@ -156,12 +156,12 @@ public final class SystemFlavorMap implements FlavorMap, FlavorTable
       return null;
   }
 
-  public List getFlavorsForNative (String nat)
+  public List<DataFlavor> getFlavorsForNative (String nat)
   {
     throw new Error ("Not implemented");
   }
 
-  public List getNativesForFlavor (DataFlavor flav)
+  public List<String> getNativesForFlavor (DataFlavor flav)
   {
     throw new Error ("Not implemented");
   }

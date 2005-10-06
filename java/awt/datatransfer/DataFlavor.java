@@ -146,7 +146,7 @@ static
 private final String mimeType;
 
 // The representation class for this flavor
-private final Class representationClass;
+private final Class<?> representationClass;
 
 // The human readable name of this flavor
 private String humanPresentableName;
@@ -169,7 +169,7 @@ private String humanPresentableName;
  *
  * @exception ClassNotFoundException If the class cannot be loaded.
  */
-protected static final Class
+protected static final Class<?>
 tryToLoadClass(String className, ClassLoader classLoader)
                throws ClassNotFoundException
 {
@@ -256,7 +256,7 @@ DataFlavor(Class representationClass,
  * @param humanPresentableName The display name of the object.
  */
 public
-DataFlavor(Class representationClass, String humanPresentableName)
+DataFlavor(Class<?> representationClass, String humanPresentableName)
 {
     this(representationClass,
        "application/x-java-serialized-object"
@@ -381,7 +381,7 @@ getMimeType()
  *
  * @return The representation class for this flavor.
  */
-public Class
+public Class<?>
 getRepresentationClass()
 {
   return(representationClass);
@@ -885,7 +885,7 @@ getTextPlainUnicodeFlavor()
  *
  * @since 1.3
  */
-public final Class
+public final Class<?>
 getDefaultRepresentationClass()
 {
   return(java.io.InputStream.class);
