@@ -65,7 +65,7 @@ import java.util.Set;
  * @see java.util.jar.Attributes.Name
  * @author Mark Wielaard (mark@klomp.org)
  */
-public class Attributes implements Cloneable, Map
+public class Attributes implements Cloneable, Map<Object, Object>
 {
 
   // Fields
@@ -75,7 +75,7 @@ public class Attributes implements Cloneable, Map
    * implementation it is actually a Hashtable, but that can be different in
    * other implementations.
    */
-  protected Map map;
+  protected Map<Object, Object> map;
 
   // Inner class
 
@@ -493,7 +493,7 @@ public class Attributes implements Cloneable, Map
    *
    * @return a set of attribute name value pairs
    */
-  public Set entrySet()
+  public Set<Map.Entry<Object, Object>> entrySet()
   {
     return map.entrySet();
   }
@@ -559,7 +559,7 @@ public class Attributes implements Cloneable, Map
   /**
    * Gives a Set of all the values of defined attribute names.
    */
-  public Set keySet()
+  public Set<Object> keySet()
   {
     return map.keySet();
   }
@@ -588,7 +588,7 @@ public class Attributes implements Cloneable, Map
    * @exception ClassCastException if the supplied map is not an instance of
    * Attributes
    */
-  public void putAll(Map attr)
+  public void putAll(Map<?, ?> attr)
   {
     if (!(attr instanceof Attributes))
       {
@@ -623,7 +623,7 @@ public class Attributes implements Cloneable, Map
    * Returns all the values of the defined attribute name/value pairs as a
    * Collection.
    */
-  public Collection values()
+  public Collection<Object> values()
   {
     return map.values();
   }

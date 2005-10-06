@@ -64,7 +64,7 @@ public class Manifest implements Cloneable
   private final Attributes mainAttr;
 
   /** A map of atrributes for all entries described in this Manifest. */
-  private final Map entries;
+  private final Map<String, Attributes> entries;
 
   // Constructors
 
@@ -74,7 +74,7 @@ public class Manifest implements Cloneable
   public Manifest()
   {
     mainAttr = new Attributes();
-    entries = new Hashtable();
+    entries = new Hashtable<String, Attributes>();
   }
 
   /**
@@ -108,7 +108,7 @@ public class Manifest implements Cloneable
   public Manifest(Manifest man)
   {
     mainAttr = new Attributes(man.getMainAttributes());
-    entries = new Hashtable(man.getEntries());
+    entries = new Hashtable<String, Attributes>(man.getEntries());
   }
 
   // Methods
@@ -126,7 +126,7 @@ public class Manifest implements Cloneable
    * in this manifest. Adding, changing or removing from this entries map
    * changes the entries of this manifest.
    */
-  public Map getEntries()
+  public Map<String, Attributes> getEntries()
   {
     return entries;
   }
@@ -279,7 +279,7 @@ public class Manifest implements Cloneable
       }
   }
 
-  private static void read_individual_sections(Map entries,
+  private static void read_individual_sections(Map<String, Attributes> entries,
 					       BufferedReader br) throws
     IOException
   {
@@ -293,7 +293,7 @@ public class Manifest implements Cloneable
   }
 
   private static Attributes read_section_name(String s, BufferedReader br,
-					      Map entries) throws JarException
+					      Map<String, Attributes> entries) throws JarException
   {
     try
       {
@@ -378,10 +378,10 @@ public class Manifest implements Cloneable
   private static void write_main_attributes(Attributes attr, PrintWriter pw) 
     throws JarException
   {
-    Iterator it = attr.entrySet().iterator();
+    Iterator<Map.Entry<Object, Object>> it = attr.entrySet().iterator();
     while (it.hasNext())
       {
-	Map.Entry entry = (Map.Entry) it.next();
+	Map.Entry<Object, Object> entry = it.next();
 	// Don't print the manifest version again
 	if (!Attributes.Name.MANIFEST_VERSION.equals(entry.getKey()))
 	  {
@@ -390,7 +390,8 @@ public class Manifest implements Cloneable
       }
   }
 
-  private static void write_attribute_entry(Map.Entry entry, PrintWriter pw) 
+  private static void write_attribute_entry(Map.Entry<Object, Object> entry,
+                                            PrintWriter pw) 
     throws JarException
   {
     String name = entry.getKey().toString();
@@ -409,14 +410,15 @@ public class Manifest implements Cloneable
     write_header(name, value, pw);
   }
 
-  private static void write_individual_sections(Map entries, PrintWriter pw)
+  private static void write_individual_sections(Map<String, Attributes> entries,
+                                                PrintWriter pw)
     throws JarException
   {
 
-    Iterator it = entries.entrySet().iterator();
+    Iterator<Map.Entry<String, Attributes>> it = entries.entrySet().iterator();
     while (it.hasNext())
       {
-	Map.Entry entry = (Map.Entry) it.next();
+	Map.Entry<String, Attributes> entry = it.next();
 	write_header("Name", entry.getKey().toString(), pw);
 	write_entry_attributes((Attributes) entry.getValue(), pw);
 	pw.println();
@@ -426,10 +428,10 @@ public class Manifest implements Cloneable
   private static void write_entry_attributes(Attributes attr, PrintWriter pw) 
     throws JarException
   {
-    Iterator it = attr.entrySet().iterator();
+    Iterator<Map.Entry<Object, Object>> it = attr.entrySet().iterator();
     while (it.hasNext())
       {
-	Map.Entry entry = (Map.Entry) it.next();
+	Map.Entry<Object, Object> entry = it.next();
 	write_attribute_entry(entry, pw);
       }
   }

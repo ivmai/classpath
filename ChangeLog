@@ -1,5 +1,27 @@
 2005-10-05  Tom Tromey  <tromey@redhat.com>
 
+	* java/util/jar/Attributes.java: Implements Map<Object,Object>.
+	(map): Changed type.
+	(entrySet): Changed return type.
+	(keySet): Likewise.
+	(putAll): Changed argument type.
+	(values): Changed return type.
+	* java/util/jar/Manifest.java (getEntries): Genericized.
+	(Manifest): Updated.
+	(entries): Changed type.
+	(read_individual_sections): Updated.
+	(read_section_name): Likewise.
+	(write_main_attributes): Likewise.
+	(write_attribute_entry): Likewise.
+	(write_individual_sections): Likewise.
+	(write_entry_attributes): Likewise.
+	* java/util/jar/JarFile.java (entries): Genericized.
+	(JarEnumeration): Implements Enumeration<JarEntry>.
+	(JarEnumeration.nextElement): Changed return type.
+	(JarEnumeration.entries): Changed type.
+
+2005-10-05  Tom Tromey  <tromey@redhat.com>
+
 	* java/awt/datatransfer/SystemFlavorMap.java (getNativesForFlavors):
 	Genericized.
 	(getFlavorsForNatives): Likewise.
