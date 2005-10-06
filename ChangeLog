@@ -1,3 +1,40 @@
+2005-10-05  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java (getListeners):
+	Genericized.
+	* javax/swing/tree/DefaultTreeModel.java (getListeners): Genericized.
+	* javax/swing/Timer.java (getListeners): Genericized.
+	* javax/swing/text/StyleContext.java (getListeners): Genericized.
+	* javax/swing/text/DefaultCaret.java (getListeners): Genericized.
+	* javax/swing/text/AbstractDocument.java (getListeners):
+	Genericized.
+	* javax/swing/table/DefaultTableColumnModel.java (getListeners):
+	Genericized.
+	* javax/swing/table/AbstractTableModel.java (getListeners):
+	Genericized.
+	* javax/swing/JComponent.java (getListeners): Genericized.
+	* javax/swing/DefaultSingleSelectionModel.java (getListeners):
+	Genericized.
+	* javax/swing/DefaultListSelectionModel.java (getListeners):
+	Genericized.
+	* javax/swing/DefaultButtonModel.java (getListeners): Genericized.
+	* javax/swing/DefaultBoundedRangeModel.java (getListeners):
+	Genericized.
+	* javax/swing/AbstractSpinnerModel.java (getListeners): Genericized.
+	* javax/swing/event/EventListenerList.java (add): Genericized.
+	(getListeners): Likewise.
+	(remove): Likewise.
+	* java/awt/dnd/DragSource.java (getListeners): Genericized.
+	* java/awt/TextField.java (getListeners): Genericized.
+	* java/awt/Window.java (getListeners): Genericized.
+	* java/awt/Scrollbar.java (getListeners): Genericized.
+	* java/awt/List.java (getListeners): Genericized.
+	* java/awt/Choice.java (getListeners): Genericized.
+	* java/awt/TextComponent.java (getListeners): Genericized.
+	* java/awt/CheckboxMenuItem.java (getListeners): Genericized.
+	* java/awt/Button.java (getListeners): Genericized.
+	* java/awt/Container.java (getListeners): Genericized.
+
 2005-10-04  Tom Tromey  <tromey@redhat.com>
 
 	* java/awt/Dialog.java (show): Now deprecated.

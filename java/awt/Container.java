@@ -884,10 +884,10 @@ public class Container extends Component
    *
    * @since 1.3
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     if (listenerType == ContainerListener.class)
-      return getContainerListeners();
+      return (T[]) getContainerListeners();
     return super.getListeners(listenerType);
   }
 

@@ -598,7 +598,7 @@ public abstract class JComponent extends Container implements Serializable
    *
    * @see #listenerList
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     return listenerList.getListeners(listenerType);
   }

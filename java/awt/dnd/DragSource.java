@@ -241,7 +241,7 @@ public class DragSource implements Serializable
   /**
    * @since 1.4
    */
-  public EventListener[] getListeners (Class listenerType)
+  public <T extends EventListener> T[] getListeners (Class<T> listenerType)
   {
     if (listenerType == DragSourceListener.class)
       return DnDEventMulticaster.getListeners (dragSourceListener,
@@ -252,6 +252,6 @@ public class DragSource implements Serializable
                                                listenerType);
 
     // Return an empty EventListener array.
-    return new EventListener [0];
+    return (T[]) new EventListener [0];
   }
 } // class DragSource

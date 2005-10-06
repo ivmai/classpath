@@ -404,7 +404,7 @@ public abstract class AbstractDocument implements Document, Serializable
    *
    * @return all registered listeners of the specified type
    */
-  public EventListener[] getListeners(Class listenerType)
+  public <T extends EventListener> T[] getListeners(Class<T> listenerType)
   {
     return listenerList.getListeners(listenerType);
   }
