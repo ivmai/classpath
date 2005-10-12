@@ -224,7 +224,7 @@ public class BufferedImage extends Image
   public BufferedImage(ColorModel colormodel, 
 		       WritableRaster writableraster,
 		       boolean premultiplied,
-		       Hashtable properties)
+		       Hashtable<?,?> properties)
   {
     init(colormodel, writableraster, premultiplied, properties,
 	 TYPE_CUSTOM);

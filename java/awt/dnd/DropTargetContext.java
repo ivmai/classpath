@@ -161,7 +161,7 @@ public class DropTargetContext implements Serializable
     return null;
   }
 
-  protected List getCurrentDataFlavorsAsList ()
+  protected List<DataFlavor> getCurrentDataFlavorsAsList ()
   {
     return Arrays.asList (getCurrentDataFlavors ());
   }

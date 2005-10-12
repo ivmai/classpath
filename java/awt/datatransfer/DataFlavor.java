@@ -231,7 +231,7 @@ DataFlavor()
  * Private constructor.
  */
 private
-DataFlavor(Class representationClass,
+DataFlavor(Class<?> representationClass,
 	   String mimeType,
 	   String humanPresentableName)
 {

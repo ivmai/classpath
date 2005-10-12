@@ -346,7 +346,7 @@ extends AccessibleObject implements Member, GenericDeclaration
    *         specification, version 3.
    * @since 1.5
    */
-  public TypeVariable<?>[] getTypeParameters()
+  public TypeVariable<Method>[] getTypeParameters()
   {
     String sig = getSignature();
     MethodSignatureParser p = new MethodSignatureParser(this, sig);

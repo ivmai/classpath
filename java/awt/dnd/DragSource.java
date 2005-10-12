@@ -172,8 +172,8 @@ public class DragSource implements Serializable
     return flavorMap;
   }
 
-  public DragGestureRecognizer
-    createDragGestureRecognizer(Class recognizer, Component c, int actions,
+  public <T extends DragGestureRecognizer> T
+    createDragGestureRecognizer(Class<T> recognizer, Component c, int actions,
                                 DragGestureListener dgl)
   {
     return Toolkit.getDefaultToolkit ()
@@ -245,11 +245,11 @@ public class DragSource implements Serializable
   {
     if (listenerType == DragSourceListener.class)
       return DnDEventMulticaster.getListeners (dragSourceListener,
-                                               listenerType);
+					       listenerType);
 
     if (listenerType == DragSourceMotionListener.class)
       return DnDEventMulticaster.getListeners (dragSourceMotionListener,
-                                               listenerType);
+					       listenerType);
 
     // Return an empty EventListener array.
     return (T[]) new EventListener [0];

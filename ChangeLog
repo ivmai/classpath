@@ -1,3 +1,74 @@
+2005-10-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/awt/datatransfer/DataFlavor.java:
+	(DataFlavor(Class<?>,String,String): Genericized.
+	* java/awt/dnd/DragGestureEvent.java:
+	(DragGestureEvent(DragGestureRecognizer,int,Point,
+	List<? extends InputEvent>)): Likewise.
+	(iterator()): Likewise.
+	* java/awt/dnd/DragSource.java:
+	(createDragGestureRecognizer(Class<T>,Component,int,
+	DragGestureListener)): Likewise.
+	* java/awt/dnd/DropTargetContext.java:
+	(getCurrentDataFlavorsAsList()): Likewise.
+	* java/awt/dnd/DropTargetDragEvent.java:
+	(getCurrentDataFlavorsAsList()): Likewise.
+	* java/awt/dnd/DropTargetDropEvent.java:
+	(getCurrentDataFlavorsAsList()): Likewise.
+	* java/awt/font/TextLayout.java:
+	(TextLayout(String,Map<? extends
+	AttributedCharacterIterator.Attribute>, FontRenderContext)): Likewise.
+	* java/awt/image/BufferedImage.java:
+	(BufferedImage(ColorModel,WritableRaster,boolean,Hashtable<?,?>)):
+	Likewise.
+	* java/awt/image/ImageConsumer.java:
+	(setProperties(Hashtable<?,?>)): Likewise.
+	* java/awt/image/MemoryImageSource.java:
+	(MemoryImageSource(int,int,ColorModel,byte[],int,int,Hashtable<?,?>)):
+	Likewise.
+	(MemoryImageSource(int,int,ColorModel,int[],int,int,Hashtable<?,?>)):
+	Likewise.	
+	* java/awt/image/RenderedImage.java:
+	(getSources()): Likewise.
+	* java/awt/image/renderable/ParameterBlock.java:
+	(sources): Likewise.
+	(parameters): Likewise.
+	(ParameterBlock()): Likewise.
+	(ParameterBlock(Vector<Object>)): Likewise.
+	(ParameterBlock(Vector<Object>,Vector<Object>)): Likewise.
+	(clone()): Added casts to handle new Vector type.
+	(getSources()): Genericized.
+	(setSources(Vector<Object>)): Likewise.
+	(getParameters()): Likewise.
+	(setParameters(Vector<Object>)): Likewise.
+	* java/awt/image/renderable/RenderableImage.java:
+	(getSources()): Likewise.
+	* javax/swing/tree/DefaultMutableTreeNode.java:
+	(children): Likewise.
+	(getSharedAncestor(DefaultMutableTreeNode)): Likewise.
+	(getDepth()): Likewise.
+	(pathFromAncestorEnumeration(TreeNode)): Likewise.
+	(PostOrderEnumeration)): Likewise.
+	* javax/swing/undo/CompoundEdit.java:
+	(edits): Likewise.
+	(CompoundEdit()): Likewise.
+	(undo()): Likewise.
+	(redo()): Likewise.
+	(lastEdit()): Likewise.
+	(die()): Likewise.
+	(isSignificant()): Likewise.
+	* javax/swing/undo/UndoableEditSupport.java:
+	(listeners): Likewise.
+	(getUndoableEditListeners()): Likewise.
+	* lib/Makefile.am:
+	Turn off listing unused imports (at least for now).
+	* org/omg/CosNaming/_NamingContextExtImplBase.java:
+	(_methods): Likewise.
+	* org/omg/CosNaming/_NamingContextImplBase.java:
+	(methods): Likewise.
+	* vm/reference/java/lang/reflect/Method.java:
+	(getTypeParameters()): Corrected return type.
+
 2005-10-06  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/ListResourceBundle.java (getKeys): Fixed return type.

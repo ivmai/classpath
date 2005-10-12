@@ -76,7 +76,7 @@ public class MemoryImageSource implements ImageProducer
    * Constructs an ImageProducer from memory
    */
   public MemoryImageSource(int w, int h, ColorModel cm, byte[] pix, int off,
-                           int scan, Hashtable props)
+                           int scan, Hashtable<?,?> props)
   {
     width = w;
     height = h;
@@ -109,7 +109,7 @@ public class MemoryImageSource implements ImageProducer
      Constructs an ImageProducer from memory
   */
   public MemoryImageSource(int w, int h, ColorModel cm, int[] pix, int off,
-                           int scan, Hashtable props)
+                           int scan, Hashtable<?,?> props)
   {
     width = w;
     height = h;
