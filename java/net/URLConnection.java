@@ -47,6 +47,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -311,10 +312,10 @@ public abstract class URLConnection
    *
    * @since 1.4
    */
-  public Map getHeaderFields()
+  public Map<String,List<String>> getHeaderFields()
   {
     // Subclasses for specific protocols override this.
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   /**
@@ -802,14 +803,14 @@ public abstract class URLConnection
    *
    * @since 1.4
    */
-  public Map getRequestProperties()
+  public Map<String,List<String>> getRequestProperties()
   {
     if (connected)
       throw new IllegalStateException("Already connected");
 
     // Overridden by subclasses that support reading header fields from the
     // request.
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   /**

@@ -55,7 +55,8 @@ import java.security.PrivilegedAction;
  * @author Michael Koch (konqueror@gmx.de)
  * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  */
-public class ObjectStreamField implements Comparable
+public class ObjectStreamField 
+  implements Comparable<Object>
 {
   private String name;
   private Class<?> type;
@@ -80,7 +81,7 @@ public class ObjectStreamField implements Comparable
    * @param name Name of the field to export.
    * @param type Type of the field in the concerned class.
    */
-  public ObjectStreamField (String name, Class type)
+  public ObjectStreamField (String name, Class<?> type)
   {
     this (name, type, false);
   }
@@ -94,7 +95,7 @@ public class ObjectStreamField implements Comparable
    * @param type Type of the field in the concerned class.
    * @param unshared true if field will be unshared, false otherwise.
    */
-  public ObjectStreamField (String name, Class type, boolean unshared)
+  public ObjectStreamField (String name, Class<?> type, boolean unshared)
   {
     if (name == null)
       throw new NullPointerException();

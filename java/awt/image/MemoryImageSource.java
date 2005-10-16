@@ -125,7 +125,7 @@ public class MemoryImageSource implements ImageProducer
    * Constructs an ImageProducer from memory using the default RGB ColorModel
    */
   public MemoryImageSource(int w, int h, int[] pix, int off, int scan,
-                           Hashtable props)
+                           Hashtable<?,?> props)
   {
     this(w, h, ColorModel.getRGBdefault(), pix, off, scan, props);
   }

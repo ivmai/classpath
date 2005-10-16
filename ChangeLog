@@ -1,3 +1,79 @@
+2005-10-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/awt/image/BufferedImage.java:
+	(getSources()): Genericized.
+	* java/awt/image/ImageFilter.java:
+	(setProperties(Hashtable<?,?>)): Likewise.
+	* java/awt/image/MemoryImageSource.java:
+	(MemoryImageSource(int,int,int[],int,int,Hashtable<?,?>)): Likewise.
+	* java/awt/image/PixelGrabber.java:
+	(setProperties(Hashtable<?,?>)): Likewise.
+	* java/awt/image/renderable/RenderableImageOp.java:
+	(getSources()): Likewise.
+	* java/beans/Beans.java:
+	(getInstanceOf(Object,Class<?>)): Likewise.
+	(isInstanceOf(Object,Class<?>)): Likewise.
+	* java/beans/EventSetDescriptor.java:
+	(EventSetDescriptor(Class<?>,String,Class<?>,String)): Likewise.
+	(EventSetDescriptor(Class<?>,String,Class<?>,String[],String,String)):
+	Likewise.
+	(EventSetDescriptor(Class<?>,Method[],Method,Method)): Likewise.
+	(EventSetDescriptor(String,Class<?>,MethodDescriptor,Method,Method)):
+	Likewise.
+	(getListenerType()): Likewise.
+	* java/beans/FeatureDescriptor.java:
+	(FeatureDescriptor()): Likewise.
+	(attributeNames()): Likewise.
+	* java/beans/IndexedPropertyDescriptor.java:
+	(IndexedPropertyDescriptor(String,Class<?>)): Likewise.
+	(IndexedPropertyDescriptor(String,Class<?>,String,String,String,String)):
+	Likewise.
+	(getIndexedPropertyType()): Likewise.
+	* java/beans/Introspector.java:
+	(getBeanInfo(Class<?>)): Likewise.
+	(flushFromCaches(Class<?>)): Likewise.
+	(getBeanInfo(Class<?>,Class<?>)): Likewise.
+	* java/beans/PropertyDescriptor.java:
+	(PropertyDescriptor(String,Class<?>)): Likewise.
+	(getPropertyType()): Likewise.
+	(getPropertyEditorClass()): Likewise.
+	(setPropertyEditorClass(Class<?>)): Likewise.
+	(checkMethods(Method,Method)): Likewise.
+	* java/beans/PropertyEditorManager.java:
+	(registerEditor(Class<?>,Class<?>)): Likewise.
+	(getEditor(Class<?>)): Likewise.
+	* java/io/ObjectInputStream.java:
+	(resolveClass(ObjectStreamClass)): Likewise.
+	* java/io/ObjectOutputStream.java:
+	(annotateClass(Class<?>)): Likewise.
+	(annotateProxyClass(Class<?>)): Likewise.
+	* java/io/ObjectStreamClass.java:
+	(lookup(Class<?>)): Likewise.
+	(forClass()): Likewise.
+	* java/io/ObjectStreamField.java:
+	(ObjectStreamField(String,Class<?>)): Likewise.
+	(ObjectStreamField(String,Class<?>,boolean)): Likewise.
+	* java/net/NetworkInterface.java:
+	(getInetAddresses()): Likewise.
+	(getNetworkInterfaces()): Likewise.
+	* java/net/URLClassLoader.java:
+	(findClass(String)): Likewise.
+	(findResources(String)): Likewise.
+	* java/net/URLConnection.java:
+	(getHeaderFields()): Likewise.
+	(getRequestProperties()): Likewise.
+	* javax/swing/text/TextAction.java:
+	(augmentList(Action[],Action[])): Likewise.
+	* javax/swing/text/html/HTML.java:
+	(attrMap): Likewise.
+	(tagMap): Likewise.
+	* javax/swing/text/html/parser/DTD.java:
+	(dtdHash): Likewise.
+	(elementHash): Likewise.
+	(entityHash): Likewise.
+	(defineAttributes(String,AttributeList)): Likewise.
+	(newElement(String)): Likewise.
+
 2005-10-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/awt/datatransfer/DataFlavor.java:

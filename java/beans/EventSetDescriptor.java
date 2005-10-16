@@ -91,7 +91,7 @@ import java.util.Vector;
 public class EventSetDescriptor extends FeatureDescriptor {
 	private Method addListenerMethod;
 	private Method removeListenerMethod;
-	private Class listenerType;
+	private Class<?> listenerType;
 	private MethodDescriptor[] listenerMethodDescriptors;
 	private Method[] listenerMethods;
 
@@ -132,9 +132,9 @@ public class EventSetDescriptor extends FeatureDescriptor {
 	 ** @exception IntrospectionException if listenerType is not an EventListener,
 	 **                                   or if methods are not found or are invalid.
 	 **/
-	public EventSetDescriptor(Class  eventSourceClass,
+	public EventSetDescriptor(Class<?>  eventSourceClass,
 				  String eventSetName,
-				  Class  listenerType,
+				  Class<?>  listenerType,
 				  String listenerMethodName) throws IntrospectionException {
 		setName(eventSetName);
 		if(!java.util.EventListener.class.isAssignableFrom(listenerType)) {
@@ -172,9 +172,9 @@ public class EventSetDescriptor extends FeatureDescriptor {
 	 ** @exception IntrospectionException if listenerType is not an EventListener
 	 **                                   or if methods are not found or are invalid.
 	 **/
-	public EventSetDescriptor(Class eventSourceClass,
+	public EventSetDescriptor(Class<?> eventSourceClass,
 				   String eventSetName,
-				   Class listenerType,
+				   Class<?> listenerType,
 				   String[] listenerMethodNames,
 				   String addListenerMethodName,
 				   String removeListenerMethodName) throws IntrospectionException {
@@ -205,7 +205,7 @@ public class EventSetDescriptor extends FeatureDescriptor {
 	 **                                   or any of the methods are invalid.
 	 **/
 	public EventSetDescriptor(String eventSetName,
-				   Class listenerType,
+				   Class<?> listenerType,
 				   Method[] listenerMethods,
 				   Method addListenerMethod,
 				   Method removeListenerMethod) throws IntrospectionException {
@@ -239,7 +239,7 @@ public class EventSetDescriptor extends FeatureDescriptor {
 	 **                                   or any of the methods are invalid.
 	 **/
 	public EventSetDescriptor(String eventSetName,
-				   Class listenerType,
+				   Class<?> listenerType,
 				   MethodDescriptor[] listenerMethodDescriptors,
 				   Method addListenerMethod,
 				   Method removeListenerMethod) throws IntrospectionException {
@@ -265,7 +265,7 @@ public class EventSetDescriptor extends FeatureDescriptor {
 	}
 
 	/** Get the class that contains the event firing methods. **/
-	public Class getListenerType() {
+	public Class<?> getListenerType() {
 		return listenerType;
 	}
 

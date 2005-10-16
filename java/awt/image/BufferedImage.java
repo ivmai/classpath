@@ -499,7 +499,7 @@ public class BufferedImage extends Image
       };
   }
   
-  public Vector getSources()
+  public Vector<RenderedImage> getSources()
   {
     return null;
   }

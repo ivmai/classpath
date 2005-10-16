@@ -760,7 +760,7 @@ public class ObjectInputStream extends InputStream
    *
    * @see java.io.ObjectOutputStream#annotateClass (java.lang.Class)
    */
-  protected Class resolveClass(ObjectStreamClass osc)
+  protected Class<?> resolveClass(ObjectStreamClass osc)
     throws ClassNotFoundException, IOException
   {
     String name = osc.getName();

@@ -77,7 +77,7 @@ import java.lang.reflect.Method;
  **/
 
 public class IndexedPropertyDescriptor extends PropertyDescriptor {
-	private Class indexedPropertyType;
+	private Class<?> indexedPropertyType;
 	private Method setIndex;
 	private Method getIndex;
 
@@ -110,7 +110,7 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 	 ** @param beanClass the class the get and set methods live in.
 	 ** @exception IntrospectionException if the methods are not found or invalid.
 	 **/
-	public IndexedPropertyDescriptor(String name, Class beanClass) throws IntrospectionException {
+	public IndexedPropertyDescriptor(String name, Class<?> beanClass) throws IntrospectionException {
 		super(name);
 		String capitalized;
 		try {
@@ -150,7 +150,7 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 	 ** @param setIndexName the name of the set index method.
 	 ** @exception IntrospectionException if the methods are not found or invalid.
 	 **/
-	public IndexedPropertyDescriptor(String name, Class beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName) throws IntrospectionException {
+	public IndexedPropertyDescriptor(String name, Class<?> beanClass, String getMethodName, String setMethodName, String getIndexName, String setIndexName) throws IntrospectionException {
 		super(name);
 		findMethods(beanClass, getMethodName, setMethodName, getIndexName, setIndexName);
 	}
@@ -221,7 +221,7 @@ public class IndexedPropertyDescriptor extends PropertyDescriptor {
 		this.propertyType = getMethod != null ? getMethod.getReturnType() : (setMethod != null ? setMethod.getParameterTypes()[0] : Array.newInstance(this.indexedPropertyType,0).getClass());
 	}
 
-	public Class getIndexedPropertyType() {
+	public Class<?> getIndexedPropertyType() {
 		return indexedPropertyType;
 	}
 

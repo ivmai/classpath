@@ -80,7 +80,7 @@ public class ObjectStreamClass implements Serializable
    *
    * @see java.io.Serializable
    */
-  public static ObjectStreamClass lookup(Class cl)
+  public static ObjectStreamClass lookup(Class<?> cl)
   {
     if (cl == null)
       return null;
@@ -132,7 +132,7 @@ public class ObjectStreamClass implements Serializable
    *
    * @see java.io.ObjectInputStream
    */
-  public Class forClass()
+  public Class<?> forClass()
   {
     return clazz;
   }
@@ -232,7 +232,7 @@ public class ObjectStreamClass implements Serializable
   // classes of CLAZZ and CLAZZ itself in order from most super to
   // CLAZZ.  ObjectStreamClass[0] is the highest superclass of CLAZZ
   // that is serializable.
-  static ObjectStreamClass[] getObjectStreamClasses(Class clazz)
+  static ObjectStreamClass[] getObjectStreamClasses(Class<?> clazz)
   {
     ObjectStreamClass osc = ObjectStreamClass.lookup(clazz);
 
@@ -924,7 +924,7 @@ outer:
     Class[] writeMethodArgTypes = { java.io.ObjectOutputStream.class };
 
   private ObjectStreamClass superClass;
-  private Class clazz;
+  private Class<?> clazz;
   private String name;
   private long uid;
   private byte flags;

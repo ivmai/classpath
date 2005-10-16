@@ -604,11 +604,11 @@ public class ObjectOutputStream extends OutputStream
    *
    * @see ObjectInputStream#resolveClass(java.io.ObjectStreamClass)
    */
-  protected void annotateClass(Class cl) throws IOException
+  protected void annotateClass(Class<?> cl) throws IOException
   {
   }
 
-  protected void annotateProxyClass(Class cl) throws IOException
+  protected void annotateProxyClass(Class<?> cl) throws IOException
   {
   }
 
