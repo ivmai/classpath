@@ -1,5 +1,12 @@
 2005-10-24  Tom Tromey  <tromey@redhat.com>
 
+	* javax/accessibility/AccessibleStateSet.java (states):
+	Changed type.
+	* javax/accessibility/AccessibleRelationSet.java (relations):
+	Changed type.
+
+2005-10-24  Tom Tromey  <tromey@redhat.com>
+
 	* java/security/acl/Group.java (isMember): Javadoc fix.
 	(members): Changed return type.
 	* java/security/acl/AclEntry.java (addPermission): Fixed javadoc.
