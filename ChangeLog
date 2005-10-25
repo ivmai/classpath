@@ -1,5 +1,19 @@
 2005-10-24  Tom Tromey  <tromey@redhat.com>
 
+	* gnu/java/nio/SelectorImpl.java (keys): Changed type.
+	(selected): Likewise.
+	(SelectorImpl): Updated.
+	(keys): Changed return type.
+	(getFDsAsArray): Updated.
+	(select): Likewise.
+	(selectedKeys): Changed return type.
+	(deregisterCancelledKeys): Updated.
+	* java/nio/channels/Selector.java (selectedKeys): Changed return
+	type.
+	(keys): Likewise.
+
+2005-10-24  Tom Tromey  <tromey@redhat.com>
+
 	* java/awt/image/ReplicateScaleFilter.java (setProperties): Changed
 	argument type.
 	* java/awt/image/CropImageFilter.java (setProperties): Changed
