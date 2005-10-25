@@ -1,5 +1,15 @@
 2005-10-24  Tom Tromey  <tromey@redhat.com>
 
+	* java/security/acl/Group.java (isMember): Javadoc fix.
+	(members): Changed return type.
+	* java/security/acl/AclEntry.java (addPermission): Fixed javadoc.
+	(checkPermission): Likewise.
+	(permissions): Changed return type.
+	* java/security/acl/Acl.java (entries): Changed return type.
+	(getPermissions): Likewise.
+
+2005-10-24  Tom Tromey  <tromey@redhat.com>
+
 	* gnu/java/nio/SelectorImpl.java (keys): Changed type.
 	(selected): Likewise.
 	(SelectorImpl): Updated.
