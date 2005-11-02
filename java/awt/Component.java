@@ -587,6 +587,7 @@ public abstract class Component
    */
   protected Component()
   {
+    // Nothing to do here.
   }
 
   /**
@@ -977,7 +978,7 @@ public abstract class Component
   {
     if (foreground != null)
       return foreground;
-    return parent == null ? SystemColor.windowText : parent.getForeground();
+    return parent == null ? null : parent.getForeground();
   }
 
   /**
@@ -1645,7 +1646,7 @@ public abstract class Component
    */
   public Dimension getMaximumSize()
   {
-    return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    return new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
   }
 
   /**
@@ -5572,6 +5573,7 @@ p   * <li>the set of backward traversal keys
        */
       protected AccessibleAWTComponentHandler()
       {
+        // Nothing to do here.
       }
 
       /**
@@ -5603,6 +5605,7 @@ p   * <li>the set of backward traversal keys
        */
       public void componentMoved(ComponentEvent e)
       {
+        // Nothing to do here.
       }
 
       /**
@@ -5612,6 +5615,7 @@ p   * <li>the set of backward traversal keys
        */
       public void componentResized(ComponentEvent e)
       {
+        // Nothing to do here.
       }
     } // class AccessibleAWTComponentHandler
 
@@ -5629,6 +5633,7 @@ p   * <li>the set of backward traversal keys
        */
       protected AccessibleAWTFocusHandler()
       {
+        // Nothing to do here.
       }
 
       /**

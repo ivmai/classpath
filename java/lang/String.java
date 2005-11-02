@@ -237,6 +237,7 @@ public final class String
    * @param count the number of characters from data to copy
    * @throws NullPointerException if data is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; data.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    */
@@ -260,6 +261,7 @@ public final class String
    * @param count the number of characters from ascii to copy
    * @throws NullPointerException if ascii is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; ascii.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    * @see #String(byte[])
@@ -271,8 +273,13 @@ public final class String
    */
   public String(byte[] ascii, int hibyte, int offset, int count)
   {
-    if (offset < 0 || count < 0 || offset + count > ascii.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > ascii.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     value = new char[count];
     this.offset = 0;
     this.count = count;
@@ -331,8 +338,13 @@ public final class String
   public String(byte[] data, int offset, int count, String encoding)
     throws UnsupportedEncodingException
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     try 
       {
         CharsetDecoder csd = Charset.forName(encoding).newDecoder();
@@ -406,8 +418,13 @@ public final class String
    */
   public String(byte[] data, int offset, int count)
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     int o, c;
     char[] v;
     String encoding;
@@ -516,8 +533,13 @@ public final class String
    */
   String(char[] data, int offset, int count, boolean dont_copy)
   {
-    if (offset < 0 || count < 0 || offset + count > data.length)
-      throw new StringIndexOutOfBoundsException();
+    if (offset < 0)
+      throw new StringIndexOutOfBoundsException("offset: " + offset);
+    if (count < 0)
+      throw new StringIndexOutOfBoundsException("count: " + count);
+    if (offset + count < 0 || offset + count > data.length)
+      throw new StringIndexOutOfBoundsException("offset + count: "
+						+ (offset + count));
     if (dont_copy)
       {
         value = data;
@@ -1613,6 +1635,8 @@ public final class String
    * @return String containing the chars from data[offset..offset+count]
    * @throws NullPointerException if data is null
    * @throws IndexOutOfBoundsException if (offset &lt; 0 || count &lt; 0
+   *         || offset + count &lt; 0 (overflow)
+   *         || offset + count &lt; 0 (overflow)
    *         || offset + count &gt; data.length)
    *         (while unspecified, this is a StringIndexOutOfBoundsException)
    * @see #String(char[], int, int)

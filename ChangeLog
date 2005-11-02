@@ -16,6 +16,174 @@
 	(getTracks): Updated.
 	(getTickLength): Updated.
 
+2005-11-02  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* NEWS: Mention Qt4 configury for OS-X.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* NEWS: Added some news items regarding my Swing work.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(findOverlapFreeParent): Don't search beyond the components
+	containing window (important when in a Dialog).
+
+2005-11-02  Christian Thalinger  <twisti@complang.tuwien.ac.at>
+
+	* AUTHORS: Added myself to the cool gang.
+
+2005-11-02  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* javax/swing/text/WrappedPlainView.java:
+	(calculateBreakPosition): If the component is not valid use it's 
+	preferredSize instead of getBounds().
+
+2005-11-02  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/Dialog.java
+	(show): pack should always be called before show, so Dialog is
+	set to the correct size and validated.
+
+2005-11-02  Christian Thalinger  <twisti@complang.tuwien.ac.at>
+
+	* configure.ac: Check for cairo, pangoft2 and freetype2 only 
+	when gtk peers are enabled.
+
+2005-11-02    Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* AUTHORS (Stuart Ballard): Address update.
+
+2005-11-02    Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* AUTHORS: Added Lillian Angel.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JToolBar.java
+	(addImpl): Don't call updateUI here. This is really not necessary.
+	* javax/swing/plaf/basic/BasicToolBarUI.java
+	(installDefaults): Call setRolloverBorders() here in order to
+	initialize the button borders.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicScrollPaneUI.java
+	(PropertyChangeHandler.propertyChange): Re-setup listeners on
+	the scrollbars if the scrollbars change.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Container.java
+	(addImpl): Notify registered ContainerListeners even when the
+	Container is not showing. Notify the listeners directly, not
+	via the event queue.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	(initComponentDefaults): Fixed the defaults for EditorPane.border,
+	TextArea.font and TextPane.border.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(getForeground): Return null as default color, instead of some
+	system color.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/BoxLayout.java
+	(BoxLayout): Throw AWTError when the axis is invalid.
+	(minimumLayoutSize): Respect the insets of the container.
+	(maximumLayoutSize): Likewise.
+	(invalidateLayout): Throw AWTError if the managed container is
+	not the same as the parent parameter.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(getMaximumSize): Return (Short.MAX_VALUE, Short.MAX_VALUE) instead
+	of (Integer.MAX_VALUE, Integer.MAX_VALUE) as shown by the
+	Mauve test.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JTable.java
+	(AccessibleJTable.AccessibleJTableCell): New inner class.
+
+2005-11-02  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/filechooser/FileSystemView.java: Added API docs all over,
+	* javax/swing/filechooser/UnixFileSystemView.java: Likewise.
+
+2005-11-02  Christian Thalinger  <twisti@complang.tuwien.ac.at>
+
+	* java/lang/String.java (String): Added 
+	StringIndexOutOfBoundsException check (overflow) and a message 
+	to the exceptions.
+			
+2005-11-02  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* NEWS: added entries for javax.swing.plaf.metal.* package and updates
+	to the gnu.classpath.examples.swing.Demo application,
+	* AUTHORS:  Added my name to bring honour and glory to myself and all 
+	my descendants.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(AccessibleJComponent.changeSupport): New field.
+	(AccessibleJComponent.AccessibleJComponent): Initialize changeSupport.
+	(AccessibleJComponent.addPropertyChangeListener): Implemented this
+	method.
+	(AccessibleJComponent.removePropertyChangeListener): Implemented this
+	method.
+	(AccessibleJComponent.getAccessibleChildrenCount): Implemented this
+	method.
+	(AccessibleJComponent.getAccessibleChild): Implemented this
+	method.
+	(AccessibleJComponent.getAccessibleName): Added API comment and
+	TODO tag.
+	(AccessibleJComponent.getAccessibleDescription): Added API comment
+	and TODO tag.
+	(AccessibleJComponent.getAccessibleRole): Implemented this method.
+	(AccessibleJComponent.getBorderTitle): Implemented this method.
+	(AccessibleJComponent.getToolTipText): Implemented this method.
+	(AccessibleJComponent.getTitledBorderText): Implemented this method.
+	(AccessibleJComponent.getAccessibleKeyBinding): Added API comment
+	and TODO tag.
+
+2005-11-01  Mark Wielaard  <mark@klomp.org>
+
+	* examples/gnu/classpath/examples/swing/Demo.java (init): Use
+	JOptionPane to select the laf if not explicitly set.
+
+2005-11-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/io/ObjectInputStream.java:
+	(parseContent(byte)): Remove weird exception
+	throwing.
+	
+2005-11-01  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Window.java
+	(show): Don't set size of the window here.
+
+2005-11-01  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/metal/MetalScrollPaneUI.java
+	(instance): Removed unnecessary field.
+	(createUI): Always return a new instance instead of returning a
+	shared instance.
+
+2005-11-01  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/Window.java
+	(show): If pack is not called before show, the size of the
+	window is often set to 0. This is now fixed.
+
 2005-11-01  Roman Kennke  <kennke@aicas.com>
 
 	* javax/swing/JPopupMenu.java
