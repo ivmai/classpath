@@ -1,3 +1,9 @@
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac (AC_INIT): Set version to 0.19-generics.
+	* lib/Makefile.am: Add typeHiding, unchecked, unused and varargsCast
+	to ECJ compile warning rule.
+
 2005-11-02  Tom Tromey  <tromey@redhat.com>
 
 	* javax/sound/midi/Instrument.java (Instrument): Genericized argument
