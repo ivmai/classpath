@@ -56,20 +56,17 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.DesktopManager;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MouseInputAdapter;
@@ -448,6 +445,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void addLayoutComponent(String name, Component c)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -637,6 +635,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void removeLayoutComponent(Component c)
     {
+      // Nothing to do here.
     }
   }
 
@@ -950,7 +949,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
           if (frame.isSelected())
             activateFrame(frame);
           else
-            getDesktopManager().deactivateFrame(frame);
+            deactivateFrame(frame);
         }
       else if (evt.getPropertyName().equals(JInternalFrame.ROOT_PANE_PROPERTY)
                || evt.getPropertyName().equals(
@@ -1138,6 +1137,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   public BasicInternalFrameUI(JInternalFrame b)
   {
+    // Nothing to do here.
   }
 
   /**
@@ -1204,10 +1204,8 @@ public class BasicInternalFrameUI extends InternalFrameUI
    */
   protected void installDefaults()
     {
-      UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-      Border border = defaults.getBorder("InternalFrame.border");
-      frame.setBorder(border);
-      frame.setFrameIcon(defaults.getIcon("InternalFrame.icon"));
+      LookAndFeel.installBorder(frame, "InternalFrame.border");
+      frame.setFrameIcon(UIManager.getIcon("InternalFrame.icon"));
       // InternalFrames are invisible by default.
       frame.setVisible(false);
   }
@@ -1702,6 +1700,16 @@ public class BasicInternalFrameUI extends InternalFrameUI
   protected void activateFrame(JInternalFrame f)
   {
     getDesktopManager().activateFrame(f);
+  }
+
+  /**
+   * This is a convenience method that deactivates the JInternalFrame.
+   *
+   * @param f the JInternalFrame to deactivate
+   */
+  protected void deactivateFrame(JInternalFrame f)
+  {
+    getDesktopManager().deactivateFrame(f);
   }
 
   /**

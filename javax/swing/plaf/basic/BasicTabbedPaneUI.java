@@ -64,9 +64,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -354,7 +354,6 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
           for (int i = 0; i < tabCount; i++)
             {
               width = calculateTabWidth(tabPlacement, i, fm);
-
               if (runWidth + width > max)
                 {
                   runWidth = tabAreaInsets.left + insets.left
@@ -1182,6 +1181,7 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
    */
   private class ScrollingViewport extends JViewport implements UIResource
   {
+    // TODO: Maybe remove this inner class.
   }
 
   /**
@@ -1536,28 +1536,26 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    tabPane.setFont(defaults.getFont("TabbedPane.font"));
-    tabPane.setForeground(defaults.getColor("TabbedPane.foreground"));
-    tabPane.setBackground(defaults.getColor("TabbedPane.background"));
+    LookAndFeel.installColorsAndFont(tabPane, "TabbedPane.background",
+                                     "TabbedPane.foreground",
+                                     "TabbedPane.font");
     tabPane.setOpaque(false);
 
-    highlight = defaults.getColor("TabbedPane.highlight");
-    lightHighlight = defaults.getColor("TabbedPane.lightHighlight");
+    highlight = UIManager.getColor("TabbedPane.highlight");
+    lightHighlight = UIManager.getColor("TabbedPane.lightHighlight");
 
-    shadow = defaults.getColor("TabbedPane.shadow");
-    darkShadow = defaults.getColor("TabbedPane.darkShadow");
+    shadow = UIManager.getColor("TabbedPane.shadow");
+    darkShadow = UIManager.getColor("TabbedPane.darkShadow");
 
-    focus = defaults.getColor("TabbedPane.focus");
+    focus = UIManager.getColor("TabbedPane.focus");
 
-    textIconGap = defaults.getInt("TabbedPane.textIconGap");
-    tabRunOverlay = defaults.getInt("TabbedPane.tabRunOverlay");
+    textIconGap = UIManager.getInt("TabbedPane.textIconGap");
+    tabRunOverlay = UIManager.getInt("TabbedPane.tabRunOverlay");
 
-    tabInsets = defaults.getInsets("TabbedPane.tabbedPaneTabInsets");
-    selectedTabPadInsets = defaults.getInsets("TabbedPane.tabbedPaneTabPadInsets");
-    tabAreaInsets = defaults.getInsets("TabbedPane.tabbedPaneTabAreaInsets");
-    contentBorderInsets = defaults.getInsets("TabbedPane.tabbedPaneContentBorderInsets");
+    tabInsets = UIManager.getInsets("TabbedPane.tabbedPaneTabInsets");
+    selectedTabPadInsets = UIManager.getInsets("TabbedPane.tabbedPaneTabPadInsets");
+    tabAreaInsets = UIManager.getInsets("TabbedPane.tabbedPaneTabAreaInsets");
+    contentBorderInsets = UIManager.getInsets("TabbedPane.tabbedPaneContentBorderInsets");
 
     calcRect = new Rectangle();
     tabRuns = new int[10];
@@ -1737,11 +1735,15 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
     // we WANT to paint the outermost run first and then work our way in.
     int tabCount = tabPane.getTabCount();
     int currRun = 1;
+    
+    if (tabCount > runCount)
+      runCount = tabCount;
+    
     if (tabCount < 1)
       return;
-
+    
     if (runCount > 1)
-      currRun = 0;
+      currRun = 0;    
     for (int i = 0; i < runCount; i++)
       {
         int first = lastTabInRun(tabCount, getPreviousTabRun(currRun)) + 1;
@@ -1856,7 +1858,7 @@ public class BasicTabbedPaneUI extends TabbedPaneUI implements SwingConstants
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
                                        SwingConstants.CENTER,
-                                       SwingConstants.CENTER, tabRect,
+                                       SwingConstants.RIGHT, tabRect,
                                        iconRect, textRect, textIconGap);
 
     int shiftX = getTabLabelShiftX(tabPlacement, tabIndex, isSelected);

@@ -53,8 +53,7 @@ import javax.swing.plaf.basic.BasicRadioButtonUI;
 
 
 /**
- * A UI delegate for the {@link JRadioButton} component under the 
- * {@link MetalLookAndFeel}.
+ * A UI delegate for the {@link JRadioButton} component.
  */
 public class MetalRadioButtonUI
   extends BasicRadioButtonUI
@@ -70,7 +69,7 @@ public class MetalRadioButtonUI
   protected Color disabledTextColor;
   
   /**
-   * Constructs a new instance of MetalRadioButtonUI.
+   * Constructs a new instance of <code>MetalRadioButtonUI</code>.
    */
   public MetalRadioButtonUI()
   {
@@ -78,11 +77,11 @@ public class MetalRadioButtonUI
   }
 
   /**
-   * Returns an instance of MetalRadioButtonUI.
+   * Returns a new instance of <code>MetalRadioButtonUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalRadioButtonUI
+   * @return A new instance of <code>MetalRadioButtonUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {
@@ -179,9 +178,9 @@ public class MetalRadioButtonUI
   protected void paintFocus(Graphics g, Rectangle t, Dimension d)
   {
     g.setColor(focusColor);
-    g.drawRect(t.x, t.y, t.width, t.height);
-    // FIXME: we seem to be drawing too tight a rectangle here, perhaps there
-    // is some padding to do somewhere???
+    // minus 2 because of line thickness. Prevents border
+    // from being cutoff.
+    g.drawRect(t.x, t.y, t.width - 2, t.height - 2);
   }
   
 }

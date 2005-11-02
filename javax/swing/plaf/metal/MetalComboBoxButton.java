@@ -38,7 +38,7 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
-import java.awt.FontMetrics;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -99,7 +99,9 @@ public class MetalComboBoxButton extends JButton {
   public MetalComboBoxButton(JComboBox cb, Icon i, boolean onlyIcon,
       CellRendererPane pane, JList list)
   {
-    super(i);
+    super();
+    if (cb == null)
+      throw new NullPointerException("Null 'cb' argument");
     comboBox = cb;
     comboIcon = i;
     iconOnly = onlyIcon;
@@ -200,6 +202,7 @@ public class MetalComboBoxButton extends JButton {
    */
   public void paintComponent(Graphics g)
   {
+    super.paintComponent(g);
     if (iconOnly)
       {
         Rectangle bounds = getBounds();
@@ -209,28 +212,30 @@ public class MetalComboBoxButton extends JButton {
       }
     else
       {
-        String text = comboBox.getModel().getSelectedItem().toString();
+        Object selected = comboBox.getModel().getSelectedItem();
+        if (selected == null)
+          selected = "";
         Rectangle bounds = comboBox.getBounds();
         Rectangle innerArea = SwingUtilities.calculateInnerArea(this, null);
+        Insets insets = comboBox.getInsets();
+        Rectangle renderArea = new Rectangle(innerArea.x, innerArea.y, 
+            innerArea.width - comboIcon.getIconWidth() - 4, innerArea.height);
+        Component cellRenderer 
+            = comboBox.getRenderer().getListCellRendererComponent(this.listBox,
+                    selected, comboBox.getSelectedIndex(), false, false);
+        cellRenderer.setBackground(comboBox.getBackground());
+        cellRenderer.setEnabled(comboBox.isEnabled());
+        rendererPane.paintComponent(g, cellRenderer, this, renderArea);
         if (comboBox.hasFocus())
           {
             g.setColor(MetalLookAndFeel.getFocusColor());
             g.drawRect(innerArea.x, innerArea.y - 1, innerArea.width - 1, 
                     innerArea.height);
           }
-        Insets insets = comboBox.getInsets();
         int iconX = bounds.width - insets.right - comboIcon.getIconWidth() - 7;
         int iconY = insets.top 
             + (bounds.height - comboIcon.getIconHeight()) / 2; 
         comboIcon.paintIcon(comboBox, g, iconX, iconY);
-        if (comboBox.isEnabled())
-          g.setColor(MetalLookAndFeel.getBlack());
-        else
-          g.setColor(MetalLookAndFeel.getControlDisabled());
-        FontMetrics fm = g.getFontMetrics(comboBox.getFont());
-        // FIXME: the label may need truncating with '...' and the 
-        // alignment needs work
-        g.drawString(text, insets.left + 5, fm.getAscent() + 4);
       }
   }
 }

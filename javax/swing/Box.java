@@ -70,6 +70,7 @@ public class Box extends JComponent implements Accessible
   
     protected AccessibleBox()
     {
+      // Nothing to do here.
     }
     
     public AccessibleRole getAccessibleRole()
@@ -95,6 +96,7 @@ public class Box extends JComponent implements Accessible
       
       protected AccessibleBoxFiller()
       {
+        // Nothing to do here.
       }
       
       public AccessibleRole getAccessibleRole()
@@ -102,8 +104,6 @@ public class Box extends JComponent implements Accessible
         return null;
       }
     }
-    
-    protected AccessibleContext accessibleContext;
     
     private transient Dimension min, pref, max;
     

@@ -52,6 +52,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
 
 /**
@@ -97,7 +99,6 @@ public class ObjectInputStream extends InputStream
       }
 
     this.resolveEnabled = false;
-    this.isDeserializing = false;
     this.blockDataPosition = 0;
     this.blockDataBytes = 0;
     this.blockData = new byte[BUFFER_SIZE];
@@ -105,7 +106,6 @@ public class ObjectInputStream extends InputStream
     this.realInputStream = new DataInputStream(in);
     this.nextOID = baseWireHandle;
     this.objectLookupTable = new Hashtable<Integer,ObjectIdentityWrapper>();
-    this.validators = new Vector<ValidatorAndPriority>();
     this.classLookupTable = new Hashtable<Class,ObjectStreamClass>();
     setBlockDataMode(true);
     readStreamHeader();
@@ -133,42 +133,28 @@ public class ObjectInputStream extends InputStream
     if (this.useSubclassMethod)
       return readObjectOverride();
 
-    boolean was_deserializing;
-
     Object ret_val;
-    was_deserializing = this.isDeserializing;
-
     boolean old_mode = setBlockDataMode(false);
-
-    this.isDeserializing = true;
-
     byte marker = this.realInputStream.readByte();
 
-    depth += 2;
+    if (DEBUG)
+      depth += 2;
 
     if(dump) dumpElement("MARKER: 0x" + Integer.toHexString(marker) + " ");
 
     try
       {
  	ret_val = parseContent(marker);
-       }
-     finally
-       {
+      }
+    finally
+      {
  	setBlockDataMode(old_mode);
- 	
- 	this.isDeserializing = was_deserializing;
- 	
- 	depth -= 2;
- 	
- 	if (! was_deserializing)
-	  {
- 	    if (validators.size() > 0)
- 	      invokeValidators();
- 	  }
-       }
-     
-     return ret_val;
-   }
+ 	if (DEBUG)
+	  depth -= 2;
+      }
+    
+    return ret_val;
+  }
 
    /**
     * Handles a content block within the stream, which begins with a marker
@@ -242,7 +228,6 @@ public class ObjectInputStream extends InputStream
  	  for (int i = 0; i < n_intf; i++)
  	    {
  	      intfs[i] = this.realInputStream.readUTF();
- 	      System.out.println(intfs[i]);
  	    }
  	  
  	  boolean oldmode = setBlockDataMode(true);
@@ -250,6 +235,21 @@ public class ObjectInputStream extends InputStream
  	  setBlockDataMode(oldmode);
  	  
  	  ObjectStreamClass osc = lookupClass(cl);
+          if (osc.firstNonSerializableParentConstructor == null)
+            {
+              osc.realClassIsSerializable = true;
+              osc.fields = osc.fieldMapping = new ObjectStreamField[0];
+              try
+                {
+                  osc.firstNonSerializableParentConstructor =
+                    Object.class.getConstructor(new Class[0]);
+                }
+              catch (NoSuchMethodException x)
+                {
+                  throw (InternalError)
+                    new InternalError("Object ctor missing").initCause(x);
+                }
+            }
  	  assignNewHandle(osc);
  	  
  	  if (!is_consumed)
@@ -354,8 +354,11 @@ public class ObjectInputStream extends InputStream
  	  int handle = assignNewHandle(obj);
  	  Object prevObject = this.currentObject;
  	  ObjectStreamClass prevObjectStreamClass = this.currentObjectStreamClass;
+	  TreeSet<ValidatorAndPriority> prevObjectValidators =
+	    this.currentObjectValidators;
  	  
  	  this.currentObject = obj;
+	  this.currentObjectValidators = null;
  	  ObjectStreamClass[] hierarchy =
  	    inputGetObjectStreamClasses(clazz);
  	  
@@ -407,7 +410,10 @@ public class ObjectInputStream extends InputStream
  	  this.currentObject = prevObject;
  	  this.currentObjectStreamClass = prevObjectStreamClass;
  	  ret_val = processResolution(osc, obj, handle);
- 	  
+	  if (currentObjectValidators != null)
+	    invokeValidators();
+	  this.currentObjectValidators = prevObjectValidators;
+
  	  break;
  	}
 	
@@ -739,8 +745,10 @@ public class ObjectInputStream extends InputStream
       throw new InvalidObjectException("attempt to add a null "
 				       + "ObjectInputValidation object");
 
-    this.validators.addElement(new ValidatorAndPriority (validator,
-							 priority));
+    if (currentObjectValidators == null)
+      currentObjectValidators = new TreeSet<ValidatorAndPriority>();
+    
+    currentObjectValidators.add(new ValidatorAndPriority(validator, priority));
   }
 
 
@@ -1844,18 +1852,19 @@ public class ObjectInputStream extends InputStream
   // on OBJ
   private void invokeValidators() throws InvalidObjectException
   {
-    Object[] validators = new Object[this.validators.size()];
-    this.validators.copyInto (validators);
-    Arrays.sort (validators);
-
     try
       {
-	for (int i=0; i < validators.length; i++)
-	  ((ObjectInputValidation)validators[i]).validateObject();
+	Iterator<ValidatorAndPriority> it = currentObjectValidators.iterator();
+	while(it.hasNext())
+	  {
+	    ValidatorAndPriority vap = it.next();
+	    ObjectInputValidation validator = vap.validator;
+	    validator.validateObject();
+	  }
       }
     finally
       {
-	this.validators.removeAllElements();
+	currentObjectValidators = null;
       }
   }
 
@@ -1904,10 +1913,9 @@ public class ObjectInputStream extends InputStream
   private Hashtable<Integer,ObjectIdentityWrapper> objectLookupTable;
   private Object currentObject;
   private ObjectStreamClass currentObjectStreamClass;
+  private TreeSet<ValidatorAndPriority> currentObjectValidators;
   private boolean readDataFromBlock;
-  private boolean isDeserializing;
   private boolean fieldsAlreadyRead;
-  private Vector<ValidatorAndPriority> validators;
   private Hashtable<Class,ObjectStreamClass> classLookupTable;
   private GetField prereadFields;
 

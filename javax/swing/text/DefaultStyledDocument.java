@@ -899,6 +899,10 @@ public class DefaultStyledDocument extends AbstractDocument
 
   /**
    * Returns the paragraph element for the specified position.
+   * If the position is outside the bounds of the document's root element,
+   * then the closest element is returned. That is the last paragraph if
+   * <code>position >= endIndex</code> or the first paragraph if
+   * <code>position < startIndex</code>.
    *
    * @param position the position for which to query the paragraph element
    *
@@ -907,7 +911,16 @@ public class DefaultStyledDocument extends AbstractDocument
   public Element getParagraphElement(int position)
   {
     BranchElement root = (BranchElement) getDefaultRootElement();
+    int start = root.getStartOffset();
+    int end = root.getEndOffset();
+    if (position >= end)
+      position = end - 1;
+    else if (position < start)
+      position = start;
+
     Element par = root.positionToElement(position);
+
+    assert par != null : "The paragraph element must not be null";
     return par;
   }
 
@@ -1060,8 +1073,9 @@ public class DefaultStyledDocument extends AbstractDocument
       }
     catch (BadLocationException ex)
       {
-        throw new AssertionError("BadLocationException must not be thrown "
-                                 + "here.");
+        AssertionError ae = new AssertionError("Unexpected bad location");
+	ae.initCause(ex);
+	throw ae;
       }
 
     int len = 0;

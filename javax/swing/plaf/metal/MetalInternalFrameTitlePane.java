@@ -61,9 +61,10 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 
 /**
- * The title pane for a {@link JInternalFrame}.  This can be displayed in two
- * styles: one for regular internal frames, and the other for "palette" style
- * internal frames.
+ * The title pane for a {@link JInternalFrame} (see 
+ * {@link MetalInternalFrameUI#createNorthPane(JInternalFrame)}).  This can 
+ * be displayed in two styles: one for regular internal frames, and the other 
+ * for "palette" style internal frames.
  */
 public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane 
 {
@@ -86,7 +87,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
     
     /**
      * Handles <code>JInternalFrame.isPalette</code> property changes, with all
-     * other propert changes being passed to the superclass.
+     * other property changes being passed to the superclass.
      * 
      * @param e  the event.
      */
@@ -214,6 +215,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
      */
     public void removeLayoutComponent(Component c)
     {
+      // Nothing to do here.
     }
   }
 
@@ -234,7 +236,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
   protected int paletteTitleHeight;
    
   /** The label used to display the title for the internal frame. */
-  private JLabel title;
+  JLabel title;
   
   /**
    * Creates a new title pane for the specified frame.
@@ -315,6 +317,9 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
       // do nothing    
   }
   
+  /**
+   * Adds the sub components of the title pane.
+   */
   protected void addSubComponents()
   {
     // FIXME:  this method is probably overridden to only add the required 
@@ -348,7 +353,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
     Rectangle b = SwingUtilities.getLocalBounds(this);
     g.setColor(MetalLookAndFeel.getPrimaryControlShadow());
     g.fillRect(b.x, b.y, b.width, b.height);
-    MetalUtils.fillMetalPattern(g, b.x + 4, b.y + 2, b.width 
+    MetalUtils.fillMetalPattern(this, g, b.x + 4, b.y + 2, b.width 
             - paletteCloseIcon.getIconWidth() - 13, b.height - 5,
             MetalLookAndFeel.getPrimaryControlHighlight(), 
             MetalLookAndFeel.getBlack());
@@ -399,7 +404,7 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
           endX = Math.max(closeButton.getX(), endX);
         endX -= 7;
         if (endX > startX)
-          MetalUtils.fillMetalPattern(g, startX, 3, endX - startX, getHeight() - 6, Color.white, Color.gray);
+          MetalUtils.fillMetalPattern(this, g, startX, 3, endX - startX, getHeight() - 6, Color.white, Color.gray);
       }
     g.setColor(savedColor);
   }
@@ -422,6 +427,11 @@ public class MetalInternalFrameTitlePane extends BasicInternalFrameTitlePane
       closeButton.setIcon(closeIcon);
   }
   
+  /**
+   * Creates and returns a property change handler for the title pane.
+   * 
+   * @return The property change handler.
+   */
   protected PropertyChangeListener createPropertyChangeListener()
   {
     return new MetalInternalFrameTitlePanePropertyChangeHandler();   

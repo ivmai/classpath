@@ -442,6 +442,7 @@ public final class StringBuffer
    * @param code the code point to append
    * @return this <code>StringBuffer</code>
    * @see Character#toChars(int, char[], int)
+   * @since 1.5
    */
   public synchronized StringBuffer appendCodePoint(int code)
   {

@@ -38,20 +38,18 @@ exception statement from your version. */
 
 package javax.swing.plaf.metal;
 
-import java.util.HashMap;
-
 import javax.swing.JComponent;
+import javax.swing.JProgressBar;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-public class MetalProgressBarUI
-  extends BasicProgressBarUI
+/**
+ * A UI delegate for the {@link JProgressBar} component.
+ */
+public class MetalProgressBarUI extends BasicProgressBarUI
 {  
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
   /**
-   * Constructs a new instance of MetalProgressBarUI.
+   * Constructs a new instance of <code>MetalProgressBarUI</code>.
    */
   public MetalProgressBarUI()
   {
@@ -59,27 +57,14 @@ public class MetalProgressBarUI
   }
 
   /**
-   * Returns an instance of MetalProgressBarUI.
+   * Returns a new instance of <code>MetalProgressBarUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalProgressBarUI
+   * @return A new instance of <code>MetalProgressBarUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalProgressBarUI instance;
-    if (o == null)
-      {
-        instance = new MetalProgressBarUI();
-        instances.put(component, instance);
-      }
-    else
-      instance = (MetalProgressBarUI) o;
-
-    return instance;
+    return new MetalProgressBarUI();
   }
 }

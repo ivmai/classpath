@@ -76,17 +76,33 @@ public class ButtonDemo
   public ButtonDemo(String title) 
   {
     super(title);
-    getContentPane().add(createContent());
+    JPanel content = createContent();
+    JPanel closePanel = new JPanel();
+    JButton closeButton = new JButton("Close");
+    closeButton.setActionCommand("CLOSE");
+    closeButton.addActionListener(this);
+    closePanel.add(closeButton);
+    content.add(closePanel, BorderLayout.SOUTH);
+    getContentPane().add(content);
   }
-       
-  private JPanel createContent() 
+
+  /**
+   * Returns a panel with the demo content.  The panel
+   * uses a BorderLayout(), and the BorderLayout.SOUTH area
+   * is empty, to allow callers to add controls to the 
+   * bottom of the panel if they want to (a close button is
+   * added if this demo is being run as a standalone demo).
+   */       
+  JPanel createContent() 
   {
+    JPanel content = new JPanel(new BorderLayout());
     JPanel panel = new JPanel(new GridLayout(4, 1));
     panel.add(createButtonPanel());
     panel.add(createTogglePanel());
     panel.add(createCheckBoxPanel());
     panel.add(createRadioPanel());
-    return panel;        
+    content.add(panel);
+    return content;        
   }
     
   private JPanel createButtonPanel() 
@@ -251,6 +267,10 @@ public class ButtonDemo
       radio1.setEnabled(radioState.isSelected());
       radio2.setEnabled(radioState.isSelected());
       radio3.setEnabled(radioState.isSelected());
+    }
+    else if (e.getActionCommand().equals("CLOSE"))
+    {
+      System.exit(0);
     }
   }
 

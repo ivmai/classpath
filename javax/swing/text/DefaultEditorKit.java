@@ -222,9 +222,6 @@ public class DefaultEditorKit extends EditorKit
             {
               t.getDocument().insertString(t.getCaret().getDot(),
                                            event.getActionCommand(), null);
-              t.getCaret().setDot(Math.min(t.getCaret().getDot() + 1,
-                                           t.getDocument().getEndPosition()
-                                           .getOffset()));
             }
           catch (BadLocationException be)
             {
@@ -286,6 +283,8 @@ public class DefaultEditorKit extends EditorKit
      */
     public void actionPerformed(ActionEvent event)
     {
+      // FIXME: Figure out what this Action is supposed to do. Obviously text
+      // that is entered by the user is inserted through DefaultKeyTypedAction.
     }
   }
 
@@ -692,6 +691,7 @@ public class DefaultEditorKit extends EditorKit
    */
   public DefaultEditorKit()
   {
+    // Nothing to do here.
   }
 
   /**
@@ -947,15 +947,23 @@ public class DefaultEditorKit extends EditorKit
    * @param offset the beginning offset from where to write
    * @param len the length of the fragment to write
    *
-   * @throws BadLocationException if <code>offset</code> or
-   *         <code>offset + len</code>is an invalid location inside
-   *         <code>document</code>
+   * @throws BadLocationException if <code>offset</code> is an 
+   * invalid location inside <code>document</code>.
    * @throws IOException if something goes wrong while writing to
    *        <code>out</code>
    */
   public void write(Writer out, Document document, int offset, int len)
-    throws BadLocationException, IOException
+      throws BadLocationException, IOException
   {
-    // TODO: Implement this properly.
+    // Throw a BLE if offset is invalid
+    if (offset < 0 || offset > document.getLength())
+      throw new BadLocationException("Tried to write to invalid location",
+                                     offset);
+
+    // If they gave an overly large len, just adjust it
+    if (offset + len > document.getLength())
+      len = document.getLength() - offset;
+
+    out.write(document.getText(offset, len));
   }
 }

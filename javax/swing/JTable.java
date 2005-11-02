@@ -45,8 +45,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
@@ -58,6 +56,10 @@ import java.util.Vector;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleExtendedTable;
+import javax.accessibility.AccessibleSelection;
+import javax.accessibility.AccessibleTable;
+import javax.accessibility.AccessibleTableModelChange;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -78,15 +80,414 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.Caret;
 
-public class JTable extends JComponent
+public class JTable
+  extends JComponent
   implements TableModelListener, Scrollable, TableColumnModelListener,
              ListSelectionListener, CellEditorListener, Accessible
 {
   /**
+   * Provides accessibility support for <code>JTable</code>.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  protected class AccessibleJTable
+    extends AccessibleJComponent
+    implements AccessibleSelection, ListSelectionListener, TableModelListener,
+    TableColumnModelListener, CellEditorListener, PropertyChangeListener,
+    AccessibleExtendedTable
+  {
+
+    protected class AccessibleJTableModelChange
+      implements AccessibleTableModelChange
+    {
+      protected int type;
+      protected int firstRow;
+      protected int lastRow;
+      protected int firstColumn;
+      protected int lastColumn;
+
+      protected AccessibleJTableModelChange(int type, int firstRow,
+                                            int lastRow, int firstColumn,
+                                            int lastColumn)
+      {
+        this.type = type;
+        this.firstRow = firstRow;
+        this.lastRow = lastRow;
+        this.firstColumn = firstColumn;
+        this.lastColumn = lastColumn;
+      }
+
+      public int getType()
+      {
+        return type;
+      }
+
+      public int getFirstRow()
+      {
+        return firstRow;
+      }
+
+      public int getLastRow()
+      {
+        return lastRow;
+      }
+
+      public int getFirstColumn()
+      {
+        return firstColumn;
+      }
+
+      public int getLastColumn()
+      {
+        return lastColumn;
+      }
+    }
+
+    /**
+     * Creates a new <code>AccessibleJTable</code>.
+     *
+     * @since JDK1.5
+     */
+    protected AccessibleJTable()
+    {
+      getModel().addTableModelListener(this);
+      getSelectionModel().addListSelectionListener(this);
+      getColumnModel().addColumnModelListener(this);
+      getCellEditor().addCellEditorListener(this);
+    }
+
+    /**
+     * Returns the number of selected items in this table.
+     */
+    public int getAccessibleSelectionCount()
+    {
+      return getSelectedColumnCount();
+    }
+
+    public Accessible getAccessibleSelection(int i)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public boolean isAccessibleChildSelected(int i)
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    public void addAccessibleSelection(int i)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void removeAccessibleSelection(int i)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void clearAccessibleSelection()
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void selectAllAccessibleSelection()
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void valueChanged(ListSelectionEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    /**
+     * Receives notification when the table model changes. Depending on the
+     * type of change, this method calls {@link #tableRowsInserted} or
+     * {@link #tableRowsDeleted}.
+     *
+     * @param event the table model event
+     */
+    public void tableChanged(TableModelEvent event)
+    {
+      switch (event.getType())
+        {
+        case TableModelEvent.INSERT:
+          tableRowsInserted(event);
+          break;
+        case TableModelEvent.DELETE:
+          tableRowsDeleted(event);
+          break;
+        }
+    }
+
+    /**
+     * Receives notification when one or more rows have been inserted into the
+     * table.
+     *
+     * @param event the table model event
+     */
+    public void tableRowsInserted(TableModelEvent event)
+    {
+      // TODO: What to do here, if anything? This might be a hook method for
+      // subclasses...
+    }
+
+    /**
+     * Receives notification when one or more rows have been deleted from the
+     * table.
+     *
+     * @param event the table model event
+     */
+    public void tableRowsDeleted(TableModelEvent event)
+    {
+      // TODO: What to do here, if anything? This might be a hook method for
+      // subclasses...
+    }
+
+    public void columnAdded(TableColumnModelEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void columnMarginChanged(ChangeEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void columnMoved(TableColumnModelEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void columnRemoved(TableColumnModelEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void columnSelectionChanged(ListSelectionEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void editingCanceled(ChangeEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void editingStopped(ChangeEvent event)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    /**
+     * Receives notification when any of the JTable's properties changes. This
+     * is used to replace the listeners on the table's model, selection model,
+     * column model and cell editor.
+     *
+     * @param e the property change event
+     */
+    public void propertyChange(PropertyChangeEvent e)
+    {
+      String propName = e.getPropertyName(); 
+      if (propName.equals("tableModel"))
+        {
+          TableModel oldModel = (TableModel) e.getOldValue();
+          oldModel.removeTableModelListener(this);
+          TableModel newModel = (TableModel) e.getNewValue();
+          newModel.addTableModelListener(this);
+        }
+      else if (propName.equals("columnModel"))
+        {
+          TableColumnModel oldModel = (TableColumnModel) e.getOldValue();
+          oldModel.removeColumnModelListener(this);
+          TableColumnModel newModel = (TableColumnModel) e.getNewValue();
+          newModel.addColumnModelListener(this);
+        }
+      else if (propName.equals("selectionModel"))
+        {
+          ListSelectionModel oldModel = (ListSelectionModel) e.getOldValue();
+          oldModel.removeListSelectionListener(this);
+          ListSelectionModel newModel = (ListSelectionModel) e.getNewValue();
+          newModel.addListSelectionListener(this);
+        }
+      else if (propName.equals("cellEditor"))
+        {
+          CellEditor oldEd = (CellEditor) e.getOldValue();
+          oldEd.removeCellEditorListener(this);
+          CellEditor newEd = (CellEditor) e.getNewValue();
+          newEd.addCellEditorListener(this);
+        }
+    }
+
+    public int getAccessibleRow(int index)
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public int getAccessibleColumn(int index)
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public int getAccessibleIndex(int r, int c)
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public Accessible getAccessibleCaption()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleCaption(Accessible caption)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Accessible getAccessibleSummary()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleSummary(Accessible summary)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public int getAccessibleRowCount()
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public int getAccessibleColumnCount()
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public Accessible getAccessibleAt(int r, int c)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public int getAccessibleRowExtentAt(int r, int c)
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public int getAccessibleColumnExtentAt(int r, int c)
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    public AccessibleTable getAccessibleRowHeader()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleRowHeader(AccessibleTable header)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public AccessibleTable getAccessibleColumnHeader()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleColumnHeader(AccessibleTable header)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Accessible getAccessibleRowDescription(int r)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleRowDescription(int r, Accessible description)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public Accessible getAccessibleColumnDescription(int c)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public void setAccessibleColumnDescription(int c, Accessible description)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public boolean isAccessibleSelected(int r, int c)
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    public boolean isAccessibleRowSelected(int r)
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    public boolean isAccessibleColumnSelected(int c)
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    public int[] getSelectedAccessibleRows()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    public int[] getSelectedAccessibleColumns()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+      
+  }
+  /**
    * Handles property changes from the <code>TableColumn</code>s of this
    * <code>JTable</code>.
    *
-   * More specifically, this triggers a {@link #revalidate} call if the
+   * More specifically, this triggers a {@link #revalidate()} call if the
    * preferredWidth of one of the observed columns changes.
    */
   class TableColumnPropertyChangeHandler implements PropertyChangeListener
@@ -393,7 +794,7 @@ public class JTable extends JComponent
    * property when the {@link #dataModel} property is changed. 
    *
    * @see #setModel(TableModel)
-   * @see #createColumnsFromModel()
+   * @see #createDefaultColumnsFromModel()
    * @see #setColumnModel(TableColumnModel)
    * @see #setAutoCreateColumnsFromModel(boolean)
    * @see #getAutoCreateColumnsFromModel()
@@ -509,11 +910,6 @@ public class JTable extends JComponent
   protected ListSelectionModel selectionModel;
 
   /**
-   * The accessibleContext property.
-   */
-  protected AccessibleContext accessibleContext;
-
-  /**
    * The current cell editor. 
    */
   protected TableCellEditor cellEditor;
@@ -521,7 +917,7 @@ public class JTable extends JComponent
   /**
    * Whether or not drag-and-drop is enabled on this table.
    *
-   * @see #setDragEnabled()
+   * @see #setDragEnabled(boolean)
    * @see #getDragEnabled()
    */
   private boolean dragEnabled;
@@ -678,24 +1074,28 @@ public class JTable extends JComponent
    */
   public JTable (TableModel dm, TableColumnModel cm, ListSelectionModel sm)
   {
-    setModel(dm == null ? createDefaultDataModel() : dm);
-    setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
-
+    boolean autoCreate = false;
     if (cm != null)
-      {
         setColumnModel(cm);
-        setAutoCreateColumnsFromModel(false);
-      }
     else 
       {
         setColumnModel(createDefaultColumnModel());
-        setAutoCreateColumnsFromModel(true);
-      }
+        autoCreate = true;
+      }        
+    setSelectionModel(sm == null ? createDefaultSelectionModel() : sm);
+    setModel(dm == null ? createDefaultDataModel() : dm);
+    setAutoCreateColumnsFromModel(autoCreate);
     initializeLocalVars();
-    // The next two lines are for compliance with the JDK which starts
-    // the JLists associated with a JTable  with both lead selection 
-    // indices at 0, rather than -1 as in regular JLists
+    // The following four lines properly set the lead selection indices.
+    // After this, the UI will handle the lead selection indices.
+    // FIXME: this should probably not be necessary, if the UI is installed
+    // before the TableModel is set then the UI will handle things on its
+    // own, but certain variables need to be set before the UI can be installed
+    // so we must get the correct order for all the method calls in this
+    // constructor.
+    selectionModel.setAnchorSelectionIndex(0);    
     selectionModel.setLeadSelectionIndex(0);
+    columnModel.getSelectionModel().setAnchorSelectionIndex(0);
     columnModel.getSelectionModel().setLeadSelectionIndex(0);
     updateUI();
   }    
@@ -919,6 +1319,12 @@ public class JTable extends JComponent
 
         createDefaultColumnsFromModel();
 
+    // If the structure changes, we need to revalidate, since that might
+    // affect the size parameters of the JTable. Otherwise we only need
+    // to perform a repaint to update the view.
+    if (event.getType() == TableModelEvent.INSERT
+        || event.getType() == TableModelEvent.DELETE)
+      revalidate();
     repaint();
   }
 
@@ -971,8 +1377,7 @@ public class JTable extends JComponent
       {
         int y0 = getLocation().y;
         int nrows = getRowCount();
-        Dimension gap = getIntercellSpacing();
-        int height = getRowHeight() + (gap == null ? 0 : gap.height);
+        int height = getRowHeight();
         int y = point.y;
 
         for (int i = 0; i < nrows; ++i)
@@ -1093,13 +1498,14 @@ public class JTable extends JComponent
     // scroll direction.
 
     if (orientation == SwingConstants.VERTICAL)
-      return rowHeight;
+      return direction * rowHeight;
     else
       {
         int sum = 0;
         for (int i = 0; i < getColumnCount(); ++i)
           sum += columnModel.getColumn(0).getWidth();
-        return getColumnCount() == 0 ? 10 : sum / getColumnCount();
+        int inc = getColumnCount() == 0 ? 10 : sum / getColumnCount();
+        return direction * inc;
       }
   }
 
@@ -1680,7 +2086,9 @@ public class JTable extends JComponent
     // Don't do anything if setting the current model again.
     if (dataModel == m)
       return;
-    
+
+    TableModel oldModel = dataModel;
+
     // Remove table as TableModelListener from old model.
     if (dataModel != null)
       dataModel.removeTableModelListener(this);
@@ -1697,7 +2105,10 @@ public class JTable extends JComponent
         if (autoCreateColumnsFromModel)
           createDefaultColumnsFromModel();
       }
-    
+
+    // This property is bound, so we fire a property change event.
+    firePropertyChange("model", oldModel, dataModel);
+
     // Repaint table.
     revalidate();
     repaint();
@@ -1983,7 +2394,8 @@ public class JTable extends JComponent
     int average = spill / cols.length;
     for (int i = 0; i < cols.length; i++)
       {
-        cols[i].setWidth(cols[i].getWidth() + average);
+        if (cols[i] != null)
+          cols[i].setWidth(cols[i].getWidth() + average);
       }
   }
 
@@ -2401,5 +2813,14 @@ public class JTable extends JComponent
   {
     return editor.getTableCellEditorComponent
       (this, getValueAt(row, column), isCellSelected(row, column), row, column);
+  }
+
+  /**
+   * This revalidates the <code>JTable</code> and queues a repaint.
+   */
+  protected void resizeAndRepaint()
+  {
+    revalidate();
+    repaint();
   }
 }

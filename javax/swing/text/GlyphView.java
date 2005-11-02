@@ -44,6 +44,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Toolkit;
 import java.text.BreakIterator;
 
 import javax.swing.SwingConstants;
@@ -71,6 +72,7 @@ public class GlyphView extends View implements TabableView, Cloneable
      */
     public GlyphPainter()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -258,7 +260,7 @@ public class GlyphView extends View implements TabableView, Cloneable
     public float getHeight(GlyphView view)
     {
       Font font = view.getFont();
-      FontMetrics metrics = view.getContainer().getFontMetrics(font);
+      FontMetrics metrics = Toolkit.getDefaultToolkit().getFontMetrics(font);
       float height = metrics.getHeight();
       return height;
     }
@@ -377,7 +379,7 @@ public class GlyphView extends View implements TabableView, Cloneable
     {
       Element el = view.getElement();
       Font font = view.getFont();
-      FontMetrics fm = view.getContainer().getFontMetrics(font);
+      FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(font);
       Segment txt = view.getText(p0, p1);
       int span = Utilities.getTabbedTextWidth(txt, fm, (int) x, te, p0);
       return span;
@@ -664,8 +666,11 @@ public class GlyphView extends View implements TabableView, Cloneable
       }
     catch (BadLocationException ex)
       {
-        throw new AssertionError("BadLocationException must not be thrown "
-                                 + "here");
+	AssertionError ae;
+        ae = new AssertionError("BadLocationException must not be thrown "
+				+ "here");
+	ae.initCause(ex);
+	throw ae;
       }
     FontMetrics fm = null; // Fetch font metrics somewhere.
     return Utilities.getTabbedTextWidth(seg, fm, 0, null, p0);
@@ -712,8 +717,11 @@ public class GlyphView extends View implements TabableView, Cloneable
       }
     catch (BadLocationException ex)
       {
-        throw new AssertionError("BadLocationException should not be "
-                                 + "thrown here. p0 = " + p0 + ", p1 = " + p1);
+	AssertionError ae;
+        ae = new AssertionError("BadLocationException should not be "
+				+ "thrown here. p0 = " + p0 + ", p1 = " + p1);
+	ae.initCause(ex);
+	throw ae;
       }
 
     return txt;

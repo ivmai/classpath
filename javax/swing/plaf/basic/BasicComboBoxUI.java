@@ -43,6 +43,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.LayoutManager;
@@ -70,8 +71,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -157,12 +158,29 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected PropertyChangeListener propertyChangeListener;
 
-  /**
-   * Colors that are used to render selected item in the combo box.
+  /** 
+   * The button background. 
+   * @see #installDefaults()
    */
-  private Color shadow;
-  private Color darkShadow;
-  private Color highlight;
+  private Color buttonBackground;
+  
+  /** 
+   * The button shadow. 
+   * @see #installDefaults()
+   */
+  private Color buttonShadow;
+  
+  /**
+   * The button dark shadow.
+   * @see #installDefaults()
+   */
+  private Color buttonDarkShadow;
+
+  /**
+   * The button highlight.
+   * @see #installDefaults()
+   */
+  private Color buttonHighlight;
 
   /* Size of the largest item in the comboBox
    * This is package-private to avoid an accessor method.
@@ -179,6 +197,7 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   public BasicComboBoxUI()
   {
+    // Nothing to do here.
   }
 
   /**
@@ -207,13 +226,13 @@ public class BasicComboBoxUI extends ComboBoxUI
 
     if (c instanceof JComboBox)
       {
-	comboBox = (JComboBox) c;
-	comboBox.setOpaque(true);
-	comboBox.setLayout(createLayoutManager());
-	installDefaults();
-	installComponents();
-	installListeners();
-	installKeyboardActions();
+        comboBox = (JComboBox) c;
+        comboBox.setOpaque(true);
+        comboBox.setLayout(createLayoutManager());
+        installDefaults();
+        installComponents();
+        installListeners();
+        installKeyboardActions();
       }
   }
 
@@ -241,21 +260,14 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    if (comboBox.getFont() instanceof UIResource)
-      comboBox.setFont(defaults.getFont("ComboBox.font"));
+    LookAndFeel.installColorsAndFont(comboBox, "ComboBox.background",
+                                     "ComboBox.foreground", "ComboBox.font");
     
-    if (comboBox.getForeground() instanceof UIResource)
-      comboBox.setForeground(defaults.getColor("ComboBox.foreground"));
-
-    if (comboBox.getBackground() instanceof UIResource)
-      comboBox.setBackground(defaults.getColor("ComboBox.background"));
-
     // fetch the button color scheme
-    shadow = defaults.getColor("ComboBox.buttonShadow");
-    darkShadow = defaults.getColor("ComboBox.buttonDarkShadow");
-    highlight = defaults.getColor("ComboBox.buttonHighlight");
+    buttonBackground = UIManager.getColor("ComboBox.buttonBackground");
+    buttonShadow = UIManager.getColor("ComboBox.buttonShadow");
+    buttonDarkShadow = UIManager.getColor("ComboBox.buttonDarkShadow");
+    buttonHighlight = UIManager.getColor("ComboBox.buttonHighlight");
   }
 
   /**
@@ -303,9 +315,10 @@ public class BasicComboBoxUI extends ComboBoxUI
     if (comboBox.getBackground() instanceof UIResource)
       comboBox.setBackground(null);
 
-    shadow = null;
-    darkShadow = null;
-    highlight = null;
+    buttonBackground = null;
+    buttonShadow = null;
+    buttonDarkShadow = null;
+    buttonHighlight = null;
   }
 
   /**
@@ -440,7 +453,7 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected ComboBoxEditor createEditor()
   {
-    return new BasicComboBoxEditor();
+    return new BasicComboBoxEditor.UIResource();
   }
 
   /**
@@ -450,25 +463,26 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected void installComponents()
   {
-    // create and install arrow button
-    arrowButton = createArrowButton();
-    configureArrowButton();
-    comboBox.add(arrowButton);
-
-    // Set list that will be used by BasicComboBoxRender 
-    // in order to determine the right colors when rendering
-    listBox = new JList();
+    // create drop down list of items
+    popup = createPopup();
+    listBox = popup.getList();
 
     // set editor and renderer for the combo box. Editor is used
     // only if combo box becomes editable, otherwise renderer is used
     // to paint the selected item; combobox is not editable by default. 
     comboBox.setRenderer(createRenderer());
 
-    comboBox.setEditor(createEditor());
-    editor = comboBox.getEditor().getEditorComponent();
+    // create and install arrow button
+    arrowButton = createArrowButton();
+    configureArrowButton();
+    comboBox.add(arrowButton);
 
-    // create drop down list of items
-    popup = createPopup();
+    ComboBoxEditor currentEditor = comboBox.getEditor();
+    if (currentEditor == null || currentEditor instanceof UIResource)
+      {
+        comboBox.setEditor(createEditor());
+        editor = comboBox.getEditor().getEditorComponent();
+      }
 
     comboBox.revalidate();
   }
@@ -490,8 +504,14 @@ public class BasicComboBoxUI extends ComboBoxUI
 
     comboBox.setRenderer(null);
 
-    comboBox.setEditor(null);
-    editor = null;
+    // if the editor is not an instanceof UIResource, it was not set by the
+    // UI delegate, so don't clear it...
+    ComboBoxEditor currentEditor = comboBox.getEditor();
+    if (currentEditor instanceof UIResource)
+      {
+        comboBox.setEditor(null);
+        editor = null;
+      }
   }
 
   /**
@@ -537,16 +557,19 @@ public class BasicComboBoxUI extends ComboBoxUI
   {
     arrowButton.setEnabled(comboBox.isEnabled());
     arrowButton.setFont(comboBox.getFont());
-    arrowButton.setMargin(new Insets(0, 0, 0, 0));
   }
 
   /**
    * Unconfigures the arrow button.
    * 
    * @see #configureArrowButton()
+   *
+   * @specnote The specification says this method is implementation specific
+   *           and should not be used or overridden.
    */
   public void unconfigureArrowButton()
   {
+    // Nothing to do here yet.
   }
 
   /**
@@ -558,7 +581,8 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected JButton createArrowButton()
   {
-    return new BasicArrowButton(BasicArrowButton.SOUTH);
+    return new BasicArrowButton(BasicArrowButton.SOUTH, buttonBackground, 
+            buttonShadow, buttonDarkShadow, buttonHighlight);
   }
 
   /**
@@ -627,6 +651,9 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   public Dimension getPreferredSize(JComponent c)
   {
+    // note:  overriding getMinimumSize() (for example in the MetalComboBoxUI 
+    // class) affects the getPreferredSize() result, so it seems logical that
+    // this method is implemented by delegating to the getMinimumSize() method
     return getMinimumSize(c);
   }
 
@@ -641,9 +668,8 @@ public class BasicComboBoxUI extends ComboBoxUI
   public Dimension getMinimumSize(JComponent c)
   {
     Dimension d = getDisplaySize();
-    Dimension arrowDim = arrowButton.getPreferredSize();
-    Dimension result = new Dimension(d.width + arrowDim.width, 
-            Math.max(d.height, arrowDim.height));
+    int arrowButtonWidth = d.height;
+    Dimension result = new Dimension(d.width + arrowButtonWidth, d.height);
     return result;
   }
 
@@ -656,7 +682,7 @@ public class BasicComboBoxUI extends ComboBoxUI
    *
    * @param c The {@link JComponent} to find the maximum size for
    *
-   * @return The dimensions of the minimum size.
+   * @return The maximum size (<code>Dimension(32767, 32767)</code>).
    */
   public Dimension getMaximumSize(JComponent c)
   {
@@ -804,15 +830,24 @@ public class BasicComboBoxUI extends ComboBoxUI
   }
 
   /**
-   * Returns default size for the combo box that doesn't contain any elements
-   * in it
+   * Returns the default size for the display area of a combo box that does 
+   * not contain any elements.  This method returns the width and height of
+   * a single space in the current font, plus a margin of 1 pixel. 
    *
-   * @return Default size of the combo box with no elements in it.
+   * @return The default display size.
+   * 
+   * @see #getDisplaySize()
    */
   protected Dimension getDefaultSize()
   {
-    // FIXME: Not implemented properly.
-    return new Dimension(100, 5);
+    // There is nothing in the spec to say how this method should be
+    // implemented...so I've done some guessing, written some Mauve tests,
+    // and written something that gives dimensions that are close to the 
+    // reference implementation.
+    FontMetrics fm = comboBox.getFontMetrics(comboBox.getFont());
+    int w = fm.charWidth(' ') + 2;
+    int h = fm.getHeight() + 2;
+    return new Dimension(w, h);
   }
 
   /**
@@ -823,40 +858,52 @@ public class BasicComboBoxUI extends ComboBoxUI
    */
   protected Dimension getDisplaySize()
   {
-    ComboBoxModel model = comboBox.getModel();
-    int numItems = model.getSize();
-
-    // if combo box doesn't have any items then simply
-    // return its default size
-    if (numItems == 0)
+    Object prototype = comboBox.getPrototypeDisplayValue();
+    if (prototype != null)
       {
-	displaySize = getDefaultSize();
-	return displaySize;
-      }
-
-    Dimension size = new Dimension(0, 0);
-
-    // ComboBox's display size should be equal to the 
-    // size of the largest item in the combo box. 
-    ListCellRenderer renderer = comboBox.getRenderer();
-
-    // FIXME: use the JComboBox.getPrototypeDisplayValue() if there is
-    // one
-    for (int i = 0; i < numItems; i++)
-      {
-        Object item = model.getElementAt(i);
-        String s = item.toString();
-        Component comp = renderer.getListCellRendererComponent(listBox, item,
-            -1, false, false);
-
+        // calculate result based on prototype
+        ListCellRenderer renderer = comboBox.getRenderer();
+        Component comp = renderer.getListCellRendererComponent(listBox, 
+                prototype, -1, false, false);
         Dimension compSize = comp.getPreferredSize();
-        if (compSize.width > size.width)
-          size.width = compSize.width;
-        if (compSize.height > size.height)
-          size.height = compSize.height;
+        compSize.width += 2;  // add 1 pixel margin around area
+        compSize.height += 2;
+        return compSize;
       }
-    displaySize = size;
-    return displaySize;
+    else
+      {
+        ComboBoxModel model = comboBox.getModel();
+        int numItems = model.getSize();
+
+        // if combo box doesn't have any items then simply
+        // return its default size
+        if (numItems == 0)
+          {
+            displaySize = getDefaultSize();
+            return displaySize;
+          }
+
+        Dimension size = new Dimension(0, 0);
+
+        // ComboBox's display size should be equal to the 
+        // size of the largest item in the combo box. 
+        ListCellRenderer renderer = comboBox.getRenderer();
+
+        for (int i = 0; i < numItems; i++)
+          {
+            Object item = model.getElementAt(i);
+            Component comp = renderer.getListCellRendererComponent(listBox, 
+                    item, -1, false, false);
+
+            Dimension compSize = comp.getPreferredSize();
+            if (compSize.width + 2 > size.width)
+              size.width = compSize.width + 2;
+            if (compSize.height + 2 > size.height)
+              size.height = compSize.height + 2;
+          }
+        displaySize = size;
+        return displaySize;
+      }
   }
 
   /**
@@ -890,6 +937,7 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public ComboBoxLayoutManager()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -976,6 +1024,7 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public FocusHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -999,6 +1048,7 @@ public class BasicComboBoxUI extends ComboBoxUI
     public void focusLost(FocusEvent e)
     {
       hasFocus = false;
+      setPopupVisible(comboBox, false);
       comboBox.repaint();
     }
   }
@@ -1014,6 +1064,7 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public ItemHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1024,6 +1075,8 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public void itemStateChanged(ItemEvent e)
     {
+      if (e.getStateChange() == ItemEvent.SELECTED && comboBox.isEditable())
+        comboBox.getEditor().setItem(e.getItem());
       comboBox.repaint();
     }
   }
@@ -1035,6 +1088,7 @@ public class BasicComboBoxUI extends ComboBoxUI
   {
     public KeyHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1057,6 +1111,7 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public ListDataHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1114,6 +1169,7 @@ public class BasicComboBoxUI extends ComboBoxUI
      */
     public PropertyChangeHandler()
     {
+      // Nothing to do here.
     }
 
     /**

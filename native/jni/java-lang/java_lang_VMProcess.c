@@ -366,7 +366,6 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
 			  streams[0], streams[1], streams[2], (jlong) pid);
   if ((*env)->ExceptionOccurred (env))
     goto done;
-  (*env)->DeleteLocalRef (env, clazz);
 
 done:
   /*

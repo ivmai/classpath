@@ -44,8 +44,8 @@ import java.awt.Rectangle;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.swing.JComponent;
@@ -56,23 +56,23 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.event.CellEditorListener;
-import javax.swing.event.MouseInputListener;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionListener;
-
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 
-public class MetalTreeUI
-  extends BasicTreeUI
+/**
+ * A UI delegate for the {@link JTree} component.
+ */
+public class MetalTreeUI extends BasicTreeUI
 {
 
   /** Listeners */
   private PropertyChangeListener propertyChangeListener;
   private FocusListener focusListener;
   private TreeSelectionListener treeSelectionListener;
-  private MouseInputListener mouseInputListener;
+  private MouseListener mouseListener;
   private KeyListener keyListener;
   private PropertyChangeListener selectionModelPropertyChangeListener;
   private ComponentListener componentListener;
@@ -80,11 +80,8 @@ public class MetalTreeUI
   private TreeExpansionListener treeExpansionListener;
   private TreeModelListener treeModelListener;
     
-  /** The UI instances for MetalTreeUIs */
-  private static HashMap instances = null;
-
   /**
-   * Constructs a new instance of MetalTreeUI.
+   * Constructs a new instance of <code>MetalTreeUI</code>.
    */
   public MetalTreeUI()
   {
@@ -92,28 +89,15 @@ public class MetalTreeUI
   }
 
   /**
-   * Returns an instance of MetalTreeUI.
+   * Returns a new instance of <code>MetalTreeUI</code>.
    *
    * @param component the component for which we return an UI instance
    *
-   * @return an instance of MetalTreeUI
+   * @return A new instance of <code>MetalTreeUI</code>.
    */
   public static ComponentUI createUI(JComponent component)
   {
-    if (instances == null)
-      instances = new HashMap();
-
-    Object o = instances.get(component);
-    MetalTreeUI instance;
-    if (o == null)
-      {
-        instance = new MetalTreeUI();
-        instances.put(component, instance);
-      }
-    else
-      instance = (MetalTreeUI) o;
-
-    return instance;
+    return new MetalTreeUI();
   }
   
   /**
@@ -156,6 +140,7 @@ public class MetalTreeUI
     rightChildIndent = defaults.getInt("Tree.rightChildIndent");
     leftChildIndent = defaults.getInt("Tree.leftChildIndent");
     setRowHeight(defaults.getInt("Tree.rowHeight"));
+    tree.setRowHeight(defaults.getInt("Tree.rowHeight"));
     tree.requestFocusInWindow(false);
     
     setExpandedIcon(defaults.getIcon("Tree.expandedIcon"));
@@ -168,9 +153,7 @@ public class MetalTreeUI
     createdCellEditor = true;
     TreeModel mod = tree.getModel();
     setModel(mod);
-    tree.setRootVisible(true);
-    if (mod != null)
-      tree.expandPath(new TreePath(mod.getRoot()));
+
     treeSelectionModel = tree.getSelectionModel();
     drawingCache = new Hashtable();
     nodeDimensions = createNodeDimensions();
@@ -178,7 +161,7 @@ public class MetalTreeUI
     propertyChangeListener = createPropertyChangeListener();
     focusListener = createFocusListener();
     treeSelectionListener = createTreeSelectionListener();
-    mouseInputListener = new MouseInputHandler(null, null, null);
+    mouseListener = createMouseListener();
     keyListener = createKeyListener();
     selectionModelPropertyChangeListener = createSelectionModelPropertyChangeListener();
     componentListener = createComponentListener();
@@ -194,13 +177,20 @@ public class MetalTreeUI
     tree.addPropertyChangeListener(propertyChangeListener);
     tree.addFocusListener(focusListener);
     tree.addTreeSelectionListener(treeSelectionListener);
-    tree.addMouseListener(mouseInputListener);
+    tree.addMouseListener(mouseListener);
     tree.addKeyListener(keyListener);
     tree.addPropertyChangeListener(selectionModelPropertyChangeListener);
     tree.addComponentListener(componentListener);
     tree.addTreeExpansionListener(treeExpansionListener);
     if (treeModel != null)
       treeModel.addTreeModelListener(treeModelListener);
+    
+    if (mod != null)
+      {
+        TreePath path = new TreePath(mod.getRoot());
+        if (!tree.isExpanded(path))
+          toggleExpandState(path);
+      }
     
     completeUIInstall();
   }
@@ -231,7 +221,7 @@ public class MetalTreeUI
     tree.removePropertyChangeListener(propertyChangeListener);
     tree.removeFocusListener(focusListener);
     tree.removeTreeSelectionListener(treeSelectionListener);
-    tree.removeMouseListener(mouseInputListener);
+    tree.removeMouseListener(mouseListener);
     tree.removeKeyListener(keyListener);
     tree.removePropertyChangeListener(selectionModelPropertyChangeListener);
     tree.removeComponentListener(componentListener);

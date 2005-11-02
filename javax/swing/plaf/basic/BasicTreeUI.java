@@ -78,6 +78,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
@@ -111,11 +112,11 @@ import javax.swing.tree.TreeSelectionModel;
  * the Basic look and feel.
  * 
  * @see javax.swing.JTree
- * @author Sascha Brawer (brawer@dandelis.ch)
+ *
  * @author Lillian Angel (langel@redhat.com)
+ * @author Sascha Brawer (brawer@dandelis.ch)
  */
-public class BasicTreeUI
-  extends TreeUI
+public class BasicTreeUI extends TreeUI
 {
   /** Collapse Icon for the tree. */
   protected transient Icon collapsedIcon;
@@ -136,9 +137,6 @@ public class BasicTreeUI
    * rightChildIndent .
    */
   protected int totalChildIndent;
-
-  /** Minimum preferred size. */
-  protected Dimension preferredMinsize;
 
   /** Index of the row that was last selected. */
   protected int lastSelectedRow;
@@ -227,7 +225,7 @@ public class BasicTreeUI
 
   /** Set to true if the editor has a different size than the renderer. */
   protected boolean editorHasDifferentSize;
-
+  
   /** The action listener for the editor's Timer. */
   Timer editorTimer = new EditorUpdateTimer();
 
@@ -242,16 +240,22 @@ public class BasicTreeUI
   
   /** The bounds of the current cell. */
   Rectangle bounds;
+  
+  /** The current path of the visible nodes in the tree. */
+  TreePath currentVisiblePath;
+  
+  /** The gap between the icon and text. */
+  int gap = 4;
 
   /** Listeners */
   private PropertyChangeListener propertyChangeListener;
   private FocusListener focusListener;
   private TreeSelectionListener treeSelectionListener;
-  private MouseInputListener mouseInputListener;
+  private MouseListener mouseListener;
   private KeyListener keyListener;
   private PropertyChangeListener selectionModelPropertyChangeListener;
   private ComponentListener componentListener;
-  private CellEditorListener cellEditorListener;
+  CellEditorListener cellEditorListener;
   private TreeExpansionListener treeExpansionListener;
   private TreeModelListener treeModelListener;
 
@@ -260,6 +264,7 @@ public class BasicTreeUI
    */
   public BasicTreeUI()
   {
+    validCachedPreferredSize = false;
     drawingCache = new Hashtable();
     nodeDimensions = createNodeDimensions();
     configureLayoutCache();
@@ -267,7 +272,7 @@ public class BasicTreeUI
     propertyChangeListener = createPropertyChangeListener();
     focusListener = createFocusListener();
     treeSelectionListener = createTreeSelectionListener();
-    mouseInputListener = new MouseInputHandler(null, null, null);
+    mouseListener = createMouseListener();
     keyListener = createKeyListener();
     selectionModelPropertyChangeListener = createSelectionModelPropertyChangeListener();
     componentListener = createComponentListener();
@@ -329,7 +334,7 @@ public class BasicTreeUI
    * 
    * @return the indent value for the left child.
    */
-  public int getLeftChildIndent(int newAmount)
+  public int getLeftChildIndent()
   {
     return leftChildIndent;
   }
@@ -625,6 +630,7 @@ public class BasicTreeUI
         if (treeModel != null)
           {
             Object root = treeModel.getRoot();
+
             if (!tree.isRootVisible() && tree.isExpanded(new TreePath(root)))
               root = getNextNode(root);
 
@@ -646,20 +652,11 @@ public class BasicTreeUI
    */
   public TreePath getPathForRow(JTree tree, int row)
   {
-    if (treeModel != null)
+    if (treeModel != null && currentVisiblePath != null)
       {
-        Object node = treeModel.getRoot();
-        if (!tree.isRootVisible()
-            && tree.isExpanded(new TreePath(getPathToRoot(node, 0))))
-          node = getNextNode(node);
-
-        for (int i = 0; i < row; i++)
-          node = getNextVisibleNode(node);
-
-        if (node == null)
-          return null;
-
-        return new TreePath(getPathToRoot(node, 0));
+        Object[] nodes = currentVisiblePath.getPath();
+        if (row < nodes.length)
+          return new TreePath(getPathToRoot(nodes[row], 0));
       }
     return null;
   }
@@ -680,13 +677,18 @@ public class BasicTreeUI
   {
     int row = 0;
     Object dest = path.getLastPathComponent();
-    Object curr = treeModel.getRoot();
-    while (curr != null && !curr.equals(dest))
+    int rowCount = getRowCount(tree);
+    if (currentVisiblePath != null)
       {
-        ++row;
-        curr = getNextVisibleNode(curr);
+        Object[] nodes = currentVisiblePath.getPath();
+        while (row < rowCount)
+          {
+            if (dest.equals(nodes[row]))
+              return row;
+            row++;          
+          }
       }
-    return row;
+    return -1;
   }
 
   /**
@@ -698,21 +700,9 @@ public class BasicTreeUI
    */
   public int getRowCount(JTree tree)
   {
-    int count = 0;
-    if (treeModel != null)
-      {
-        Object node = treeModel.getRoot();
-        if (!tree.isRootVisible()
-            && tree.isExpanded(new TreePath((getPathToRoot(node, 0)))))
-          node = getNextNode(node);
-
-        while (node != null)
-          {
-            count++;
-            node = getNextVisibleNode(node);
-          }
-      }
-    return count;
+    if (currentVisiblePath != null)
+      return currentVisiblePath.getPathCount();
+    return 0;
   }
 
   /**
@@ -733,7 +723,7 @@ public class BasicTreeUI
   {
     // FIXME: what if root is hidden? should not depend on (0,0)
     // should start counting rows from where root is.
-
+    
     int row = Math.round(y / getRowHeight());
     TreePath path = getPathForRow(tree, row);
 
@@ -820,6 +810,7 @@ public class BasicTreeUI
    */
   protected void prepareForUIInstall()
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -828,6 +819,7 @@ public class BasicTreeUI
    */
   protected void completeUIInstall()
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -836,6 +828,7 @@ public class BasicTreeUI
    */
   protected void completeUIUninstall()
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -1026,7 +1019,7 @@ public class BasicTreeUI
     tree.removePropertyChangeListener(propertyChangeListener);
     tree.removeFocusListener(focusListener);
     tree.removeTreeSelectionListener(treeSelectionListener);
-    tree.removeMouseListener(mouseInputListener);
+    tree.removeMouseListener(mouseListener);
     tree.removeKeyListener(keyListener);
     tree.removePropertyChangeListener(selectionModelPropertyChangeListener);
     tree.removeComponentListener(componentListener);
@@ -1044,6 +1037,7 @@ public class BasicTreeUI
    */
   protected void uninstallKeyboardActions()
   {
+    // TODO: Implement this properly.
   }
 
   /**
@@ -1087,8 +1081,7 @@ public class BasicTreeUI
   protected void updateLayoutCacheExpandedNodes()
   {
     if (treeModel != null)
-      updateExpandedDescendants(new TreePath(getPathToRoot(treeModel.
-                                                           getRoot(), 0)));
+      updateExpandedDescendants(new TreePath(treeModel.getRoot()));
   }
 
   /**
@@ -1144,7 +1137,14 @@ public class BasicTreeUI
   protected void updateRenderer()
   {
     if (tree != null)
-      tree.setCellRenderer(currentCellRenderer);
+      {
+        if(tree.getCellRenderer() == null)
+          {  
+            if(currentCellRenderer == null) 
+              currentCellRenderer = createDefaultCellRenderer();                
+            tree.setCellRenderer(currentCellRenderer);
+          }
+      }
   }
 
   /**
@@ -1169,14 +1169,30 @@ public class BasicTreeUI
 
   /**
    * Updates the <code>preferredSize</code> instance variable, which is
-   * returned from <code>getPreferredSize()</code>. For left to right
-   * orientations, the size is determined from the current AbstractLayoutCache.
-   * For RTL orientations, the preferred size becomes the width minus the
-   * minimum x position.
+   * returned from <code>getPreferredSize()</code>.
    */
   protected void updateCachedPreferredSize()
   {
-    // FIXME: not implemented
+    int maxWidth = 0;
+    boolean isLeaf = false;
+    if (currentVisiblePath != null)
+      {
+        Object[] path = currentVisiblePath.getPath();
+        for (int i = 0; i < path.length; i++)
+          {
+            TreePath curr = new TreePath(getPathToRoot(path[i], 0));
+            Rectangle bounds = getPathBounds(tree, curr);  
+            
+            if (treeModel != null)
+              isLeaf = treeModel.isLeaf(path[i]);
+            if (!isLeaf && hasControlIcons())
+              bounds.width += getCurrentControlIcon(curr).getIconWidth();
+            maxWidth = Math.max(maxWidth, bounds.x + bounds.width);
+          }
+        preferredSize = new Dimension(maxWidth, (getRowHeight() * path.length));
+      }
+    else preferredSize = new Dimension(0, 0);
+    validCachedPreferredSize = true;
   }
 
   /**
@@ -1187,7 +1203,9 @@ public class BasicTreeUI
    */
   protected void pathWasExpanded(TreePath path)
   {
-    // FIXME: not implemented
+    validCachedPreferredSize = false;
+    tree.revalidate();
+    tree.repaint();
   }
 
   /**
@@ -1195,31 +1213,28 @@ public class BasicTreeUI
    */
   protected void pathWasCollapsed(TreePath path)
   {
-    // FIXME: not implemented
+    validCachedPreferredSize = false;
+    tree.revalidate();
+    tree.repaint();
   }
 
   /**
    * Install all defaults for the tree.
-   * 
-   * @param tree
-   *          is the JTree to install defaults for
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    tree.setFont(defaults.getFont("Tree.font"));
-    tree.setForeground(defaults.getColor("Tree.foreground"));
-    tree.setBackground(defaults.getColor("Tree.background"));
+    LookAndFeel.installColorsAndFont(tree, "Tree.background",
+                                     "Tree.foreground", "Tree.font");
     tree.setOpaque(true);
 
-    rightChildIndent = defaults.getInt("Tree.rightChildIndent");
-    leftChildIndent = defaults.getInt("Tree.leftChildIndent");
-    setRowHeight(defaults.getInt("Tree.rowHeight"));
+    rightChildIndent = UIManager.getInt("Tree.rightChildIndent");
+    leftChildIndent = UIManager.getInt("Tree.leftChildIndent");
+    setRowHeight(UIManager.getInt("Tree.rowHeight"));
+    tree.setRowHeight(UIManager.getInt("Tree.rowHeight"));
     tree.requestFocusInWindow(false);
-    tree.setScrollsOnExpand(defaults.getBoolean("Tree.scrollsOnExpand"));
-    setExpandedIcon(defaults.getIcon("Tree.expandedIcon"));
-    setCollapsedIcon(defaults.getIcon("Tree.collapsedIcon"));
+    tree.setScrollsOnExpand(UIManager.getBoolean("Tree.scrollsOnExpand"));
+    setExpandedIcon(UIManager.getIcon("Tree.expandedIcon"));
+    setCollapsedIcon(UIManager.getIcon("Tree.collapsedIcon"));
   }
 
   /**
@@ -1309,7 +1324,7 @@ public class BasicTreeUI
     tree.addPropertyChangeListener(propertyChangeListener);
     tree.addFocusListener(focusListener);
     tree.addTreeSelectionListener(treeSelectionListener);
-    tree.addMouseListener(mouseInputListener);
+    tree.addMouseListener(mouseListener);
     tree.addKeyListener(keyListener);
     tree.addPropertyChangeListener(selectionModelPropertyChangeListener);
     tree.addComponentListener(componentListener);
@@ -1326,34 +1341,34 @@ public class BasicTreeUI
    */
   public void installUI(JComponent c)
   {
+    tree = (JTree) c;
     prepareForUIInstall();
     super.installUI(c);
-    tree = (JTree) c;
     installDefaults();
 
     installComponents();
-
+    installKeyboardActions();
+    installListeners();
+    
     setCellEditor(createDefaultCellEditor());
     createdCellEditor = true;
     isEditing = false;
-    
+
     TreeModel mod = tree.getModel();
     setModel(mod);
-    tree.setRootVisible(true);
     if (mod != null)
-      tree.expandPath(new TreePath(mod.getRoot()));
+      {
+        TreePath path = new TreePath(mod.getRoot());
+        if (!tree.isExpanded(path))
+          toggleExpandState(path);
+      }
     treeSelectionModel = tree.getSelectionModel();
 
-    installKeyboardActions();
-    installListeners();
     completeUIInstall();
   }
 
   /**
    * Uninstall the defaults for the tree
-   * 
-   * @param tree
-   *          to uninstall defaults for
    */
   protected void uninstallDefaults()
   {
@@ -1395,18 +1410,16 @@ public class BasicTreeUI
   public void paint(Graphics g, JComponent c)
   {
     JTree tree = (JTree) c;
-
+    if (currentVisiblePath == null)
+      updateCurrentVisiblePath();
+    
     if (treeModel != null)
       {
         Object root = treeModel.getRoot();
-
-        if (!tree.isRootVisible())
-          tree.expandPath(new TreePath(root));
-
-        paintRecursive(g, 0, 0, 0, 0, tree, treeModel, root);
-
+        paintRecursive(g, 0, 0, 0, tree, treeModel, root);
+        
         if (hasControlIcons())
-          paintControlIcons(g, 0, 0, 0, 0, tree, treeModel, root);
+          paintControlIcons(g, 0, 0, 0, tree, treeModel, root);
       }
   }
 
@@ -1443,7 +1456,7 @@ public class BasicTreeUI
    */
   public void setPreferredMinSize(Dimension newSize)
   {
-    // FIXME: not implemented
+    preferredMinSize = newSize;
   }
 
   /**
@@ -1453,8 +1466,7 @@ public class BasicTreeUI
    */
   public Dimension getPreferredMinSize()
   {
-    // FIXME: not implemented
-    return null;
+    return preferredMinSize;
   }
 
   /**
@@ -1484,27 +1496,10 @@ public class BasicTreeUI
    */
   public Dimension getPreferredSize(JComponent c, boolean checkConsistancy)
   {
-    // FIXME: checkConsistancy not implemented, c not used
-    int maxWidth = 0;
-    int count = 0;
-    if (treeModel != null)
-      {
-        Object node = treeModel.getRoot();
-        if (node != null)
-          {
-            maxWidth = (int) (getCellBounds(0, 0, node).getWidth());
-            while (node != null)
-              {
-                count++;
-                Object nextNode = getNextVisibleNode(node);
-                if (nextNode != null)
-                  maxWidth = Math.max(maxWidth,
-                                      (int) (getCellBounds(0, 0, nextNode).getWidth()));
-                node = nextNode;
-              }
-          }
-      }
-    return new Dimension(maxWidth, (getRowHeight() * count));
+    // FIXME: checkConsistancy not implemented, c not used 
+    if(!validCachedPreferredSize) 
+      updateCachedPreferredSize();
+    return preferredSize;
   }
 
   /**
@@ -1598,7 +1593,7 @@ public class BasicTreeUI
     int y;
     if (event == null)
       {
-        Rectangle bounds = getPathBounds(tree, path);
+        bounds = getPathBounds(tree, path);
         x = bounds.x;
         y = bounds.y;
       }
@@ -1628,6 +1623,8 @@ public class BasicTreeUI
         editingComponent.getParent().validate();
         tree.add(editingComponent.getParent());
         editingComponent.getParent().validate();
+        validCachedPreferredSize = false;
+        tree.revalidate();
         ((JTextField) editingComponent).requestFocusInWindow(false);
         editorTimer.start();
         return true;
@@ -1676,16 +1673,10 @@ public class BasicTreeUI
     
     if (!isLeaf(row))
       {
-        if (bounds == null)
-          bounds = getPathBounds(tree, path);
-        if (tree.isExpanded(path) && expandedIcon != null)
-            bounds.x -= expandedIcon.getIconWidth() - 4;
-        else if (collapsedIcon != null)
-            bounds.x -= collapsedIcon.getIconWidth() - 4;
+        bounds = getPathBounds(tree, path);
 
-        Icon controlIcon = getCurrentControlIcon(path);
-        if (controlIcon != null && (mouseX < bounds.x) 
-            && (mouseX > (bounds.x - controlIcon.getIconWidth())))
+        if (hasControlIcons() && (mouseX < bounds.x) 
+            && (mouseX > (bounds.x - getCurrentControlIcon(path).getIconWidth() - gap)))
           cntlClick = true;
       }
     return cntlClick;
@@ -1722,6 +1713,7 @@ public class BasicTreeUI
       tree.collapsePath(path);
     else
       tree.expandPath(path);
+    updateCurrentVisiblePath();
   }
 
   /**
@@ -1856,7 +1848,7 @@ public class BasicTreeUI
         (new TreeTraverseAction(0, "")).actionPerformed(e);
       else if (e.getActionCommand().equals("selectAll"))
         {
-          TreePath[] paths = new TreePath[tree.getRowCount()];
+          TreePath[] paths = new TreePath[tree.getVisibleRowCount()];
 
           Object curr = getNextVisibleNode(treeModel.getRoot());
           int i = 0;
@@ -1971,8 +1963,7 @@ public class BasicTreeUI
   /**
    * Updates the preferred size when scrolling, if necessary.
    */
-  public class ComponentHandler
-    extends ComponentAdapter
+  public class ComponentHandler extends ComponentAdapter
     implements ActionListener
   {
     /**
@@ -1988,6 +1979,7 @@ public class BasicTreeUI
      */
     public ComponentHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -1998,6 +1990,7 @@ public class BasicTreeUI
      */
     public void componentMoved(ComponentEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2006,6 +1999,7 @@ public class BasicTreeUI
      */
     protected void startTimer()
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2027,21 +2021,22 @@ public class BasicTreeUI
      */
     public void actionPerformed(ActionEvent ae)
     {
+      // TODO: Implement this properly.
     }
-  }// ComponentHandler
+  }
 
   /**
    * Listener responsible for getting cell editing events and updating the tree
    * accordingly.
    */
-  public class CellEditorHandler
-    implements CellEditorListener
+  public class CellEditorHandler implements CellEditorListener
   {
     /**
      * Constructor
      */
     public CellEditorHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2074,6 +2069,9 @@ public class BasicTreeUI
       isEditing = false;
       tree.requestFocusInWindow(false);
       editorTimer.stop();
+      validCachedPreferredSize = false;
+      tree.revalidate();
+      tree.repaint();
     }
 
     /**
@@ -2102,6 +2100,8 @@ public class BasicTreeUI
       tree.requestFocusInWindow(false);
       editorTimer.stop();
       isEditing = false;
+      validCachedPreferredSize = false;
+      tree.revalidate();
       tree.repaint();
     }
   }// CellEditorHandler
@@ -2117,6 +2117,7 @@ public class BasicTreeUI
      */
     public FocusHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2128,6 +2129,7 @@ public class BasicTreeUI
      */
     public void focusGained(FocusEvent e)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2139,8 +2141,9 @@ public class BasicTreeUI
      */
     public void focusLost(FocusEvent e)
     {
+      // TODO: Implement this properly.
     }
-  }// FocusHandler
+  }
 
   /**
    * This is used to get multiple key down events to appropriately genereate
@@ -2160,6 +2163,7 @@ public class BasicTreeUI
      */
     public KeyHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2173,6 +2177,7 @@ public class BasicTreeUI
      */
     public void keyTyped(KeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2183,6 +2188,7 @@ public class BasicTreeUI
      */
     public void keyPressed(KeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2193,22 +2199,22 @@ public class BasicTreeUI
      */
     public void keyReleased(KeyEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
-  }// KeyHandler
+  }
 
   /**
    * MouseListener is responsible for updating the selection based on mouse
    * events.
    */
-  public class MouseHandler
-    extends MouseAdapter
-    implements MouseMotionListener
+  public class MouseHandler extends MouseAdapter implements MouseMotionListener
   {
     /**
      * Constructor
      */
     public MouseHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2216,91 +2222,6 @@ public class BasicTreeUI
      * 
      * @param e
      *          is the mouse event that occured
-     */
-    public void mousePressed(MouseEvent e)
-    {
-    }
-
-    /**
-     * Invoked when a mouse button is pressed on a component and then dragged.
-     * MOUSE_DRAGGED events will continue to be delivered to the component where
-     * the drag originated until the mouse button is released (regardless of
-     * whether the mouse position is within the bounds of the component).
-     * 
-     * @param e
-     *          is the mouse event that occured
-     */
-    public void mouseDragged(MouseEvent e)
-    {
-    }
-
-    /**
-     * Invoked when the mouse button has been moved on a component (with no
-     * buttons no down).
-     * 
-     * @param e
-     *          the mouse event that occured
-     */
-    public void mouseMoved(MouseEvent e)
-    {
-    }
-
-    /**
-     * Invoked when a mouse button has been released on a component.
-     * 
-     * @param e
-     *          is the mouse event that occured
-     */
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-  }// MouseHandler
-
-  /**
-   * MouseInputHandler handles passing all mouse events, including mouse motion
-   * events, until the mouse is released to the destination it is constructed
-   * with.
-   */
-  public class MouseInputHandler
-    implements MouseInputListener
-  {
-    /** Source that events are coming from */
-    protected Component source;
-
-    /** Destination that receives all events. */
-    protected Component destination;
-
-    /**
-     * Constructor
-     * 
-     * @param source
-     *          that events are coming from
-     * @param destination
-     *          that receives all events
-     * @param e
-     *          is the event received
-     */
-    public MouseInputHandler(Component source, Component destination,
-                             MouseEvent e)
-    {
-    }
-
-    /**
-     * Invoked when the mouse button has been clicked (pressed and released) on
-     * a component.
-     * 
-     * @param e
-     *          mouse event that occured
-     */
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-
-    /**
-     * Invoked when a mouse button has been pressed on a component.
-     * 
-     * @param e
-     *          mouse event that occured
      */
     public void mousePressed(MouseEvent e)
     {
@@ -2312,16 +2233,28 @@ public class BasicTreeUI
           bounds = getPathBounds(tree, path);
           int row = getRowForPath(tree, path);
           boolean cntlClick = isLocationInExpandControl(path, click.x, click.y);
+
+          boolean isLeaf = isLeaf(row);
           
-          if (isLeaf(row))
+          TreeCellRenderer tcr = getCellRenderer();
+          Icon icon;
+          if (isLeaf)
+            icon = UIManager.getIcon("Tree.leafIcon");
+          else if (tree.isExpanded(path))
+            icon = UIManager.getIcon("Tree.openIcon");
+          else
+            icon = UIManager.getIcon("Tree.closedIcon");
+          
+          if (tcr instanceof DefaultTreeCellRenderer)
             {
-              bounds.x -= rightChildIndent - 4;
-              bounds.width += rightChildIndent + 4;
+             Icon tmp = ((DefaultTreeCellRenderer) tcr).getIcon();
+             if (tmp != null)
+               icon = tmp;
             }
-          else if (tree.isExpanded(path) && expandedIcon != null)
-              bounds.width += expandedIcon.getIconWidth() + 4;
-          else if (collapsedIcon != null)
-              bounds.width += collapsedIcon.getIconWidth() + 4;
+          
+          // add gap*2 for the space before and after the text
+          if (icon != null)
+            bounds.width += icon.getIconWidth() + gap*2;
 
           boolean inBounds = bounds.contains(click.x, click.y);
           if ((inBounds || cntlClick) && tree.isVisible(path))
@@ -2343,6 +2276,97 @@ public class BasicTreeUI
     }
 
     /**
+     * Invoked when a mouse button is pressed on a component and then dragged.
+     * MOUSE_DRAGGED events will continue to be delivered to the component where
+     * the drag originated until the mouse button is released (regardless of
+     * whether the mouse position is within the bounds of the component).
+     * 
+     * @param e
+     *          is the mouse event that occured
+     */
+    public void mouseDragged(MouseEvent e)
+    {
+      // TODO: What should be done here, if anything?
+    }
+
+    /**
+     * Invoked when the mouse button has been moved on a component (with no
+     * buttons no down).
+     * 
+     * @param e
+     *          the mouse event that occured
+     */
+    public void mouseMoved(MouseEvent e)
+    {
+      // TODO: What should be done here, if anything?
+    }
+
+    /**
+     * Invoked when a mouse button has been released on a component.
+     * 
+     * @param e
+     *          is the mouse event that occured
+     */
+    public void mouseReleased(MouseEvent e)
+    {
+      // TODO: What should be done here, if anything?
+    }
+  }
+
+  /**
+   * MouseInputHandler handles passing all mouse events, including mouse motion
+   * events, until the mouse is released to the destination it is constructed
+   * with.
+   */
+  public class MouseInputHandler implements MouseInputListener
+  {
+    /** Source that events are coming from */
+    protected Component source;
+
+    /** Destination that receives all events. */
+    protected Component destination;
+
+    /**
+     * Constructor
+     * 
+     * @param source
+     *          that events are coming from
+     * @param destination
+     *          that receives all events
+     * @param e
+     *          is the event received
+     */
+    public MouseInputHandler(Component source, Component destination,
+                             MouseEvent e)
+    {
+      this.source = source;
+      this.destination = destination;
+    }
+
+    /**
+     * Invoked when the mouse button has been clicked (pressed and released) on
+     * a component.
+     * 
+     * @param e
+     *          mouse event that occured
+     */
+    public void mouseClicked(MouseEvent e)
+    {
+      // TODO: What should be done here, if anything?
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     * 
+     * @param e
+     *          mouse event that occured
+     */
+    public void mousePressed(MouseEvent e)
+    {
+      // TODO: What should be done here, if anything?
+    }
+
+    /**
      * Invoked when a mouse button has been released on a component.
      * 
      * @param e
@@ -2350,6 +2374,7 @@ public class BasicTreeUI
      */
     public void mouseReleased(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2360,6 +2385,7 @@ public class BasicTreeUI
      */
     public void mouseEntered(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2370,6 +2396,7 @@ public class BasicTreeUI
      */
     public void mouseExited(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2383,6 +2410,7 @@ public class BasicTreeUI
      */
     public void mouseDragged(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2394,6 +2422,7 @@ public class BasicTreeUI
      */
     public void mouseMoved(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
 
     /**
@@ -2401,8 +2430,9 @@ public class BasicTreeUI
      */
     protected void removeFromSource()
     {
+      // TODO: Implement this properly.
     }
-  }// MouseInputHandler
+  }
 
   /**
    * Class responsible for getting size of node, method is forwarded to
@@ -2417,6 +2447,7 @@ public class BasicTreeUI
      */
     public NodeDimensionsHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2464,6 +2495,7 @@ public class BasicTreeUI
      */
     public PropertyChangeHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2475,8 +2507,9 @@ public class BasicTreeUI
      */
     public void propertyChange(PropertyChangeEvent event)
     {
+      // TODO: What should be done here, if anything?
     }
-  }// PropertyChangeHandler
+  }
 
   /**
    * Listener on the TreeSelectionModel, resets the row selection if any of the
@@ -2491,6 +2524,7 @@ public class BasicTreeUI
      */
     public SelectionModelPropertyChangeHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2502,8 +2536,9 @@ public class BasicTreeUI
      */
     public void propertyChange(PropertyChangeEvent event)
     {
+      // TODO: What should be done here, if anything?
     }
-  }// SelectionModelPropertyChangeHandler
+  }
 
   /**
    * ActionListener that invokes cancelEditing when action performed.
@@ -2517,6 +2552,7 @@ public class BasicTreeUI
      */
     public TreeCancelEditingAction(String name)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2527,6 +2563,7 @@ public class BasicTreeUI
      */
     public void actionPerformed(ActionEvent e)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2536,9 +2573,10 @@ public class BasicTreeUI
      */
     public boolean isEnabled()
     {
+      // TODO: Implement this properly.
       return false;
     }
-  }// TreeCancelEditingAction
+  }
 
   /**
    * Updates the TreeState in response to nodes expanding/collapsing.
@@ -2552,6 +2590,7 @@ public class BasicTreeUI
      */
     public TreeExpansionHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2562,6 +2601,9 @@ public class BasicTreeUI
      */
     public void treeExpanded(TreeExpansionEvent event)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
 
@@ -2573,6 +2615,9 @@ public class BasicTreeUI
      */
     public void treeCollapsed(TreeExpansionEvent event)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
   }// TreeExpansionHandler
@@ -2598,6 +2643,7 @@ public class BasicTreeUI
      */
     public TreeHomeAction(int direction, String name)
     {
+      // TODO: Implement this properly
     }
 
     /**
@@ -2608,6 +2654,7 @@ public class BasicTreeUI
      */
     public void actionPerformed(ActionEvent e)
     {
+      // TODO: Implement this properly
     }
 
     /**
@@ -2617,9 +2664,10 @@ public class BasicTreeUI
      */
     public boolean isEnabled()
     {
+      // TODO: Implement this properly
       return false;
     }
-  }// TreeHomeAction
+  }
 
   /**
    * TreeIncrementAction is used to handle up/down actions. Selection is moved
@@ -2642,6 +2690,7 @@ public class BasicTreeUI
      */
     public TreeIncrementAction(int direction, String name)
     {
+      // TODO: Implement this properly
     }
 
     /**
@@ -2661,7 +2710,7 @@ public class BasicTreeUI
           if (prev != null)
             {
               TreePath newPath = new TreePath(getPathToRoot(prev, 0));
-              selectPath(tree, new TreePath(getPathToRoot(prev, 0)));
+              selectPath(tree, newPath);
               tree.setLeadSelectionPath(newPath);
             }
         }
@@ -2681,7 +2730,7 @@ public class BasicTreeUI
           if (prev != null)
             {
               TreePath newPath = new TreePath(getPathToRoot(prev, 0));
-              selectPath(tree, new TreePath(getPathToRoot(prev, 0)));
+              selectPath(tree, newPath);
             }
         }
       else if (e.getActionCommand().equals("selectNext"))
@@ -2722,21 +2771,22 @@ public class BasicTreeUI
      */
     public boolean isEnabled()
     {
+      // TODO: Implement this properly
       return false;
     }
-  }// TreeIncrementAction
+  }
 
   /**
    * Forwards all TreeModel events to the TreeState.
    */
-  public class TreeModelHandler
-    implements TreeModelListener
+  public class TreeModelHandler implements TreeModelListener
   {
     /**
      * Constructor
      */
     public TreeModelHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2754,6 +2804,9 @@ public class BasicTreeUI
      */
     public void treeNodesChanged(TreeModelEvent e)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
 
@@ -2767,6 +2820,9 @@ public class BasicTreeUI
      */
     public void treeNodesInserted(TreeModelEvent e)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
 
@@ -2783,6 +2839,9 @@ public class BasicTreeUI
      */
     public void treeNodesRemoved(TreeModelEvent e)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
 
@@ -2798,6 +2857,9 @@ public class BasicTreeUI
      */
     public void treeStructureChanged(TreeModelEvent e)
     {
+      validCachedPreferredSize = false;
+      updateCurrentVisiblePath();
+      tree.revalidate();
       tree.repaint();
     }
   }// TreeModelHandler
@@ -2805,8 +2867,7 @@ public class BasicTreeUI
   /**
    * TreePageAction handles page up and page down events.
    */
-  public class TreePageAction
-    extends AbstractAction
+  public class TreePageAction extends AbstractAction
   {
     /** Specifies the direction to adjust the selection by. */
     protected int direction;
@@ -2821,6 +2882,7 @@ public class BasicTreeUI
      */
     public TreePageAction(int direction, String name)
     {
+      this.direction = direction;
     }
 
     /**
@@ -2831,6 +2893,7 @@ public class BasicTreeUI
      */
     public void actionPerformed(ActionEvent e)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2848,14 +2911,14 @@ public class BasicTreeUI
    * Listens for changes in the selection model and updates the display
    * accordingly.
    */
-  public class TreeSelectionHandler
-    implements TreeSelectionListener
+  public class TreeSelectionHandler implements TreeSelectionListener
   {
     /**
      * Constructor
      */
     public TreeSelectionHandler()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2875,8 +2938,7 @@ public class BasicTreeUI
   /**
    * For the first selected row expandedness will be toggled.
    */
-  public class TreeToggleAction
-    extends AbstractAction
+  public class TreeToggleAction extends AbstractAction
   {
     /**
      * Constructor
@@ -2886,6 +2948,7 @@ public class BasicTreeUI
      */
     public TreeToggleAction(String name)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -2896,6 +2959,7 @@ public class BasicTreeUI
      */
     public void actionPerformed(ActionEvent e)
     {
+      // TODO: Implement this properly.
     }
 
     /**
@@ -2913,8 +2977,7 @@ public class BasicTreeUI
    * TreeTraverseAction is the action used for left/right keys. Will toggle the
    * expandedness of a node, as well as potentially incrementing the selection.
    */
-  public class TreeTraverseAction
-    extends AbstractAction
+  public class TreeTraverseAction extends AbstractAction
   {
     /**
      * Determines direction to traverse, 1 means expand, -1 means collapse.
@@ -2931,6 +2994,7 @@ public class BasicTreeUI
      */
     public TreeTraverseAction(int direction, String name)
     {
+      this.direction = direction;
     }
 
     /**
@@ -2948,8 +3012,8 @@ public class BasicTreeUI
           TreePath path = new TreePath(getPathToRoot(last, 0));
           Object p = getParent(treeModel.getRoot(), last);
 
-          if (!treeModel.isLeaf(last) && tree.isExpanded(path))
-            tree.collapsePath(path);
+          if (!treeModel.isLeaf(last))
+            toggleExpandState(path);
           else if (p != null)
             selectPath(tree, new TreePath(getPathToRoot(p, 0)));
         }
@@ -2957,8 +3021,8 @@ public class BasicTreeUI
         {
           TreePath path = new TreePath(getPathToRoot(last, 0));
 
-          if (!treeModel.isLeaf(last) && tree.isCollapsed(path))
-            tree.expandPath(path);
+          if (!treeModel.isLeaf(last))
+            toggleExpandState(path);
           else
             {
               Object next = getNextVisibleNode(last);
@@ -2976,9 +3040,10 @@ public class BasicTreeUI
      */
     public boolean isEnabled()
     {
+      // TODO: Implement this properly
       return false;
     }
-  } // TreeTraverseAction
+  }
 
   /**
    * Returns the cell bounds for painting selected cells Package private for use
@@ -3001,8 +3066,7 @@ public class BasicTreeUI
         FontMetrics fm = tree.getToolkit().getFontMetrics(f);
 
         if (s != null)
-          return new Rectangle(x, y,
-                               SwingUtilities.computeStringWidth(fm, s) + 4,
+            return new Rectangle(x, y, SwingUtilities.computeStringWidth(fm, s),
                                fm.getHeight());
       }
     return new Rectangle(x, y, 0, 0);
@@ -3032,77 +3096,16 @@ public class BasicTreeUI
     int rowHeight = getRowHeight();
     if (startNode == null || startNode.equals(node))
       {
-        if (!tree.isRootVisible()
-            && tree.isExpanded(new TreePath(mod.getRoot())))
-          return new Point(x + ((getLevel(node)) * rightChildIndent), y);
-
-        return new Point(x + ((getLevel(node) + 1) * rightChildIndent), y);
+        int level = getLevel(node);
+        if (level == 0)
+          return new Point(x, y);
+        if (!tree.isRootVisible() && 
+            tree.isExpanded(new TreePath(mod.getRoot())))
+          return new Point(x + ((level - 1) * rightChildIndent), y);
+        return new Point(x + (level * rightChildIndent), y);
       }
-
-    if (!mod.isLeaf(startNode)
-        && tree.isExpanded(new TreePath(getPathToRoot(startNode, 0)))
-        && !mod.isLeaf(startNode) && mod.getChildCount(startNode) > 0)
-      {
-        Object child = mod.getChild(startNode, 0);
-        if (child != null)
-          return getCellLocation(x, y + rowHeight, tree, mod, node, child);
-      }
-
     return getCellLocation(x, y + rowHeight, tree, mod, node,
                            getNextVisibleNode(startNode));
-  }
-
-  /**
-   * Paints a node in the tree Package private for use in inner classes.
-   * 
-   * @param g
-   *          the Graphics context in which to paint
-   * @param x
-   *          the x location of the node
-   * @param y
-   *          the y location of the node
-   * @param tree
-   *          the tree to draw on
-   * @param node
-   *          the object to draw
-   */
-  void paintNode(Graphics g, int x, int y, JTree tree, Object node,
-                 boolean isLeaf)
-  {
-    TreePath curr = new TreePath(getPathToRoot(node, 0));
-    boolean selected = tree.isPathSelected(curr);
-    boolean expanded = false;
-    boolean hasIcons = false;
-
-    if (tree.isVisible(curr))
-      {
-        if (!isLeaf)
-          expanded = tree.isExpanded(curr);
-
-        if (editingComponent != null && editingPath != null && isEditing(tree)
-            && node.equals(editingPath.getLastPathComponent()))
-          {
-            Rectangle bounds = getPathBounds(tree, editingPath);
-            rendererPane.paintComponent(g, editingComponent.getParent(), null,
-                                        new Rectangle(0, 0, bounds.width,
-                                                      bounds.height));
-          }
-        else
-          {
-            TreeCellRenderer dtcr = tree.getCellRenderer();
-            if (dtcr == null)
-              dtcr = createDefaultCellRenderer();
-
-            int row = getRowForPath(tree, curr);
-
-            Component c = dtcr.getTreeCellRendererComponent(tree, node,
-                                                            selected, expanded,
-                                                            isLeaf, row, false);
-
-            rendererPane.paintComponent(g, c, c.getParent(),
-                                        getCellBounds(x, y, node));
-          }
-      }
   }
 
   /**
@@ -3115,8 +3118,6 @@ public class BasicTreeUI
    *          of the current object
    * @param descent
    *          is the number of elements drawn
-   * @param childNumber
-   *          is the index of the current child in the tree
    * @param depth
    *          is the depth of the current object in the tree
    * @param tree
@@ -3127,46 +3128,50 @@ public class BasicTreeUI
    *          is the current object to draw
    * @return int - current descent of the tree
    */
-  int paintRecursive(Graphics g, int indentation, int descent, int childNumber,
+  int paintRecursive(Graphics g, int indentation, int descent,
                      int depth, JTree tree, TreeModel mod, Object curr)
   {
-    Rectangle clip = g.getClipBounds();
+    Rectangle clip = tree.getVisibleRect();
     if (indentation > clip.x + clip.width + rightChildIndent
         || descent > clip.y + clip.height + getRowHeight())
       return descent;
 
+    TreePath path = new TreePath(getPathToRoot(curr, 0));
     int halfHeight = getRowHeight() / 2;
     int halfWidth = rightChildIndent / 2;
     int y0 = descent + halfHeight;
     int heightOfLine = descent + halfHeight;
+    int row = getRowForPath(tree, path);
     boolean isRootVisible = tree.isRootVisible();
+    boolean isExpanded = tree.isExpanded(path);
+    boolean isLeaf = mod.isLeaf(curr);
+    Rectangle bounds = getPathBounds(tree, path);
+    Object root = mod.getRoot();
 
-    if (mod.isLeaf(curr))
+    if (isLeaf)
       {
-        paintNode(g, indentation + 4, descent, tree, curr, true);
+        paintRow(g, clip, null, bounds, path, row, true, false, true);
         descent += getRowHeight();
       }
     else
       {
         if (depth > 0 || isRootVisible)
           {
-            paintNode(g, indentation + 4, descent, tree, curr, false);
+            paintRow(g, clip, null, bounds, path, row, isExpanded, false, false);
             descent += getRowHeight();
             y0 += halfHeight;
           }
-
-        int max = 0;
-        if (!mod.isLeaf(curr))
-          max = mod.getChildCount(curr);
-        if (tree.isExpanded(new TreePath(getPathToRoot(curr, 0))))
+        
+        int max = mod.getChildCount(curr);
+        if (isExpanded)
           {
             for (int i = 0; i < max; i++)
               {
                 int indent = indentation + rightChildIndent;
                 if (!isRootVisible && depth == 0)
                   indent = 0;
-                else if ((!isRootVisible && !curr.equals(mod.getRoot()))
-                         || isRootVisible)
+                else if (isRootVisible || 
+                    (!isRootVisible && !curr.equals(root)))
                   {
                     g.setColor(getHashColor());
                     heightOfLine = descent + halfHeight;
@@ -3174,14 +3179,14 @@ public class BasicTreeUI
                       indentation + halfWidth, indentation + rightChildIndent);
                   }
 
-                descent = paintRecursive(g, indent, descent, i, depth + 1,
+                descent = paintRecursive(g, indent, descent, depth + 1,
                                          tree, mod, mod.getChild(curr, i));
               }
           }
       }
 
-    if (tree.isExpanded(new TreePath(getPathToRoot(curr, 0))))
-      if (y0 != heightOfLine && !mod.isLeaf(curr)
+    if (isExpanded)
+      if (y0 != heightOfLine && !isLeaf
           && mod.getChildCount(curr) > 0)
         {
           g.setColor(getHashColor());
@@ -3191,7 +3196,7 @@ public class BasicTreeUI
 
     return descent;
   }
-
+  
   /**
    * Recursively paints all the control icons on the tree. Package private for
    * use in inner classes.
@@ -3202,90 +3207,98 @@ public class BasicTreeUI
    *          of the current object
    * @param descent
    *          is the number of elements drawn
-   * @param childNumber
-   *          is the index of the current child in the tree
    * @param depth
    *          is the depth of the current object in the tree
    * @param tree
    *          is the tree to draw to
    * @param mod
    *          is the TreeModel we are using to draw
-   * @param curr
+   * @param node
    *          is the current object to draw
-   * @return int - current descent of the tree
+   * @return int current descent of the tree
    */
   int paintControlIcons(Graphics g, int indentation, int descent,
-                        int childNumber, int depth, JTree tree, TreeModel mod,
+                        int depth, JTree tree, TreeModel mod,
                         Object node)
   {
-    int h = descent;
     int rowHeight = getRowHeight();
     TreePath path = new TreePath(getPathToRoot(node, 0));
     Icon icon = getCurrentControlIcon(path);
-    
-    Rectangle clip = g.getClipBounds();
+       
+    Rectangle clip = tree.getVisibleRect();
     if (indentation > clip.x + clip.width + rightChildIndent
         || descent > clip.y + clip.height + getRowHeight())
       return descent;
-
+   
     if (mod.isLeaf(node))
       descent += rowHeight;
     else
-      {
+      {   
+        if (!node.equals(mod.getRoot()) && 
+            (tree.isRootVisible() || getLevel(node) != 1))
+          {
+            int width = icon.getIconWidth();
+            int height = icon.getIconHeight() + 2;
+            int posX = indentation - rightChildIndent;
+            int posY = descent;
+            if (width > rightChildIndent)
+              posX -= gap;
+            else posX += width/2;
+               
+            if (height < rowHeight)
+              posY += height/2;
+               
+            icon.paintIcon(tree, g, posX, posY);
+          }
+
         if (depth > 0 || tree.isRootVisible())
           descent += rowHeight;
-
-        int max = 0;
-        if (!mod.isLeaf(node))
-          max = mod.getChildCount(node);
-
-        if (!node.equals(mod.getRoot()))
-          icon.paintIcon(tree, g, indentation - rightChildIndent - 3, h);
-        
+           
         if (tree.isExpanded(path))
           {
+            int max = 0;
+            if (!mod.isLeaf(node))
+              max = mod.getChildCount(node);
+               
             for (int i = 0; i < max; i++)
               {
                 int indent = indentation + rightChildIndent;
                 if (depth == 0 && !tree.isRootVisible())
-                  indent = -1;
-
-                descent = paintControlIcons(g, indent, descent, i, depth + 1,
+                  indent =  1;
+   
+                descent = paintControlIcons(g, indent, descent, depth + 1,
                                             tree, mod, mod.getChild(node, i));
               }
           }
       }
-
+   
     return descent;
   }
 
   /**
-   * Returns control icon. It is null if the LookAndFeel does not 
-   * implements the control icons.
-   * Package private for use in inner classes.
+   * Returns true if the LookAndFeel implements the control icons. Package
+   * private for use in inner classes.
+   * 
+   * @returns true if there are control icons
+   */
+  boolean hasControlIcons()
+  {
+    if (expandedIcon != null || collapsedIcon != null)
+      return true;
+    return false;
+  }
+  
+  /**
+   * Returns control icon. It is null if the LookAndFeel does not implements the
+   * control icons. Package private for use in inner classes.
    * 
    * @return control icon if it exists.
    */
   Icon getCurrentControlIcon(TreePath path)
   {
     if (tree.isExpanded(path))
-      return UIManager.getLookAndFeelDefaults().getIcon("Tree.expandedIcon");
-    return UIManager.getLookAndFeelDefaults().getIcon("Tree.collapsedIcon");
-  }
-  
-  /**
-   * Returns true if the LookAndFeel implements the control icons.
-   * Package private for use in inner classes.
-   * 
-   * @returns true if there are control icons
-   */
-  boolean hasControlIcons()
-  {
-    if (UIManager.getLookAndFeelDefaults().getIcon("Tree.expandedIcon") != null
-        || UIManager.getLookAndFeelDefaults().getIcon("Tree.collapsedIcon") 
-        != null)
-      return true;
-    return false;
+      return expandedIcon;
+    return collapsedIcon;
   }
 
   /**
@@ -3333,77 +3346,33 @@ public class BasicTreeUI
   }
 
   /**
-   * Get next visible node in the tree. Package private for use in inner
-   * classes.
-   * 
-   * @param the
-   *          current node
-   * @return the next visible node in the JTree. Return null if there are no
-   *         more.
-   */
-  Object getNextVisibleNode(Object node)
-  {
-    Object next = null;
-    TreePath current = null;
-
-    if (node != null)
-      next = getNextNode(node);
-
-    if (next != null)
-      {
-        current = new TreePath(getPathToRoot(next, 0));
-        if (tree.isVisible(current))
-          return next;
-
-        while (next != null && !tree.isVisible(current))
-          {
-            next = getNextNode(next);
-
-            if (next != null)
-              current = new TreePath(getPathToRoot(next, 0));
-          }
-      }
-    return next;
-  }
-
-  /**
    * Get previous visible node in the tree. Package private for use in inner
    * classes.
    * 
-   * @param the
+   * @param node -
    *          current node
    * @return the next visible node in the JTree. Return null if there are no
    *         more.
    */
   Object getPreviousVisibleNode(Object node)
   {
-    Object prev = null;
-    TreePath current = null;
-
-    if (node != null)
-      prev = getPreviousNode(node);
-
-    if (prev != null)
+    if (currentVisiblePath != null)
       {
-        current = new TreePath(getPathToRoot(prev, 0));
-        if (tree.isVisible(current))
-          return prev;
-
-        while (prev != null && !tree.isVisible(current))
-          {
-            prev = getPreviousNode(prev);
-
-            if (prev != null)
-              current = new TreePath(getPathToRoot(prev, 0));
-          }
+        Object[] nodes = currentVisiblePath.getPath();
+        int i = 0;
+        while (i < nodes.length && !node.equals(nodes[i]))
+          i++;
+        // return the next node
+        if (i-1 > 0)
+          return nodes[i-1];
       }
-    return prev;
+    return null;
   }
 
   /**
    * Returns the next node in the tree Package private for use in inner classes.
    * 
-   * @param the
+   * @param curr - 
    *          current node
    * @return the next node in the tree
    */
@@ -3429,7 +3398,7 @@ public class BasicTreeUI
    * Returns the previous node in the tree Package private for use in inner
    * classes.
    * 
-   * @param the
+   * @param node
    *          current node
    * @return the previous node in the tree
    */
@@ -3463,7 +3432,7 @@ public class BasicTreeUI
    * Returns the next sibling in the tree Package private for use in inner
    * classes.
    * 
-   * @param the
+   * @param node - 
    *          current node
    * @return the next sibling in the tree
    */
@@ -3488,7 +3457,7 @@ public class BasicTreeUI
    * Returns the previous sibling in the tree Package private for use in inner
    * classes.
    * 
-   * @param the
+   * @param node -
    *          current node
    * @return the previous sibling in the tree
    */
@@ -3572,7 +3541,7 @@ public class BasicTreeUI
   /**
    * Returns the level of the node in the tree.
    * 
-   * @param the
+   * @param node -
    *          current node
    * @return the number of the level
    */
@@ -3646,7 +3615,7 @@ public class BasicTreeUI
    *          is the center position in y-direction FIXME what to do if x <
    *          (icon.width / 2). Same with y
    */
-  protected void drawCentered(JComponent c, Graphics g, Icon icon, int x, int y)
+  protected void drawCentered(Component c, Graphics g, Icon icon, int x, int y)
   {
     int beginPositionX = x - icon.getIconWidth() / 2;
     int beginPositionY = y - icon.getIconHeight() / 2;
@@ -3701,8 +3670,8 @@ public class BasicTreeUI
                                     boolean isExpanded, boolean hasBeenExpanded,
                                     boolean isLeaf)
   {
-    if (treeModel != null)
-      paintControlIcons(g, 0, 0, 0, 0, tree, treeModel, path.getLastPathComponent());
+    if (treeModel != null && hasControlIcons())
+      paintControlIcons(g, 0, 0, 0, tree, treeModel, path.getLastPathComponent());
   }
 
   /**
@@ -3734,7 +3703,7 @@ public class BasicTreeUI
    * clipBounds, insets.
    * 
    * @param g - the graphics configuration.
-   * @param clipbounds - 
+   * @param clipBounds - 
    * @param insets - 
    * @param path - the path to draw the vertical part for.
    */
@@ -3764,7 +3733,32 @@ public class BasicTreeUI
                           boolean isExpanded, boolean hasBeenExpanded,
                           boolean isLeaf)
   {
-    // FIXME: not implemented.
+    boolean selected = tree.isPathSelected(path);
+    boolean hasIcons = false;
+    Object node = path.getLastPathComponent();
+    
+    if (tree.isVisible(path))
+      {
+        bounds.width = preferredSize.width;
+        bounds.x += gap;
+        
+        if (editingComponent != null && editingPath != null && isEditing(tree)
+            && node.equals(editingPath.getLastPathComponent()))
+          {    
+            rendererPane.paintComponent(g, editingComponent.getParent(), null,
+                                        bounds);
+          }
+        else
+          {
+            TreeCellRenderer dtcr = tree.getCellRenderer();
+            if (dtcr == null)
+              dtcr = createDefaultCellRenderer();
+            
+            Component c = dtcr.getTreeCellRendererComponent(tree, node,
+                                     selected, isExpanded, isLeaf, row, false);
+            rendererPane.paintComponent(g, c, c.getParent(), bounds);
+          }
+      }
   }
 
   /**
@@ -3772,6 +3766,7 @@ public class BasicTreeUI
    */
   protected void prepareForUIUninstall()
   {
+    // TODO: Implement this properly.
   }
   
   /**
@@ -3789,7 +3784,72 @@ public class BasicTreeUI
                                              boolean hasBeenExpanded,
                                              boolean isLeaf)
   {
-    // FIXME: not implemented.
+    Object node = path.getLastPathComponent();
+    if (treeModel != null && (!isLeaf && !node.equals(treeModel.getRoot())) && 
+        (tree.isRootVisible() || getLevel(node) != 1))
+      return true;
     return false;
+  }
+  
+  /**
+   * Updates the cached current TreePath of all visible
+   * nodes in the tree.
+   */
+  void updateCurrentVisiblePath()
+  {
+    if (treeModel == null)
+      return;
+
+    Object next = treeModel.getRoot();
+    Rectangle bounds = getCellBounds(0, 0, next);
+    
+    // If root is not a valid size to be visible, or is
+    // not visible and the tree is expanded, then the next node acts
+    // as the root
+    if ((bounds.width == 0 && bounds.height == 0) || (!isRootVisible() 
+        && tree.isExpanded(new TreePath(next))))
+      next = getNextNode(next);
+    TreePath current = null;
+
+    while (next != null)
+      {
+        if (current == null)
+          current = new TreePath(next);
+        else 
+            current = current.pathByAddingChild(next);
+        do
+          next = getNextNode(next);
+        while (next != null && 
+            !tree.isVisible(new TreePath(getPathToRoot(next, 0))));
+      }
+    currentVisiblePath = current;
+    tree.setVisibleRowCount(getRowCount(tree));
+    if (tree.getSelectionModel() != null && tree.getSelectionCount() == 0 &&
+        currentVisiblePath != null)
+      tree.addSelectionRow(0);
+  }
+  
+  /**
+   * Get next visible node in the currentVisiblePath. Package private for use in
+   * inner classes.
+   * 
+   * @param node
+   *          current node
+   * @return the next visible node in the JTree. Return null if there are no
+   *         more.
+   */
+  Object getNextVisibleNode(Object node)
+  {
+    if (currentVisiblePath != null)
+      {
+        Object[] nodes = currentVisiblePath.getPath();
+        int i = 0;
+        while (i < nodes.length && !node.equals(nodes[i]))
+          i++;
+        // return the next node
+        if (i+1 < nodes.length)
+          return nodes[i+1];
+      }
+    return null;
   }
 } // BasicTreeUI

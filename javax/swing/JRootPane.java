@@ -76,6 +76,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     protected AccessibleJRootPane()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -101,6 +102,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     protected RootLayout()
     {
+      // Nothing to do here.
     }
 
     /**
@@ -111,6 +113,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void addLayoutComponent(Component comp, Object constraints)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -121,6 +124,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void addLayoutComponent(String name, Component comp)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -154,6 +158,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void invalidateLayout(Container target)
     {
+      // Nothing to do here.
     }
 
     /**
@@ -309,6 +314,7 @@ public class JRootPane extends JComponent implements Accessible
      */
     public void removeLayoutComponent(Component comp)
     {
+      // Nothing to do here.
     }
   }
 
@@ -338,6 +344,32 @@ public class JRootPane extends JComponent implements Accessible
   protected Container contentPane;
 
   protected JButton defaultButton;
+
+  /**
+   * This field is unused since JDK1.3. To override the default action you
+   * should modify the JRootPane's ActionMap.
+   *
+   * @deprecated since JDK1.3
+   *
+   * @specnote the specs indicate that the type of this field is
+   *           a package private inner class
+   *           javax.swing.JRootPane.DefaultAction. I assume that the closest
+   *           public superclass is javax.swing.Action.
+   */
+  protected Action defaultPressAction;
+
+  /**
+   * This field is unused since JDK1.3. To override the default action you
+   * should modify the JRootPane's ActionMap.
+   *
+   * @deprecated since JDK1.3
+   *
+   * @specnote the specs indicate that the type of this field is
+   *           a package private inner class
+   *           javax.swing.JRootPane.DefaultAction. I assume that the closest
+   *           public superclass is javax.swing.Action.
+   */
+  protected Action defaultReleaseAction;
 
   /**
    * @since 1.4
@@ -504,7 +536,6 @@ public class JRootPane extends JComponent implements Accessible
     getGlassPane();
     getLayeredPane();
     getContentPane();
-    setDoubleBuffered(true);
     updateUI();
   }
 

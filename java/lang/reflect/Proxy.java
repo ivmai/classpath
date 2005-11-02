@@ -111,8 +111,8 @@ import java.util.Set;
  *      the only way to create an instance of the proxy class.</li>
  *  <li>The proxy class contains a single constructor, which takes as
  *      its only argument an {@link InvocationHandler}.  The method
- *      {@link #newInstance} is shorthand to do the necessary
- *      reflection.</li>
+ *      {@link #newProxyInstance(ClassLoader, Class[], InvocationHandler)}
+ *      is shorthand to do the necessary reflection.</li>
  * </ul>
  *
  * <h3>Proxy Instances</h3>
@@ -413,8 +413,6 @@ public class Proxy implements Serializable
      */
     ProxyType(ClassLoader loader, Class[] interfaces)
     {
-      if (loader == null)
-         loader = ClassLoader.getSystemClassLoader();
       this.loader = loader;
       this.interfaces = interfaces;
     }
@@ -426,8 +424,7 @@ public class Proxy implements Serializable
      */
     public int hashCode()
     {
-      //loader is always not null
-      int hash = loader.hashCode();
+      int hash = loader == null ? 0 : loader.hashCode();
       for (int i = 0; i < interfaces.length; i++)
         hash = hash * 31 + interfaces[i].hashCode();
       return hash;

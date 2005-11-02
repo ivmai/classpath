@@ -38,9 +38,6 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -50,10 +47,10 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.LookAndFeel;
 import javax.swing.MenuElement;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
@@ -169,12 +166,9 @@ public class BasicMenuBarUI extends MenuBarUI
    */
   protected void installDefaults()
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-
-    menuBar.setBackground(defaults.getColor("MenuBar.background"));
-    menuBar.setBorder(defaults.getBorder("MenuBar.border"));
-    menuBar.setFont(defaults.getFont("MenuBar.font"));
-    menuBar.setForeground(defaults.getColor("MenuBar.foreground"));
+    LookAndFeel.installBorder(menuBar, "MenuBar.border");
+    LookAndFeel.installColorsAndFont(menuBar, "MenuBar.background",
+                                     "MenuBar.foreground", "MenuBar.font");
     menuBar.setOpaque(true);
   }
 
@@ -262,6 +256,7 @@ public class BasicMenuBarUI extends MenuBarUI
   {
     public void stateChanged(ChangeEvent event)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 
@@ -326,7 +321,11 @@ public class BasicMenuBarUI extends MenuBarUI
       MenuElement[] me = menuBar.getSubElements();
       
       for (int i = 0; i < me.length; i++)
-        menuBar.getMenu(i).setSelected(false);
+        {
+          JMenu menu = menuBar.getMenu(i);
+          if (menu != null)
+            menu.setSelected(false);
+        }
     }
     
     /**
@@ -336,6 +335,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mousePressed(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -345,6 +345,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseReleased(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -354,6 +355,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseExited(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -363,6 +365,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseDragged(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -372,6 +375,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseMoved(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
     
     /**
@@ -381,6 +385,7 @@ public class BasicMenuBarUI extends MenuBarUI
      */
     public void mouseEntered(MouseEvent e)
     {
+      // TODO: What should be done here, if anything?
     }
   }
 }
