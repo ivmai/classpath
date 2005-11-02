@@ -1,3 +1,15 @@
+2005-11-02  Tom Tromey  <tromey@redhat.com>
+
+	* javax/sound/midi/Instrument.java (Instrument): Genericized argument
+	type.
+	* javax/sound/midi/SoundbankResource.java (SoundbankResource):
+	Genericized argument type.
+	(getDataClass): Genericized return type.
+	* javax/sound/midi/Sequence.java (tracks): Changed type.
+	(init): Updated.
+	(getTracks): Updated.
+	(getTickLength): Updated.
+
 2005-11-01  Roman Kennke  <kennke@aicas.com>
 
 	* javax/swing/JPopupMenu.java
