@@ -1,3 +1,7 @@
+2005-11-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* AUTHORS: Added myself.
+
 2005-11-02  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac (AC_INIT): Set version to 0.19-generics.
