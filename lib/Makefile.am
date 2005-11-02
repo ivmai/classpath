@@ -15,29 +15,25 @@ compile_classpath = $(vm_classes):$(top_srcdir):$(top_srcdir)/external/w3c_dom:$
 # handling source to bytecode compiler programs like gcj, jikes  and kjc
 if FOUND_ECJ
 JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial,typeHiding,unchecked,unused,varargsCast -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
-else
-if FOUND_GCJ
+#else
+#if FOUND_GCJ
 ## This should never be used when gcj is the compiler.
 ## See the compile-classes target.
-JAVAC = exit 1
-else
-if FOUND_JIKES
-JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F $(JIKESENCODING) -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
-else
-if FOUND_KJC
-## FIXME: from what I can tell, kjc does not support a -encoding option.
-JAVAC = $(KJC) -classpath .:$(USER_CLASSLIB) -d . @classes
+#JAVAC = exit 1
+#else
+#if FOUND_JIKES
+#JAVAC = $(JIKES) +Pno-shadow +Pno-switchcheck +F $(JIKESENCODING) -bootclasspath '' -extdirs '' -sourcepath '' --classpath $(compile_classpath) -d . @classes
+#else
+#if FOUND_KJC
+### FIXME: from what I can tell, kjc does not support a -encoding option.
+#JAVAC = $(KJC) -classpath .:$(USER_CLASSLIB) -d . @classes
 else
 if FOUND_GCJX
 JAVAC = $(GCJX) -encoding UTF-8 -classpath .:$(USER_CLASSLIB) -d . @classes
-else
-if FOUND_ECJ
-JAVAC = $(ECJ) -source 1.4 -encoding UTF-8 -warn:none -proceedOnError -bootclasspath '' -classpath $(compile_classpath) -d . @classes
-endif # FOUND_ECJ
 endif # FOUND_GCJX
-endif # FOUND_KJC
-endif # FOUND_GCJ
-endif # FOUND_JIKES
+#endif # FOUND_KJC
+#endif # FOUND_GCJ
+#endif # FOUND_JIKES
 endif # FOUND_ECJ
 
 JAVAH = $(USER_JAVAH) -jni -classpath .:$(USER_CLASSLIB)
@@ -123,21 +119,21 @@ endif # REGEN_PARSER
 
 $(JAVA_DEPEND): genclasses
 
-if FOUND_GCJ
+#if FOUND_GCJ
 ## When building with gcj, we do a recursive make.  We split this rule
 ## out specially, rather than simply defining JAVAC, so that GNU make
 ## will see the recursive make invocation and still allow parallel
 ## builds.
-compile-classes: classes $(JAVA_SRCS) Makefile
-	$(MAKE) -f $(srcdir)/Makefile.gcj \
-	  GCJ='$(GCJ)' \
-	  compile_classpath='$(top_builddir):$(compile_classpath)' \
-	  top_srcdir=$(top_srcdir)
-else
+#compile-classes: classes $(JAVA_SRCS) Makefile
+#	$(MAKE) -f $(srcdir)/Makefile.gcj \
+#	  GCJ='$(GCJ)' \
+#	  compile_classpath='$(top_builddir):$(compile_classpath)' \
+#	  top_srcdir=$(top_srcdir)
+#else
 compile-classes: classes $(JAVA_SRCS) Makefile
 	$(JAVAC)
 	touch compile-classes
-endif
+#endif
 
 EXTRA_DIST = standard.omit mkcollections.pl.in Makefile.gcj split-for-gcj.sh
 CLEANFILES = compile-classes resources classes \

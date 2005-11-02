@@ -5,27 +5,28 @@ AC_DEFUN([CLASSPATH_FIND_JAVAC],
 [
   user_specified_javac=
 
-  CLASSPATH_WITH_GCJ
-  CLASSPATH_WITH_JIKES
-  CLASSPATH_WITH_KJC
+dnl  CLASSPATH_WITH_GCJ
+dnl  CLASSPATH_WITH_JIKES
+dnl  CLASSPATH_WITH_KJC
   CLASSPATH_WITH_GCJX
   CLASSPATH_WITH_ECJ
 
   if test "x${user_specified_javac}" = x; then
-    AM_CONDITIONAL(FOUND_GCJ, test "x${GCJ}" != x)
-    AM_CONDITIONAL(FOUND_JIKES, test "x${JIKES}" != x)
+dnl    AM_CONDITIONAL(FOUND_GCJ, test "x${GCJ}" != x)
+dnl    AM_CONDITIONAL(FOUND_JIKES, test "x${JIKES}" != x)
     AM_CONDITIONAL(FOUND_ECJ, test "x${ECJ}" != x)
   else
-    AM_CONDITIONAL(FOUND_GCJ, test "x${user_specified_javac}" = xgcj)
-    AM_CONDITIONAL(FOUND_JIKES, test "x${user_specified_javac}" = xjikes)
+dnl    AM_CONDITIONAL(FOUND_GCJ, test "x${user_specified_javac}" = xgcj)
+dnl    AM_CONDITIONAL(FOUND_JIKES, test "x${user_specified_javac}" = xjikes)
     AM_CONDITIONAL(FOUND_ECJ, test "x${user_specified_javac}" = xecj)
   fi
-  AM_CONDITIONAL(FOUND_KJC, test "x${user_specified_javac}" = xkjc)
+dnl  AM_CONDITIONAL(FOUND_KJC, test "x${user_specified_javac}" = xkjc)
   AM_CONDITIONAL(FOUND_GCJX, test "x${user_specified_javac}" = xgcjx)
 
-  if test "x${GCJ}" = x && test "x${JIKES}" = x && test "x${user_specified_javac}" != xkjc && test "x${user_specified_javac}" != xgcjx; then
+dnl  if test "x${GCJ}" = x && test "x${JIKES}" = x && test "x${user_specified_javac}" != xkjc && test "x${user_specified_javac}" != xgcjx; then
+  if test "x${ECJ}" = x && test "x${user_specified_javac}" != xecj && test "x${user_specified_javac}" != xgcjx; then
       # FIXME: use autoconf error function
-      echo "configure: cannot find javac, try --with-gcj, --with-jikes, --with-kjc, or --with-gcjx" 1>&2
+      echo "configure: cannot find javac, try -with-ecj or --with-gcjx" 1>&2
       exit 1    
   fi
 ])

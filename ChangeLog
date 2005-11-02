@@ -1,5 +1,15 @@
 2005-11-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* examples/Makefile.am:
+	Comment out JIKES and GCJ conditionals.
+	* lib/Makefile.am:
+	Comment out JIKES, KJC and GCJ conditionals.
+	* m4/acinclude.m4:
+	Comment out selection of GCJ, Jikes and KJC as compilers for
+	the branch.
+	
+2005-11-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* AUTHORS: Added myself.
 
 2005-11-02  Mark Wielaard  <mark@klomp.org>
