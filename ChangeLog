@@ -1,3 +1,26 @@
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics.java (initComponentGraphics): Set
+	color to BLACK when getForeground() returns null.
+	(initComponentGraphicsUnlocked): Likewise.
+
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* javax/swing/Timer.java (Waker.run): Synchronize on queueLock and use
+	queueLock.wait(), not Thread.sleep().
+	(start): Synchronize on queueLock and check whether waker is null.
+	(stop): Synchronize on queueLock and notifyAll().
+
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Set version to 0.19.
+	* NEWS: Add date of release.
+
+2005-11-02  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Dialog.java
+	(show): Do not call pack() here.
+
 2005-11-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* examples/Makefile.am:
@@ -11,6 +34,23 @@
 2005-11-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* AUTHORS: Added myself.
+
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* javax/swing/Timer.java (Waker.run): Only break out when !running.
+
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* javax/swing/UIManager.java (static): Print complete exception.
+
+2005-11-02  Mark Wielaard  <mark@klomp.org>
+
+	* lib/Makefile.am: Add typeHiding, unchecked, unused and varargsCast
+	to ECJ compile warning rule.
+
+2005-11-02  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* lib/copy-vmresources.sh.in: Added definition for top_srcdir.
 
 2005-11-02  Mark Wielaard  <mark@klomp.org>
 
