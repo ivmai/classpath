@@ -1,5 +1,61 @@
 2005-11-25  Tom Tromey  <tromey@redhat.com>
 
+	* java/security/cert/X509Extension.java (getCriticalExtensionOIDs):
+	Genericized.
+	(getNonCriticalExtensionOIDs): Likewise.
+	* java/security/cert/X509Certificate.java (getExtendedKeyUsage):
+	Genericized.
+	(getIssuerAlternativeNames): Likewise.
+	(getSubjectAlternativeNames): Likewise.
+	* java/security/cert/X509CertSelector.java (setExtendedKeyUsage):
+	Genericized.
+	(setSubjectAlternativeNames): Likewise.
+	* java/security/cert/X509CRLSelector.java (getIssuerNames):
+	Genericized.
+	(setIssuerNames): Likewise.
+	* java/security/cert/X509CRL.java (getRevokedCertificates):
+	Genericized.
+	* java/security/cert/PolicyNode.java (getChildren): Genericized.
+	(getExpectedPolicies): Likewise.
+	(getPolicyQualifiers): Likewise.
+	* java/security/cert/PKIXCertPathChecker.java (check): Genericized.
+	(getSupportedExtensions): Likewise.
+	* java/security/cert/CertificateFactorySpi.java
+	(engineGenerateCertPath): Genericized.
+	(engineGenerateCertificates): Likewise.
+	(engineGenerateCRLs): Likewise.
+	(engineGetCertPathEncodings): Likewise.
+	* java/security/cert/CertificateFactory.java (generateCertificates):
+	Genericized.
+	(generateCertPath): Likewise.
+	(generateCRLs): Likewise.
+	(getCertPathEncodings): Likewise.
+	* java/security/cert/CertStoreSpi.java (engineGetCertificates):
+	Genericized.
+	(engineGetCRLs): Likewise.
+	* java/security/cert/CertStore.java (getCertificates): Genericized.
+	(getCRLs): Likewise.
+	* java/security/cert/CertPath.java (getCertificates): Genericized.
+	(getEncodings): Likewise.
+	* java/security/cert/PKIXParameters.java (PKIXParameters):
+	Genericized.
+	(getCertStores): Likewise.
+	(getCertPathCheckers): Likewise.
+	(getInitialPolicies): Likewise.
+	(getTrustAnchors): Likewise.
+	(setCertPathCheckers): Likewise.
+	(setCertStores): Likewise.
+	(setInitialPolicies): Likewise.
+	(setTrustAnchors): Likewise.
+	* java/security/cert/PKIXBuilderParameters.java
+	(PKIXBuilderParameters): Genericized.
+	* java/security/cert/CollectionCertStoreParameters.java
+	(CollectionCertStoreParameters): Genericized.
+	(getCollection): Likewise.
+	* java/security/cert/PolicyQualifierInfo.java: No longer final.
+
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
 	* java/security/Security.java (getAlgorithms): Genericized.
 	(getProviders): Likewise.
 	* java/security/SecureClassLoader.java (defineClass): Genericized.
