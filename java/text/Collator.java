@@ -72,7 +72,7 @@ import java.util.ResourceBundle;
  * API docs for JDK 1.2 from http://www.javasoft.com.
  * Status: Mostly complete, but parts stubbed out.  Look for FIXME.
  */
-public abstract class Collator implements Comparator, Cloneable
+public abstract class Collator implements Comparator<Object>, Cloneable
 {
   /**
    * This constant is a strength value which indicates that only primary

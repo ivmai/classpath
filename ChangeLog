@@ -1,5 +1,17 @@
 2005-11-25  Tom Tromey  <tromey@redhat.com>
 
+	* java/text/NumberFormat.java (format): No longer final.
+	* java/text/AttributedCharacterIterator.java (getAllAttributeKeys):
+	Genericized.
+	(getAttributes): Likewise.
+	(getRunLimit): Likewise.
+	(getRunStart): Likewise.
+	* java/text/AttributedString.java (AttributedString): Genericized.
+	(addAttributes): Likewise.
+	* java/text/Collator.java: Implement Comparator<Object>.
+
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
 	* java/security/cert/X509Extension.java (getCriticalExtensionOIDs):
 	Genericized.
 	(getNonCriticalExtensionOIDs): Likewise.
