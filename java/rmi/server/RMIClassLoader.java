@@ -48,6 +48,7 @@ import java.net.URL;
  * network-based class loading in RMI. These methods are called by RMI's
  * internal marshal streams to implement the dynamic class loading of types for
  * RMI parameters and return values.
+ * @since 1.1
  */
 public class RMIClassLoader
 {
@@ -59,13 +60,13 @@ public class RMIClassLoader
   /**
    * @deprecated
    */
-  public static Class loadClass(String name)
+  public static Class<?> loadClass(String name)
     throws MalformedURLException, ClassNotFoundException
   {
     return loadClass("", name);
   }
 
-  public static Class loadClass(String codebase, String name)
+  public static Class<?> loadClass(String codebase, String name)
     throws MalformedURLException, ClassNotFoundException
   {
     RMIClassLoaderSpi spi = getProviderInstance();
@@ -74,8 +75,8 @@ public class RMIClassLoader
     return spi.loadClass(codebase, name, null);
   }
 
-  public static Class loadClass(String codebase, String name,
-                                ClassLoader defaultLoader)
+  public static Class<?> loadClass(String codebase, String name,
+                                   ClassLoader defaultLoader)
     throws MalformedURLException, ClassNotFoundException
   {
     RMIClassLoaderSpi spi = getProviderInstance();
@@ -138,7 +139,7 @@ public class RMIClassLoader
    * @return a space seperated list of URLs where the class-definition
    * of cl may be found
    */
-  public static String getClassAnnotation(Class cl)
+  public static String getClassAnnotation(Class<?> cl)
   {
     RMIClassLoaderSpi spi = getProviderInstance();
     if (spi == null)

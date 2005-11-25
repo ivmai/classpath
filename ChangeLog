@@ -1,5 +1,14 @@
 2005-11-25  Tom Tromey  <tromey@redhat.com>
 
+	* java/rmi/server/RMIClassLoaderSpi.java (loadClass): Genericized.
+	(loadProxyClass): Likewise.
+	(getClassAnnotation): Likewise.
+	* java/rmi/server/RMIClassLoader.java (loadClass): Genericized.
+	(getClassAnnotation): Likewise.
+	* java/rmi/server/LoaderHandler.java (loadClass): Genericized.
+
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
 	* java/awt/Font.java (Font): Genericized.
 	(deriveFont): Likewise.
 	(getAttributes): Likewise.
