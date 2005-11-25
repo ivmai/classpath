@@ -210,7 +210,7 @@ public abstract class IdentityScope extends Identity
    *
    * @return an enumeration of all identities in this identity scope.
    */
-  public abstract Enumeration identities();
+  public abstract Enumeration<Identity> identities();
 
   /**
    * Returns a string representation of this identity scope, including its name,

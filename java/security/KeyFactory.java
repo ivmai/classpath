@@ -275,7 +275,7 @@ public class KeyFactory
    * inappropriate for the given key, or the given key cannot be processed
    * (e.g., the given key has an unrecognized algorithm or format).
    */
-  public final KeySpec getKeySpec(Key key, Class keySpec)
+  public final <T extends KeySpec> T getKeySpec(Key key, Class<T> keySpec)
     throws InvalidKeySpecException
   {
     return keyFacSpi.engineGetKeySpec(key, keySpec);

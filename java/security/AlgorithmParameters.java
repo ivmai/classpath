@@ -291,7 +291,8 @@ public class AlgorithmParameters
    * specification is inappropriate for this parameter object, or if this
    * parameter object has not been initialized.
    */
-  public final AlgorithmParameterSpec getParameterSpec(Class paramSpec)
+  public final <T extends AlgorithmParameterSpec>
+  T getParameterSpec(Class<T> paramSpec)
     throws InvalidParameterSpecException
   {
     return paramSpi.engineGetParameterSpec(paramSpec);

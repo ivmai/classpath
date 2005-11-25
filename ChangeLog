@@ -1,3 +1,25 @@
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
+	* java/security/Security.java (getAlgorithms): Genericized.
+	(getProviders): Likewise.
+	* java/security/SecureClassLoader.java (defineClass): Genericized.
+	(protectionDomainCache): Likewise.
+	* java/security/PermissionCollection.java (elements): Genericized.
+	(toString): Updated.
+	* java/security/KeyStoreSpi.java (engineAliases): Genericized.
+	* java/security/KeyStore.java (aliases): Genericized.
+	* java/security/KeyFactorySpi.java (engineGetKeySpec): Genericized.
+	(engineTranslateKey): Fixed javadoc.
+	* java/security/KeyFactory.java (getKeySpec): Genericized.
+	* java/security/IdentityScope.java (identities): Genericized.
+	* java/security/AlgorithmParametersSpi.java (engineGetParameterSpec):
+	Genericized.
+	* java/security/AlgorithmParameters.java (getParameterSpec):
+	Genericized.
+	* java/security/AccessController.java (doPrivileged): Genericized.
+	* java/security/PrivilegedExceptionAction.java: Genericized.
+	* java/security/PrivilegedAction.java: Genericized.
+
 2005-11-02  Mark Wielaard  <mark@klomp.org>
 
 	* gnu/java/awt/peer/gtk/GdkGraphics.java (initComponentGraphics): Set
