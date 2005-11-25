@@ -1,5 +1,12 @@
 2005-11-25  Tom Tromey  <tromey@redhat.com>
 
+	* java/awt/Font.java (Font): Genericized.
+	(deriveFont): Likewise.
+	(getAttributes): Likewise.
+	(getFont): Likewise.
+
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
 	* java/text/NumberFormat.java (format): No longer final.
 	* java/text/AttributedCharacterIterator.java (getAllAttributeKeys):
 	Genericized.
