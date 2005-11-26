@@ -1045,7 +1045,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    *
    * @param listData Initial data to populate the list with
    */
-  public JList(Vector listData)
+  public JList(Vector<?> listData)
   {
     init();
     setListData(listData);
@@ -1562,7 +1562,7 @@ public class JList extends JComponent implements Accessible, Scrollable
    * @param listData The object array to build a new list model on
    * @see #setModel
    */
-  public void setListData(final Vector listData)
+  public void setListData(final Vector<?> listData)
   {
     setModel(new AbstractListModel()
         {

@@ -479,7 +479,7 @@ public class StyleContext
    * Get the names of the style. The returned enumeration always
    * contains at least one member, the default style.
    */
-  public Enumeration getStyleNames()
+  public Enumeration<?> getStyleNames()
   {
     return styleTable.keys();
   }

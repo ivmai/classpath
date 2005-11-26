@@ -194,7 +194,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
    *
    * @param itemVector vector containing list of items for this JComboBox.
    */
-  public JComboBox(Vector itemVector)
+  public JComboBox(Vector<?> itemVector)
   {
     this(new DefaultComboBoxModel(itemVector));
 

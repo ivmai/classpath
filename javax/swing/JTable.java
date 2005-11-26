@@ -1966,7 +1966,7 @@ public class JTable
     return editor;
   }
 
-  public TableCellEditor getDefaultEditor(Class columnClass)
+  public TableCellEditor getDefaultEditor(Class<?> columnClass)
   {
     if (defaultEditorsByColumnClass.containsKey(columnClass))
       return (TableCellEditor) defaultEditorsByColumnClass.get(columnClass);
@@ -1992,12 +1992,12 @@ public class JTable
     return renderer;
   }
 
-  public void setDefaultRenderer(Class columnClass, TableCellRenderer rend)
+  public void setDefaultRenderer(Class<?> columnClass, TableCellRenderer rend)
   {
     defaultRenderersByColumnClass.put(columnClass, rend);
   }
 
-  public TableCellRenderer getDefaultRenderer(Class columnClass)
+  public TableCellRenderer getDefaultRenderer(Class<?> columnClass)
   {
     if (defaultRenderersByColumnClass.containsKey(columnClass))
       return (TableCellRenderer) defaultRenderersByColumnClass.get(columnClass);
@@ -2966,7 +2966,7 @@ public class JTable
     repaint();
   }
 
-  public Class getColumnClass(int column)
+  public Class<?> getColumnClass(int column)
   {
     return dataModel.getColumnClass(column);
   }
@@ -3007,7 +3007,7 @@ public class JTable
     return editorComp != null;
   }
 
-  public void setDefaultEditor(Class columnClass, TableCellEditor editor)
+  public void setDefaultEditor(Class<?> columnClass, TableCellEditor editor)
   {
     if (editor != null)
       defaultEditorsByColumnClass.put(columnClass, editor);

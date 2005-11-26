@@ -232,7 +232,7 @@ public abstract class LookAndFeel
    * Utility method that creates a UIDefaults.LazyValue that creates an
    * ImageIcon UIResource for the specified gifFile filename. 
    */
-  public static Object makeIcon(Class baseClass, String gifFile)
+  public static Object makeIcon(Class<?> baseClass, String gifFile)
   {
     final URL file = baseClass.getResource(gifFile);
     return new UIDefaults.LazyValue() 

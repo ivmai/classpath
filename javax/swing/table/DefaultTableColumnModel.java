@@ -68,7 +68,7 @@ public class DefaultTableColumnModel
   /**
    * Columns that this model keeps track of.
    */
-  protected Vector tableColumns;
+  protected Vector<TableColumn> tableColumns;
 
   /**
    * Selection Model that keeps track of columns selection
@@ -156,7 +156,7 @@ public class DefaultTableColumnModel
       throw new IllegalArgumentException("Index 'i' out of range.");
     if (j < 0 || j >= columnCount)
       throw new IllegalArgumentException("Index 'j' out of range.");
-    Object column = tableColumns.remove(i);
+    TableColumn column = tableColumns.remove(i);
     tableColumns.add(j, column);
     fireColumnAdded(new TableColumnModelEvent(this, i, j));
   }
@@ -184,7 +184,7 @@ public class DefaultTableColumnModel
    * getColumns
    * @return Enumeration
    */
-  public Enumeration getColumns()
+  public Enumeration<TableColumn> getColumns()
   {
     return tableColumns.elements();
   }

@@ -175,7 +175,7 @@ public class EventListenerList
    * <code>t</code>. Thus, subclasses of <code>t</code> will not be
    * counted.
    */
-  public int getListenerCount(Class t)
+  public int getListenerCount(Class<?> t)
   {
     int result = 0;
     for (int i = 0; i < listenerList.length; i += 2)

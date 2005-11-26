@@ -154,7 +154,7 @@ public class DTD
   /**
    * The entity table for accessing all DTD entities by name.
    */
-  public Hashtable<String,Entity> entityHash = new Hashtable<String,Entity>();
+  public Hashtable<Object, Entity> entityHash = new Hashtable<Object, Entity>();
 
   /**
    *  The name of this DTD.

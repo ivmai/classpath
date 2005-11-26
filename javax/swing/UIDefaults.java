@@ -62,7 +62,7 @@ import javax.swing.plaf.ComponentUI;
  *
  * @author Ronald Veldema (rveldema@cs.vu.nl)
  */
-public class UIDefaults extends Hashtable
+public class UIDefaults extends Hashtable<Object, Object>
 {
 
   /** Our ResourceBundles. */
@@ -667,7 +667,7 @@ public class UIDefaults extends Hashtable
    *
    * @return the UI class for <code>id</code>
    */
-  public Class getUIClass(String id, ClassLoader loader)
+  public Class<? extends ComponentUI> getUIClass(String id, ClassLoader loader)
   {
     String className = (String) get (id);
     if (className == null)
@@ -676,7 +676,7 @@ public class UIDefaults extends Hashtable
       {
         if (loader == null)
           loader = ClassLoader.getSystemClassLoader();
-        return loader.loadClass (className);
+        return (Class<? extends ComponentUI>) loader.loadClass (className);
       }
     catch (Exception e)
       {
@@ -693,7 +693,7 @@ public class UIDefaults extends Hashtable
    *
    * @return the UI class for <code>id</code>
    */
-  public Class getUIClass(String id)
+  public Class<? extends ComponentUI> getUIClass(String id)
   {
     return getUIClass (id, null);
   }

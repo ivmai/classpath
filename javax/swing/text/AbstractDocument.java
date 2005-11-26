@@ -376,7 +376,7 @@ public abstract class AbstractDocument implements Document, Serializable
    *
    * @return the properties of this <code>Document</code>
    */
-  public Dictionary getDocumentProperties()
+  public Dictionary<Object, Object> getDocumentProperties()
   {
     // FIXME: make me thread-safe
     if (properties == null)
@@ -849,7 +849,7 @@ public abstract class AbstractDocument implements Document, Serializable
    *
    * @param p the document properties to set
    */
-  public void setDocumentProperties(Dictionary p)
+  public void setDocumentProperties(Dictionary<Object, Object> p)
   {
     // FIXME: make me thread-safe
     properties = p;
@@ -1023,7 +1023,7 @@ public abstract class AbstractDocument implements Document, Serializable
      * @return the attributes of <code>old</code> minus the attributes in
      *         <code>attributes</code>
      */
-    AttributeSet removeAttributes(AttributeSet old, Enumeration names);
+    AttributeSet removeAttributes(AttributeSet old, Enumeration<?> names);
   }
 
   /**

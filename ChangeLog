@@ -1,5 +1,74 @@
 2005-11-25  Tom Tromey  <tromey@redhat.com>
 
+	* javax/swing/text/StyleContext.java (getStyleNames): Genericized.
+	* javax/swing/text/MutableAttributeSet.java (removeAttributes):
+	Genericized.
+	* javax/swing/text/DefaultFormatter.java (getValueClass): Genericized.
+	(setValueClass): Likewise.
+	* javax/swing/text/AttributeSet.java (getAttributeNames): Genericized.
+	* javax/swing/text/AbstractDocument.java (getDocumentProperties):
+	Genericized.
+	(setDocumentProperties): Likewise.
+	(removeAttributes): Likewise.
+	* javax/swing/SwingUtilities.java (getAncestorOfClass): Genericized.
+	* javax/swing/LookAndFeel.java (makeIcon): Genericized.
+	* javax/swing/JTable.java (getColumnClass): Genericized.
+	(getDefaultRenderer): Likewise.
+	(setDefaultRenderer): Likewise.
+	(getDefaultEditor): Likewise.
+	(setDefaultEditor): Likewise.
+	* javax/swing/JLayeredPane.java (getComponentToLayer): Genericized.
+	* javax/swing/DefaultListModel.java (elements): Genericized.
+	* javax/swing/ButtonGroup.java (buttons): Genericized.
+	(getElements): Likewise.
+	* javax/swing/SpinnerListModel.java (SpinnerListModel): Genericized.
+	(getList): Likewise.
+	(setList): Likewise.
+	* javax/swing/SortingFocusTraversalPolicy.java
+	(SortingFocusTraversalPolicy): Genericized.
+	(getComparator): Likewise.
+	(setComparator): Likewise.
+	* javax/swing/JTree.java (JTree): Genericized.
+	(getDescendantToggledPaths): Likewise.
+	(getExpandedDescendants): Likewise.
+	(removeDescendantToggledPaths): Likewise.
+	* javax/swing/JList.java (JList): Genericized.
+	Likewise.
+	* javax/swing/JComboBox.java (JComboBox): Genericized.
+	* javax/swing/DefaultComboBoxModel.java (DefaultComboBoxModel):
+	Genericized.
+	* javax/swing/UIDefaults.java: Genericized superclass.
+	(getUIClass): Likewise.
+	* javax/swing/event/EventListenerList.java (getListenerCount):
+	Genericized.
+	* javax/swing/plaf/basic/BasicDirectoryModel.java (getDirectories):
+	Genericized.
+	(getFiles): Likewise.
+	(sort): Likewise.
+	* javax/swing/plaf/basic/BasicTreeUI.java (drawingCache): Genericized.
+	* javax/swing/plaf/basic/BasicFileChooserUI.java (iconCache):
+	Genericized.
+	* javax/swing/table/TableModel.java (getColumnClass): Genericized.
+	* javax/swing/table/DefaultTableColumnModel.java (tableColumns):
+	Genericized.
+	(getColumns): Likewise.
+	(moveColumn): Updated.
+	* javax/swing/text/html/parser/ContentModel.java (getElements):
+	Genericized.
+	* javax/swing/text/html/parser/DTD.java (entityHash): Fixed type.
+	* javax/swing/text/html/parser/AttributeList.java (AttributeList):
+	Genericized.
+	(values): Likewise.
+	(getValues): Likewise.
+	* javax/swing/tree/AbstractLayoutCache.java (getVisiblePathsFrom):
+	Genericized.
+	* javax/swing/tree/DefaultMutableTreeNode.java (EMPTY_ENUMERATION):
+	Genericized.
+	* javax/swing/undo/StateEditable.java (restoreState): Genericized.
+	(storeState): Likewise.
+
+2005-11-25  Tom Tromey  <tromey@redhat.com>
+
 	* java/rmi/server/RMIClassLoaderSpi.java (loadClass): Genericized.
 	(loadProxyClass): Likewise.
 	(getClassAnnotation): Likewise.

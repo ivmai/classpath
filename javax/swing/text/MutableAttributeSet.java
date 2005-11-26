@@ -69,7 +69,7 @@ public interface MutableAttributeSet extends AttributeSet
    * removeAttributes
    * @param names TODO
    */
-  void removeAttributes(Enumeration names);
+  void removeAttributes(Enumeration<?> names);
 
   /**
    * removeAttributes
