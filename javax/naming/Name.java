@@ -80,7 +80,7 @@ public interface Name extends Cloneable, Serializable, Comparable<Object>
    * Returns a non-null (but possibly empty) <code>Enumeration</code> of the
    * components of the <code>Name</code> as <code>String</code>s.
    */
-  Enumeration getAll();
+  Enumeration<String> getAll();
 
   /**
    * Gets the component at the given index.

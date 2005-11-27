@@ -135,7 +135,7 @@ public class Reference implements Cloneable, Serializable
     return null;
   }
 
-  public Enumeration getAll ()
+  public Enumeration<RefAddr> getAll ()
   {
     return addrs.elements ();
   }
@@ -187,7 +187,7 @@ public class Reference implements Cloneable, Serializable
     return x + "]";
   }
 
-  protected Vector addrs;
+  protected Vector<RefAddr> addrs;
   protected String classFactory;
   protected String classFactoryLocation;
   protected String className;

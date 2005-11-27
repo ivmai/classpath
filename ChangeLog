@@ -1,5 +1,62 @@
 2005-11-27  Tom Tromey  <tromey@redhat.com>
 
+	* javax/naming/spi/StateFactory.java (getStateToBind): Genericized.
+	* javax/naming/spi/Resolver.java (resolveToClass): Genericized.
+	* javax/naming/spi/ObjectFactoryBuilder.java (createObjectFactory):
+	Genericized.
+	* javax/naming/spi/NamingManager.java (getInitialContext):
+	Genericized.
+	(getURLContext): Likewise.
+	(getObjectInstance): Likewise.
+	(getStateToBind): Likewise.
+	* javax/naming/spi/InitialContextFactoryBuilder.java
+	(createInitialContextFactory): Genericized.
+	* javax/naming/spi/InitialContextFactory.java (getInitialContext):
+	Genericized.
+	* javax/naming/spi/DirectoryManager.java (getObjectInstance):
+	Genericized.
+	(getStateToBind): Likewise.
+	* javax/naming/spi/DirStateFactory.java (getStateToBind):
+	Genericized.
+	* javax/naming/spi/ObjectFactory.java (getObjectInstance):
+	Genericized.
+	* javax/naming/spi/DirObjectFactory.java (getObjectInstance):
+	Genericized.
+	* javax/naming/ldap/LdapReferralException.java (getReferralContext):
+	Genericized.
+	* javax/naming/ldap/ControlFactory.java (getControlInstance):
+	Genericized.
+	* javax/naming/ldap/InitialLdapContext.java (InitialLdapContext):
+	Genericized.
+	* javax/naming/directory/DirContext.java (search): Genericized.
+	* javax/naming/directory/Attributes.java (getAll): Genericized.
+	(getIDs): Likewise.
+	* javax/naming/directory/Attribute.java (getAll): Genericized.
+	* javax/naming/directory/BasicAttribute.java (values): Genericized.
+	(getAll): Likewise.
+	* javax/naming/directory/InitialDirContext.java (InitialDirContext):
+	Genericized.
+	* javax/naming/ReferralException.java (getReferralContext):
+	Genericized.
+	* javax/naming/Name.java (getAll): Genericized.
+	* javax/naming/Context.java (getEnvironment): Genericized.
+	(list): Likewise.
+	(listBindings): Likewise.
+	* javax/naming/NamingEnumeration.java: Genericized.
+	(next): Likewise.
+	* javax/naming/Reference.java (addrs): Genericized.
+	(getAll): Likewise.
+	* javax/naming/CannotProceedException.java (environment): Genericized.
+	(getEnvironment): Likewise.
+	(setEnvironment): Likewise.
+	* javax/naming/InitialContext.java (myProps): Genericized.
+	(InitialContext): Likewise.
+	(init): Likewise.
+	* javax/naming/CompoundName.java (CompoundName): Genericized.
+	* javax/naming/CompositeName.java (CompositeName): Genericized.
+
+2005-11-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/sql/Struct.java (getAttributes): Genericized.
 	* java/sql/ResultSet.java (getObject): Genericized.
 	* java/sql/Ref.java (getObject): Genericized.

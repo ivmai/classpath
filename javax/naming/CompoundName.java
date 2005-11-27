@@ -69,7 +69,7 @@ public class CompoundName implements Name, Cloneable, Serializable
     initializeSyntax ();
   }
 
-  protected CompoundName (Enumeration comps, Properties syntax)
+  protected CompoundName (Enumeration<String> comps, Properties syntax)
   {
     elts = new Vector ();
     mySyntax = syntax;

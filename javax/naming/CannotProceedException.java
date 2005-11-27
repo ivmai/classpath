@@ -49,7 +49,7 @@ public class CannotProceedException extends NamingException
 {
   // Serialized fields.
   protected Name remainingNewName;
-  protected Hashtable environment;
+  protected Hashtable<?, ?> environment;
   protected Name altName;
   protected Context altNameCtx;
 
@@ -63,12 +63,12 @@ public class CannotProceedException extends NamingException
     super (msg);
   }
 
-  public Hashtable getEnvironment()
+  public Hashtable<?, ?> getEnvironment()
   {
     return environment;
   }
 
-  public void setEnvironment(Hashtable environment)
+  public void setEnvironment(Hashtable<?, ?> environment)
   {
     this.environment = environment;
   }

@@ -52,9 +52,9 @@ public class InitialContext implements Context
 {
   protected Context defaultInitCtx;
   protected boolean gotDefault = false;
-  protected Hashtable myProps;
+  protected Hashtable<Object, Object> myProps;
   
-  public InitialContext (Hashtable environment)
+  public InitialContext (Hashtable<?, ?> environment)
     throws NamingException
   {
     init (environment);
@@ -74,7 +74,7 @@ public class InitialContext implements Context
   }
  
   /** @since 1.3 */
-  protected void init (Hashtable environment)
+  protected void init (Hashtable<?, ?> environment)
     throws NamingException
   {
     // FIXME: Is this enough?

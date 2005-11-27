@@ -59,7 +59,7 @@ public class CompositeName implements Name, Cloneable, Serializable
     elts = new Vector ();
   }
 
-  protected CompositeName (Enumeration comps)
+  protected CompositeName (Enumeration<String> comps)
   {
     elts = new Vector ();
     try

@@ -66,7 +66,7 @@ public class InitialDirContext extends InitialContext implements DirContext
     super (lazy);
   }
 
-  public InitialDirContext (Hashtable environment)
+  public InitialDirContext (Hashtable<?, ?> environment)
     throws NamingException
   {
     super (environment);
