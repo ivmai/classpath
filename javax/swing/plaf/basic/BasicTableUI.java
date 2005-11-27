@@ -66,11 +66,11 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.LookAndFeel;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.InputMapUIResource;
 import javax.swing.plaf.TableUI;
@@ -397,11 +397,10 @@ public class BasicTableUI extends TableUI
 
   protected void installKeyboardActions() 
   {
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-    InputMap ancestorMap = (InputMap)defaults.get("Table.ancestorInputMap");
+    InputMap ancestorMap = (InputMap) UIManager.get("Table.ancestorInputMap");
     InputMapUIResource parentInputMap = new InputMapUIResource();
     // FIXME: The JDK uses a LazyActionMap for parentActionMap
-    ActionMap parentActionMap = new ActionMap();
+    ActionMap parentActionMap = new ActionMapUIResource();
     action = new TableAction();
     Object keys[] = ancestorMap.allKeys();
     // Register key bindings in the UI InputMap-ActionMap pair
@@ -1194,29 +1193,9 @@ public class BasicTableUI extends TableUI
                  TableCellRenderer rend, TableModel data,
                  int rowLead, int colLead)
   {
-    boolean rowSelAllowed = table.getRowSelectionAllowed();
-    boolean colSelAllowed = table.getColumnSelectionAllowed();
-    boolean isSel = false;
-    if (rowSelAllowed && colSelAllowed || !rowSelAllowed && !colSelAllowed)
-      isSel = table.isCellSelected(row, col);
-    else
-      isSel = table.isRowSelected(row) && table.getRowSelectionAllowed()
-           || table.isColumnSelected(col) && table.getColumnSelectionAllowed();
-
-    // Determine the focused cell. The focused cell is the cell at the
-    // leadSelectionIndices of the row and column selection model.
-    ListSelectionModel rowSel = table.getSelectionModel();
-    ListSelectionModel colSel = table.getColumnModel().getSelectionModel();
-    boolean hasFocus = table.hasFocus() && table.isEnabled()
-                       && rowSel.getLeadSelectionIndex() == row
-                       && colSel.getLeadSelectionIndex() == col;
-
-    Component comp = rend.getTableCellRendererComponent(table,
-                                                       data.getValueAt(row, col),
-                                                       isSel, hasFocus, row, col);
-    
+    Component comp = table.prepareRenderer(rend, row, col);
     rendererPane.paintComponent(g, comp, table, bounds);
-    
+
     // FIXME: this is manual painting of the Caret, why doesn't the 
     // JTextField take care of this itself?
     if (comp instanceof JTextField)
@@ -1264,7 +1243,7 @@ public class BasicTableUI extends TableUI
                                              width - gap.width + 1,
                                              height - gap.height);
             if (bounds.intersects(clip))
-              {                                                     
+              {           
                 paintCell(gfx, r, c, bounds, table.getCellRenderer(r, c),
                           table.getModel(),
                           table.getSelectionModel().getLeadSelectionIndex(),
@@ -1287,12 +1266,10 @@ public class BasicTableUI extends TableUI
         x = x0;
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        boolean paintedLine = false;
         for (int c = 0; c < ncols && x < xmax; ++c)
           {
             x += cols.getColumn(c).getWidth();
             gfx.drawLine(x, y0, x, ymax);
-            paintedLine = true;
           }
         gfx.setColor(save);
       }
@@ -1303,12 +1280,10 @@ public class BasicTableUI extends TableUI
         y = y0;
         Color save = gfx.getColor();
         gfx.setColor(grid);
-        boolean paintedLine = false;
         for (int r = 0; r < nrows && y < ymax; ++r)
           {
             y += height;
             gfx.drawLine(x0, y, xmax, y);
-            paintedLine = true;
           }
         gfx.setColor(save);
       }

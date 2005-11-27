@@ -125,6 +125,7 @@ public class Container extends Component
    */
   public Container()
   {
+    // Nothing to do here.
   }
 
   /**
@@ -429,7 +430,8 @@ public class Container extends Component
         for (int j = 0; j < list.length; j++)
               r.removeComponentListener(list[j]);
         
-        r.removeNotify();
+        if (r.isShowing())
+          r.removeNotify();
 
         System.arraycopy(component, index + 1, component, index,
                          ncomponents - index - 1);
@@ -740,7 +742,16 @@ public class Container extends Component
    */
   public float getAlignmentX()
   {
-    return super.getAlignmentX();
+    LayoutManager layout = getLayout();
+    float alignmentX = 0.0F;
+    if (layout != null && layout instanceof LayoutManager2)
+      {
+        LayoutManager2 lm2 = (LayoutManager2) layout;
+        alignmentX = lm2.getLayoutAlignmentX(this);
+      }
+    else
+      alignmentX = super.getAlignmentX();
+    return alignmentX;
   }
 
   /**
@@ -752,7 +763,16 @@ public class Container extends Component
    */
   public float getAlignmentY()
   {
-    return super.getAlignmentY();
+    LayoutManager layout = getLayout();
+    float alignmentY = 0.0F;
+    if (layout != null && layout instanceof LayoutManager2)
+      {
+        LayoutManager2 lm2 = (LayoutManager2) layout;
+        alignmentY = lm2.getLayoutAlignmentY(this);
+      }
+    else
+      alignmentY = super.getAlignmentY();
+    return alignmentY;
   }
 
   /**
@@ -830,7 +850,7 @@ public class Container extends Component
    */
   public void paintComponents(Graphics g)
   {
-    super.paint(g);
+    paint(g);
     visitChildren(g, GfxPaintAllVisitor.INSTANCE, true);
   }
 
@@ -878,13 +898,21 @@ public class Container extends Component
   }
 
   /**
-   * Returns an array of all the objects currently registered as FooListeners
-   * upon this Container. FooListeners are registered using the addFooListener
-   * method.
+   * Returns all registered {@link EventListener}s of the given 
+   * <code>listenerType</code>.
    *
-   * @exception ClassCastException If listenerType doesn't specify a class or
-   * interface that implements @see java.util.EventListener.
-   *
+   * @param listenerType the class of listeners to filter (<code>null</code> 
+   *                     not permitted).
+   *                     
+   * @return An array of registered listeners.
+   * 
+   * @throws ClassCastException if <code>listenerType</code> does not implement
+   *                            the {@link EventListener} interface.
+   * @throws NullPointerException if <code>listenerType</code> is 
+   *                              <code>null</code>.
+   *                            
+   * @see #getContainerListeners()
+   * 
    * @since 1.3
    */
   public <T extends EventListener> T[] getListeners(Class<T> listenerType)
@@ -1076,7 +1104,7 @@ public class Container extends Component
       {
         if (!contains(x, y))
           return null;
-
+          
         for (int i = 0; i < ncomponents; ++i)
           {
             // Ignore invisible children...
@@ -1099,7 +1127,8 @@ public class Container extends Component
           }
 
         //don't return transparent components with no MouseListeners
-        if (this.getMouseListeners().length == 0)
+        if (getMouseListeners().length == 0
+            && getMouseMotionListeners().length == 0)
           return null;
         return this;
       }
@@ -1958,6 +1987,7 @@ public class Container extends Component
        */
       protected AccessibleContainerHandler()
       {
+        // Nothing to do here.
       }
 
       /**
@@ -2025,8 +2055,7 @@ class LightweightDispatcher implements Serializable
    * location, otherwise the appropriate component from the conditions
    * above.
    */
-  Component getDeepestComponentForMouseEventAt (
-                                                              Component parent, int x, int y)
+  Component getDeepestComponentForMouseEventAt(Component parent, int x, int y)
   {
     if (parent == null || (! parent.contains(x, y)))
       return null;
@@ -2050,8 +2079,7 @@ class LightweightDispatcher implements Serializable
     Point p = me.getPoint();
     while (candidate == null && parent != null)
       {
-        candidate =
-          getDeepestComponentForMouseEventAt(parent, p.x, p.y);
+        candidate = getDeepestComponentForMouseEventAt(parent, p.x, p.y);
         if (candidate == null || (candidate.eventMask & me.getID()) == 0)
           {
             candidate = null;
@@ -2133,14 +2161,12 @@ class LightweightDispatcher implements Serializable
         break;
       }
 
-    if (me.getID() == MouseEvent.MOUSE_RELEASED
-        || me.getID() == MouseEvent.MOUSE_PRESSED && modifiers > 0
+    if (me.getID() == MouseEvent.MOUSE_PRESSED && modifiers > 0
         || me.getID() == MouseEvent.MOUSE_DRAGGED)
       {
         // If any of the following events occur while a button is held down,
         // they should be dispatched to the same component to which the
         // original MOUSE_PRESSED event was dispatched:
-        //   - MOUSE_RELEASED
         //   - MOUSE_PRESSED: another button pressed while the first is held
         //     down
         //   - MOUSE_DRAGGED
@@ -2152,7 +2178,10 @@ class LightweightDispatcher implements Serializable
         // Don't dispatch CLICKED events whose target is not the same as the
         // target for the original PRESSED event.
         if (candidate != pressedComponent)
-          mouseEventTarget = null;
+          {
+            mouseEventTarget = null;
+            pressCount = 0;
+          }
         else if (pressCount == 0)
           pressedComponent = null;
       }
@@ -2187,7 +2216,10 @@ class LightweightDispatcher implements Serializable
                 // there is a CLICKED event after this, it will do clean up.
                 if (--pressCount == 0
                     && mouseEventTarget != pressedComponent)
-                  pressedComponent = null;
+                  {
+                    pressedComponent = null;
+                    pressCount = 0;
+                  }
                 break;
               }
 

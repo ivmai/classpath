@@ -949,10 +949,13 @@ public class JTable
       if (ev.getPropertyName().equals("preferredWidth"))
         {
           JTableHeader header = getTableHeader();
-          TableColumn col = (TableColumn) ev.getSource();
-          header.setResizingColumn(col);
-          doLayout();
-          header.setResizingColumn(null);
+	  if (header != null)
+	    {
+	      TableColumn col = (TableColumn) ev.getSource();
+	      header.setResizingColumn(col);
+	      doLayout();
+	      header.setResizingColumn(null);
+	    }
         }
     }
   }
@@ -1763,14 +1766,19 @@ public class JTable
     if ((event.getFirstRow() ==TableModelEvent.HEADER_ROW)
         && autoCreateColumnsFromModel)
 
-        createDefaultColumnsFromModel();
+      createDefaultColumnsFromModel();
 
     // If the structure changes, we need to revalidate, since that might
     // affect the size parameters of the JTable. Otherwise we only need
     // to perform a repaint to update the view.
-    if (event.getType() == TableModelEvent.INSERT
-        || event.getType() == TableModelEvent.DELETE)
+    if (event.getType() == TableModelEvent.INSERT)
       revalidate();
+    else if (event.getType() == TableModelEvent.DELETE)
+      {
+        if (dataModel.getRowCount() == 0)
+          clearSelection();
+        revalidate();
+      }
     repaint();
   }
 
@@ -1791,7 +1799,6 @@ public class JTable
   {
     if (point != null)
       {
-        int x0 = getLocation().x;
         int ncols = getColumnCount();
         Dimension gap = getIntercellSpacing();
         TableColumnModel cols = getColumnModel();
@@ -1821,7 +1828,6 @@ public class JTable
   {
     if (point != null)
       {
-        int y0 = getLocation().y;
         int nrows = getRowCount();
         int height = getRowHeight();
         int y = point.y;
@@ -1890,7 +1896,7 @@ public class JTable
    * @return The current value of the selectedRow property
    */
   public int getSelectedRow ()
-  {
+  {    
     return selectionModel.getMinSelectionIndex();
   }
   
@@ -1979,16 +1985,13 @@ public class JTable
       }
   }
 
-
-
   public TableCellRenderer getCellRenderer(int row, int column)
   {
     TableCellRenderer renderer =
       columnModel.getColumn(column).getCellRenderer();
-    
     if (renderer == null)
-      renderer = getDefaultRenderer(dataModel.getColumnClass(column));
-    
+      renderer = getDefaultRenderer(getColumnClass(column));
+
     return renderer;
   }
 
@@ -2034,19 +2037,29 @@ public class JTable
                                    int row,
                                    int column)
   {
-    boolean rsa = getRowSelectionAllowed();
-    boolean csa = getColumnSelectionAllowed();
-    boolean rs = rsa ? getSelectionModel().isSelectedIndex(row) : false;
-    boolean cs = csa ? columnModel.getSelectionModel().isSelectedIndex(column) : false;
-    boolean isSelected = ((rsa && csa && rs && cs) 
-                          || (rsa && !csa && rs) 
-                          || (!rsa && csa && cs));
-    
+
+    boolean rowSelAllowed = getRowSelectionAllowed();
+    boolean colSelAllowed = getColumnSelectionAllowed();
+    boolean isSel = false;
+    if (rowSelAllowed && colSelAllowed || !rowSelAllowed && !colSelAllowed)
+      isSel = isCellSelected(row, column);
+    else
+      isSel = isRowSelected(row) && getRowSelectionAllowed()
+           || isColumnSelected(column) && getColumnSelectionAllowed();
+
+    // Determine the focused cell. The focused cell is the cell at the
+    // leadSelectionIndices of the row and column selection model.
+    ListSelectionModel rowSel = getSelectionModel();
+    ListSelectionModel colSel = getColumnModel().getSelectionModel();
+    boolean hasFocus = hasFocus() && isEnabled()
+                       && rowSel.getLeadSelectionIndex() == row
+                       && colSel.getLeadSelectionIndex() == column;
+
     return renderer.getTableCellRendererComponent(this,
                                                   dataModel.getValueAt(row, 
 						                       convertColumnIndexToModel(column)),
-                                                  isSelected,
-                                                  false, // hasFocus
+                                                  isSel,
+                                                  hasFocus,
                                                   row, column);
   }
 
@@ -2212,7 +2225,6 @@ public class JTable
     int lo = lsm.getMinSelectionIndex();
     int hi = lsm.getMaxSelectionIndex();
     int j = 0;
-    java.util.ArrayList ls = new java.util.ArrayList();
     if (lo != -1 && hi != -1)
       {
         switch (lsm.getSelectionMode())
@@ -2968,7 +2980,7 @@ public class JTable
 
   public Class<?> getColumnClass(int column)
   {
-    return dataModel.getColumnClass(column);
+    return getModel().getColumnClass(column);
   }
   
   public String getColumnName(int column)

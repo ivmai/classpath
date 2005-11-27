@@ -59,6 +59,9 @@ import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.WrappedPlainView;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -164,6 +167,14 @@ public class JEditorPane extends JTextComponent
     extends AccessibleJEditorPane implements AccessibleHypertext
   {
 
+    /**
+     * Creates a new JEditorPaneAccessibleHypertextSupport object.
+     */
+    public JEditorPaneAccessibleHypertextSupport()
+    {
+      super();
+    }
+    
     /**
      * The accessible representation of a HTML link. 
      *
@@ -466,6 +477,30 @@ public class JEditorPane extends JTextComponent
     }
   }
 
+  /**
+   * An EditorKit used for plain text. This is the default editor kit for
+   * JEditorPanes.
+   *
+   * @author Roman Kennke (kennke@aicas.com)
+   */
+  private static class PlainEditorKit extends DefaultEditorKit
+  {
+
+    /**
+     * Returns a ViewFactory that supplies WrappedPlainViews.
+     */
+    public ViewFactory getViewFactory()
+    {
+      return new ViewFactory()
+      {
+        public View create(Element el)
+        {
+          return new WrappedPlainView(el);
+        }
+      };
+    }
+  }
+
   private static final long serialVersionUID = 3140472492599046285L;
   
   private URL page;
@@ -497,12 +532,12 @@ public class JEditorPane extends JTextComponent
 
   protected EditorKit createDefaultEditorKit()
   {
-    return new DefaultEditorKit();
+    return new PlainEditorKit();
   }
 
   public static EditorKit createEditorKitForContentType(String type)
   {
-    return new DefaultEditorKit();
+    return new PlainEditorKit();
   }
 
   /**

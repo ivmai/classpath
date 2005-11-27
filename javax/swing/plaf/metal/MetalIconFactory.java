@@ -52,6 +52,8 @@ import javax.swing.JInternalFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
 
@@ -66,6 +68,12 @@ public class MetalIconFactory implements Serializable
     
   /** A constant representing "light". */
   public static final boolean LIGHT = true;
+  
+  /** A shared instance of the MenuArrowIcon. */
+  private static Icon menuArrow;
+  
+  /** A shared instance of the MenuItemArrowIcon. */
+  private static Icon menuItemArrow;
     
   /**
    * An icon displayed for {@link JCheckBoxMenuItem} components.
@@ -779,6 +787,10 @@ public class MetalIconFactory implements Serializable
      */
     public void paintIcon(Component c, Graphics g, int x, int y) 
     {
+      if (UIManager.get("RadioButton.gradient") != null)
+        MetalUtils.paintGradient(g, x, y, getIconWidth(), getIconHeight(),
+                              SwingConstants.VERTICAL, "RadioButton.gradient");
+
       Color savedColor = g.getColor();
       JRadioButton b = (JRadioButton) c;
       
@@ -2461,4 +2473,102 @@ public class MetalIconFactory implements Serializable
     return treeHardDriveIcon;
   }
 
+  /**
+   * Returns a new instance of a 4 x 8 icon showing a small black triangle that
+   * points to the right.  This is displayed in menu items that have a 
+   * sub menu.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuArrowIcon()
+  {
+    if (menuArrow == null)
+      menuArrow = new Icon()
+      {
+        public int getIconHeight()
+        {
+          return 8;
+        }
+
+        public int getIconWidth()
+        {
+          return 4;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y)
+        {
+          Color saved = g.getColor();
+          g.setColor(Color.BLACK);
+          for (int i = 0; i < 4; i++)
+            g.drawLine(x + i, y + i, x + i, y + 7 - i);
+          g.setColor(saved);
+        }
+      };
+    return menuArrow;
+  }
+  
+  /**
+   * Returns a new instance of a 4 x 8 icon showing a small black triangle that
+   * points to the right. This is displayed in menu items that have a sub menu.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuItemArrowIcon()
+  {
+    if (menuItemArrow == null)
+      menuItemArrow = new Icon()
+      {
+        public int getIconHeight()
+        {
+          return 8;
+        }
+
+        public int getIconWidth()
+        {
+          return 4;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y)
+        {
+          Color saved = g.getColor();
+          g.setColor(Color.BLACK);
+          for (int i = 0; i < 4; i++)
+            g.drawLine(x + i, y + i, x + i, y + 7 - i);
+          g.setColor(saved);
+        }
+      };
+    return menuItemArrow;
+  }
+  
+  /**
+   * Returns a new instance of a 13 x 13 icon showing a small black check mark.
+   * 
+   * @return The icon.
+   */
+  public static Icon getMenuItemCheckIcon()
+  {
+    return new Icon()
+    {
+      public int getIconHeight()
+      {
+        return 13;
+      }
+
+      public int getIconWidth()
+      {
+        return 13;
+      }
+
+      public void paintIcon(Component c, Graphics g, int x, int y)
+      {
+        Color saved = g.getColor();
+        g.setColor(Color.BLACK);
+        g.drawLine(3 + x, 5 + y, 3 + x, 9 + y);
+        g.drawLine(4 + x, 5 + y, 4 + x, 9 + y);
+        g.drawLine(5 + x, 7 + y, 9 + x, 3 + y);
+        g.drawLine(5 + x, 8 + y, 9 + x, 4 + y);
+        g.setColor(saved);
+      }
+    };
+  }
 }

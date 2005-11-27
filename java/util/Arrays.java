@@ -2544,7 +2544,13 @@ public class Arrays
     return true;
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(boolean[] v)
   {
     if (v == null)
@@ -2560,7 +2566,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(byte[] v)
   {
     if (v == null)
@@ -2576,7 +2588,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(char[] v)
   {
     if (v == null)
@@ -2592,7 +2610,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(short[] v)
   {
     if (v == null)
@@ -2608,7 +2632,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(int[] v)
   {
     if (v == null)
@@ -2624,7 +2654,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(long[] v)
   {
     if (v == null)
@@ -2640,7 +2676,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(float[] v)
   {
     if (v == null)
@@ -2656,7 +2698,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(double[] v)
   {
     if (v == null)
@@ -2672,7 +2720,13 @@ public class Arrays
     return b.toString();
   }
 
-  /** @since 1.5 */
+  /**
+   * Returns a String representation of the argument array.  Returns "null"
+   * if <code>a</code> is null.
+   * @param a the array to represent
+   * @return a String representing this array
+   * @since 1.5
+   */
   public static String toString(Object[] v)
   {
     if (v == null)

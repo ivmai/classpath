@@ -1038,14 +1038,10 @@ public abstract class Component
     if ((c != null) && c.equals(background))
       return;
 
-    // If c is null, inherit from closest ancestor whose bg is set.
-    if (c == null && parent != null)
-      c = parent.getBackground();
-    if (peer != null && c != null)
-      peer.setBackground(c);
-    
     Color previous = background;
     background = c;
+    if (peer != null && c != null)
+      peer.setBackground(c);
     firePropertyChange("background", previous, c);
   }
 
@@ -1409,7 +1405,6 @@ public abstract class Component
       {
         if (parent != null)
           {
-            Rectangle parentBounds = parent.getBounds();
             Rectangle oldBounds = new Rectangle(oldx, oldy, oldwidth,
                                                 oldheight);
             Rectangle newBounds = new Rectangle(x, y, width, height);
@@ -1720,7 +1715,7 @@ public abstract class Component
     valid = false;
     prefSize = null;
     minSize = null;
-    if (parent != null && parent.valid)
+    if (parent != null && parent.isValid())
       parent.invalidate();
   }
 
@@ -1887,13 +1882,7 @@ public abstract class Component
    */
   public void repaint()
   {   
-    if(!isShowing())
-      {
-        Component p = parent;
-        if (p != null)
-          p.repaint(0, getX(), getY(), width, height);
-      }
-    else
+    if (isShowing())
       repaint(0, 0, 0, width, height);
   }
 
@@ -1908,13 +1897,7 @@ public abstract class Component
    */
   public void repaint(long tm)
   {
-    if(!isShowing())
-      {
-        Component p = parent;
-        if (p != null)
-          p.repaint(tm, getX(), getY(), width, height);
-      }
-    else
+    if (isShowing())
       repaint(tm, 0, 0, width, height);
   }
 
@@ -1932,13 +1915,7 @@ public abstract class Component
    */
   public void repaint(int x, int y, int w, int h)
   {
-    if(!isShowing())
-      {
-        Component p = parent;
-        if (p != null)
-          p.repaint(0, x + getX(), y + getY(), width, height);
-      }
-    else
+    if (isShowing())
       repaint(0, x, y, w, h);
   }
 
@@ -1957,13 +1934,7 @@ public abstract class Component
    */
   public void repaint(long tm, int x, int y, int width, int height)
   {
-    if(!isShowing())
-      {
-        Component p = parent;
-        if (p != null)
-          p.repaint(tm, x + getX(), y + getY(), width, height);
-      }
-    else
+    if (isShowing())
       {
         ComponentPeer p = peer;
         if (p != null)
@@ -2667,7 +2638,7 @@ public abstract class Component
   {
     mouseMotionListener = AWTEventMulticaster.add(mouseMotionListener, listener);
     if (mouseMotionListener != null)
-      enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+      enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK);
   }
 
   /**
@@ -2800,10 +2771,19 @@ public abstract class Component
   }
 
   /**
-   * Returns all registered EventListers of the given listenerType.
+   * Returns all registered {@link EventListener}s of the given 
+   * <code>listenerType</code>.
    *
-   * @param listenerType the class of listeners to filter
-   * @return an array of registered listeners
+   * @param listenerType the class of listeners to filter (<code>null</code> 
+   *                     not permitted).
+   *                     
+   * @return An array of registered listeners.
+   * 
+   * @throws ClassCastException if <code>listenerType</code> does not implement
+   *                            the {@link EventListener} interface.
+   * @throws NullPointerException if <code>listenerType</code> is 
+   *                              <code>null</code>.
+   *                            
    * @see #getComponentListeners()
    * @see #getFocusListeners()
    * @see #getHierarchyListeners()
@@ -4879,11 +4859,12 @@ p   * <li>the set of backward traversal keys
       case MouseEvent.MOUSE_EXITED:
       case MouseEvent.MOUSE_PRESSED:
       case MouseEvent.MOUSE_RELEASED:
+        return (mouseListener != null
+                || (eventMask & AWTEvent.MOUSE_EVENT_MASK) != 0);
       case MouseEvent.MOUSE_MOVED:
       case MouseEvent.MOUSE_DRAGGED:
-        return (mouseListener != null
-                || mouseMotionListener != null
-                || (eventMask & AWTEvent.MOUSE_EVENT_MASK) != 0);
+        return (mouseMotionListener != null
+                || (eventMask & AWTEvent.MOUSE_MOTION_EVENT_MASK) != 0);
         
       case FocusEvent.FOCUS_GAINED:
       case FocusEvent.FOCUS_LOST:

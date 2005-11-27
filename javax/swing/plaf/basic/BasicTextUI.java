@@ -56,8 +56,8 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -329,6 +329,34 @@ public abstract class BasicTextUI extends TextUI
     {
       view.changedUpdate(ev, shape, vf);
     }
+
+    /**
+     * Returns the document position that is (visually) nearest to the given
+     * document position <code>pos</code> in the given direction <code>d</code>.
+     *
+     * @param pos the document position
+     * @param b the bias for <code>pos</code>
+     * @param a the allocation for the view
+     * @param d the direction, must be either {@link SwingConstants#NORTH},
+     *        {@link SwingConstants#SOUTH}, {@link SwingConstants#WEST} or
+     *        {@link SwingConstants#EAST}
+     * @param biasRet an array of {@link Position.Bias} that can hold at least
+     *        one element, which is filled with the bias of the return position
+     *        on method exit
+     *
+     * @return the document position that is (visually) nearest to the given
+     *         document position <code>pos</code> in the given direction
+     *         <code>d</code>
+     *
+     * @throws BadLocationException if <code>pos</code> is not a valid offset in
+     *         the document model
+     */
+    public int getNextVisualPositionFrom(int pos, Position.Bias b, Shape a,
+                                         int d, Position.Bias[] biasRet)
+      throws BadLocationException
+    {
+      return view.getNextVisualPositionFrom(pos, b, a, d, biasRet);
+    }
   }
 
   /**
@@ -522,10 +550,12 @@ public abstract class BasicTextUI extends TextUI
     caret.setBlinkRate(UIManager.getInt(prefix + ".caretBlinkRate"));
 
     // Fetch the colors for enabled/disabled text components.
+    background = UIManager.getColor(prefix + ".background");
     inactiveBackground = UIManager.getColor(prefix + ".inactiveBackground");
     textComponent.setDisabledTextColor
                          (UIManager.getColor(prefix + ".inactiveForeground"));
     textComponent.setSelectedTextColor(UIManager.getColor(prefix + ".selectionForeground"));
+    textComponent.setSelectionColor(UIManager.getColor(prefix + ".selectionBackground"));    
   }
 
   /**
@@ -586,13 +616,14 @@ public abstract class BasicTextUI extends TextUI
   protected Keymap createKeymap()
   {
     String prefix = getPropertyPrefix();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
     JTextComponent.KeyBinding[] bindings = 
-      (JTextComponent.KeyBinding[]) defaults.get(prefix + ".keyBindings");
+      (JTextComponent.KeyBinding[]) UIManager.get(prefix + ".keyBindings");
     if (bindings == null)
       {
         bindings = new JTextComponent.KeyBinding[0];
-        defaults.put(prefix + ".keyBindings", bindings);
+        // FIXME: Putting something into the defaults map is certainly wrong.
+        // Must be fixed somehow.
+        UIManager.put(prefix + ".keyBindings", bindings);
       }
 
     Keymap km = JTextComponent.addKeymap(getKeymapName(), 
@@ -629,17 +660,16 @@ public abstract class BasicTextUI extends TextUI
   InputMap getInputMap(int condition)
   {
     String prefix = getPropertyPrefix();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();
     switch (condition)
       {
       case JComponent.WHEN_IN_FOCUSED_WINDOW:
         // FIXME: is this the right string? nobody seems to use it.
-        return (InputMap) defaults.get(prefix + ".windowInputMap"); 
+        return (InputMap) UIManager.get(prefix + ".windowInputMap"); 
       case JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT:
-        return (InputMap) defaults.get(prefix + ".ancestorInputMap");
+        return (InputMap) UIManager.get(prefix + ".ancestorInputMap");
       default:
       case JComponent.WHEN_FOCUSED:
-        return (InputMap) defaults.get(prefix + ".focusInputMap");
+        return (InputMap) UIManager.get(prefix + ".focusInputMap");
       }
   }
 
@@ -653,12 +683,14 @@ public abstract class BasicTextUI extends TextUI
   ActionMap getActionMap()
   {
     String prefix = getPropertyPrefix();
-    UIDefaults defaults = UIManager.getLookAndFeelDefaults();    
-    ActionMap am = (ActionMap) defaults.get(prefix + ".actionMap");
+    ActionMap am = (ActionMap) UIManager.get(prefix + ".actionMap");
     if (am == null)
       {
         am = createActionMap();
-        defaults.put(prefix + ".actionMap", am);
+        // FIXME: Putting something in the UIDefaults map is certainly wrong.
+        // However, the whole method seems wrong and must be replaced by
+        // something that is less wrong.
+        UIManager.put(prefix + ".actionMap", am);
       }
     return am;
   }
@@ -716,6 +748,7 @@ public abstract class BasicTextUI extends TextUI
   protected void uninstallListeners()
   {
     textComponent.removeFocusListener(focuslistener);
+    textComponent.getDocument().removeDocumentListener(documentHandler);
   }
 
   /**
@@ -769,6 +802,18 @@ public abstract class BasicTextUI extends TextUI
   }
 
   /**
+   * Returns the minimum size for text components. This returns the size
+   * of the component's insets.
+   *
+   * @return the minimum size for text components
+   */
+  public Dimension getMinimumSize(JComponent c)
+  {
+    Insets i = c.getInsets();
+    return new Dimension(i.left + i.right, i.top + i.bottom);
+  }
+
+  /**
    * Paints the text component.
    *
    * @param g the <code>Graphics</code> context to paint to
@@ -788,10 +833,10 @@ public abstract class BasicTextUI extends TextUI
   {
     Caret caret = textComponent.getCaret();
     Highlighter highlighter = textComponent.getHighlighter();
-    
+
     if (textComponent.isOpaque())
       paintBackground(g);
-    
+
     if (highlighter != null
 	&& textComponent.getSelectionStart() != textComponent.getSelectionEnd())
       highlighter.paint(g);
@@ -1013,6 +1058,7 @@ public abstract class BasicTextUI extends TextUI
    */
   protected Rectangle getVisibleEditorRect()
   {
+    JTextComponent textComponent = getComponent();
     int width = textComponent.getWidth();
     int height = textComponent.getHeight();
 
@@ -1021,8 +1067,8 @@ public abstract class BasicTextUI extends TextUI
 	
     Insets insets = textComponent.getInsets();
     return new Rectangle(insets.left, insets.top,
-			 width - insets.left + insets.right,
-			 height - insets.top + insets.bottom);
+			 width - insets.left - insets.right,
+			 height - insets.top - insets.bottom);
   }
 
   /**

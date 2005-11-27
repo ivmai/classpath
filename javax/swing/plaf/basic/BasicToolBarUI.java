@@ -404,6 +404,8 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
     boolean tmp = ((loc == SwingConstants.NORTH)
                   || (loc == SwingConstants.SOUTH) || (loc == -1));
 
+    cachedOrientation = toolBar.getOrientation();
+    cachedBounds = toolBar.getSize();
     if (((cachedOrientation == SwingConstants.HORIZONTAL) && tmp)
         || ((cachedOrientation == VERTICAL) && ! tmp))
       {
@@ -570,9 +572,6 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
     floatFrame = (Window) createFloatingWindow(toolBar);
 
     dragWindow = createDragWindow(toolBar);
-
-    cachedBounds = toolBar.getPreferredSize();
-    cachedOrientation = toolBar.getOrientation();
 
     nonRolloverBorder = createNonRolloverBorder();
     rolloverBorder = createRolloverBorder();
@@ -1061,7 +1060,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
       isDragging = true;
 
       if (dragWindow != null)
-	dragWindow.setOffset(new Point(e.getX(), e.getY()));
+	dragWindow.setOffset(new Point(cachedBounds.width/2, cachedBounds.height/2));
 
       dragTo(e.getPoint(), origin);
     }

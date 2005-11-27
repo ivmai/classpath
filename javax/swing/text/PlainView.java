@@ -46,6 +46,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentEvent.ElementChange;
 
@@ -184,7 +185,6 @@ public class PlainView extends View implements TabExpander
     
     JTextComponent textComponent = (JTextComponent) getContainer();
 
-    g.setFont(textComponent.getFont());
     selectedColor = textComponent.getSelectedTextColor();
     unselectedColor = textComponent.getForeground();
     disabledColor = textComponent.getDisabledTextColor();
@@ -325,19 +325,19 @@ public class PlainView extends View implements TabExpander
     
     Element line = root.getElement(lineClicked);
     Segment s = getLineBuffer();
-
     int start = line.getStartOffset();
-    int end = line.getEndOffset();
+    // We don't want the \n at the end of the line.
+    int end = line.getEndOffset() - 1;
     try
-    {
-      doc.getText(start, end - start, s);
-    }
+      {
+        doc.getText(start, end - start, s);
+      }
     catch (BadLocationException ble)
-    {
-      AssertionError ae = new AssertionError("Unexpected bad location");
-      ae.initCause(ble);
-      throw ae;
-    }
+      {
+        AssertionError ae = new AssertionError("Unexpected bad location");
+        ae.initCause(ble);
+        throw ae;
+      }
     
     int pos = Utilities.getTabbedTextOffset(s, metrics, rec.x, (int)x, this, start);
     return Math.max (0, pos);
@@ -512,7 +512,8 @@ public class PlainView extends View implements TabExpander
     else
       {
         Rectangle repaintRec = rec0.union(rec1);
-        host.repaint();
+        host.repaint(repaintRec.x, repaintRec.y, repaintRec.width,
+                     repaintRec.height);
       }    
   }
 
