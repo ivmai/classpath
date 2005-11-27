@@ -1309,7 +1309,7 @@ public interface ResultSet
    * @return The value of the column as an <code>Object</code>.
    * @exception SQLException If an error occurs.
    */
-  Object getObject(int i, Map map) throws SQLException;
+  Object getObject(int i, Map<String, Class<?>> map) throws SQLException;
 
   /**
    * This method returns a <code>Ref</code> for the specified column which
@@ -1357,7 +1357,8 @@ public interface ResultSet
    * @return The value of the column as an <code>Object</code>.
    * @exception SQLException If an error occurs.
    */
-  Object getObject(String colName, Map map) throws SQLException;
+  Object getObject(String colName, Map<String, Class<?>> map) 
+    throws SQLException;
 
   /**
    * This method returns a <code>Ref</code> for the specified column which

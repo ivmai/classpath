@@ -341,7 +341,7 @@ public interface Connection
    * @return The SQL type to Java class mapping.
    * @exception SQLException If an error occurs.
    */
-  Map getTypeMap() throws SQLException;
+  Map<String, Class<?>> getTypeMap() throws SQLException;
 
   /**
    * This method sets the mapping table for SQL types to Java classes.
@@ -350,7 +350,7 @@ public interface Connection
    * @param map The new SQL mapping table.
    * @exception SQLException If an error occurs.
    */
-  void setTypeMap(Map map) throws SQLException;
+  void setTypeMap(Map<String, Class<?>> map) throws SQLException;
 
   /**
    * @since 1.4
