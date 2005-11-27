@@ -1,5 +1,16 @@
 2005-11-27  Tom Tromey  <tromey@redhat.com>
 
+	* javax/print/attribute/standard/PrinterStateReasons.java:
+	Genericized.
+	* javax/print/attribute/standard/JobStateReasons.java: Genericized.
+	* javax/print/PrintService.java (getAttribute): Genericized.
+	(getDefaultAttributeValue): Likewise.
+	(getSupportedAttributeCategories): Likewise.
+	(getSupportedAttributeValues): Likewise.
+	(isAttributeValueSupported): Likewise.
+
+2005-11-27  Tom Tromey  <tromey@redhat.com>
+
 	* javax/naming/spi/StateFactory.java (getStateToBind): Genericized.
 	* javax/naming/spi/Resolver.java (resolveToClass): Genericized.
 	* javax/naming/spi/ObjectFactoryBuilder.java (createObjectFactory):

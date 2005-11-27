@@ -45,7 +45,7 @@ import javax.print.attribute.PrintJobAttribute;
 /**
  * @author Michael Koch (konqueror@gmx.de)
  */
-public final class JobStateReasons extends HashSet
+public final class JobStateReasons extends HashSet<JobStateReason>
   implements PrintJobAttribute
 {
   private static final long serialVersionUID = 8849088261264331812L;
