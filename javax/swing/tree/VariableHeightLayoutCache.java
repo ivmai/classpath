@@ -188,7 +188,7 @@ public class VariableHeightLayoutCache extends AbstractLayoutCache {
 	 * @param value0 TODO
 	 * @returns Enumeration
 	 */
-	public Enumeration getVisiblePathsFrom(TreePath value0) {
+	public Enumeration<TreePath> getVisiblePathsFrom(TreePath value0) {
 		return null; // TODO
 	} // getVisiblePathsFrom()
 

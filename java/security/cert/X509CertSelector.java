@@ -574,7 +574,7 @@ public class X509CertSelector implements CertSelector, Cloneable
    *
    * @return The set of key purpose OIDs (strings).
    */
-  public Set getExtendedKeyUsage()
+  public Set<String> getExtendedKeyUsage()
   {
     if (keyPurposeSet != null)
       return Collections.unmodifiableSet(keyPurposeSet);

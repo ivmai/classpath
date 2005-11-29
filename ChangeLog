@@ -1,3 +1,45 @@
+2005-11-29  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/text/StyleContext.java (removeAttributes): Genericized.
+	(getAttributeNames): Likewise.
+	* javax/swing/text/SimpleAttributeSet.java (getAttributeNames):
+	Genericized.
+	(removeAttributes): Likewise.
+	* javax/swing/text/DefaultStyledDocument.java (getStyleNames):
+	Genericized.
+	* javax/swing/text/AbstractDocument.java (getAttributeNames):
+	Genericized.
+	(removeAttributes): Likewise.
+	* javax/swing/table/TableColumnModel.java (getColumns): Genericized.
+	* javax/swing/table/AbstractTableModel.java (getColumnClass):
+	Genericized.
+	* javax/swing/tree/VariableHeightLayoutCache.java
+	(getVisiblePathsFrom): Genericized.
+	* javax/swing/tree/FixedHeightLayoutCache.java (getVisiblePathsFrom):
+	Genericized.
+	* javax/swing/undo/StateEdit.java (postState): Genericized.
+	(preState): Likewise.
+	* javax/security/sasl/SaslServerFactory.java (createSaslServer):
+	Genericized.
+	* javax/security/sasl/SaslClientFactory.java (createSaslClient):
+	Genericized.
+	(getMechanismNames): Likewise.
+	* javax/security/sasl/Sasl.java (createSaslClient): Genericized.
+	(createSaslServer): Likewise.
+	(getSaslClientFactories): Likewise.
+	(getSaslServerFactories): Likewise.
+	* javax/security/auth/spi/LoginModule.java (initialize): Genericized.
+	* javax/security/auth/login/AppConfigurationEntry.java
+	(AppConfigurationEntry): Genericized.
+	(getOptions): Likewise.
+	* javax/sql/RowSet.java (getTypeMap): Genericized.
+	(setTypeMap): Likewise.
+	* java/sql/Array.java (getResultSet): Genericized.
+	* java/security/cert/X509CertSelector.java (getExtendedKeyUsage):
+	Genericized.
+	* java/security/Permissions.java (elements): Genericized.
+	* java/rmi/server/RMIClassLoader.java (loadClass): Genericized.
+
 2005-11-27  Tom Tromey  <tromey@redhat.com>
 
 	* javax/print/attribute/standard/PrinterStateReasons.java:

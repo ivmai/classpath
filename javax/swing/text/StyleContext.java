@@ -168,7 +168,7 @@ public class StyleContext
       return attributes.getAttributeCount();
     }
 
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {
       return attributes.getAttributeNames();
     }
@@ -195,7 +195,7 @@ public class StyleContext
       fireStateChanged();
     }
 
-    public void removeAttributes(Enumeration names)
+    public void removeAttributes(Enumeration<?> names)
     {
       attributes = StyleContext.this.removeAttributes(attributes, names);
       fireStateChanged();
@@ -323,7 +323,7 @@ public class StyleContext
       return attrs.length / 2;
     }
 
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {      
       return new Enumeration() 
         {

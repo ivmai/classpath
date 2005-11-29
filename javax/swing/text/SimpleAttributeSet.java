@@ -158,7 +158,7 @@ public class SimpleAttributeSet
     return tab.size();
   }
 
-  public Enumeration getAttributeNames()
+  public Enumeration<?> getAttributeNames()
   {
     return tab.keys();
   }
@@ -216,7 +216,7 @@ public class SimpleAttributeSet
       }
   }
 
-  public void removeAttributes(Enumeration names)
+  public void removeAttributes(Enumeration<?> names)
   {
     while (names.hasMoreElements())
       {

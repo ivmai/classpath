@@ -125,7 +125,7 @@ public abstract class AbstractTableModel implements TableModel, Serializable
    * 
    * @return The class.
    */
-  public Class getColumnClass(int columnIndex)
+  public Class<?> getColumnClass(int columnIndex)
   {
     return Object.class;
   }

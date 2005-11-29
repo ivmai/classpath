@@ -102,7 +102,7 @@ public class RMIClassLoader
    * @throws MalformedURLException if the URL is not well formed
    * @throws ClassNotFoundException if the requested class cannot be found
    */
-  public static Class loadClass(URL codeBase, String name)
+  public static Class<?> loadClass(URL codeBase, String name)
     throws MalformedURLException, ClassNotFoundException
   {
     RMIClassLoaderSpi spi = getProviderInstance();

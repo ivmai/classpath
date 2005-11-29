@@ -181,6 +181,6 @@ public interface Array
    * @exception SQLException If an error occurs.
    * @see ResultSet
    */  
-  ResultSet getResultSet(long index, int count, Map map)
+  ResultSet getResultSet(long index, int count, Map<String, Class<?>> map)
     throws SQLException;
 }

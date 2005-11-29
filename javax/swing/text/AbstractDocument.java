@@ -1257,7 +1257,7 @@ public abstract class AbstractDocument implements Document, Serializable
      *
      * @param names the names of the attributes to be removed
      */
-    public void removeAttributes(Enumeration names)
+    public void removeAttributes(Enumeration<?> names)
     {
       attributes = getAttributeContext().removeAttributes(attributes, names);
     }
@@ -1345,7 +1345,7 @@ public abstract class AbstractDocument implements Document, Serializable
      *
      * @return the names of the attributes of this element
      */
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {
       return attributes.getAttributeNames();
     }
