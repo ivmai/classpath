@@ -1,3 +1,62 @@
+2005-12-01  Tom Tromey  <tromey@redhat.com>
+
+	* javax/imageio/spi/RegisterableService.java (onRegistration):
+	Genericized.
+	(onDeregistration): Likewise.
+	* javax/imageio/spi/ServiceRegistry.java (ServiceRegistry):
+	Genericized.
+	(deregisterServiceProvider): Likewise.
+	(getCategories): Likewise.
+	(getServiceProviderByClass): Likewise.
+	(getServiceProviders): Likewise.
+	(lookupProviders): Likewise.
+	(registerServiceProvider): Likewise.
+	(registerServiceProviders): Likewise.
+	(setOrdering): Likewise.
+	(unsetOrdering): Likewise.
+	* javax/imageio/spi/ImageOutputStreamSpi.java (outputClass):
+	Genericized.
+	(ImageOutputStreamSpi): Likewise.
+	(getOutputClass): Likewise.
+	* javax/imageio/spi/ImageInputStreamSpi.java (inputClass):
+	Genericized.
+	(ImageInputStreamSpi): Likewise.
+	(getInputClass): Likewise.
+	* javax/imageio/metadata/IIOMetadataFormatImpl.java (addAttribute):
+	Genericized.
+	(addObjectValue): Likewise.
+	* javax/imageio/metadata/IIOMetadataFormat.java (getObjectClass):
+	Genericized.
+	(getObjectMaxValue): Likewise.
+	(getObjectMinValue): Likewise.
+	* javax/imageio/ImageIO.java (getImageReaders): Genericized.
+	(getImageReadersByFormatName): Likewise.
+	(getImageReadersByMIMEType): Likewise.
+	(getImageTranscoders): Likewise.
+	(getImageWritersByFormatName): Likewise.
+	(getImageWritersByMIMEType): Likewise.
+	(getImageWritersBySuffix): Likewise.
+	(getImageReader): Use getOriginatingProvider.
+	(getImageWriter): Likewise.
+	* javax/imageio/ImageWriter.java (progressListeners): Genericized.
+	(warningListeners): Likewise.
+	(warningLocales): Likewise.
+	(prepareInsertEmpty): Likewise.
+	(prepareWriteEmpty): Likewise.
+	* javax/imageio/ImageReader.java (progressListeners): Genericized.
+	(updateListeners): Likewise.
+	(warningListeners): Likewise.
+	(warningLocales): Likewise.
+	(getDestination): Likewise.
+	(getImageMetadata): Likewise.
+	(getImageTypes): Likewise.
+	(getStreamMetadata): Likewise.
+	(readAll): Likewise.
+	* javax/imageio/IIOImage.java (IIOImage): Genericized.
+	(thumbnails): Likewise.
+	(getThumbnails): Likewise.
+	(setThumbnails): Likewise.
+
 2005-11-29  Tom Tromey  <tromey@redhat.com>
 
 	* javax/swing/text/StyleContext.java (removeAttributes): Genericized.

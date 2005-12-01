@@ -436,7 +436,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if formatName is null
    */
-  public static Iterator getImageReadersByFormatName(String formatName)
+  public static Iterator<ImageReader> getImageReadersByFormatName(String formatName)
   {
     if (formatName == null)
       throw new IllegalArgumentException("formatName may not be null");
@@ -457,7 +457,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if MIMEType is null
    */
-  public static Iterator getImageReadersByMIMEType(String MIMEType)
+  public static Iterator<ImageReader> getImageReadersByMIMEType(String MIMEType)
   {
     if (MIMEType == null)
       throw new IllegalArgumentException("MIMEType may not be null");
@@ -497,7 +497,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if formatName is null
    */
-  public static Iterator getImageWritersByFormatName(String formatName)
+  public static Iterator<ImageWriter> getImageWritersByFormatName(String formatName)
   {
     if (formatName == null)
       throw new IllegalArgumentException("formatName may not be null");
@@ -518,7 +518,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if MIMEType is null
    */
-  public static Iterator getImageWritersByMIMEType(String MIMEType)
+  public static Iterator<ImageWriter> getImageWritersByMIMEType(String MIMEType)
   {
     if (MIMEType == null)
       throw new IllegalArgumentException("MIMEType may not be null");
@@ -538,7 +538,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if fileSuffix is null
    */
-  public static Iterator getImageWritersBySuffix(String fileSuffix)
+  public static Iterator<ImageWriter> getImageWritersBySuffix(String fileSuffix)
   {
     if (fileSuffix == null)
       throw new IllegalArgumentException("fileSuffix may not be null");
@@ -1068,8 +1068,7 @@ public final class ImageIO
     if (writer == null)
       throw new IllegalArgumentException ("null argument");
 
-    ImageWriterSpi spi = (ImageWriterSpi) getRegistry()
-      .getServiceProviderByClass(writer.getClass());
+    ImageWriterSpi spi = writer.getOriginatingProvider();
 
     String[] readerSpiNames = spi.getImageReaderSpiNames();
 
@@ -1098,12 +1097,12 @@ public final class ImageIO
    *
    * @return an iterator over a collection of image readers
    */
-  public static Iterator getImageReaders (Object input)
+  public static Iterator<ImageReader> getImageReaders (Object input)
   {
     if (input == null)
       throw new IllegalArgumentException ("null argument");
 
-    return getRegistry().getServiceProviders (ImageReaderSpi.class,
+    return getRegistry().getServiceProviders (ImageReader.class,
 					      new ReaderObjectFilter(input),
 					      true);
   }
@@ -1149,8 +1148,7 @@ public final class ImageIO
     if (reader == null)
       throw new IllegalArgumentException ("null argument");
 
-    ImageReaderSpi spi = (ImageReaderSpi) getRegistry()
-      .getServiceProviderByClass(reader.getClass());
+    ImageReaderSpi spi = reader.getOriginatingProvider();
 
     String[] writerSpiNames = spi.getImageWriterSpiNames();
 
@@ -1184,13 +1182,13 @@ public final class ImageIO
    * @exception IllegalArgumentException if either reader or writer is
    * null
    */
-  public static Iterator getImageTranscoders (ImageReader reader,
-					      ImageWriter writer)
+  public static Iterator<ImageTranscoder> getImageTranscoders (ImageReader reader,
+                                                               ImageWriter writer)
   {
     if (reader == null || writer == null)
       throw new IllegalArgumentException ("null argument");
 
-    return getRegistry().getServiceProviders (ImageTranscoderSpi.class,
+    return getRegistry().getServiceProviders (ImageTranscoder.class,
 					      new TranscoderFilter (reader,
                                                                     writer),
 					      true);
