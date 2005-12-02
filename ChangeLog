@@ -1,5 +1,17 @@
 2005-12-02  Tom Tromey  <tromey@redhat.com>
 
+	* javax/sound/sampled/Port.java (Info): Genericized.
+	* javax/sound/sampled/Line.java (Info): Genericized.
+	(getLineClass): Likewise.
+	* javax/sound/sampled/DataLine.java (Info): Genericized.
+	* javax/sound/sampled/AudioFormat.java (AudioFormat): Genericized.
+	(properties): Likewise.
+	* javax/sound/sampled/AudioFileFormat.java (AudioFileFormat):
+	Genericized.
+	(properties): Likewise.
+
+2005-12-02  Tom Tromey  <tromey@redhat.com>
+
 	* javax/naming/directory/InitialDirContext.java (search): Genericized.
 	* javax/naming/directory/BasicAttributes.java (getAll): Genericized.
 	(getIDs): Likewise.
