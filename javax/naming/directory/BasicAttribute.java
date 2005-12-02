@@ -178,7 +178,7 @@ public class BasicAttribute implements Attribute
     return values.get (index);
   }
 
-  public NamingEnumeration<Attribute> getAll ()
+  public NamingEnumeration<?> getAll ()
     throws NamingException
   {
     return new BasicAttributeEnumeration ();

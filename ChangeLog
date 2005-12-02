@@ -1,3 +1,16 @@
+2005-12-02  Tom Tromey  <tromey@redhat.com>
+
+	* javax/naming/directory/InitialDirContext.java (search): Genericized.
+	* javax/naming/directory/BasicAttributes.java (getAll): Genericized.
+	(getIDs): Likewise.
+	* javax/naming/directory/BasicAttribute.java (getAll): Fixed return
+	type.
+	* javax/naming/InitialContext.java: Genericized.
+	(list): Likewise.
+	(listBindings): Likewise.
+	* javax/naming/CompoundName.java (getAll): Genericized.
+	* javax/naming/CompositeName.java (getAll): Genericized.
+
 2005-12-01  Tom Tromey  <tromey@redhat.com>
 
 	* javax/imageio/spi/RegisterableService.java (onRegistration):

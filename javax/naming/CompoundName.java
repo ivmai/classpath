@@ -285,7 +285,7 @@ public class CompoundName implements Name, Cloneable, Serializable
     return (String) elts.get (posn);
   }
 
-  public Enumeration getAll ()
+  public Enumeration<String> getAll ()
   {
     return elts.elements ();
   }
