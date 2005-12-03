@@ -1,3 +1,20 @@
+2005-12-03  Nicolas Geoffray  <nicolas.geoffray@menlina.com>
+	* java/lang/instrument: New directory.
+	* java/lang/instrument/ClassDefinition.java:
+	New file.
+	* java/lang/instrument/ClassFileTransformer.java:
+	New file.
+	* java/lang/instrument/IllegalClassFormatException.java:
+	New file.
+	* java/lang/instrument/Instrumentation.java:
+	New file.
+	* java/lang/instrument/UnmodifiableClassException.java:
+	New file.
+	* java/lang/InstrumentationImpl.java:
+	New file.
+	* vm/reference/java/lang/VMInstrumentationImpl.java:
+	New file. 
+
 2005-12-02  Tom Tromey  <tromey@redhat.com>
 
 	* javax/sound/sampled/Port.java (Info): Genericized.
