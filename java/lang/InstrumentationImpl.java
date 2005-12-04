@@ -154,7 +154,7 @@ final class InstrumentationImpl implements Instrumentation
     if (!isRedefineClassesSupported())
       throw new UnsupportedOperationException();
     
-    VMInstrumentationImpl.redefineClasses(definitions);
+    VMInstrumentationImpl.redefineClasses(this, definitions);
   }
 
 

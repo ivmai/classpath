@@ -40,6 +40,7 @@ exception statement from your version. */
 package java.lang;
 
 import java.lang.instrument.ClassDefinition;
+import java.lang.instrument.Instrumentation;
 
 /**
  * @author Nicolas Geoffray (nicolas.geoffray@menlina.com)
@@ -59,6 +60,7 @@ final class VMInstrumentationImpl
    * Redefines classes given as parameters. The method has to call
    * the callTransformers from InstrumentationImpl
    *
+   * @param inst an instrumentation object
    * @param definitions an array of bytecode<->class correspondance
    *
    * @throws ClassNotFoundException if a class cannot be found 
@@ -74,7 +76,8 @@ final class VMInstrumentationImpl
    * classes
    * @throws LinkageError if a linkage error occurs 
    */
-  static native void redefineClasses(ClassDefinition[] definitions);
+  static native void redefineClasses(Instrumentation inst,
+      ClassDefinition[] definitions);
  
   /**
    * Get all the classes loaded by the JVM.

@@ -1,4 +1,15 @@
+2005-12-04  Nicolas Geoffray  <nicolas.geoffray@menlina.com>
+
+	* vm/reference/java/lang/VMInstrumentationImpl.java
+	(redefineClasses): Added an extra parameter of type
+	java.lang.instrument.Instrument.
+	* java/lang/InstrumentationImpl.java
+	(redefineClasses): Added the Instrumentation object
+	to the arguments of VMInstrumentationImpl.redefineClasses
+	call. 
+
 2005-12-03  Nicolas Geoffray  <nicolas.geoffray@menlina.com>
+	
 	* java/lang/instrument: New directory.
 	* java/lang/instrument/ClassDefinition.java:
 	New file.
