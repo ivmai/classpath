@@ -58,7 +58,7 @@ public interface ClassFileTransformer
    * Implementation of this method transforms a class by redefining its
    * bytecodes. Once a ClassFileTransformer object registers itself to the
    * Instrumentation object, this method will be called each time a class is
-   * defined (<code> ClassLoader.defineClass </code> or redefined
+   * defined (<code>ClassLoader.defineClass</code>) or redefined
    * (<code>Instrumentation.redefineClasses</code>)
    * @param loader the loader of the class
    * @param className the name of the class with packages separated with "/"

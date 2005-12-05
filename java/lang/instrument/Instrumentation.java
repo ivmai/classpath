@@ -101,8 +101,8 @@ public interface Instrumentation
    * @throws NullPointerException if the definitions array is null, or any
    * of its element
    *
-   * @see isRedefineClassesSupported()
-   * @see addTransformer(java.lang.instrument.ClassFileTransformer)
+   * @see #isRedefineClassesSupported()
+   * @see #addTransformer(java.lang.instrument.ClassFileTransformer)
    * @see ClassFileTransformer
    */
   void redefineClasses(ClassDefinition[] definitions)

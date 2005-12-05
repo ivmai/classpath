@@ -1,3 +1,10 @@
+2005-12-05  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/instrument/Instrumentation.java (redefineClasses): Javadoc
+	fix.
+	* java/lang/instrument/ClassFileTransformer.java (transform): Javadoc
+	fix.
+
 2005-12-04  Nicolas Geoffray  <nicolas.geoffray@menlina.com>
 
 	* vm/reference/java/lang/VMInstrumentationImpl.java
