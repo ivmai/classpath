@@ -50,23 +50,14 @@ exception statement from your version. */
 #include <fcntl.h>
 #include <stdio.h>
 
+#include <jcl.h>
+
 #include "target_native.h"
 #include "target_native_misc.h"
 
 /* Internal functions */
 static char *copy_string (JNIEnv * env, jobject string);
 static char *copy_elem (JNIEnv * env, jobject stringArray, jint i);
-
-/* Some O/S's don't declare 'environ' */
-#if HAVE_CRT_EXTERNS_H
-/* Darwin does not have a variable named environ
-   but has a function which you can get the environ
-   variable with.  */
-#include <crt_externs.h>
-#define environ (*_NSGetEnviron())
-#else
-extern char **environ;
-#endif /* HAVE_CRT_EXTERNS_H */
 
 /*
  * Internal helper function to copy a String in UTF-8 format.

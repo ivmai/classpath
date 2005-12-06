@@ -159,7 +159,6 @@ JNIEXPORT jobject JNICALL
 Java_java_lang_VMSystem_environ (JNIEnv *env,
 				jclass klass __attribute__((__unused__)))
 {
-  extern char** environ;
   char **env_pointer;
   jobject variables;
   jclass list_class;
