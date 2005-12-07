@@ -1,5 +1,13 @@
 2005-12-06  Tom Tromey  <tromey@redhat.com>
 
+	* javax/security/auth/Subject.java (Subject): Genericized.
+	(getPrincipals): Likewise.
+	(getPrivateCredentials): Likewise.
+	(getPublicCredentials): Likewise.
+	(getPublicCredentials): Likewise.
+
+2005-12-06  Tom Tromey  <tromey@redhat.com>
+
 	* javax/imageio/ImageIO.java (ImageReaderIterator): Genericized.
 	Added new constructor.
 	(ImageWriterIterator): Likewise.
