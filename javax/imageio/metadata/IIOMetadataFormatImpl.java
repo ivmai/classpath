@@ -836,7 +836,7 @@ public abstract class IIOMetadataFormatImpl implements IIOMetadataFormat
     return ((Integer) ((NodeObjectArray) getNodeObject (node)).getArrayMinLength ()).intValue();
   }
 
-  public Class getObjectClass (String elementName)
+  public Class<?> getObjectClass (String elementName)
   {
     IIOMetadataNode node = (IIOMetadataNode) nodes.get (elementName);
     return getNodeObject (node).getClassType ();
@@ -854,13 +854,13 @@ public abstract class IIOMetadataFormatImpl implements IIOMetadataFormat
     return ((NodeObjectEnumerated) getNodeObject (node)).getEnumerations ();
   }
 
-  public Comparable getObjectMaxValue (String elementName)
+  public Comparable<?> getObjectMaxValue (String elementName)
   {
     IIOMetadataNode node = (IIOMetadataNode) nodes.get (elementName);
     return ((NodeObjectBounded) getNodeObject (node)).getMaxValue ();
   }
 
-  public Comparable getObjectMinValue (String elementName)
+  public Comparable<?> getObjectMinValue (String elementName)
   {
     IIOMetadataNode node = (IIOMetadataNode) nodes.get (elementName);
     return ((NodeObjectBounded) getNodeObject (node)).getMinValue ();

@@ -315,15 +315,22 @@ public final class ImageIO
     }
   }
 
-  private static final class ImageReaderIterator implements Iterator
+  private static final class ImageReaderIterator
+    implements Iterator<ImageReader>
   {
-    Iterator it;
+    Iterator<ImageReaderSpi> it;
     Object readerExtension;
     
-    public ImageReaderIterator(Iterator it, Object readerExtension)
+    public ImageReaderIterator(Iterator<ImageReaderSpi> it,
+                               Object readerExtension)
     {
       this.it = it;
       this.readerExtension = readerExtension;
+    }
+    
+    public ImageReaderIterator(Iterator<ImageReaderSpi> it)
+    {
+      this.it = it;
     }
 
     public boolean hasNext()
@@ -331,11 +338,14 @@ public final class ImageIO
       return it.hasNext();
     }
 
-    public Object next()
+    public ImageReader next()
     {
       try
         {
-          return ((ImageReaderSpi) it.next()).createReaderInstance(readerExtension);
+          ImageReaderSpi spi = it.next();
+          return (readerExtension == null
+              ? spi.createReaderInstance()
+              : spi.createReaderInstance(readerExtension));
         }
       catch (IOException e)
         {
@@ -349,15 +359,22 @@ public final class ImageIO
     }
   }
 
-  private static final class ImageWriterIterator implements Iterator
+  private static final class ImageWriterIterator
+    implements Iterator<ImageWriter>
   {
-    Iterator it;
+    Iterator<ImageWriterSpi> it;
     Object writerExtension;
     
-    public ImageWriterIterator(Iterator it, Object writerExtension)
+    public ImageWriterIterator(Iterator<ImageWriterSpi> it,
+                               Object writerExtension)
     {
       this.it = it;
       this.writerExtension = writerExtension;
+    }
+    
+    public ImageWriterIterator(Iterator<ImageWriterSpi> it)
+    {
+      this.it = it;
     }
 
     public boolean hasNext()
@@ -365,11 +382,14 @@ public final class ImageIO
       return it.hasNext();
     }
 
-    public Object next()
+    public ImageWriter next()
     {
       try
         {
-          return ((ImageWriterSpi) it.next()).createWriterInstance(writerExtension);
+          ImageWriterSpi spi = it.next();
+          return (writerExtension == null
+              ? spi.createWriterInstance()
+              : spi.createWriterInstance(writerExtension));
         }
       catch (IOException e)
         {
@@ -386,13 +406,14 @@ public final class ImageIO
   private static File cacheDirectory;
   private static boolean useCache = true;
 
-  private static Iterator getReadersByFilter(Class type,
-                                             ServiceRegistry.Filter filter,
-                                             Object readerExtension)
+  private static Iterator<ImageReader> getReadersByFilter(Class<ImageReaderSpi> type,
+                                                          ServiceRegistry.Filter filter,
+                                                          Object readerExtension)
   {
     try
       {
-        Iterator it = getRegistry().getServiceProviders(type, filter, true);
+        Iterator<ImageReaderSpi> it
+          = getRegistry().getServiceProviders(type, filter, true);
         return new ImageReaderIterator(it, readerExtension);
       }
     catch (IllegalArgumentException e)
@@ -401,13 +422,14 @@ public final class ImageIO
       }
   }
   
-  private static Iterator getWritersByFilter(Class type,
-					     ServiceRegistry.Filter filter,
-                                             Object writerExtension)
+  private static Iterator<ImageWriter> getWritersByFilter(Class<ImageWriterSpi> type,
+                                                          ServiceRegistry.Filter filter,
+                                                          Object writerExtension)
   {
     try
       {
-        Iterator it = getRegistry().getServiceProviders(type, filter, true);
+        Iterator<ImageWriterSpi> it
+          = getRegistry().getServiceProviders(type, filter, true);
         return new ImageWriterIterator(it, writerExtension);
       }
     catch (IllegalArgumentException e)
@@ -477,7 +499,7 @@ public final class ImageIO
    *
    * @exception IllegalArgumentException if fileSuffix is null
    */
-  public static Iterator getImageReadersBySuffix(String fileSuffix)
+  public static Iterator<ImageReader> getImageReadersBySuffix(String fileSuffix)
   {
     if (fileSuffix == null)
       throw new IllegalArgumentException("formatName may not be null");
@@ -1102,9 +1124,11 @@ public final class ImageIO
     if (input == null)
       throw new IllegalArgumentException ("null argument");
 
-    return getRegistry().getServiceProviders (ImageReader.class,
-					      new ReaderObjectFilter(input),
-					      true);
+    Iterator<ImageReaderSpi> spiIterator
+      = getRegistry().getServiceProviders (ImageReaderSpi.class,
+                                           new ReaderObjectFilter(input),
+                                           true);
+    return new ImageReaderIterator(spiIterator);
   }
 
   /**
@@ -1117,16 +1141,18 @@ public final class ImageIO
    *
    * @return an iterator over a collection of image writers
    */
-  public static Iterator getImageWriters (ImageTypeSpecifier type,
+  public static Iterator<ImageWriter> getImageWriters (ImageTypeSpecifier type,
 					  String formatName)
   {
     if (type == null || formatName == null)
       throw new IllegalArgumentException ("null argument");
 
-    return getRegistry().getServiceProviders (ImageWriterSpi.class,
-					      new WriterObjectFilter(type,
-                                                                     formatName),
-					      true);
+    final Iterator<ImageWriterSpi> spiIterator
+      = getRegistry().getServiceProviders (ImageWriterSpi.class,
+                                           new WriterObjectFilter(type,
+                                                                  formatName),
+                                                                  true);
+    return new ImageWriterIterator(spiIterator);
   }
 
   /**
@@ -1188,9 +1214,27 @@ public final class ImageIO
     if (reader == null || writer == null)
       throw new IllegalArgumentException ("null argument");
 
-    return getRegistry().getServiceProviders (ImageTranscoder.class,
-					      new TranscoderFilter (reader,
-                                                                    writer),
-					      true);
+    final Iterator<ImageTranscoderSpi> spiIterator
+      = getRegistry().getServiceProviders (ImageTranscoderSpi.class,
+                                           new TranscoderFilter (reader,
+                                                                 writer),
+                                           true);
+    return new Iterator<ImageTranscoder>()
+    {
+      public boolean hasNext()
+      {
+        return spiIterator.hasNext();
+      }
+      
+      public ImageTranscoder next()
+      {
+        return spiIterator.next().createTranscoderInstance();
+      }
+      
+      public void remove()
+      {
+        throw new UnsupportedOperationException();
+      }
+    };
   }
 }

@@ -52,7 +52,7 @@ public interface Attribute extends Serializable
    * 
    * @return The concrete {@link Class} instance of the attribute class.
    */
-  Class getCategory ();
+  Class<?> getCategory ();
 
   /**
    * Returns the descriptive name of the attribute category.

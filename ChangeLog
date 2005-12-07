@@ -1,3 +1,36 @@
+2005-12-06  Tom Tromey  <tromey@redhat.com>
+
+	* javax/imageio/ImageIO.java (ImageReaderIterator): Genericized.
+	Added new constructor.
+	(ImageWriterIterator): Likewise.
+	(getReadersByFilter): Genericized.
+	(getWritersByFilter): Likewise.
+	(getImageReadersBySuffix): Likewise.
+	(getImageWriters): Likewise.
+	(hasNext): Likewise.
+	* javax/print/attribute/AttributeSetUtilities.java
+	(verifyAttributeCategory): Genericized.
+	(verifyAttributeValue): Likewise.
+	(verifyCategoryForValue): Likewise.
+	* javax/print/attribute/AttributeSet.java (containsKey): Genericized.
+	(get): Likewise.
+	(remove): Likewise.
+	* javax/print/attribute/Attribute.java (getCategory): Genericized.
+	* javax/print/attribute/HashAttributeSet.java (HashAttributeSet):
+	Genericized.
+	(containsKey): Likewise.
+	* javax/imageio/spi/ServiceRegistry.java (deregisterAll):
+	Genericized.
+	* javax/imageio/spi/IIOServiceProvider.java (onDeregistration):
+	Genericized.
+	(onRegistration): Likewise.
+	* javax/imageio/metadata/IIOMetadataFormatImpl.java (getObjectClass):
+	Genericized.
+	(getObjectMaxValue): Likewise.
+	(getObjectMinValue): Likewise.
+	* javax/imageio/ImageIO.java (getImageReadersBySuffix): Genericized.
+	(getImageWriters): Likewise.
+
 2005-12-05  Casey Marshall <csm@gnu.org>
 
 	* native/jni/classpath/jcl.h (environ): define, or declare

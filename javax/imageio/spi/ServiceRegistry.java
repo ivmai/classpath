@@ -535,7 +535,7 @@ public class ServiceRegistry
    * #ServiceRegistry(Iterator) constructor} of this
    * <code>ServiceRegistry</code>.
    */
-  public synchronized void deregisterAll(Class category)
+  public synchronized void deregisterAll(Class<?> category)
   {
     boolean ok = false;
 
