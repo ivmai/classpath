@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package javax.print.attribute.standard;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.SetOfIntegerSyntax;
 import javax.print.attribute.SupportedValuesAttribute;
 
@@ -62,7 +63,7 @@ public final class JobKOctetsSupported extends SetOfIntegerSyntax
    *
    * @return the class <code>ColorSupported</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobKOctetsSupported.class;
   }

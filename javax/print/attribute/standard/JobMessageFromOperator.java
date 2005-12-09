@@ -40,6 +40,7 @@ package javax.print.attribute.standard;
 
 import java.util.Locale;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.PrintJobAttribute;
 import javax.print.attribute.TextSyntax;
 
@@ -83,7 +84,7 @@ public final class JobMessageFromOperator extends TextSyntax
    *
    * @return the class <code>JobMessageFromOperator</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobMessageFromOperator.class;
   }

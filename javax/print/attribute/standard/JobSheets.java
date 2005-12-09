@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package javax.print.attribute.standard;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.EnumSyntax;
 import javax.print.attribute.PrintJobAttribute;
 import javax.print.attribute.PrintRequestAttribute;
@@ -66,7 +67,7 @@ public class JobSheets extends EnumSyntax
    *
    * @return the class <code>JobSheets</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobSheets.class;
   }

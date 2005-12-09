@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package javax.print.attribute.standard;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.DocAttribute;
 import javax.print.attribute.PrintJobAttribute;
 import javax.print.attribute.PrintRequestAttribute;
@@ -65,7 +66,7 @@ public final class PrinterResolution extends ResolutionSyntax
    *
    * @return the class <code>PrinterResolution</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return PrinterResolution.class;
   }

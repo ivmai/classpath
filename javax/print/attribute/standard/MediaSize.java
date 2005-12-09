@@ -79,7 +79,7 @@ public class MediaSize extends Size2DSyntax
    *
    * @return the class <code>MediaSize</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return MediaSize.class;
   }

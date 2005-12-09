@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package javax.print.attribute.standard;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.IntegerSyntax;
 import javax.print.attribute.PrintJobAttribute;
 
@@ -83,7 +84,7 @@ public final class JobMediaSheetsCompleted extends IntegerSyntax
    *
    * @return the class <code>JobMediaSheetsCompleted</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobMediaSheetsCompleted.class;
   }

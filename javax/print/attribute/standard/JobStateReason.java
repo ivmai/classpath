@@ -92,7 +92,7 @@ public class JobStateReason extends EnumSyntax
    *
    * @return the class <code>JobStateReason</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobStateReason.class;
   }

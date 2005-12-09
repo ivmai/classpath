@@ -40,6 +40,7 @@ package javax.print.attribute.standard;
 
 import java.util.HashMap;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.PrintServiceAttribute;
 
 /**
@@ -56,7 +57,7 @@ public final class PrinterStateReasons
    *
    * @return the class <code>PrintStateReasons</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return PrinterStateReasons.class;
   }

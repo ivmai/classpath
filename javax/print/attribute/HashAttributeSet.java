@@ -298,7 +298,7 @@ public class HashAttributeSet implements AttributeSet, Serializable
    * @throws ClassCastException if category is not implementing 
    * <code>Attribute</code>.
    */
-  public Attribute get(Class category)
+  public Attribute get(Class<?> category)
   {
     if (category == null)
       throw new NullPointerException("category may not be null");
@@ -356,7 +356,7 @@ public class HashAttributeSet implements AttributeSet, Serializable
    * @return <code>true</code> if an attribute is removed, false in all other cases. 
    * @throws UnmodifiableSetException if the set does not support modification.
    */
-  public boolean remove(Class category)
+  public boolean remove(Class<?> category)
   {
     if (category == null)
       return false;

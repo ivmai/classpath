@@ -40,6 +40,7 @@ package javax.print.attribute.standard;
 
 import java.util.HashSet;
 
+import javax.print.attribute.Attribute;
 import javax.print.attribute.PrintJobAttribute;
 
 /**
@@ -55,7 +56,7 @@ public final class JobStateReasons extends HashSet<JobStateReason>
    *
    * @return the class <code>ColorSupported</code> itself
    */
-  public Class getCategory()
+  public Class< ? extends Attribute> getCategory()
   {
     return JobStateReasons.class;
   }
