@@ -467,7 +467,9 @@ public abstract class ClassLoader
     checkInitialized();
     if (domain == null)
       domain = StaticData.defaultProtectionDomain;
-    return VMClassLoader.defineClass(this, name, data, offset, len, domain);
+    
+    return VMClassLoader.defineClassWithTransformers(this, name, data, offset,
+        len, domain);
   }
 
   /**
