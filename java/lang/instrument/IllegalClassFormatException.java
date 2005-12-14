@@ -45,7 +45,7 @@ package java.lang.instrument;
  */
 public class IllegalClassFormatException extends Exception
 {
-  
+
   /**
    * Compatible with JDK 1.5+.
    */
@@ -54,9 +54,10 @@ public class IllegalClassFormatException extends Exception
   /**
    * Create an exception without a message.
    */
-  public IllegalClassFormatException(){
+  public IllegalClassFormatException()
+  {
   }
-  
+
   /**
    * Create an exception with a message.
    *

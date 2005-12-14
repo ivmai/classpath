@@ -1,5 +1,11 @@
 2005-12-13  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/instrument/ClassDefinition.java: Reformatted.
+	* java/lang/instrument/UnmodifiableClassException.java: Reformatted.
+	* java/lang/instrument/IllegalClassFormatException.java: Reformatted.
+
+2005-12-13  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/instrument/ClassDefinition.java (ClassDefinition): Now
 	public.
 

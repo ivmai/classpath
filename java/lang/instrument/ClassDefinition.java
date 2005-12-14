@@ -71,16 +71,16 @@ public final class ClassDefinition
   /**
    * @return the Class
    */
-  public Class<?> getDefinitionClass(){
+  public Class<?> getDefinitionClass()
+  {
     return theClass;
   }
 
   /**
    * @return the bytes
    */
-  public byte[] getDefinitionClassFile(){
+  public byte[] getDefinitionClassFile()
+  {
     return theClassFile;
   }
-
 }
-

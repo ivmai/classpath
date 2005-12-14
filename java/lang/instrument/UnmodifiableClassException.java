@@ -53,9 +53,10 @@ public class UnmodifiableClassException extends Exception
   /**
    * Create an exception without a message.
    */
-  public UnmodifiableClassException(){
+  public UnmodifiableClassException()
+  {
   }
-  
+
   /**
    * Create an exception with a message.
    *
