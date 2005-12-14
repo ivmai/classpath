@@ -1,3 +1,8 @@
+2005-12-13  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/instrument/ClassDefinition.java (ClassDefinition): Now
+	public.
+
 2005-12-09  Tom Tromey  <tromey@redhat.com>
 
 	* javax/print/attribute/standard/Chromaticity.java

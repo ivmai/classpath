@@ -60,7 +60,8 @@ public final class ClassDefinition
    * @param theClassFile the new class file
    * @throws NullPointerException if one of the argument is null
    */
-  ClassDefinition(Class<?> theClass, byte[] theClassFile){
+  public ClassDefinition(Class<?> theClass, byte[] theClassFile)
+  {
     if (theClass == null || theClassFile == null)
       throw new NullPointerException();
     this.theClass = theClass;
