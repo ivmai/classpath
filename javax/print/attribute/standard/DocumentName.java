@@ -1,5 +1,5 @@
 /* DocumentName.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,6 +45,18 @@ import javax.print.attribute.DocAttribute;
 import javax.print.attribute.TextSyntax;
 
 /**
+ * The <code>DocumentName</code> printing attribute specifies a document name.
+ * <p>
+ * The document name may be different than the name of the job. It must not be
+ * unique across multiple documents in the same print job. Normally, an 
+ * application provides the document name for the user by using e.g. the file 
+ * name or a name generated automatically by the application.
+ * </p>
+ * <p>
+ * <b>IPP Compatibility:</b> DocumentName is an IPP 1.1 attribute.
+ * </p>
+ * @see javax.print.attribute.standard.JobName
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class DocumentName extends TextSyntax
@@ -56,6 +68,8 @@ public final class DocumentName extends TextSyntax
    * Creates a <code>DocumentName</code> object.
    *
    * @param documentName the document name
+   * @param locale the locale to use, if <code>null</code> the default
+   * locale is used.
    *
    * @exception NullPointerException if documentName is null
    */
@@ -65,11 +79,12 @@ public final class DocumentName extends TextSyntax
   }
 
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -82,7 +97,7 @@ public final class DocumentName extends TextSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>DocumentName</code> itself
+   * @return The class <code>DocumentName</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -90,9 +105,9 @@ public final class DocumentName extends TextSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "document-name"
+   * @return The name "document-name".
    */
   public String getName()
   {

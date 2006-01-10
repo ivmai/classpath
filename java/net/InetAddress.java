@@ -649,8 +649,11 @@ public class InetAddress implements Serializable
 
     InetAddress[] addresses;
 
+    if (hostname != null)
+      hostname = hostname.trim();
+
     // Default to current host if necessary
-    if (hostname == null)
+    if (hostname == null || hostname.equals(""))
       {
 	addresses = new InetAddress[1];
 	addresses[0] = LOCALHOST;
@@ -757,6 +760,7 @@ public class InetAddress implements Serializable
       {
 	byte[] tmp = VMInetAddress.lookupInaddrAny();
 	inaddr_any = new Inet4Address(tmp, null);
+	inaddr_any.hostName = inaddr_any.getHostName();
       }
 
     return inaddr_any;

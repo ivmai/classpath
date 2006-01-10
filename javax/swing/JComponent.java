@@ -45,7 +45,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -621,7 +620,6 @@ public abstract class JComponent extends Container implements Serializable
   public JComponent()
   {
     super();
-    super.setLayout(new FlowLayout());
     setDropTarget(new DropTarget());
     defaultLocale = Locale.getDefault();
     debugGraphicsOptions = DebugGraphics.NONE_OPTION;
@@ -1296,7 +1294,7 @@ public abstract class JComponent extends Container implements Serializable
   {
     Dimension prefSize = null;
     if (preferredSize != null)
-      prefSize = preferredSize;
+      prefSize = new Dimension(preferredSize);
 
     else if (ui != null)
       {
@@ -1307,12 +1305,7 @@ public abstract class JComponent extends Container implements Serializable
 
     if (prefSize == null)
       prefSize = super.getPreferredSize();
-    // make sure that prefSize is not smaller than minSize
-    if (minimumSize != null && prefSize != null
-        && (minimumSize.width > prefSize.width
-            || minimumSize.height > prefSize.height))
-        prefSize = new Dimension(Math.max(minimumSize.width, prefSize.width),
-                                 Math.max(minimumSize.height, prefSize.height));
+
     return prefSize;
   }
 
@@ -2740,7 +2733,7 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void updateUI()
   {
-    System.out.println("update UI not overwritten in class: " + this);
+    // Nothing to do here.
   }
 
   public static Locale getDefaultLocale()
@@ -3271,7 +3264,7 @@ public abstract class JComponent extends Container implements Serializable
         Rectangle target = SwingUtilities.convertRectangle(found,
                                                            currentClip,
                                                            newParent);
-        if (target.contains(parRect) || target.intersects(parRect))
+        if (! target.intersection(parRect).equals(target))
           {
             found = newParent;
             currentClip = target;
@@ -3287,10 +3280,12 @@ public abstract class JComponent extends Container implements Serializable
         boolean skip = true;
         for (int i = children.length - 1; i >= 0; i--)
           {
+            boolean nextSkip = skip;
             if (children[i] == parent)
-              skip = false;
+              nextSkip = false;
             if (skip)
               continue;
+            skip = nextSkip;
             Component c = children[i];
             Rectangle compBounds = c.getBounds();
             // If the component completely overlaps the clip in question, we

@@ -1,5 +1,5 @@
 /* RequestingUserName.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,6 +45,12 @@ import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.TextSyntax;
 
 /**
+ * The <code>RequestingUserName</code> attribute provides the name of 
+ * the user which requests the printing of the given job.
+ * <p>
+ * <b>IPP Compatibility:</b> RequestingUserName is an IPP 1.1 attribute.
+ * </p>
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class RequestingUserName extends TextSyntax
@@ -55,10 +61,11 @@ public final class RequestingUserName extends TextSyntax
   /**
    * Creates a <code>RequestingUserName</code> object.
    *
-   * @param userName the job name
-   * @param locale the locale of the user, null means default locale
+   * @param userName the user name
+   * @param locale the locale to use, if <code>null</code> the default
+   * locale is used.
    *
-   * @exception NullPointerException if userName is null
+   * @exception NullPointerException if userName is <code>null</code>.
    */
   public RequestingUserName(String userName, Locale locale)
   {
@@ -66,11 +73,12 @@ public final class RequestingUserName extends TextSyntax
   }
 
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -83,7 +91,7 @@ public final class RequestingUserName extends TextSyntax
   /**
    * Returns category of this attribute.
    *
-   * @return the class <code>RequestingUserName</code> itself
+   * @return The class <code>RequestingUserName</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -91,9 +99,9 @@ public final class RequestingUserName extends TextSyntax
   }
 
   /**
-   * Returns name of this attribute.
+   * Returns the name of this attribute.
    *
-   * @return the string "requesting-user-name"
+   * @return The name "requesting-user-name".
    */
   public String getName()
   {

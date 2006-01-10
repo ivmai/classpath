@@ -38,9 +38,9 @@ exception statement from your version. */
 
 package java.lang;
 
+import gnu.java.util.WeakIdentityHashMap;
 import java.security.Permission;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
  * "The Java Language Specification", ISBN 0-201-63451-1
@@ -141,7 +141,7 @@ public class Thread implements Runnable
   /** Thread local storage. Package accessible for use by
     * InheritableThreadLocal.
     */
-  WeakHashMap locals;
+  WeakIdentityHashMap locals;
 
   /** The uncaught exception handler.  */
   UncaughtExceptionHandler exceptionHandler;
@@ -1015,7 +1015,7 @@ public class Thread implements Runnable
     Map locals = thread.locals;
     if (locals == null)
       {
-        locals = thread.locals = new WeakHashMap();
+        locals = thread.locals = new WeakIdentityHashMap();
       }
     return locals;
   }

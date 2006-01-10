@@ -590,8 +590,7 @@ public final class Class<T>
   /**
    * Returns the <code>Package</code> in which this class is defined
    * Returns null when this information is not available from the
-   * classloader of this class or when the classloader of this class
-   * is null.
+   * classloader of this class.
    *
    * @return the package for this class, if it is available
    * @since 1.2
@@ -843,7 +842,10 @@ public final class Class<T>
    */
   public int getModifiers()
   {
-    return VMClass.getModifiers (this, false);
+    int mod = VMClass.getModifiers (this, false);
+    return (mod & (Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE |
+          Modifier.FINAL | Modifier.STATIC | Modifier.ABSTRACT |
+          Modifier.INTERFACE));
   }
   
   /**

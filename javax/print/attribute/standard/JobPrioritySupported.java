@@ -1,5 +1,5 @@
 /* JobPrioritySupported.java -- 
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -43,6 +43,20 @@ import javax.print.attribute.SupportedValuesAttribute;
 
 
 /**
+ * The <code>JobPrioritySupported</code> printing attribute provides
+ * the supported values for the <code>JobPriority</code> attribute.
+ * <p>
+ * A client may specify any JobPriority value between 1 and 100. If a
+ * print service supports fewer priority levels it indicates the maximum
+ * levels through this attribute. The print service then automatically 
+ * maps the job priority value provided by the client in an even distribution
+ * over the whole range of 1 to 100.
+ * </p>
+ * <p>
+ * <b>IPP Compatibility:</b> JobPrioritySupported is an IPP 1.1 attribute.
+ * </p>
+ * @see javax.print.attribute.standard.JobPriority
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class JobPrioritySupported extends IntegerSyntax
@@ -55,7 +69,7 @@ public final class JobPrioritySupported extends IntegerSyntax
    *
    * @param value the priority
    *
-   * @exception IllegalArgumentException if value < 1 or value > 100
+   * @exception IllegalArgumentException if value &lt; 1 or value &gt; 100
    */
   public JobPrioritySupported(int value)
   {
@@ -66,11 +80,12 @@ public final class JobPrioritySupported extends IntegerSyntax
   }
 
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -83,7 +98,7 @@ public final class JobPrioritySupported extends IntegerSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>JobPrioritySupported</code> itself
+   * @return The class <code>JobPrioritySupported</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -91,9 +106,9 @@ public final class JobPrioritySupported extends IntegerSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "job-priority-supported"
+   * @return The name "job-priority-supported".
    */
   public String getName()
   {

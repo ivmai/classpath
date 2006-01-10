@@ -424,8 +424,9 @@ public class JViewport extends JComponent implements Accessible
 
   public void setView(Component v)
   {
-    if (viewListener != null)
-      getView().removeComponentListener(viewListener);
+    Component currView = getView();
+    if (viewListener != null && currView != null)
+      currView.removeComponentListener(viewListener);
 
     if (v != null)
       {
@@ -786,6 +787,9 @@ public class JViewport extends JComponent implements Accessible
    */
   void paintSimple(Graphics g)
   {
+    // We need to call this to properly clear the background.
+    paintComponent(g);
+
     Point pos = getViewPosition();
     Component view = getView();
     boolean translated = false;

@@ -298,3 +298,17 @@ terms:
  for any purpose is hereby granted without fee, provided that the
  above copyright notice and this permission notice are included in
  all copies or substantial portions of the software.
+
+The files in java/util/concurrent and subdirectories (with the
+exception of CopyOnWriteArrayList.java), along with
+java.util.NavigableMap, java.util.NavigableSet, java.util.Deque and
+java.util.ArrayDeque, are taken from JSR166 concurrency materials
+maintained by Doug Lea and distributed under the following terms:
+
+ Written by Doug Lea with assistance from members of JCP JSR-166
+ Expert Group and released to the public domain, as explained at
+ http://creativecommons.org/licenses/publicdomain
+ 
+CopyOnWriteArrayList.java has been reimplemented for GNU Classpath,
+and is distributed under the same terms as other GNU Classpath files,
+as specified at the top of this file.

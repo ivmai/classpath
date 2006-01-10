@@ -354,6 +354,14 @@ public final class Security
    */
   public static Provider getProvider(String name)
   {
+    if (name == null)
+      return null;
+    else
+      {
+        name = name.trim();
+        if (name.length() == 0)
+          return null;
+      }
     Provider p;
     int max = providers.size ();
     for (int i = 0; i < max; i++)
@@ -399,20 +407,23 @@ public final class Security
    * </p>
    *
    * @param key the name of the property to be set.
-   * @param datnum the value of the property to be set.
+   * @param datum the value of the property to be set.
    * @throws SecurityException if a security manager exists and its
    * {@link SecurityManager#checkPermission(Permission)} method denies access
    * to set the specified security property value.
    * @see #getProperty(String)
    * @see SecurityPermission
    */
-  public static void setProperty(String key, String datnum)
+  public static void setProperty(String key, String datum)
   {
     SecurityManager sm = System.getSecurityManager();
     if (sm != null)
       sm.checkSecurityAccess("setProperty." + key);
 
-    secprops.put(key, datnum);
+    if (datum == null)
+      secprops.remove(key);
+    else
+      secprops.put(key, datum);
   }
 
   /**

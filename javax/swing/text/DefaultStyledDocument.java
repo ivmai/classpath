@@ -48,6 +48,7 @@ import java.util.Vector;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.UndoableEditEvent;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 
@@ -428,6 +429,9 @@ public class DefaultStyledDocument extends AbstractDocument
 
     /** Holds the length of structural changes. */
     private int length;
+    
+    /** Holds the end offset for structural changes. **/
+    private int endOffset;
 
     /**
      * The number of inserted end tags. This is a counter which always gets
@@ -482,6 +486,85 @@ public class DefaultStyledDocument extends AbstractDocument
     public Element getRootElement()
     {
       return root;
+    }
+
+    /**
+     * Updates the element structure of the document in response to removal of
+     * content. It removes the affected {@link Element}s from the document
+     * structure.
+     *
+     * This method sets some internal parameters and delegates the work
+     * to {@link #removeUpdate}.
+     *
+     * @param offs the offset from which content is remove
+     * @param len the length of the removed content
+     * @param ev the document event that records the changes
+     */
+    public void remove(int offs, int len, DefaultDocumentEvent ev)
+    {
+      offset = offs;
+      length = len;
+      documentEvent = ev;
+      removeUpdate();
+    }
+
+    /**
+     * Updates the element structure of the document in response to removal of
+     * content. It removes the affected {@link Element}s from the document
+     * structure.
+     */
+    protected void removeUpdate()
+    {
+      int startParagraph = root.getElementIndex(offset);
+      int endParagraph = root.getElementIndex(offset + length);
+      Element[] empty = new Element[0];
+      int removeStart = -1;
+      int removeEnd = -1;
+      for (int i = startParagraph;  i < endParagraph; i++)
+        {
+          Element paragraph = root.getElement(i);
+          int contentStart = paragraph.getElementIndex(offset);
+          int contentEnd = paragraph.getElementIndex(offset + length);
+          if (contentStart == paragraph.getStartOffset()
+              && contentEnd == paragraph.getEndOffset())
+            {
+              // In this case we only need to remove the whole paragraph. We
+              // do this in one go after this loop and only record the indices
+              // here.
+              if (removeStart == -1)
+                {
+                  removeStart = i;
+                  removeEnd = i;
+                }
+              else
+                removeEnd = i;
+            }
+          else
+            {
+              // In this case we remove a couple of child elements from this
+              // paragraph.
+              int removeLen = contentEnd - contentStart;
+              Element[] removed = new Element[removeLen];
+              for (int j = contentStart; j < contentEnd; j++)
+                removed[j] = paragraph.getElement(j);
+              ((BranchElement) paragraph).replace(contentStart, removeLen,
+                                                  empty);
+              documentEvent.addEdit(new ElementEdit(paragraph, contentStart,
+                                                    removed, empty));
+            }
+        }
+      // Now we remove paragraphs from the root that have been tagged for
+      // removal.
+      if (removeStart != -1)
+        {
+          int removeLen = removeEnd - removeStart;
+          Element[] removed = new Element[removeLen];
+          for (int i = removeStart; i < removeEnd; i++)
+            removed[i] = root.getElement(i);
+          ((BranchElement) root).replace(removeStart, removeLen, empty);
+          documentEvent.addEdit(new ElementEdit(root, removeStart, removed,
+                                                empty));
+        }
     }
 
     /**
@@ -675,8 +758,11 @@ public class DefaultStyledDocument extends AbstractDocument
     public void insert(int offset, int length, ElementSpec[] data,
                        DefaultDocumentEvent ev)
     {
+      if (length == 0)
+        return;
       this.offset = offset;
       this.length = length;
+      this.endOffset = offset + length;
       documentEvent = ev;
       // Push the root and the paragraph at offset onto the element stack.
       elementStack.clear();
@@ -703,9 +789,11 @@ public class DefaultStyledDocument extends AbstractDocument
             {
             case ElementSpec.StartTagType:
               numStartTags++;
+              documentEvent.modified = true;
               break;
             case ElementSpec.EndTagType:
               numEndTags++;
+              documentEvent.modified = true;
               break;
             default:
               insertContentTag(data[i]);
@@ -799,7 +887,7 @@ public class DefaultStyledDocument extends AbstractDocument
         }
       return ret;
     }
-
+    
     /**
      * Inserts a content element into the document structure.
      *
@@ -810,6 +898,7 @@ public class DefaultStyledDocument extends AbstractDocument
       prepareContentInsertion();
       int len = tag.getLength();
       int dir = tag.getDirection();
+      AttributeSet tagAtts = tag.getAttributes();
       if (dir == ElementSpec.JoinPreviousDirection)
         {
           // The mauve tests to this class show that a JoinPrevious insertion
@@ -824,66 +913,77 @@ public class DefaultStyledDocument extends AbstractDocument
           Element current = paragraph.getElement(currentIndex);
           Element next = paragraph.getElement(currentIndex + 1);
 
+          if (next == null)
+            return;
+
           Element newEl1 = createLeafElement(paragraph,
                                              current.getAttributes(),
-                                             current.getStartOffset(),
+                                             current.getStartOffset(), 
                                              offset);
           Element newEl2 = createLeafElement(paragraph,
-                                             current.getAttributes(),
+                                             current.getAttributes(), 
                                              offset,
                                              next.getEndOffset());
 
-          Element[] add = new Element[] {newEl1, newEl2};
-          Element[] remove = new Element[] {current, next};
+          Element[] add = new Element[] { newEl1, newEl2 };
+          Element[] remove = new Element[] { current, next };
           paragraph.replace(currentIndex, 2, add);
-
           // Add this action to the document event.
           addEdit(paragraph, currentIndex, remove, add);
         }
-      else
+      else if (dir == ElementSpec.JoinFractureDirection)
+        {
+          // TODO: What should be done here?
+        }
+      else if (dir == ElementSpec.OriginateDirection)
         {
           BranchElement paragraph = (BranchElement) elementStack.peek();
           int index = paragraph.getElementIndex(offset);
           Element current = paragraph.getElement(index);
-
+          
           Element[] added;
-          Element[] removed;
+          Element[] removed = new Element[] {current};
           Element[] splitRes = split(current, offset, length);
-          // Special case for when offset == startOffset or offset == endOffset.
           if (splitRes[0] == null)
             {
               added = new Element[2];
-              added[0] = createLeafElement(paragraph, tag.getAttributes(),
-                                           offset, offset + length);
+              added[0] = createLeafElement(paragraph, tagAtts,
+                                           offset, endOffset);
               added[1] = splitRes[1];
               removed = new Element[0];
               index++;
             }
           else if (current.getStartOffset() == offset)
-            {
+            { 
+              // This is if the new insertion happens immediately before 
+              // the <code>current</code> Element.  In this case there are 2 
+              // resulting Elements.              
               added = new Element[2];
-              added[0] = createLeafElement(paragraph, tag.getAttributes(),
-                                           offset, offset + length);
+              added[0] = createLeafElement(paragraph, tagAtts, offset,
+                                           endOffset);
               added[1] = splitRes[1];
-              removed = new Element[] { current };
             }
-          else if (current.getEndOffset() - length == offset)
+          else if (current.getEndOffset() == endOffset)
             {
+              // This is if the new insertion happens right at the end of 
+              // the <code>current</code> Element.  In this case there are 
+              // 2 resulting Elements.
               added = new Element[2];
               added[0] = splitRes[0];
-              added[1] = createLeafElement(paragraph, tag.getAttributes(),
-                                           offset, offset + length);
-              removed = new Element[] { current };
+              added[1] = createLeafElement(paragraph, tagAtts, offset,
+                                           endOffset);
             }
           else
             {
+              // This is if the new insertion is in the middle of the 
+              // <code>current</code> Element.  In this case 
+              // there will be 3 resulting Elements.
               added = new Element[3];
               added[0] = splitRes[0];
-              added[1] = createLeafElement(paragraph, tag.getAttributes(),
-                                           offset, offset + length);
+              added[1] = createLeafElement(paragraph, tagAtts, offset,
+                                           endOffset);
               added[2] = splitRes[1];
-              removed = new Element[] { current };
-            }
+            }          
           paragraph.replace(index, removed.length, added);
           addEdit(paragraph, index, removed, added);
         }
@@ -1014,7 +1114,7 @@ public class DefaultStyledDocument extends AbstractDocument
      */
     public String getName()
     {
-      return "section";
+      return SectionElementName;
     }
   }
 
@@ -1135,8 +1235,7 @@ public class DefaultStyledDocument extends AbstractDocument
     // Use createBranchElement() and createLeafElement instead.
     SectionElement section = new SectionElement();
 
-    BranchElement paragraph =
-      (BranchElement) createBranchElement(section, null);
+    BranchElement paragraph = new BranchElement(section, null);
     paragraph.setResolveParent(getStyle(StyleContext.DEFAULT_STYLE));
     tmp = new Element[1];
     tmp[0] = paragraph;
@@ -1233,7 +1332,11 @@ public class DefaultStyledDocument extends AbstractDocument
   {
     Element paragraph = getParagraphElement(position);
     AttributeSet attributes = paragraph.getAttributes();
-    return (Style) attributes.getResolveParent();
+    AttributeSet a = attributes.getResolveParent();
+    // If the resolve parent is not of type Style, we return null.
+    if (a instanceof Style)
+      return (Style) a;
+    return null;
   }
 
   /**
@@ -1302,50 +1405,54 @@ public class DefaultStyledDocument extends AbstractDocument
 				     AttributeSet attributes,
 				     boolean replace)
   {
-    DefaultDocumentEvent ev =
-      new DefaultDocumentEvent(offset, length,
-			       DocumentEvent.EventType.CHANGE);
-
-    // Modify the element structure so that the interval begins at an element
-    // start and ends at an element end.
-    buffer.change(offset, length, ev);
-
-    Element root = getDefaultRootElement();
-    // Visit all paragraph elements within the specified interval
-    int paragraphCount =  root.getElementCount();
-    for (int pindex = 0; pindex < paragraphCount; pindex++)
+    // Exit early if length is 0, so no DocumentEvent is created or fired.
+    if (length == 0)
+      return;
+    try
       {
-        Element paragraph = root.getElement(pindex);
-        // Skip paragraphs that lie outside the interval.
-        if ((paragraph.getStartOffset() > offset + length)
-            || (paragraph.getEndOffset() < offset))
-          continue;
+        // Must obtain a write lock for this method.  writeLock() and
+        // writeUnlock() should always be in try/finally block to make
+        // sure that locking happens in a balanced manner.
+        writeLock();
+        DefaultDocumentEvent ev = 
+          new DefaultDocumentEvent(
+                                   offset, 
+                                   length, 
+                                   DocumentEvent.EventType.CHANGE);
 
-        // Visit content elements within this paragraph
-        int contentCount = paragraph.getElementCount();
-        for (int cindex = 0; cindex < contentCount; cindex++)
+        // Modify the element structure so that the interval begins at an
+        // element
+        // start and ends at an element end.
+        buffer.change(offset, length, ev);
+
+        Element root = getDefaultRootElement();
+        // Visit all paragraph elements within the specified interval
+        int end = offset + length;
+        Element curr;
+        for (int pos = offset; pos < end; )
           {
-            Element content = paragraph.getElement(cindex);
-            // Skip content that lies outside the interval.
-            if ((content.getStartOffset() > offset + length)
-                || (content.getEndOffset() < offset))
-              continue;
-
-            if (content instanceof AbstractElement)
-              {
-                AbstractElement el = (AbstractElement) content;
-                if (replace)
-                  el.removeAttributes(el);
-                el.addAttributes(attributes);
-              }
-            else
-              throw new AssertionError("content elements are expected to be"
-                                       + "instances of "
-		       + "javax.swing.text.AbstractDocument.AbstractElement");
+            // Get the CharacterElement at offset pos.
+            curr = getCharacterElement(pos);
+            if (pos == curr.getEndOffset())
+              break;
+            
+            MutableAttributeSet a = (MutableAttributeSet) curr.getAttributes();
+            ev.addEdit(new AttributeUndoableEdit(curr, attributes, replace));
+            // If replace is true, remove all the old attributes.
+            if (replace)
+              a.removeAttributes(a);
+            // Add all the new attributes.
+            a.addAttributes(attributes);
+            // Increment pos so we can check the next CharacterElement.
+            pos = curr.getEndOffset();
           }
+        fireChangedUpdate(ev);
+        fireUndoableEditUpdate(new UndoableEditEvent(this, ev));
       }
-
-    fireChangedUpdate(ev);
+    finally
+      {
+        writeUnlock();
+      }
   }
   
   /**
@@ -1357,14 +1464,36 @@ public class DefaultStyledDocument extends AbstractDocument
   public void setLogicalStyle(int position, Style style)
   {
     Element el = getParagraphElement(position);
-    if (el instanceof AbstractElement)
-      {
-        AbstractElement ael = (AbstractElement) el;
-        ael.setResolveParent(style);
-      }
-    else
-      throw new AssertionError("paragraph elements are expected to be"
-         + "instances of javax.swing.text.AbstractDocument.AbstractElement");
+    // getParagraphElement doesn't return null but subclasses might so
+    // we check for null here.
+    if (el == null)
+      return;
+    try
+    {
+      writeLock();    
+      if (el instanceof AbstractElement)
+        {
+          AbstractElement ael = (AbstractElement) el;
+          ael.setResolveParent(style);
+          int start = el.getStartOffset();
+          int end = el.getEndOffset();
+          DefaultDocumentEvent ev = 
+            new DefaultDocumentEvent (
+                                      start, 
+                                      end - start, 
+                                      DocumentEvent.EventType.CHANGE);
+          // FIXME: Add an UndoableEdit to this event and fire it.
+          fireChangedUpdate(ev);
+        }
+      else
+        throw new 
+        AssertionError("paragraph elements are expected to be"
+                       + "instances of AbstractDocument.AbstractElement");
+    }
+    finally
+    {
+      writeUnlock();
+    }
   }
 
   /**
@@ -1380,15 +1509,47 @@ public class DefaultStyledDocument extends AbstractDocument
                                      AttributeSet attributes,
                                      boolean replace)
   {
-    int index = offset;
-    while (index < offset + length)
+    try
       {
-        AbstractElement par = (AbstractElement) getParagraphElement(index);
-        AttributeContext ctx = getAttributeContext();
-        if (replace)
-          par.removeAttributes(par);
-        par.addAttributes(attributes);
-        index = par.getElementCount();
+        // Must obtain a write lock for this method.  writeLock() and
+        // writeUnlock() should always be in try/finally blocks to make
+        // sure that locking occurs in a balanced manner.
+        writeLock();
+        
+        // Create a DocumentEvent to use for changedUpdate().
+        DefaultDocumentEvent ev = 
+          new DefaultDocumentEvent (
+                                    offset, 
+                                    length, 
+                                    DocumentEvent.EventType.CHANGE);
+        
+        // Have to iterate through all the _paragraph_ elements that are
+        // contained or partially contained in the interval
+        // (offset, offset + length).
+        Element rootElement = getDefaultRootElement();
+        int startElement = rootElement.getElementIndex(offset);
+        int endElement = rootElement.getElementIndex(offset + length - 1);
+        if (endElement < startElement)
+          endElement = startElement;
+        
+        for (int i = startElement; i <= endElement; i++)
+          {
+            Element par = rootElement.getElement(i);
+            MutableAttributeSet a = (MutableAttributeSet) par.getAttributes();
+            // Add the change to the DocumentEvent.
+            ev.addEdit(new AttributeUndoableEdit(par, attributes, replace));
+            // If replace is true remove the old attributes.
+            if (replace)
+              a.removeAttributes(a);
+            // Add the new attributes.
+            a.addAttributes(attributes);
+          }
+        fireChangedUpdate(ev);
+        fireUndoableEditUpdate(new UndoableEditEvent(this, ev));
+      }
+    finally
+      {
+        writeUnlock();
       }
   }
 
@@ -1402,9 +1563,14 @@ public class DefaultStyledDocument extends AbstractDocument
   protected void insertUpdate(DefaultDocumentEvent ev, AttributeSet attr)
   {
     super.insertUpdate(ev, attr);
+    // If the attribute set is null, use an empty attribute set.
+    if (attr == null)
+      attr = SimpleAttributeSet.EMPTY;
     int offset = ev.getOffset();
     int length = ev.getLength();
     int endOffset = offset + length;
+    AttributeSet paragraphAttributes = 
+      getParagraphElement(endOffset).getAttributes();    
     Segment txt = new Segment();
     try
       {
@@ -1419,70 +1585,149 @@ public class DefaultStyledDocument extends AbstractDocument
 
     int len = 0;
     Vector specs = new Vector();
-
+    ElementSpec finalStartTag = null;
+    short finalStartDirection = ElementSpec.OriginateDirection;
+    boolean prevCharWasNewline = false;
     Element prev = getCharacterElement(offset);
-    Element next = getCharacterElement(endOffset);
+    Element next = getCharacterElement(endOffset);    
+    Element prevParagraph = getParagraphElement(offset);
+    Element paragraph = getParagraphElement(endOffset);
+    
+    int segmentEnd = txt.offset + txt.count;
+    
+    // Check to see if we're inserting immediately after a newline.
+    if (offset > 0)
+      {
+        try
+        {
+          String s = getText(offset - 1, 1);
+          if (s.equals("\n"))
+            {
+              finalStartDirection = 
+                handleInsertAfterNewline(specs, offset, endOffset,
+                                         prevParagraph,
+                                         paragraph,
+                                         paragraphAttributes);
+              
+              prevCharWasNewline = true;
+              // Find the final start tag from the ones just created.
+              for (int i = 0; i < specs.size(); i++)
+                if (((ElementSpec) specs.get(i)).getType() 
+                    == ElementSpec.StartTagType)
+                  finalStartTag = (ElementSpec)specs.get(i);
+            }
+        }
+        catch (BadLocationException ble)
+        {          
+          // This shouldn't happen.
+          AssertionError ae = new AssertionError();
+          ae.initCause(ble);
+          throw ae;
+        }        
+      }
 
-    for (int i = offset; i < endOffset; ++i)
+        
+    for (int i = txt.offset; i < segmentEnd; ++i)
       {
         len++;
         if (txt.array[i] == '\n')
           {
-            ElementSpec spec = new ElementSpec(attr, ElementSpec.ContentType,
-                                               len);
-
-            // If we are at the last index, then check if we could probably be
-            // joined with the next element.
-            if (i == endOffset - 1)
-              {
-                if (next.getAttributes().isEqual(attr))
-                  spec.setDirection(ElementSpec.JoinNextDirection);
-              }
-            // If we are at the first new element, then check if it could be
-            // joined with the previous element.
-            else if (specs.size() == 0)
-              {
-                if (prev.getAttributes().isEqual(attr))
-                    spec.setDirection(ElementSpec.JoinPreviousDirection);
-              }
-
-            specs.add(spec);
+            // Add the ElementSpec for the content.
+            specs.add(new ElementSpec(attr, ElementSpec.ContentType, len));            
 
             // Add ElementSpecs for the newline.
-            ElementSpec endTag = new ElementSpec(null, ElementSpec.EndTagType);
-            specs.add(endTag);
-            ElementSpec startTag = new ElementSpec(null,
+            specs.add(new ElementSpec(null, ElementSpec.EndTagType));
+            finalStartTag = new ElementSpec(paragraphAttributes,
                                                    ElementSpec.StartTagType);
-            startTag.setDirection(ElementSpec.JoinFractureDirection);
-            specs.add(startTag);
-
+            specs.add(finalStartTag);
             len = 0;
-            offset += len;
           }
       }
 
     // Create last element if last character hasn't been a newline.
-    if (len > 0)
+    if (len > 0)                      
+      specs.add(new ElementSpec(attr, ElementSpec.ContentType, len));
+
+    // Set the direction of the last spec of type StartTagType.  
+    // If we are inserting after a newline then this value comes from 
+    // handleInsertAfterNewline.
+    if (finalStartTag != null)
       {
-        ElementSpec spec = new ElementSpec(attr, ElementSpec.ContentType, len);
-        // If we are at the first new element, then check if it could be
-        // joined with the previous element.
-        if (specs.size() == 0)
+        if (prevCharWasNewline)
+          finalStartTag.setDirection(finalStartDirection);
+        else if (prevParagraph.getEndOffset() != endOffset)
+          finalStartTag.setDirection(ElementSpec.JoinFractureDirection);
+        else
           {
-            if (prev.getAttributes().isEqual(attr))
-              spec.setDirection(ElementSpec.JoinPreviousDirection);
+            // If there is an element AFTER this one, then set the 
+            // direction to JoinNextDirection.
+            Element parent = prevParagraph.getParentElement();
+            int index = parent.getElementIndex(offset);
+            if (index + 1 < parent.getElementCount()
+                && !parent.getElement(index + 1).isLeaf())
+              finalStartTag.setDirection(ElementSpec.JoinNextDirection);
           }
-        // Check if we could probably be joined with the next element.
-        else if (next.getAttributes().isEqual(attr))
-          spec.setDirection(ElementSpec.JoinNextDirection);
-
-        specs.add(spec);
       }
-
+    
+    // If we are at the last index, then check if we could probably be
+    // joined with the next element.
+    ElementSpec last = (ElementSpec) specs.lastElement();        
+    if (next.getAttributes().isEqual(attr)
+        && last.getType() == ElementSpec.ContentType)
+      last.setDirection(ElementSpec.JoinNextDirection);    
+    
+    // If we are at the first new element, then check if it could be
+    // joined with the previous element.
+    ElementSpec first = (ElementSpec) specs.firstElement();
+    if (prev.getAttributes().isEqual(attr)
+        && first.getType() == ElementSpec.ContentType)
+      first.setDirection(ElementSpec.JoinPreviousDirection);
+    
     ElementSpec[] elSpecs =
       (ElementSpec[]) specs.toArray(new ElementSpec[specs.size()]);
 
     buffer.insert(offset, length, elSpecs, ev);
+  }
+
+  /**
+   * A helper method to set up the ElementSpec buffer for the special
+   * case of an insertion occurring immediately after a newline.
+   * @param specs the ElementSpec buffer to initialize.
+   */
+  short handleInsertAfterNewline(Vector specs, int offset, int endOffset,
+                                Element prevParagraph, Element paragraph,
+                                AttributeSet a)
+  {
+    if (prevParagraph.getParentElement() == paragraph.getParentElement())
+      {
+        specs.add(new ElementSpec(a, ElementSpec.EndTagType));
+        specs.add(new ElementSpec(a, ElementSpec.StartTagType));
+        if (prevParagraph.getEndOffset() != endOffset)
+          return ElementSpec.JoinFractureDirection;
+        // If there is an Element after this one, use JoinNextDirection.
+        Element parent = paragraph.getParentElement();
+        if (parent.getElementCount() > parent.getElementIndex(offset) + 1)
+          return ElementSpec.JoinNextDirection;
+      }
+    else
+      {
+        // TODO: What to do here?
+      }
+    return ElementSpec.OriginateDirection;
+  }
+  
+  /**
+   * Updates the document structure in response to text removal. This is
+   * forwarded to the {@link ElementBuffer} of this document. Any changes to
+   * the document structure are added to the specified document event and
+   * sent to registered listeners.
+   *
+   * @param ev the document event that records the changes to the document
+   */
+  protected void removeUpdate(DefaultDocumentEvent ev)
+  {
+    super.removeUpdate(ev);
+    buffer.remove(ev.getOffset(), ev.getLength(), ev);
   }
 
   /**
@@ -1506,6 +1751,35 @@ public class DefaultStyledDocument extends AbstractDocument
     // Nothing to do here. This is intended to be overridden by subclasses.
   }
 
+  void printElements (Element start, int pad)
+  {
+    for (int i = 0; i < pad; i++)
+      System.out.print(" ");
+    if (pad == 0)
+      System.out.println ("ROOT ELEMENT ("+start.getStartOffset()+", "+start.getEndOffset()+")");
+    else if (start instanceof AbstractDocument.BranchElement)
+      System.out.println ("BranchElement ("+start.getStartOffset()+", "+start.getEndOffset()+")");
+    else
+      {
+        {
+          try
+            {
+              System.out.println ("LeafElement ("+start.getStartOffset()+", "
+                                  + start.getEndOffset()+"): "+ 
+                                  start.getDocument().
+                                  getText(start.getStartOffset(), 
+                                          start.getEndOffset() - 
+                                          start.getStartOffset()));
+            }
+          catch (BadLocationException ble)
+            {
+            }
+        }
+      }
+    for (int i = 0; i < start.getElementCount(); i ++)
+      printElements (start.getElement(i), pad+3);
+  }
+  
   /**
    * Inserts a bulk of structured content at once.
    *
@@ -1515,37 +1789,58 @@ public class DefaultStyledDocument extends AbstractDocument
   protected void insert(int offset, ElementSpec[] data)
     throws BadLocationException
   {
-    writeLock();
-    // First we insert the content.
-    int index = offset;
-    for (int i = 0; i < data.length; i++)
+    try
       {
-        ElementSpec spec = data[i];
-        if (spec.getArray() != null && spec.getLength() > 0)
+        // writeLock() and writeUnlock() should always be in a try/finally
+        // block so that locking balance is guaranteed even if some 
+        // exception is thrown.
+        writeLock();
+        
+        // First we collect the content to be inserted.
+        StringBuffer contentBuffer = new StringBuffer();
+        for (int i = 0; i < data.length; i++)
           {
-            String insertString = new String(spec.getArray(), spec.getOffset(),
-                                             spec.getLength());
-            content.insertString(index, insertString);
+            // Collect all inserts into one so we can get the correct
+            // ElementEdit
+            ElementSpec spec = data[i];
+            if (spec.getArray() != null && spec.getLength() > 0)
+              contentBuffer.append(spec.getArray(), spec.getOffset(),
+                                   spec.getLength());
           }
-        index += spec.getLength();
-      }
-    // Update the view structure.
-    DefaultDocumentEvent ev = new DefaultDocumentEvent(offset, index - offset,
-                                               DocumentEvent.EventType.INSERT);
-    for (int i = 0; i < data.length; i++)
-      {
-        ElementSpec spec = data[i];
-        AttributeSet atts = spec.getAttributes();
-        if (atts != null)
-          insertUpdate(ev, atts);
-      }
 
-    // Finally we must update the document structure and fire the insert update
-    // event.
-    buffer.insert(offset, index - offset, data, ev);
-    if (ev.modified)
-      fireInsertUpdate(ev);
-    writeUnlock();
+        int length = contentBuffer.length();
+
+        // If there was no content inserted then exit early.
+        if (length == 0)
+          return;
+        
+        UndoableEdit edit = content.insertString(offset,
+                                                 contentBuffer.toString());
+
+        // Create the DocumentEvent with the ElementEdit added
+        DefaultDocumentEvent ev = 
+          new DefaultDocumentEvent(offset,
+                                   length,
+                                   DocumentEvent.EventType.INSERT);
+        ev.addEdit(edit);
+
+        for (int i = 0; i < data.length; i++)
+          {
+            ElementSpec spec = data[i];
+            AttributeSet atts = spec.getAttributes();
+            if (atts != null)
+              insertUpdate(ev, atts);
+          }        
+
+        // Finally we must update the document structure and fire the insert
+        // update event.
+        buffer.insert(offset, length, data, ev);
+        fireInsertUpdate(ev);
+      }
+    finally
+      {
+        writeUnlock();
+      }
   }
 
   /**
@@ -1572,5 +1867,10 @@ public class DefaultStyledDocument extends AbstractDocument
         err.initCause(ex);
         throw err;
       }
+  }
+  
+  static boolean attributeSetsAreSame (AttributeSet a, AttributeSet b)
+  {
+    return (a == null && b == null) || (a != null && a.isEqual(b));
   }
 }

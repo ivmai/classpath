@@ -1,5 +1,5 @@
 /* PrinterLocation.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,6 +45,12 @@ import javax.print.attribute.PrintServiceAttribute;
 import javax.print.attribute.TextSyntax;
 
 /**
+ * The <code>PrinterLocation</code> printing attribute provides the location 
+ * of a printer device. This may be a room and building name for example.
+ * <p>
+ * <b>IPP Compatibility:</b> PrinterLocation is an IPP 1.1 attribute.
+ * </p>
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class PrinterLocation extends TextSyntax
@@ -56,9 +62,10 @@ public final class PrinterLocation extends TextSyntax
    * Creates a <code>PrinterLocation</code> object.
    *
    * @param printerLocation the printer location
-   * @param locale the locale of the location, null means default locale
+   * @param locale the locale to use, if <code>null</code> the default
+   * locale is used.
    *
-   * @exception NullPointerException if printerLocation is null
+   * @exception NullPointerException if printerLocation is <code>null</code>.
    */
   public PrinterLocation(String printerLocation, Locale locale)
   {
@@ -66,11 +73,12 @@ public final class PrinterLocation extends TextSyntax
   }
 
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -83,7 +91,7 @@ public final class PrinterLocation extends TextSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>PrinterLocation</code> itself
+   * @return The class <code>PrinterLocation</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -91,9 +99,9 @@ public final class PrinterLocation extends TextSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "printer-location"
+   * @return The name "printer-location".
    */
   public String getName()
   {

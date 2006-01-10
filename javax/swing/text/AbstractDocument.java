@@ -541,11 +541,13 @@ public abstract class AbstractDocument implements Document, Serializable
     
     writeLock();
     UndoableEdit undo = content.insertString(offset, text);
+    if (undo != null)
+      event.addEdit(undo);
+
     insertUpdate(event, attributes);
     writeUnlock();
 
-    if (event.modified)
-      fireInsertUpdate(event);
+    fireInsertUpdate(event);
     if (undo != null)
       fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
   }
@@ -1327,7 +1329,14 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public Object getAttribute(Object key)
     {
-      return attributes.getAttribute(key);
+      Object result = attributes.getAttribute(key);
+      if (result == null && element_parent != null)
+        {
+          AttributeSet parentSet = element_parent.getAttributes();
+          if (parentSet != null)
+            result = parentSet.getAttribute(key);
+        }
+      return result;
     }
 
     /**
@@ -1904,6 +1913,15 @@ public abstract class AbstractDocument implements Document, Serializable
     {
       // XXX - Fully qualify ElementChange to work around gcj bug #2499.
       return (DocumentEvent.ElementChange) changes.get(elem);
+    }
+    
+    /**
+     * Returns a String description of the change event.  This returns the
+     * toString method of the Vector of edits.
+     */
+    public String toString()
+    {
+      return edits.toString();
     }
   }
   

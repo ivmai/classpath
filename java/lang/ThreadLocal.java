@@ -1,5 +1,5 @@
 /* ThreadLocal -- a variable with a unique value per thread
-   Copyright (C) 2000, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -96,29 +96,6 @@ public class ThreadLocal<T>
   static final Object NULL = new Object();
 
   /**
-   * Serves as a key for the Thread.locals WeakHashMap.
-   * We can't use "this", because a subclass may override equals/hashCode
-   * and we need to use object identity for the map.
-   */
-  final Key key = new Key(this);
-
-  static class Key
-  {
-    private ThreadLocal outer;
-
-    Key(ThreadLocal outer)
-    {
-      this.outer = outer;
-    }
-
-    ThreadLocal get()
-    {
-      return outer;
-    }
-  }
-
-
-  /**
    * Creates a ThreadLocal object without associating any value to it yet.
    */
   public ThreadLocal()
@@ -148,14 +125,14 @@ public class ThreadLocal<T>
    */
   public T get()
   {
-    Map<Key,T> map = (Map<Key,T>) Thread.getThreadLocals();
+    Map<ThreadLocal<T>,T> map = (Map<ThreadLocal<T>,T>) Thread.getThreadLocals();
     // Note that we don't have to synchronize, as only this thread will
     // ever modify the map.
-    T value = map.get(key);
+    T value = map.get(this);
     if (value == null)
       {
         value = initialValue();
-        map.put(key, value == null ? (T) NULL : value);
+        map.put(this, (T) (value == null ? NULL : value));
       }
     return value == (T) NULL ? null : value;
   }
@@ -173,7 +150,7 @@ public class ThreadLocal<T>
     Map map = Thread.getThreadLocals();
     // Note that we don't have to synchronize, as only this thread will
     // ever modify the map.
-    map.put(key, value == null ? NULL : value);
+    map.put(this, value == null ? NULL : value);
   }
 
   /**
@@ -184,6 +161,6 @@ public class ThreadLocal<T>
   public void remove()
   {
     Map map = Thread.getThreadLocals();
-    map.remove(key);
+    map.remove(this);
   }
 }

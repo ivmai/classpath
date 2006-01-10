@@ -1,5 +1,5 @@
 /* PagesPerMinute.java -- 
-   Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -43,6 +43,13 @@ import javax.print.attribute.IntegerSyntax;
 import javax.print.attribute.PrintServiceAttribute;
 
 /**
+ * The <code>PagesPerMinute</code> printing attribute specifies 
+ * the nominal number of pages per minute which may be printed
+ * by the printer. 
+ * <p>
+ * <b>IPP Compatibility:</b> PagesPerMinute is an IPP 1.1 attribute.
+ * </p>
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class PagesPerMinute extends IntegerSyntax
@@ -55,7 +62,7 @@ public final class PagesPerMinute extends IntegerSyntax
    *
    * @param value the number of pages per minute
    *
-   * @exception IllegalArgumentException if value < 0
+   * @exception IllegalArgumentException if value &lt; 0
    */
   public PagesPerMinute(int value)
   {
@@ -66,11 +73,12 @@ public final class PagesPerMinute extends IntegerSyntax
   }
   
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -83,7 +91,7 @@ public final class PagesPerMinute extends IntegerSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>PagesPerMinute</code> itself
+   * @return The class <code>PagesPerMinute</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -91,9 +99,9 @@ public final class PagesPerMinute extends IntegerSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "pages-per-minute"
+   * @return The name "pages-per-minute".
    */
   public String getName()
   {

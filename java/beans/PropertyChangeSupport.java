@@ -408,11 +408,10 @@ public class PropertyChangeSupport implements Serializable
   public void fireIndexedPropertyChange(String name, int index,
                                         Object oldValue, Object newValue)
   {
-    // FIXME: should we use equals() here?
-    if (oldValue == newValue && oldValue != null)
-      firePropertyChange(new IndexedPropertyChangeEvent(source, name,
-                                                        oldValue, newValue,
-                                                        index));
+    // Argument checking is done in firePropertyChange(PropertyChangeEvent) .
+    firePropertyChange(new IndexedPropertyChangeEvent(source, name,
+                                                      oldValue, newValue,
+                                                      index));
   }
 
   /**

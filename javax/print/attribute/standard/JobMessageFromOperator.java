@@ -1,5 +1,5 @@
 /* JobMessageFromOperator.java -- 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,6 +45,15 @@ import javax.print.attribute.PrintJobAttribute;
 import javax.print.attribute.TextSyntax;
 
 /**
+ * The <code>JobMessageFromOperator</code> printing attribute provides 
+ * a message from an operator or a system administrator related to the
+ * print job. This may include information why a certain action has been
+ * taken on the print job like a modification.
+ * <p>
+ * <b>IPP Compatibility:</b> JobMessageFromOperator is an IPP 1.1 
+ * attribute.
+ * </p>
+ * 
  * @author Michael Koch (konqueror@gmx.de)
  */
 public final class JobMessageFromOperator extends TextSyntax
@@ -56,8 +65,10 @@ public final class JobMessageFromOperator extends TextSyntax
    * Creates a <code>JobMessageFromOperator</code> object.
    *
    * @param message the message
+   * @param locale the locale to use, if <code>null</code> the default
+   * locale is used.
    *
-   * @exception NullPointerException if message is null
+   * @exception NullPointerException if message is <code>null</code>.
    */
   public JobMessageFromOperator(String message, Locale locale)
   {
@@ -65,11 +76,12 @@ public final class JobMessageFromOperator extends TextSyntax
   }
 
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -82,7 +94,7 @@ public final class JobMessageFromOperator extends TextSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>JobMessageFromOperator</code> itself
+   * @return The class <code>JobMessageFromOperator</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -90,9 +102,9 @@ public final class JobMessageFromOperator extends TextSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "job-message-from-operator"
+   * @return The name "job-message-from-operator".
    */
   public String getName()
   {

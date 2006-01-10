@@ -1,5 +1,5 @@
 /* QueuedJobCount.java -- 
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -42,6 +42,15 @@ import javax.print.attribute.IntegerSyntax;
 import javax.print.attribute.PrintServiceAttribute;
 
 /**
+ * The <code>QueuedJobCount</code> printing attribute reports 
+ * the number of jobs currently in the queue. These are jobs
+ * that are in 'pending', 'processing', 'pending-held' or
+ * 'processing-stopped' state. 
+ * <p>
+ * <b>IPP Compatibility:</b> QueuedJobCount is an IPP 1.1 attribute.
+ * </p>
+ * @see javax.print.attribute.standard.JobState
+ * 
  * @author Michael Koch
  */
 public final class QueuedJobCount extends IntegerSyntax
@@ -54,7 +63,7 @@ public final class QueuedJobCount extends IntegerSyntax
    *
    * @param value the number of queued jobs
    *
-   * @exception IllegalArgumentException if value < 0
+   * @exception IllegalArgumentException if value &lt; 0
    */
   public QueuedJobCount(int value)
   {
@@ -65,11 +74,12 @@ public final class QueuedJobCount extends IntegerSyntax
   }
   
   /**
-   * Tests of obj is equal to this object.
+   * Tests if the given object is equal to this object.
    *
    * @param obj the object to test
    *
-   * @return true if both objects are equal, false otherwise.
+   * @return <code>true</code> if both objects are equal, 
+   * <code>false</code> otherwise.
    */
   public boolean equals(Object obj)
   {
@@ -82,7 +92,7 @@ public final class QueuedJobCount extends IntegerSyntax
   /**
    * Returns category of this class.
    *
-   * @return the class <code>QueuedJobCount</code> itself
+   * @return The class <code>QueuedJobCount</code> itself.
    */
   public Class< ? extends Attribute> getCategory()
   {
@@ -90,9 +100,9 @@ public final class QueuedJobCount extends IntegerSyntax
   }
 
   /**
-   * Returns name of this class.
+   * Returns the name of this attribute.
    *
-   * @return the string "queued-job-count"
+   * @return The name "queued-job-count".
    */
   public String getName()
   {
