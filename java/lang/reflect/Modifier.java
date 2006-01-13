@@ -292,12 +292,54 @@ public class Modifier
   }
 
   /**
+   * Package helper method that can take a StringBuilder.
+   * @param mod the modifier
+   * @param r the StringBuilder to which the String representation is appended
+   * @return r, with information appended
+   */
+  static StringBuilder toString(int mod, StringBuilder r)
+  {
+    if (isPublic(mod))
+      r.append("public ");
+    if (isProtected(mod))
+      r.append("protected ");
+    if (isPrivate(mod))
+      r.append("private ");
+    if (isAbstract(mod))
+      r.append("abstract ");
+    if (isStatic(mod))
+      r.append("static ");
+    if (isFinal(mod))
+      r.append("final ");
+    if (isTransient(mod))
+      r.append("transient ");
+    if (isVolatile(mod))
+      r.append("volatile ");
+    if (isSynchronized(mod))
+      r.append("synchronized ");
+    if (isNative(mod))
+      r.append("native ");
+    if (isStrict(mod))
+      r.append("strictfp ");
+    if (isInterface(mod))
+      r.append("interface ");
+    
+    // Trim trailing space.
+    if ((mod & ALL_FLAGS) != 0)
+      r.setLength(r.length() - 1);
+    return r;
+  }
+
+  /**
    * Package helper method that can take a StringBuffer.
+   * This is indeed a duplicate of the method that takes a StringBuilder
+   * since some runtimes override the given Method, Constructor and Field
+   * classes that and use a StringBuffer.
    * @param mod the modifier
    * @param r the StringBuffer to which the String representation is appended
    * @return r, with information appended
    */
-  static StringBuilder toString(int mod, StringBuilder r)
+  static StringBuffer toString(int mod, StringBuffer r)
   {
     if (isPublic(mod))
       r.append("public ");
