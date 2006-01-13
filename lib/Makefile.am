@@ -29,7 +29,7 @@ JAVAC = $(ECJ) -1.5 -warn:-deprecation,serial,typeHiding,unchecked,unused,vararg
 #JAVAC = $(KJC) -classpath .:$(USER_CLASSLIB) -d . @classes
 else
 if FOUND_GCJX
-JAVAC = $(GCJX) -encoding UTF-8 -classpath .:$(USER_CLASSLIB) -d . @classes
+JAVAC = $(GCJX) -g -encoding UTF-8 -classpath .:$(USER_CLASSLIB) -d . @classes
 endif # FOUND_GCJX
 #endif # FOUND_KJC
 #endif # FOUND_GCJ

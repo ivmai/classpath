@@ -1,5 +1,5 @@
 /* PrintStream.java -- OutputStream for printing output
-   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -42,6 +42,8 @@ package java.io;
 import java.util.Locale;
 import java.util.Formatter;
 
+import gnu.classpath.SystemProperties;
+
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
  * "The Java Language Specification", ISBN 0-201-63451-1
  * Status:  Believed complete and correct to 1.3
@@ -69,7 +71,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
 
   // Line separator string.
   private static final char[] line_separator
-    = System.getProperty("line.separator").toCharArray();
+    = SystemProperties.getProperty("line.separator").toCharArray();
 
   /**
    *  Encoding name
@@ -117,7 +119,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
     super (out);
 
     try {
-	this.encoding = System.getProperty("file.encoding");
+	this.encoding = SystemProperties.getProperty("file.encoding");
     } catch (SecurityException e){
 	this.encoding = "ISO8859_1";
     } catch (IllegalArgumentException e){
