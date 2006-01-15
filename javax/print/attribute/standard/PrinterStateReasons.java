@@ -139,7 +139,7 @@ public final class PrinterStateReasons
    * @param severity the severity level for the constructed set.
    * @return The set of printer state reasons.
    */
-  public Set printerStateReasonSet(Severity severity)
+  public Set<PrinterStateReason> printerStateReasonSet(Severity severity)
   {
     if (severity == null)
       throw new NullPointerException("severity is null");
