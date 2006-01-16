@@ -673,7 +673,7 @@ public class StyleContext
     return removeAttributes(old, attributes.getAttributeNames());
   }
 
-  public AttributeSet removeAttributes(AttributeSet old, Enumeration names)
+  public AttributeSet removeAttributes(AttributeSet old, Enumeration<?> names)
   {
     if (old instanceof MutableAttributeSet)
       {

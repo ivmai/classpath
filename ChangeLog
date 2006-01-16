@@ -1,3 +1,11 @@
+2006-01-15  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/text/html/HTMLDocument.java (parseBuffer): Genericized.
+	* javax/swing/text/StyleContext.java (removeAttributes): Genericized.
+	* java/beans/PersistenceDelegate.java (initialize): Genericized.
+	* java/beans/Encoder.java (getPersistenceDelegate): Genericized.
+	(setPersistenceDelegate): Likewise.
+
 2006-01-15  Wolfgang Baer  <WBaer@gmx.de>
 
 	* javax/print/attribute/standard/PrinterStateReasons.java: 
