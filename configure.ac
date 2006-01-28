@@ -421,7 +421,7 @@ dnl -----------------------------------------------------------
 dnl Add the include files for the native abstraction layer.
 dnl Used by AM_CPPFLAGS in the different modules.
 dnl -----------------------------------------------------------
-CLASSPATH_INCLUDES="-I\$(top_srcdir)/include -I\$(top_srcdir)/native/jni/classpath -I\$(top_srcdir)/native/target/Linux -I\$(top_srcdir)/native/target/generic"
+CLASSPATH_INCLUDES="-I\$(top_srcdir)/include -I\$(top_srcdir)/native/jni/classpath -I\$(top_srcdir)/native/jni/native-lib"
 AC_SUBST(CLASSPATH_INCLUDES)
 
 dnl -----------------------------------------------------------
@@ -585,9 +585,7 @@ native/jni/qt-peer/Makefile
 native/jni/xmlj/Makefile
 native/jni/midi-alsa/Makefile
 native/jni/midi-dssi/Makefile
-native/target/Makefile
-native/target/Linux/Makefile
-native/target/generic/Makefile
+native/jni/native-lib/Makefile
 resource/Makefile
 scripts/Makefile
 scripts/classpath.spec

@@ -1,3 +1,18 @@
+2006-01-28  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/target: Removed.
+
+	* configure.ac: Removed target from CLASSPATH_INCLUDES and
+	Makefile generation.
+
+	* native/jni/native-lib/Makefile.am,
+	native/jni/native-lib/cpnet.h,
+	native/jni/native-lib/cpnet.c
+	native/jni/native-lib/cpio.h,
+	native/jni/native-lib/cpio.c,
+	native/jni/native-lib/cpmath.h: Imported new native compatibility
+	layer.
+
 2006-01-28  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
 
 	* gnu/classpath/examples/swing/Demo.java (mkTree): Make a larger tree.

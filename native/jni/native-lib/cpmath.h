@@ -45,4 +45,6 @@ exception statement from your version. */
 #define cpmath_jlong_lt(l1, l2)  ((l1) < (l2))
 #define cpmath_jlong_sub_jint(l1, i2) ((l1) - (i2))
 
+#define CP_JLONG0 cpmath_jint_to_jlong(0)
+
 #endif

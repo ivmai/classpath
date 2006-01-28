@@ -41,31 +41,91 @@ exception statement from your version. */
 #include <jni.h>
 #include <jcl.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+
 typedef struct {
   jint len;
   char data[1];
 } cpnet_address;
 
-JNIEXPORT jint cpnet_openSocketStream(jint *fd);
-JNIEXPORT jint cpnet_openSocketDatagram(jint *fd);
-JNIEXPORT jint cpnet_close(jint fd);
-JNIEXPORT jint cpnet_connect(jint fd, cpnet_address *addr);
-JNIEXPORT jint cpnet_getLocalAddr(jint fd, cpnet_address **addr);
+#define CPNET_SHUTDOWN_READ 1
+#define CPNET_SHUTDOWN_WRITE 2
 
-static inline cpnet_address *cpnet_newIPV4Address(JNI_Env * env)
+JNIEXPORT jint cpnet_openSocketStream(JNIEnv *env, jint *fd);
+JNIEXPORT jint cpnet_openSocketDatagram(JNIEnv *env, jint *fd);
+JNIEXPORT jint cpnet_shutdown (JNIEnv *env, jint fd, jbyte flag);
+JNIEXPORT jint cpnet_close(JNIEnv *env, jint fd);
+JNIEXPORT jint cpnet_listen(JNIEnv *env, jint fd, jint queuelen);
+JNIEXPORT jint cpnet_accept(JNIEnv *env, jint fd, jint *newfd);
+JNIEXPORT jint cpnet_bind(JNIEnv *env, jint fd, cpnet_address *addr);
+JNIEXPORT jint cpnet_connect(JNIEnv *env, jint fd, cpnet_address *addr);
+JNIEXPORT jint cpnet_getLocalAddr(JNIEnv *env, jint fd, cpnet_address **addr);
+JNIEXPORT jint cpnet_getRemoteAddr(JNIEnv *env, jint fd, cpnet_address **addr);
+JNIEXPORT jint cpnet_setBroadcast(JNIEnv *env, jint fd, jint flag);
+JNIEXPORT jint cpnet_send (JNIEnv *env, jint fd, jbyte *data, jint len, jint *bytes_sent);
+JNIEXPORT jint cpnet_sendTo (JNIEnv *env, jint fd, jbyte *data, jint len, cpnet_address *addr, jint *bytes_sent);
+JNIEXPORT jint cpnet_recv (JNIEnv *env, jint fd, jbyte *data, jint len, jint *bytes_recv);
+JNIEXPORT jint cpnet_recvFrom (JNIEnv *env, jint fd, jbyte *data, jint len, cpnet_address **addr, jint *bytes_recv);
+JNIEXPORT jint cpnet_setSocketTCPNoDelay (JNIEnv *env, jint fd, jint nodelay);
+JNIEXPORT jint cpnet_getSocketTCPNoDelay (JNIEnv *env, jint fd, jint *nodelay);
+JNIEXPORT jint cpnet_setLinger (JNIEnv *env, jint fd, jint flag, jint value);
+JNIEXPORT jint cpnet_getLinger (JNIEnv *env, jint fd, jint *flag, jint *value);
+JNIEXPORT jint cpnet_setSocketTimeout (JNIEnv *env, jint fd, jint value);
+JNIEXPORT jint cpnet_getSocketTimeout (JNIEnv *env, jint fd, jint *value);
+JNIEXPORT jint cpnet_setSendBuf (JNIEnv *env, jint fd, jint value);
+JNIEXPORT jint cpnet_getSendBuf (JNIEnv *env, jint fd, jint *value);
+JNIEXPORT jint cpnet_setRecvBuf (JNIEnv *env, jint fd, jint value);
+JNIEXPORT jint cpnet_getRecvBuf (JNIEnv *env, jint fd, jint *value);
+JNIEXPORT jint cpnet_setTTL (JNIEnv *env, jint fd, jint value);
+JNIEXPORT jint cpnet_getTTL (JNIEnv *env, jint fd, jint *value);
+JNIEXPORT jint cpnet_setMulticastIF (JNIEnv *env, jint fd, cpnet_address *addr);
+JNIEXPORT jint cpnet_getMulticastIF (JNIEnv *env, jint fd, cpnet_address **addr);
+JNIEXPORT jint cpnet_setReuseAddress (JNIEnv *env, jint fd, jint reuse);
+JNIEXPORT jint cpnet_getReuseAddress (JNIEnv *env, jint fd, jint *reuse);
+JNIEXPORT jint cpnet_setKeepAlive (JNIEnv *env, jint fd, jint keep);
+JNIEXPORT jint cpnet_getKeepAlive (JNIEnv *env, jint fd, jint *keep);
+JNIEXPORT jint cpnet_getBindAddress (JNIEnv *env, jint fd, cpnet_address **addr);
+
+static inline cpnet_address *cpnet_newIPV4Address(JNIEnv * env)
 {
   cpnet_address *addr = (cpnet_address *)JCL_malloc(env, sizeof(cpnet_address) + sizeof(struct sockaddr_in));
   addr->len = sizeof(struct sockaddr_in);
+
+  return addr;
 }
 
-static inline void cpnet_freeAddress(JNI_Env * env, cpnet_address *addr)
+static inline void cpnet_freeAddress(JNIEnv * env, cpnet_address *addr)
 {
   JCL_free(env, addr);
 }
 
+static inline void cpnet_addressSetPort(cpnet_address *addr, jint port)
+{
+  struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(addr->data[0]);
+
+  ipaddr->sin_port = htons(port);
+}
+
+static inline jint cpnet_addressGetPort(cpnet_address *addr)
+{
+  struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(addr->data[0]);
+
+  return ntohs(ipaddr->sin_port);
+}
+
+static inline jboolean cpnet_isAddressEqual(cpnet_address *addr1, cpnet_address *addr2)
+{
+  if (addr1->len != addr2->len)
+    return JNI_FALSE;
+
+  return memcmp(addr1->data, addr2->data, addr1->len) == 0;
+}
+
 static inline void cpnet_IPV4AddressToBytes(cpnet_address *netaddr, unsigned char *octets)
 {
-  struct sockaddr_in *ipaddr = (struct sockaddr_in *)netaddr;
+  struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(netaddr->data[0]);
   jint sysaddr = ipaddr->sin_addr.s_addr;
 
   octets[0] = (sysaddr >> 24) & 0xff;
@@ -77,7 +137,7 @@ static inline void cpnet_IPV4AddressToBytes(cpnet_address *netaddr, unsigned cha
 static inline void cpnet_bytesToIPV4Address(cpnet_address *netaddr, unsigned char *octets)
 {
   jint sysaddr;
-  struct sockaddr_in *ipaddr = (struct sockaddr_in *)netaddr;
+  struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(netaddr->data[0]);
 
   sysaddr = ((jint)octets[0]) << 24;
   sysaddr |= ((jint)octets[1]) << 16;
@@ -85,8 +145,6 @@ static inline void cpnet_bytesToIPV4Address(cpnet_address *netaddr, unsigned cha
   sysaddr |= ((jint)octets[3]);
 
   ipaddr->sin_addr.s_addr = sysaddr;
-  
-  return netaddr;
 }
 
 #endif

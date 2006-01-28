@@ -1,0 +1,12 @@
+noinst_LTLIBRARIES = libclasspathnative.la
+libclasspathnative_la_SOURCES = cpnet.c \
+				cpnet.h \
+				cpio.c \
+				cpio.h \
+				cpnative.c \
+				cpnative.h \
+				cpmath.h
+
+AM_LDFLAGS = @CLASSPATH_MODULE@
+AM_CPPFLAGS = @CLASSPATH_INCLUDES@
+AM_CFLAGS = @WARNING_CFLAGS@ @STRICT_WARNING_CFLAGS@ @ERROR_CFLAGS@
