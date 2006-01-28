@@ -87,11 +87,28 @@ JNIEXPORT jint cpnet_getReuseAddress (JNIEnv *env, jint fd, jint *reuse);
 JNIEXPORT jint cpnet_setKeepAlive (JNIEnv *env, jint fd, jint keep);
 JNIEXPORT jint cpnet_getKeepAlive (JNIEnv *env, jint fd, jint *keep);
 JNIEXPORT jint cpnet_getBindAddress (JNIEnv *env, jint fd, cpnet_address **addr);
+JNIEXPORT jint cpnet_addMembership (JNIEnv *env, jint fd, cpnet_address *addr);
+JNIEXPORT jint cpnet_dropMembership (JNIEnv *env, jint fd, cpnet_address *addr);
+JNIEXPORT jint cpnet_getAvailableBytes (JNIEnv *env, jint fd, jint *availableBytes);
 
 static inline cpnet_address *cpnet_newIPV4Address(JNIEnv * env)
 {
   cpnet_address *addr = (cpnet_address *)JCL_malloc(env, sizeof(cpnet_address) + sizeof(struct sockaddr_in));
+  struct sockaddr_in *netaddr = (struct sockaddr_in *)&(addr->data[0]);
+
   addr->len = sizeof(struct sockaddr_in);
+  netaddr->sin_family = AF_INET;
+
+  return addr;
+}
+
+static inline cpnet_address *cpnet_newIPV6Address(JNIEnv * env)
+{
+  cpnet_address * addr = (cpnet_address *)JCL_malloc(env, sizeof(cpnet_address) + sizeof(struct sockaddr_in6));
+  struct sockaddr_in6 *netaddr = (struct sockaddr_in6 *)&(addr->data[0]);
+
+  addr->len = sizeof(struct sockaddr_in6);
+  netaddr->sin6_family = AF_INET6;
 
   return addr;
 }
@@ -123,7 +140,7 @@ static inline jboolean cpnet_isAddressEqual(cpnet_address *addr1, cpnet_address 
   return memcmp(addr1->data, addr2->data, addr1->len) == 0;
 }
 
-static inline void cpnet_IPV4AddressToBytes(cpnet_address *netaddr, unsigned char *octets)
+static inline void cpnet_IPV4AddressToBytes(cpnet_address *netaddr, jbyte *octets)
 {
   struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(netaddr->data[0]);
   jint sysaddr = ipaddr->sin_addr.s_addr;
@@ -145,6 +162,20 @@ static inline void cpnet_bytesToIPV4Address(cpnet_address *netaddr, unsigned cha
   sysaddr |= ((jint)octets[3]);
 
   ipaddr->sin_addr.s_addr = sysaddr;
+}
+
+static inline void cpnet_IPV6AddressToBytes(cpnet_address *netaddr, jbyte *octets)
+{
+  struct sockaddr_in6 *ipaddr = (struct sockaddr_in6 *)&(netaddr->data[0]);
+
+  memcpy(octets, &ipaddr->sin6_addr, 16);
+}
+
+static inline void cpnet_bytesToIPV6Address(cpnet_address *netaddr, jbyte *octets)
+{
+  struct sockaddr_in6 *ipaddr = (struct sockaddr_in6 *)&(netaddr->data[0]);
+
+  memcpy(&ipaddr->sin6_addr, octets, 16);
 }
 
 #endif

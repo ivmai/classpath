@@ -40,6 +40,7 @@ exception statement from your version. */
 #define _JAVANET_LOADED 
 
 #include <jni.h>
+#include <cpnet.h>
 
 /*************************************************************************/
 
@@ -89,15 +90,15 @@ exception statement from your version. */
  */
 
 extern int _javanet_get_int_field(JNIEnv *, jobject, const char *);
-extern int _javanet_get_netaddr(JNIEnv *, jobject);
+extern cpnet_address *_javanet_get_ip_netaddr(JNIEnv *, jobject);
 extern void _javanet_create(JNIEnv *, jobject, jboolean);
 extern void _javanet_close(JNIEnv *, jobject, int);
 extern void _javanet_connect(JNIEnv *, jobject, jobject, jint, jboolean);
 extern void _javanet_bind(JNIEnv *, jobject, jobject, jint, int);
 extern void _javanet_listen(JNIEnv *, jobject, jint);
 extern void _javanet_accept(JNIEnv *, jobject, jobject);
-extern int _javanet_recvfrom(JNIEnv *, jobject, jarray, int, int, int *, int *);
-extern void _javanet_sendto(JNIEnv *, jobject, jarray, int, int, int, int);
+extern int _javanet_recvfrom(JNIEnv *, jobject, jarray, int, int, cpnet_address **);
+extern void _javanet_sendto(JNIEnv *, jobject, jarray, int, int, cpnet_address *);
 extern jobject _javanet_get_option(JNIEnv *, jobject, jint);
 extern void _javanet_set_option(JNIEnv *, jobject, jint, jobject);
 extern void _javanet_shutdownInput (JNIEnv *, jobject);

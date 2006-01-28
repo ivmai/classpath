@@ -45,12 +45,9 @@ exception statement from your version. */
 #include <jni.h>
 #include <jcl.h>
 
+#include "cpnative.h"
+#include "cpnet.h"
 #include "javanet.h"
-
-#include "target_native.h"
-#ifndef WITHOUT_NETWORK
-#include "target_native_network.h"
-#endif /* WITHOUT_NETWORK */
 
 #include "java_net_VMInetAddress.h"
 
@@ -69,8 +66,8 @@ Java_java_net_VMInetAddress_getLocalHostname (JNIEnv * env,
   jstring retval;
 
 #ifndef WITHOUT_NETWORK
-  TARGET_NATIVE_NETWORK_GET_HOSTNAME (hostname, sizeof (hostname), result);
-  if (result != TARGET_NATIVE_OK)
+  result = cpnet_getHostname (hostname, sizeof (hostname));
+  if (result != CPNATIVE_OK)
     {
       strcpy (hostname, "localhost");
     }
@@ -138,14 +135,14 @@ Java_java_net_VMInetAddress_getHostByAddr (JNIEnv * env,
 #ifndef WITHOUT_NETWORK
   jbyte *octets;
   jsize len;
-  int addr;
+  cpnet_address *addr;
   char hostname[255];
   int result;
   jstring retval;
 
   /* Grab the byte[] array with the IP out of the input data */
   len = (*env)->GetArrayLength (env, arr);
-  if (len != 4)
+  if (len != 4 && len != 16)
     {
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Bad IP Address");
       return (jstring) NULL;
@@ -158,21 +155,31 @@ Java_java_net_VMInetAddress_getHostByAddr (JNIEnv * env,
       return (jstring) NULL;
     }
 
-  /* Convert it to a 32 bit address */
-  TARGET_NATIVE_NETWORK_IPADDRESS_BYTES_TO_INT (octets[0],
-						octets[1],
-						octets[2], octets[3], addr);
+  switch (len)
+    {
+    case 4:
+      addr = cpnet_newIPV4Address(env);
+      cpnet_bytesToIPV4Address (octets, addr);      
+      break;
+    case 16:
+      addr = cpnew_newIPV6Address(env);
+      cpnet_bytesToIPV6Address (octets, addr);
+      break;
+    default:
+      JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Bad IP Address");
+      return (jstring) NULL;
+
+   }
 
   /* Release some memory */
   (*env)->ReleaseByteArrayElements (env, arr, octets, 0);
 
   /* Resolve the address and return the name */
-  TARGET_NATIVE_NETWORK_GET_HOSTNAME_BY_ADDRESS (addr, hostname,
-						 sizeof (hostname), result);
-  if (result != TARGET_NATIVE_OK)
+  result = cpnet_getHostByAddr (addr, hostname, sizeof (hostname));
+  if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION,
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
+			  cpnative_getErrorString (result));
       return (jstring) NULL;
     }
 
@@ -218,7 +225,7 @@ Java_java_net_VMInetAddress_getHostByName (JNIEnv * env,
 					      addresses,
 					      max_addresses,
 					      addresses_count, result);
-  if (result != TARGET_NATIVE_OK)
+  if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, (char *) hostname);
       return (jobjectArray) NULL;

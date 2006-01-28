@@ -38,11 +38,13 @@ exception statement from your version. */
 /* do not move; needed here because of some macro definitions */
 #include <config.h>
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <jni.h>
 #include <jcl.h>
+#include "cpmath.h"
 #include "cpio.h"
 #include "cpnative.h"
 
@@ -320,7 +322,7 @@ Java_java_io_VMFile_isDirectory (JNIEnv * env,
   result = cpio_checkType (filename, &entryType);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == TARGET_NATIVE_OK && entryType == CPFILE_DIRECTORY) ? 1 : 0);
+  return ((result == CPNATIVE_OK && entryType == CPFILE_DIRECTORY) ? 1 : 0);
 #else /* not WITHOUT_FILESYSTEM */
   return (0);
 #endif /* not WITHOUT_FILESYSTEM */
@@ -351,26 +353,26 @@ Java_java_io_VMFile_length (JNIEnv * env,
      on failure */
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
-    return CPJLONG0;
+    return CP_JLONG0;
 
   /* open file for reading, get size and close file */
   result = cpio_openFile (filename, &tmpfd, CPFILE_FLAG_READ, 0);
   if (result != CPNATIVE_OK)
-    return CPJLONG0;
+    return CP_JLONG0;
 
   result = cpio_getFileSize (tmpfd, &length);
   if (result != CPNATIVE_OK)
     {
       cpio_closeFile (tmpfd);
-      return CPJLONG0;
+      return CP_JLONG0;
     }
 
   result = cpio_closeFile (tmpfd);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return (result == CPNATIVE_OK) ? length : CPJLONG0;
+  return (result == CPNATIVE_OK) ? length : CP_JLONG0;
 #else /* not WITHOUT_FILESYSTEM */
-  return CPJLONG0;
+  return CP_JLONG0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -607,7 +609,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 
   (*env)->ReleaseStringUTFChars (env, name, dirname);
 
-  if (result != TARGET_NATIVE_OK)
+  if (result != CPNATIVE_OK)
     {
       return (0);
     }
