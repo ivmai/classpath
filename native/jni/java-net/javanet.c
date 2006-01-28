@@ -246,10 +246,7 @@ _javanet_create_inetaddress (JNIEnv * env, int netaddr)
   jobject ia;
 
   /* Build a string IP address */
-  TARGET_NATIVE_NETWORK_INT_TO_IPADDRESS_BYTES (netaddr,
-						octets[0],
-						octets[1],
-						octets[2], octets[3]);
+  cpnet_netaddrToBytes(netaddr, octets);
   sprintf (buf, "%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3]);
   DBG ("_javanet_create_inetaddress(): Created ip addr string\n");
 
@@ -338,17 +335,17 @@ _javanet_set_remhost (JNIEnv * env, jobject this, int netaddr)
 /*************************************************************************/
 
 /*
- * Returns a 32 bit Internet address for the passed in InetAddress object
+ * Returns an Internet address for the passed in InetAddress object
  */
-int
-_javanet_get_netaddr (JNIEnv * env, jobject addr)
+cpnet_address *
+_javanet_get_ip_netaddr (JNIEnv * env, jobject addr)
 {
 #ifndef WITHOUT_NETWORK
   jclass cls = 0;
   jmethodID mid;
   jarray arr = 0;
   jbyte *octets;
-  int netaddr, len;
+  cpnet_address *netaddr, len;
 
   DBG ("_javanet_get_netaddr(): Entered _javanet_get_netaddr\n");
 
@@ -376,9 +373,11 @@ _javanet_get_netaddr (JNIEnv * env, jobject addr)
 
   DBG ("_javanet_get_netaddr(): Got the address\n");
 
-  /* Turn the IP address into a 32 bit Internet address in network byte order */
+  /* Turn the IP address into a system cpnet address.
+   * If the length is 4 then it is an IPV4 address, if it
+   * is 16 then it is an IPV6 address else it is an InternError. */
   len = (*env)->GetArrayLength (env, arr);
-  if (len != 4)
+  if (len != 4 && len != 16)
     {
       JCL_ThrowException (env, IO_EXCEPTION, "Internal Error");
       return 0;
@@ -391,10 +390,17 @@ _javanet_get_netaddr (JNIEnv * env, jobject addr)
 
   DBG ("_javanet_get_netaddr(): Grabbed bytes\n");
 
-  TARGET_NATIVE_NETWORK_IPADDRESS_BYTES_TO_INT (octets[0],
-						octets[1],
-						octets[2],
-						octets[3], netaddr);
+  switch (len)
+    {
+    case 4:      
+      netaddr = cpnet_newIPV4Address(env);
+      cpnet_bytesToIPV4netaddr(octets, netaddr);
+      break;
+    case 16:
+      netaddr = cpnet_newIPV6Address(env);
+      cpnet_bytesToIPV6netaddr(octets, netaddr);
+      break;
+    }
 
   (*env)->ReleaseByteArrayElements (env, arr, octets, 0);
   DBG ("_javanet_get_netaddr(): Done getting addr\n");
@@ -419,29 +425,29 @@ _javanet_create (JNIEnv * env, jobject this, jboolean stream)
   if (stream)
     {
       /* create a stream socket */
-      TARGET_NATIVE_NETWORK_SOCKET_OPEN_STREAM (fd, result);
-      if (result != TARGET_NATIVE_OK)
+      result = cpnet_openSocketStream(&fd);
+      if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
-			      TARGET_NATIVE_LAST_ERROR_STRING ());
+			      cpnative_getErrorString (result));
 	  return;
 	}
     }
   else
     {
       /* create a datagram socket, set broadcast option */
-      TARGET_NATIVE_NETWORK_SOCKET_OPEN_DATAGRAM (fd, result);
-      if (result != TARGET_NATIVE_OK)
+      result = cpnet_openSocketDatagram (&fd);
+      if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
-			      TARGET_NATIVE_LAST_ERROR_STRING ());
+			      cpnative_getErrorString (result));
 	  return;
 	}
-      TARGET_NATIVE_NETWORK_SOCKET_SET_OPTION_BROADCAST (fd, 1, result);
-      if (result != TARGET_NATIVE_OK)
+      result = cpnet_setBroadcast(fd, 1);
+      if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
-			      TARGET_NATIVE_LAST_ERROR_STRING ());
+			      cpnative_getErrorString (result));
 	  return;
 	}
     }
@@ -458,13 +464,11 @@ _javanet_create (JNIEnv * env, jobject this, jboolean stream)
       /* Try to make sure we close the socket since close() won't work. */
       do
 	{
-	  TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
-	  if (result != TARGET_NATIVE_OK
-	      && (TARGET_NATIVE_LAST_ERROR ()
-		  != TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL))
+	  result = cpnet_close(fd);
+	  if (result != CPNATIVE_OK && result != CPNATIVE_EINTR)
 	    return;
 	}
-      while (result != TARGET_NATIVE_OK);
+      while (result != CPNATIVE_OK);
       return;
     }
 
@@ -498,18 +502,16 @@ _javanet_close (JNIEnv * env, jobject this, int stream)
 			    "native_fd", -1);
   do
     {
-      TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
-      if (result != TARGET_NATIVE_OK)
+      result = cpnet_close (fd);
+      if (result != CPNATIVE_OK)
 	{
 	  /* Only throw an error when a "real" error occurs. */
-	  error = TARGET_NATIVE_LAST_ERROR ();
-	  if (error != TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL
-	      && error != ENOTCONN && error != ECONNRESET && error != EBADF)
+	  if (result != CPNATIVE_EINTR && result != ENOTCONN && result != ECONNRESET && result != EBADF)
 	    JCL_ThrowException (env, IO_EXCEPTION,
-				TARGET_NATIVE_LAST_ERROR_STRING ());
+				cpnative_getErrorString (result));
 	}
     }
-  while (error == TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL);
+  while (error == CPNATIVE_EINTR);
 
 #else /* not WITHOUT_NETWORK */
 #endif /* not WITHOUT_NETWORK */
@@ -525,9 +527,10 @@ _javanet_connect (JNIEnv * env, jobject this, jobject addr, jint port,
 		  jboolean stream)
 {
 #ifndef WITHOUT_NETWORK
-  int netaddr, fd;
+  cpnet_address *netaddr;
+  int fd;
   int result;
-  int local_address, local_port;
+  cpnet_address *local_addr;
   int remote_address, remote_port;
 
   DBG ("_javanet_connect(): Entered _javanet_connect\n");
@@ -539,6 +542,9 @@ _javanet_connect (JNIEnv * env, jobject this, jobject addr, jint port,
 
   if (port == -1)
     port = 0;
+
+  cpnet_addressSetPort(netaddr, port);
+
   DBG ("_javanet_connect(): Got network address\n");
 
   /* Grab the real socket file descriptor */
@@ -554,29 +560,28 @@ _javanet_connect (JNIEnv * env, jobject this, jobject addr, jint port,
   /* Connect up */
   do
     {
-      TARGET_NATIVE_NETWORK_SOCKET_CONNECT (fd, netaddr, port, result);
-      if (result != TARGET_NATIVE_OK
-	  && (TARGET_NATIVE_LAST_ERROR ()
-	      != TARGET_NATIVE_ERROR_INTERRUPT_FUNCTION_CALL))
+      result = cpnet_connect (fd, netaddr);
+      if (result != CPNATIVE_OK && result != CPNATIVE_EINTR)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
-			      TARGET_NATIVE_LAST_ERROR_STRING ());
+			      cpnative_getErrorString (result));
 	  return;
 	}
     }
-  while (result != TARGET_NATIVE_OK);
+  while (result != CPNATIVE_OK);
 
+  cpnet_freeAddress(env, netaddr);
+  
   DBG ("_javanet_connect(): Connected successfully\n");
 
   /* Populate instance variables */
-  TARGET_NATIVE_NETWORK_SOCKET_GET_LOCAL_INFO (fd, local_address, local_port,
-					       result);
-  if (result != TARGET_NATIVE_OK)
+  result = cpnet_getLocalAddr (fd, &local_addr);
+  if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, IO_EXCEPTION,
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
+			  cpnative_getErrorString (result));
       /* We don't care whether this succeeds. close() will cleanup later. */
-      TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+      cpnet_close (fd);
       return;
     }
 
@@ -584,63 +589,68 @@ _javanet_connect (JNIEnv * env, jobject this, jobject addr, jint port,
   if ((*env)->ExceptionOccurred (env))
     {
       /* We don't care whether this succeeds. close() will cleanup later. */
-      TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+      cpnet_freeAddress(env, local_addr);
+      cpnet_close (fd);
       return;
     }
   DBG ("_javanet_connect(): Created fd\n");
 
   if (stream)
     _javanet_set_int_field (env, this, "java/net/SocketImpl", "localport",
-			    local_port);
+			    cpnet_addressGetPort(local_addr));
   else
     _javanet_set_int_field (env, this, "java/net/DatagramSocketImpl",
-			    "localPort", local_port);
+			    "localPort", cpnet_addressGetPort(local_addr));
 
+  cpnet_freeAddress (env, fd);
   if ((*env)->ExceptionOccurred (env))
     {
       /* We don't care whether this succeeds. close() will cleanup later. */
-      TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+      cpnet_close (fd);
       return;
     }
   DBG ("_javanet_connect(): Set the local port\n");
 
-  TARGET_NATIVE_NETWORK_SOCKET_GET_REMOTE_INFO (fd, remote_address,
-						remote_port, result);
-  if (result != TARGET_NATIVE_OK)
+  result = cpnet_getRemoteAddr (fd, &remote_addr);
+  if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, IO_EXCEPTION,
-			  TARGET_NATIVE_LAST_ERROR_STRING ());
+			  cpnative_getErrorString (result));
       /* We don't care whether this succeeds. close() will cleanup later. */
-      TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+      cpnet_close (fd);
       return;
     }
 
   if (stream)
     {
-      if (remote_address == netaddr)
+      if (cpnet_isAddressEqual(remote_addr, netaddr))
 	{
 	  _javanet_set_remhost_addr (env, this, addr);
 	}
       else
 	{
-	  _javanet_set_remhost (env, this, remote_address);
+	  _javanet_set_remhost (env, this, remote_addr);
 	}
+
       if ((*env)->ExceptionOccurred (env))
 	{
 	  /* We don't care whether this succeeds. close() will cleanup later.
 	   */
-	  TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+	  cpnet_freeAddress (env, fd);
+	  cpnet_close (fd);
 	  return;
 	}
       DBG ("_javanet_connect(): Set the remote host\n");
 
       _javanet_set_int_field (env, this, "java/net/SocketImpl", "port",
-			      remote_port);
+			      cpnet_addressGetPort(remote_addr));
+      cpnet_freeAddress (env, remote_addr);
+
       if ((*env)->ExceptionOccurred (env))
 	{
 	  /* We don't care whether this succeeds. close() will cleanup later.
 	   */
-	  TARGET_NATIVE_NETWORK_SOCKET_CLOSE (fd, result);
+	  cpnet_close (fd);
 	  return;
 	}
       DBG ("_javanet_connect(): Set the remote port\n");
