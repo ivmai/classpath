@@ -1,0 +1,37 @@
+2006-02-04  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* Resynchronized with GNU Classpath's HEAD branch.
+	
+2006-01-28  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/java-io/java_io_VMFile.c,
+	native/jni/java-net/gnu_java_net_VMPlainDatagramSocketImpl.c,
+	native/jni/java-net/gnu_java_net_VMPlainSocketImpl.c,
+	native/jni/java-net/javanet.c,
+	native/jni/java-net/javanet.h: Adapted the VM layer code
+	to the new native layer.
+
+	* native/jni/native-lib/cpnet.h
+	(cpnet_addMembership,
+	cpnet_dropMembership,
+	cpnet_getAvailableBytes): Added the declarations of
+	some new functions.
+	(cpnet_newIPV6Address,
+	cpnet_IPV6AddressToBytes,
+	cpnet_bytesToIPV6Address): Implemented.
+	(cpnet_newIPV4Address): Initialize the sin_family field.
+
+2006-01-28  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/target: Removed.
+
+	* configure.ac: Removed target from CLASSPATH_INCLUDES and
+	Makefile generation.
+
+	* native/jni/native-lib/Makefile.am,
+	native/jni/native-lib/cpnet.h,
+	native/jni/native-lib/cpnet.c
+	native/jni/native-lib/cpio.h,
+	native/jni/native-lib/cpio.c,
+	native/jni/native-lib/cpmath.h: Imported new native compatibility
+	layer.
