@@ -49,7 +49,7 @@ import java.security.PublicKey;
  * public and private keys for storage and on-the-wire transmission, as well as
  * (b) re-creating their internal Java representation from external sources.</p>
  *
- * @version $Revision: 1.1.2.1 $
+ * @version $Revision: 1.1.2.2 $
  */
 public interface IKeyPairCodec
 {

@@ -58,7 +58,7 @@ import java.util.HashMap;
  * a call to an <code>initialize()</code> method), the GNU Crypto provider
  * uses a default <i>modulus</i> size (keysize) of 1024 bits.<p>
  *
- * @version $Revision: 1.1.2.2 $
+ * @version $Revision: 1.1.2.3 $
  */
 public class DSSKeyPairGeneratorSpi extends KeyPairGeneratorAdapter implements
     DSAKeyPairGenerator

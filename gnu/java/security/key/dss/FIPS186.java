@@ -54,7 +54,7 @@ import java.security.SecureRandom;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.
  *
- * @version $Revision: 1.1.2.2 $
+ * @version $Revision: 1.1.2.3 $
  */
 public class FIPS186
 {

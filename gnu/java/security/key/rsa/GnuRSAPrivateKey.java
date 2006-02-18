@@ -57,7 +57,7 @@ import java.security.interfaces.RSAPrivateKey;
  *    Jakob Jonsson and Burt Kaliski.</li>
  * </ol>
  *
- * @version $Revision: 1.1.2.1 $
+ * @version $Revision: 1.1.2.2 $
  */
 public class GnuRSAPrivateKey extends GnuRSAKey implements PrivateKey,
     RSAPrivateCrtKey

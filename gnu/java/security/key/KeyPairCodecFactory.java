@@ -55,7 +55,7 @@ import java.security.PublicKey;
 /**
  * <p>A <i>Factory</i> class to instantiate key encoder/decoder instances.</p>
  *
- * @version $Revision: 1.1.2.1 $
+ * @version $Revision: 1.1.2.2 $
  */
 public class KeyPairCodecFactory
 {
