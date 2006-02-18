@@ -1,5 +1,5 @@
-/* gnu.java.beans.DefaultExceptionListener
-   Copyright (C) 2004 Free Software Foundation, Inc.
+/* gnu/regexp/RETokenIndependent.java
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,23 +35,42 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.beans.decoder;
+package gnu.regexp;
 
-import java.beans.ExceptionListener;
-
-/** The DefaultExceptionListener is the default implementation of the ExceptionListener
- * interface. An instance of this class is used whenever the user provided no
- * ExceptionListener instance on its own.
- *
- * <p>The implementation just writes the exception's message to <code>System.err</code>.</p>
- *
- * @author Robert Schuster
+/**
+ * @author Ito Kazumitsu
  */
-public class DefaultExceptionListener implements ExceptionListener
+final class RETokenIndependent extends REToken
 {
-  public void exceptionThrown(Exception e)
-  {
-    System.err.println("non-critical exception: " + e + " - message: "
-                       + e.getMessage());
+  REToken re;
+
+  RETokenIndependent(REToken re) throws REException {
+    super(0);
+    this.re = re;
   }
+
+  int getMinimumLength() {
+    return re.getMinimumLength();
+  }
+
+  int getMaximumLength() {
+    return re.getMaximumLength();
+  }
+
+  boolean match(CharIndexed input, REMatch mymatch)
+  {
+    if (re.match(input, mymatch)) {
+      // Once we have found a match, we do not see other possible matches.
+      mymatch.next = null;
+      return next(input, mymatch);
+    }
+    return false;
+  }
+
+    void dump(StringBuffer os) {
+	os.append("(?>");
+	re.dumpAll(os);
+	os.append(')');
+    }
 }
+

@@ -538,18 +538,24 @@ public abstract class AbstractDocument implements Document, Serializable
     DefaultDocumentEvent event =
       new DefaultDocumentEvent(offset, text.length(),
 			       DocumentEvent.EventType.INSERT);
-    
-    writeLock();
-    UndoableEdit undo = content.insertString(offset, text);
-    if (undo != null)
-      event.addEdit(undo);
 
-    insertUpdate(event, attributes);
-    writeUnlock();
+    try
+      {
+        writeLock();
+        UndoableEdit undo = content.insertString(offset, text);
+        if (undo != null)
+          event.addEdit(undo);
 
-    fireInsertUpdate(event);
-    if (undo != null)
-      fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
+        insertUpdate(event, attributes);
+
+        fireInsertUpdate(event);
+        if (undo != null)
+          fireUndoableEditUpdate(new UndoableEditEvent(this, undo));
+      }
+    finally
+      {
+        writeUnlock();
+      }
   }
 
   /**
@@ -640,6 +646,12 @@ public abstract class AbstractDocument implements Document, Serializable
     // more times than you've previously called lock, but it doesn't make
     // sure that the threads calling unlock were the same ones that called lock
 
+    // If the current thread holds the write lock, and attempted to also obtain
+    // a readLock, then numReaders hasn't been incremented and we don't need
+    // to unlock it here.
+    if (currentWriter == Thread.currentThread())
+      return;
+
     // FIXME: the reference implementation throws a 
     // javax.swing.text.StateInvariantError here
     if (numReaders == 0)
@@ -675,18 +687,18 @@ public abstract class AbstractDocument implements Document, Serializable
       new DefaultDocumentEvent(offset, length,
 			       DocumentEvent.EventType.REMOVE);
     
-    removeUpdate(event);
-
-    boolean shouldFire = content.getString(offset, length).length() != 0;
-    
-    writeLock();
-    UndoableEdit temp = content.remove(offset, length);
-    writeUnlock();
-    
-    postRemoveUpdate(event);
-    
-    if (shouldFire)
-      fireRemoveUpdate(event);
+    try
+      {
+        writeLock();
+        UndoableEdit temp = content.remove(offset, length);
+        removeUpdate(event);
+        postRemoveUpdate(event);
+        fireRemoveUpdate(event);
+      }
+    finally
+      {
+        writeUnlock();
+      } 
   }
 
   /**
@@ -841,7 +853,7 @@ public abstract class AbstractDocument implements Document, Serializable
    */
   protected void writeLock()
   {
-    if (currentWriter!= null && currentWriter.equals(Thread.currentThread()))
+    if (currentWriter != null && currentWriter.equals(Thread.currentThread()))
       return;
     synchronized (documentCV)
       {
@@ -1695,9 +1707,12 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getEndOffset()
     {
+      int end = 0;
       if (getElementCount() == 0)
-        throw new NullPointerException("This BranchElement has no children.");
-      return children[children.length - 1].getEndOffset();
+        end = getLength(); // FIXME: That ain't correct, fix it.
+      else
+        end = children[children.length - 1].getEndOffset();
+      return end;
     }
 
     /**
@@ -1722,9 +1737,12 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getStartOffset()
     {
+      int start = 0;
       if (getElementCount() == 0)
-        throw new NullPointerException("This BranchElement has no children.");
-      return children[0].getStartOffset();
+        start = 0; // FIXME: That ain't correct, fix it.
+      else
+        start = children[0].getStartOffset();
+      return start;
     }
 
     /**

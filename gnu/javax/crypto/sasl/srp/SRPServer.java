@@ -73,7 +73,7 @@ import javax.security.sasl.SaslServer;
 /**
  * <p>The SASL-SRP server-side mechanism.</p>
  *
- * @version $Revision: 1.1.2.1 $
+ * @version $Revision: 1.1.2.2 $
  */
 public class SRPServer extends ServerMechanism implements SaslServer
 {

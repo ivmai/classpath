@@ -1,5 +1,9 @@
 2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
 
+	* Resynchronized with GNU Classpath's HEAD branch.
+	
+2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
 	* native/jni/java-net/java_net_VMInetAddress.c: Fixed compilation
 	errors. Removed any remaining TARGET invocations.
 

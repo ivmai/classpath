@@ -900,7 +900,7 @@ public abstract class Component
         // Avoid NullPointerExceptions by creating a local reference.
         ComponentPeer currentPeer=peer;
         if (currentPeer != null)
-            currentPeer.setVisible(true);
+            currentPeer.show();
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
@@ -1598,16 +1598,18 @@ public abstract class Component
   public Dimension preferredSize()
   {
     if (prefSize == null)
-      if (peer == null)
-	return new Dimension(width, height);
-      else 
-        prefSize = peer.getPreferredSize();
+      {
+        if (peer == null)
+          prefSize = minimumSize();
+        else
+          prefSize = peer.getPreferredSize();
+      }
     return prefSize;
   }
 
   /**
    * Returns the component's minimum size.
-   *
+   * 
    * @return the component's minimum size
    * @see #getPreferredSize()
    * @see LayoutManager
@@ -1882,8 +1884,7 @@ public abstract class Component
    */
   public void repaint()
   {   
-    if (isShowing())
-      repaint(0, 0, 0, width, height);
+    repaint(0, 0, 0, width, height);
   }
 
   /**
@@ -1897,8 +1898,7 @@ public abstract class Component
    */
   public void repaint(long tm)
   {
-    if (isShowing())
-      repaint(tm, 0, 0, width, height);
+    repaint(tm, 0, 0, width, height);
   }
 
   /**
@@ -1915,8 +1915,7 @@ public abstract class Component
    */
   public void repaint(int x, int y, int w, int h)
   {
-    if (isShowing())
-      repaint(0, x, y, w, h);
+    repaint(0, x, y, w, h);
   }
 
   /**
@@ -4482,6 +4481,109 @@ p   * <li>the set of backward traversal keys
   {
     if (changeSupport != null)
       changeSupport.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, byte oldValue,
+                                    byte newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Byte(oldValue),
+                                       new Byte(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, char oldValue,
+                                    char newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Character(oldValue),
+                                       new Character(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, short oldValue,
+                                    short newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Short(oldValue),
+                                       new Short(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, long oldValue,
+                                    long newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Long(oldValue),
+                                       new Long(newValue));
+  }
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, float oldValue,
+                                    float newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Float(oldValue),
+                                       new Float(newValue));
+  }
+
+
+  /**
+   * Report a change in a bound property to any registered property listeners.
+   *
+   * @param propertyName the property that changed
+   * @param oldValue the old property value
+   * @param newValue the new property value
+   *
+   * @since 1.5
+   */
+  public void firePropertyChange(String propertyName, double oldValue,
+                                 double newValue)
+  {
+    if (changeSupport != null)
+      changeSupport.firePropertyChange(propertyName, new Double(oldValue),
+                                       new Double(newValue));
   }
 
   /**

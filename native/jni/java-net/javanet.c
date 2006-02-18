@@ -568,7 +568,7 @@ _javanet_connect (JNIEnv * env, jobject this, jobject addr, jint port,
       result = cpnet_connect (env, fd, netaddr);
       if (result != CPNATIVE_OK && result != CPNATIVE_EINTR)
 	{
-	  JCL_ThrowException (env, IO_EXCEPTION,
+	  JCL_ThrowException (env, CONNECT_EXCEPTION,
 			      cpnative_getErrorString (result));
 	  return;
 	}

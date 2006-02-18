@@ -1,5 +1,5 @@
-/* java.lang.Math -- common mathematical functions, native allowed
-   Copyright (C) 1998, 2001, 2002, 2003 Free Software Foundation, Inc.
+/* java.lang.Math -- common mathematical functions, native allowed (VMMath)
+   Copyright (C) 1998, 2001, 2002, 2003, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -52,23 +52,31 @@ import java.util.Random;
  * @author Paul Fisher
  * @author John Keiser
  * @author Eric Blake (ebb9@email.byu.edu)
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
  * @since 1.0
  */
 public final class Math
 {
+
+  // FIXME - This is here because we need to load the "javalang" system
+  // library somewhere late in the bootstrap cycle. We cannot do this
+  // from VMSystem or VMRuntime since those are used to actually load
+  // the library. This is mainly here because historically Math was
+  // late enough in the bootstrap cycle to start using System after it
+  // was initialized (called from the java.util classes).
+  static
+  {
+    if (Configuration.INIT_LOAD_LIBRARY)
+      {
+        System.loadLibrary("javalang");
+      }
+  }
+
   /**
    * Math is non-instantiable
    */
   private Math()
   {
-  }
-
-  static
-  {
-    if (Configuration.INIT_LOAD_LIBRARY)
-      {
-	System.loadLibrary("javalang");
-      }
   }
 
   /**
@@ -298,7 +306,10 @@ public final class Math
    * @param a the angle (in radians)
    * @return sin(a)
    */
-  public static native double sin(double a);
+  public static double sin(double a)
+  {
+    return VMMath.sin(a);
+  }
 
   /**
    * The trigonometric function <em>cos</em>. The cosine of NaN or infinity is
@@ -307,7 +318,10 @@ public final class Math
    * @param a the angle (in radians)
    * @return cos(a)
    */
-  public static native double cos(double a);
+  public static double cos(double a)
+  {
+    return VMMath.cos(a);
+  }
 
   /**
    * The trigonometric function <em>tan</em>. The tangent of NaN or infinity
@@ -317,7 +331,10 @@ public final class Math
    * @param a the angle (in radians)
    * @return tan(a)
    */
-  public static native double tan(double a);
+  public static double tan(double a)
+  {
+    return VMMath.tan(a);
+  }
 
   /**
    * The trigonometric function <em>arcsin</em>. The range of angles returned
@@ -328,7 +345,10 @@ public final class Math
    * @param a the sin to turn back into an angle
    * @return arcsin(a)
    */
-  public static native double asin(double a);
+  public static double asin(double a)
+  {
+    return VMMath.asin(a);
+  }
 
   /**
    * The trigonometric function <em>arccos</em>. The range of angles returned
@@ -339,7 +359,10 @@ public final class Math
    * @param a the cos to turn back into an angle
    * @return arccos(a)
    */
-  public static native double acos(double a);
+  public static double acos(double a)
+  {
+    return VMMath.acos(a);
+  }
 
   /**
    * The trigonometric function <em>arcsin</em>. The range of angles returned
@@ -351,7 +374,10 @@ public final class Math
    * @return arcsin(a)
    * @see #atan2(double, double)
    */
-  public static native double atan(double a);
+  public static double atan(double a)
+  {
+    return VMMath.atan(a);
+  }
 
   /**
    * A special version of the trigonometric function <em>arctan</em>, for
@@ -400,7 +426,10 @@ public final class Math
    * @return <em>theta</em> in the conversion of (x, y) to (r, theta)
    * @see #atan(double)
    */
-  public static native double atan2(double y, double x);
+  public static double atan2(double y, double x)
+  {
+    return VMMath.atan2(y,x);
+  }
 
   /**
    * Take <em>e</em><sup>a</sup>.  The opposite of <code>log()</code>. If the
@@ -414,7 +443,10 @@ public final class Math
    * @see #log(double)
    * @see #pow(double, double)
    */
-  public static native double exp(double a);
+  public static double exp(double a)
+  {
+    return VMMath.exp(a);
+  }
 
   /**
    * Take ln(a) (the natural log).  The opposite of <code>exp()</code>. If the
@@ -430,7 +462,10 @@ public final class Math
    * @return the natural log of <code>a</code>
    * @see #exp(double)
    */
-  public static native double log(double a);
+  public static double log(double a)
+  {
+    return VMMath.log(a);
+  }
 
   /**
    * Take a square root. If the argument is NaN or negative, the result is
@@ -438,13 +473,18 @@ public final class Math
    * infinity; and if the result is either zero, the result is the same.
    * This is accurate within the limits of doubles.
    *
-   * <p>For other roots, use pow(a, 1 / rootNumber).
+   * <p>For a cube root, use <code>cbrt</code>.  For other roots, use
+   * <code>pow(a, 1 / rootNumber)</code>.</p>
    *
    * @param a the numeric argument
    * @return the square root of the argument
+   * @see #cbrt(double)
    * @see #pow(double, double)
    */
-  public static native double sqrt(double a);
+  public static double sqrt(double a)
+  {
+    return VMMath.sqrt(a);
+  }
 
   /**
    * Raise a number to a power. Special cases:<ul>
@@ -514,7 +554,10 @@ public final class Math
    * @param b the power to raise it to
    * @return a<sup>b</sup>
    */
-  public static native double pow(double a, double b);
+  public static double pow(double a, double b)
+  {
+    return VMMath.pow(a,b);
+  }
 
   /**
    * Get the IEEE 754 floating point remainder on two numbers. This is the
@@ -530,7 +573,10 @@ public final class Math
    * @return the IEEE 754-defined floating point remainder of x/y
    * @see #rint(double)
    */
-  public static native double IEEEremainder(double x, double y);
+  public static double IEEEremainder(double x, double y)
+  {
+    return VMMath.IEEEremainder(x,y);
+  }
 
   /**
    * Take the nearest integer that is that is greater than or equal to the
@@ -541,7 +587,10 @@ public final class Math
    * @param a the value to act upon
    * @return the nearest integer &gt;= <code>a</code>
    */
-  public static native double ceil(double a);
+  public static double ceil(double a)
+  {
+    return VMMath.ceil(a);
+  }
 
   /**
    * Take the nearest integer that is that is less than or equal to the
@@ -551,7 +600,10 @@ public final class Math
    * @param a the value to act upon
    * @return the nearest integer &lt;= <code>a</code>
    */
-  public static native double floor(double a);
+  public static double floor(double a)
+  {
+    return VMMath.floor(a);
+  }
 
   /**
    * Take the nearest integer to the argument.  If it is exactly between
@@ -561,7 +613,10 @@ public final class Math
    * @param a the value to act upon
    * @return the nearest integer to <code>a</code>
    */
-  public static native double rint(double a);
+  public static double rint(double a)
+  {
+    return VMMath.rint(a);
+  }
 
   /**
    * Take the nearest integer to the argument.  This is equivalent to
@@ -647,4 +702,5 @@ public final class Math
   {
     return (rads * 180) / PI;
   }
+
 }

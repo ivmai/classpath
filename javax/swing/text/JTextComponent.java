@@ -1241,9 +1241,15 @@ public abstract class JTextComponent extends JComponent
    */
   public String getSelectedText()
   {
+    int start = getSelectionStart();
+    int offset = getSelectionEnd() - start;
+    
+    if (offset <= 0)
+      return null;
+    
     try
       {
-        return doc.getText(getSelectionStart(), getSelectionEnd());
+        return doc.getText(start, offset);
       }
     catch (BadLocationException e)
       {
@@ -1592,8 +1598,12 @@ public abstract class JTextComponent extends JComponent
         // Insert new text.
         doc.insertString(start, content, null);
 
-        // Set dot to new position.
-        setCaretPosition(start + content.length());
+        // Set dot to new position,
+        dot = start + content.length();
+        setCaretPosition(dot);
+        
+        // and update it's magic position.
+        caret.setMagicCaretPosition(modelToView(dot).getLocation());
       }
     catch (BadLocationException e)
       {

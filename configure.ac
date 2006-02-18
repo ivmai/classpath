@@ -568,6 +568,7 @@ doc/api/Makefile
 external/Makefile
 external/sax/Makefile
 external/w3c_dom/Makefile
+external/relaxngDatatype/Makefile
 gnu/classpath/Configuration.java
 include/Makefile
 native/Makefile
@@ -592,6 +593,7 @@ scripts/classpath.spec
 lib/Makefile
 lib/gen-classlist.sh
 lib/copy-vmresources.sh
+tools/Makefile
 examples/Makefile
 examples/Makefile.jawt])
 AC_CONFIG_COMMANDS([gen-classlist],[chmod 755 lib/gen-classlist.sh])
