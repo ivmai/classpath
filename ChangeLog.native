@@ -1,5 +1,13 @@
 2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
 
+	* native/jni/java-lang/java_lang_VMProcess.c: Removed TARGET
+	dependency. Simplified the JNI code by moving some part into the
+	native layer.
+
+	* native/jni/native-lib/cpproc.h: New interface to handle processes.
+
+2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
 	* Resynchronized with GNU Classpath's HEAD branch.
 	
 2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
