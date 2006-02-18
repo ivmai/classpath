@@ -236,7 +236,7 @@ static jobject
 _javanet_create_inetaddress (JNIEnv * env, cpnet_address *netaddr)
 {
 #ifndef WITHOUT_NETWORK
-  unsigned char octets[4];
+  jbyte octets[4];
   char buf[16];
   jclass ia_cls;
   jmethodID mid;
@@ -676,8 +676,6 @@ _javanet_bind (JNIEnv * env, jobject this, jobject addr, jint port,
 	       int stream)
 {
 #ifndef WITHOUT_NETWORK
-  jbyteArray arr = 0;
-  jbyte *octets;
   jint fd;
   cpnet_address *tmpaddr;
   cpnet_address *local_addr;
@@ -704,16 +702,11 @@ _javanet_bind (JNIEnv * env, jobject this, jobject addr, jint port,
   cpnet_freeAddress (env, tmpaddr);
   if (result != CPNATIVE_OK)
     {
-      (*env)->ReleaseByteArrayElements (env, arr, octets, 0);
-
       JCL_ThrowException (env, BIND_EXCEPTION,
 			  cpnative_getErrorString (result));
       return;
     }
   DBG ("_javanet_bind(): Past bind\n");
-
-
-  (*env)->ReleaseByteArrayElements (env, arr, octets, 0);
 
   /* Update instance variables, specifically the local port number */
   result = cpnet_getLocalAddr (env, fd, &local_addr);

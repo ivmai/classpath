@@ -1,3 +1,19 @@
+2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/java-net/java_net_VMInetAddress.c: Fixed compilation
+	errors. Removed any remaining TARGET invocations.
+
+	* native/jni/java-net/javanet.c
+	(_javanet_create_inetaddress): Removed spurious arr and
+	octets. Fixed compilation errors.
+
+	* native/jni/native-lib/cpnet.h
+	(cpnet_getHostname, cpnet_getHostByName, cpnet_getHostByAddr,
+	cpnet_setIPV4Any, cpnet_freeAddresses, cpnet_isIPV6Address,
+	cpnet_isIPV4Address): New functions.
+	(cpnet_bytesToIPV4Address): Fixed interface to be consistent with
+	the rest.
+	
 2006-02-04  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* Resynchronized with GNU Classpath's HEAD branch.

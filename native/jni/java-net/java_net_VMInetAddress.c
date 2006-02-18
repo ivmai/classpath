@@ -66,7 +66,7 @@ Java_java_net_VMInetAddress_getLocalHostname (JNIEnv * env,
   jstring retval;
 
 #ifndef WITHOUT_NETWORK
-  result = cpnet_getHostname (hostname, sizeof (hostname));
+  result = cpnet_getHostname (env, hostname, sizeof (hostname));
   if (result != CPNATIVE_OK)
     {
       strcpy (hostname, "localhost");
@@ -91,6 +91,7 @@ Java_java_net_VMInetAddress_lookupInaddrAny (JNIEnv * env,
 					     __attribute__ ((__unused__)))
 {
   jarray IParray;
+  cpnet_address *addr;
   jbyte *octets;
 
   /* Allocate an array for the IP address */
@@ -105,17 +106,18 @@ Java_java_net_VMInetAddress_lookupInaddrAny (JNIEnv * env,
   octets = (*env)->GetByteArrayElements (env, IParray, 0);
 
 #ifndef WITHOUT_NETWORK
-  TARGET_NATIVE_NETWORK_INT_TO_IPADDRESS_BYTES (INADDR_ANY,
-						octets[0],
-						octets[1],
-						octets[2], octets[3]);
-  (*env)->ReleaseByteArrayElements (env, IParray, octets, 0);
+  addr = cpnet_newIPV4Address (env);
+  cpnet_setIPV4Any (addr);
+  cpnet_IPV4AddressToBytes (addr, octets);
+  cpnet_freeAddress (env, addr);
 #else /* not WITHOUT_NETWORK */
   octets[0] = 0;
   octets[1] = 0;
   octets[2] = 0;
   octets[3] = 0;
 #endif /* not WITHOUT_NETWORK */
+
+  (*env)->ReleaseByteArrayElements (env, IParray, octets, 0);
 
   return (IParray);
 }
@@ -159,11 +161,11 @@ Java_java_net_VMInetAddress_getHostByAddr (JNIEnv * env,
     {
     case 4:
       addr = cpnet_newIPV4Address(env);
-      cpnet_bytesToIPV4Address (octets, addr);      
+      cpnet_bytesToIPV4Address (addr, octets);      
       break;
     case 16:
-      addr = cpnew_newIPV6Address(env);
-      cpnet_bytesToIPV6Address (octets, addr);
+      addr = cpnet_newIPV6Address(env);
+      cpnet_bytesToIPV6Address (addr, octets);
       break;
     default:
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Bad IP Address");
@@ -175,7 +177,7 @@ Java_java_net_VMInetAddress_getHostByAddr (JNIEnv * env,
   (*env)->ReleaseByteArrayElements (env, arr, octets, 0);
 
   /* Resolve the address and return the name */
-  result = cpnet_getHostByAddr (addr, hostname, sizeof (hostname));
+  result = cpnet_getHostByAddr (env, addr, hostname, sizeof (hostname));
   if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION,
@@ -201,16 +203,14 @@ Java_java_net_VMInetAddress_getHostByName (JNIEnv * env,
 {
 #ifndef WITHOUT_NETWORK
   const char *hostname;
-/* FIXME: limitation of max. 64 addresses - how to make it more flexibale? */
-  int addresses[64];
+  cpnet_address **addresses;
   jsize addresses_count;
   int result;
   jclass arr_class;
   jobjectArray addrs;
-  int i;
+  jint i, j;
   jbyte *octets;
   jarray ret_octets;
-  int max_addresses;
 
   /* Grab the hostname string */
   hostname = (*env)->GetStringUTFChars (env, host, 0);
@@ -220,11 +220,7 @@ Java_java_net_VMInetAddress_getHostByName (JNIEnv * env,
       return (jobjectArray) NULL;
     }
 
-  max_addresses = sizeof (addresses) / sizeof (addresses[0]);
-  TARGET_NATIVE_NETWORK_GET_HOSTNAME_BY_NAME (hostname,
-					      addresses,
-					      max_addresses,
-					      addresses_count, result);
+  result = cpnet_getHostByName (env, hostname, &addresses, &addresses_count);
   if (result != CPNATIVE_OK)
     {
       JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, (char *) hostname);
@@ -249,24 +245,53 @@ Java_java_net_VMInetAddress_getHostByName (JNIEnv * env,
   /* Now loop and copy in each address */
   for (i = 0; i < addresses_count; i++)
     {
-      ret_octets = (*env)->NewByteArray (env, 4);
-      if (!ret_octets)
+      if (cpnet_isIPV6Address (addresses[i]))
+	{
+	  ret_octets = (*env)->NewByteArray (env, 16);
+
+	  if (!ret_octets)
+	    {
+	      JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Internal Error");
+	      cpnet_freeAddresses (env, addresses, addresses_count);
+	      return (jobjectArray) NULL;
+	    }
+	  
+	  octets = (*env)->GetByteArrayElements (env, ret_octets, 0);
+
+	  cpnet_IPV6AddressToBytes (addresses[i], octets);
+
+	  (*env)->ReleaseByteArrayElements (env, ret_octets, octets, 0);
+
+	  (*env)->SetObjectArrayElement (env, addrs, i, ret_octets);
+	}
+      else if (cpnet_isIPV4Address (addresses[i]))
+	{
+	  ret_octets = (*env)->NewByteArray (env, 4);
+
+	  if (!ret_octets)
+	    {
+	      JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Internal Error");
+	      cpnet_freeAddresses (env, addresses, addresses_count);
+	      return (jobjectArray) NULL;
+	    }
+	  
+	  octets = (*env)->GetByteArrayElements (env, ret_octets, 0);
+
+	  cpnet_IPV4AddressToBytes (addresses[i], octets);
+
+	  (*env)->ReleaseByteArrayElements (env, ret_octets, octets, 0);
+
+	  (*env)->SetObjectArrayElement (env, addrs, i, ret_octets);
+	}
+      else
 	{
 	  JCL_ThrowException (env, UNKNOWN_HOST_EXCEPTION, "Internal Error");
+	  cpnet_freeAddresses (env, addresses, addresses_count);
 	  return (jobjectArray) NULL;
 	}
-
-      octets = (*env)->GetByteArrayElements (env, ret_octets, 0);
-
-      TARGET_NATIVE_NETWORK_INT_TO_IPADDRESS_BYTES (addresses[i],
-						    octets[0],
-						    octets[1],
-						    octets[2], octets[3]);
-
-      (*env)->ReleaseByteArrayElements (env, ret_octets, octets, 0);
-
-      (*env)->SetObjectArrayElement (env, addrs, i, ret_octets);
     }
+
+  cpnet_freeAddresses (env, addresses, addresses_count);
 
   return (addrs);
 #else /* not WITHOUT_NETWORK */
