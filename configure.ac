@@ -235,6 +235,8 @@ AC_PROG_CC
 AC_PROG_CPP
 
 if test "x${COMPILE_JNI}" = xyes; then
+  GCC_ATTRIBUTE_UNUSED
+
   AC_HEADER_STDC
 
   dnl Checking sizeof void * is needed for fdlibm to work properly on ppc64, 

@@ -40,6 +40,7 @@ exception statement from your version. */
 
 #include <jni.h>
 #include <jcl.h>
+#include <string.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -53,8 +54,8 @@ typedef struct {
 #define CPNET_SHUTDOWN_READ 1
 #define CPNET_SHUTDOWN_WRITE 2
 
-JNIEXPORT jint cpnet_openSocketStream(JNIEnv *env, jint *fd);
-JNIEXPORT jint cpnet_openSocketDatagram(JNIEnv *env, jint *fd);
+JNIEXPORT jint cpnet_openSocketStream(JNIEnv *env, jint *fd, jint family);
+JNIEXPORT jint cpnet_openSocketDatagram(JNIEnv *env, jint *fd, jint family);
 JNIEXPORT jint cpnet_shutdown (JNIEnv *env, jint fd, jbyte flag);
 JNIEXPORT jint cpnet_close(JNIEnv *env, jint fd);
 JNIEXPORT jint cpnet_listen(JNIEnv *env, jint fd, jint queuelen);
@@ -175,7 +176,7 @@ static inline jboolean cpnet_isIPV4Address(cpnet_address *addr)
 static inline void cpnet_IPV4AddressToBytes(cpnet_address *netaddr, jbyte *octets)
 {
   struct sockaddr_in *ipaddr = (struct sockaddr_in *)&(netaddr->data[0]);
-  jint sysaddr = ipaddr->sin_addr.s_addr;
+  jint sysaddr = ntohl(ipaddr->sin_addr.s_addr);
 
   octets[0] = (sysaddr >> 24) & 0xff;
   octets[1] = (sysaddr >> 16) & 0xff;
@@ -193,7 +194,7 @@ static inline void cpnet_bytesToIPV4Address(cpnet_address *netaddr, jbyte *octet
   sysaddr |= ((jint)octets[2]) << 8;
   sysaddr |= ((jint)octets[3]);
 
-  ipaddr->sin_addr.s_addr = sysaddr;
+  ipaddr->sin_addr.s_addr = htonl(sysaddr);
 }
 
 static inline void cpnet_IPV6AddressToBytes(cpnet_address *netaddr, jbyte *octets)

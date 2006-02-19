@@ -1,5 +1,22 @@
 2006-02-19  Guilhem Lavaux  <guilhem@kaffe.org>
 
+	* configure.ac: Invoke GCC_ATTRIBUTE_UNUSED.
+
+	* m4/gcc_attribute.m4: New file from ac_archive.
+	
+	* native/jni/java-net/javanet.c: Adapted to cpnet API
+	modification.
+
+	* native/jni/native-lib/cpnet.c: Implemented.
+
+	* native/jni/native-lib/cpnet.h
+	(cpnet_openSocketDatagram,
+	cpnet_openSocketStream): These calls need an address family now.
+	(cpnet_IPV4AddressToBytes,
+	cpnet_bytesToIPV4Address): Convert the address to network order.
+	
+2006-02-19  Guilhem Lavaux  <guilhem@kaffe.org>
+
 	* native/jni/java-io/java_io_VMFile.c,
 	native/jni/java-nio/gnu_java_nio_channels_FileChannelImpl.c,
 	native/jni/midi-dssi/dssi_data.h,

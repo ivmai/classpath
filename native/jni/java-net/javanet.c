@@ -430,7 +430,7 @@ _javanet_create (JNIEnv * env, jobject this, jboolean stream)
   if (stream)
     {
       /* create a stream socket */
-      result = cpnet_openSocketStream(env, &fd);
+      result = cpnet_openSocketStream(env, &fd, AF_INET);
       if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
@@ -441,7 +441,7 @@ _javanet_create (JNIEnv * env, jobject this, jboolean stream)
   else
     {
       /* create a datagram socket, set broadcast option */
-      result = cpnet_openSocketDatagram (env, &fd);
+      result = cpnet_openSocketDatagram (env, &fd, AF_INET);
       if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, IO_EXCEPTION,
@@ -1376,7 +1376,7 @@ _javanet_get_option (JNIEnv * env, jobject this, jint option_id)
       break;
 
     case SOCKOPT_SO_BINDADDR:
-      result = cpnet_getBindAddress (env, fd, &address);
+      result = cpnet_getLocalAddr (env, fd, &address);
       if (result != CPNATIVE_OK)
 	{
 	  JCL_ThrowException (env, SOCKET_EXCEPTION,
