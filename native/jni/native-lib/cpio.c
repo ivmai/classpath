@@ -71,7 +71,6 @@ exception statement from your version. */
 #endif
 
 #include "cpnative.h"
-#include "cpmath.h"
 #include "cpio.h"
 
 JNIEXPORT int cpio_openFile (const char *filename, int *fd, int flags, int permissions)
@@ -280,13 +279,13 @@ JNIEXPORT int cpio_setFileSize (int native_fd, jlong new_size)
   if (result != CPNATIVE_OK)
     return result;
 
-  if (cpmath_jlong_lt (file_size, new_size))
+  if (file_size < new_size)
     {
       /* File is too short -- seek to one byte short of where we want,
        * then write a byte */
 
       /* move to position n-1 */
-      result = cpio_setFilePosition (native_fd, cpmath_jlong_sub_jint (new_size, 1));
+      result = cpio_setFilePosition (native_fd, new_size-1);
       if (result != CPNATIVE_OK)
 	return result;
 
@@ -299,14 +298,14 @@ JNIEXPORT int cpio_setFileSize (int native_fd, jlong new_size)
 	return result;
 
       /* Reposition file pointer to where we started if not beyond new len. */
-      if (cpmath_jlong_lt (save_offset, new_size))
+      if (save_offset < new_size)
 	{
 	  result = cpio_setFilePosition (native_fd, save_offset);
 	  if (result != CPNATIVE_OK)
 	    return result;
 	}
     }
-  else if (cpmath_jlong_lt (new_size, file_size))
+  else if (new_size < file_size)
     {
       /* File is too long - use ftruncate if available */
       result = cpio_truncate (native_fd, new_size);
@@ -314,7 +313,7 @@ JNIEXPORT int cpio_setFileSize (int native_fd, jlong new_size)
 	  return result;
 
       /* Reposition file pointer when it now is beyond the end of file. */
-      if (cpmath_jlong_lt (new_size, save_offset))
+      if (new_size < save_offset)
 	{
 	  result = cpio_setFilePosition (native_fd, new_size);
 	  if (result != CPNATIVE_OK)

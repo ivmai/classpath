@@ -46,7 +46,6 @@ exception statement from your version. */
 
 #include "cpnative.h"
 #include "cpio.h"
-#include "cpmath.h"
 
 #include "gnu_java_nio_channels_FileChannelImpl.h"
 
@@ -255,7 +254,7 @@ Java_gnu_java_nio_channels_FileChannelImpl_available (JNIEnv * env,
   while (result != CPNATIVE_OK);
 
   /* FIXME NYI ??? why only jint and not jlong? */
-  return cpmath_jlong_to_jint (bytes_available);
+  return (jint)bytes_available;
 }
 
 JNIEXPORT jlong JNICALL
@@ -272,7 +271,7 @@ Java_gnu_java_nio_channels_FileChannelImpl_size (JNIEnv * env, jobject obj)
     {
       JCL_ThrowException (env, IO_EXCEPTION,
 			  cpnative_getErrorString (result));
-      return cpmath_jint_to_jlong(-1);
+      return -1;
     }
 
   return file_size;
@@ -297,7 +296,7 @@ Java_gnu_java_nio_channels_FileChannelImpl_implPosition (JNIEnv * env,
     {
       JCL_ThrowException (env, IO_EXCEPTION,
 			  cpnative_getErrorString (result));
-      return cpmath_jint_to_jlong(-1);
+      return -1;
     }
 
   return current_offset;

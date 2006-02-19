@@ -44,7 +44,6 @@ exception statement from your version. */
 
 #include <jni.h>
 #include <jcl.h>
-#include "cpmath.h"
 #include "cpio.h"
 #include "cpnative.h"
 
@@ -73,7 +72,7 @@ Java_java_io_VMFile_create (JNIEnv * env,
   filename = JCL_jstring_to_cstring (env, name);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_openFile (filename, &fd, CPFILE_FLAG_CREATE|CPFILE_FLAG_WRITE, CPFILE_PERMISSION_NORMAL);
@@ -84,14 +83,14 @@ Java_java_io_VMFile_create (JNIEnv * env,
 			    "java/io/IOException",
 			    cpnative_getErrorString (result));
       JCL_free_cstring (env, name, filename);
-      return (0);
+      return 0;
     }
   cpio_closeFile (fd);
 
   JCL_free_cstring (env, name, filename);
-  return (1);
+  return 1;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -120,7 +119,7 @@ Java_java_io_VMFile_canRead (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   /* The lazy man's way out.  We actually do open the file for reading
@@ -128,12 +127,12 @@ Java_java_io_VMFile_canRead (JNIEnv * env,
   result = cpio_openFile (filename, &fd, CPFILE_FLAG_READ, 0);
   (*env)->ReleaseStringUTFChars (env, name, filename);
   if (result != CPNATIVE_OK)
-    return (0);
+    return 0;
   cpio_closeFile (fd);
 
-  return (1);
+  return 1;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -162,7 +161,7 @@ Java_java_io_VMFile_canWrite (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   /* The lazy man's way out.  We actually do open the file for writing
@@ -171,13 +170,13 @@ Java_java_io_VMFile_canWrite (JNIEnv * env,
   (*env)->ReleaseStringUTFChars (env, name, filename);
   if (result != CPNATIVE_OK)
     {
-      return (0);
+      return 0;
     }
   cpio_closeFile (fd);
 
-  return (1);
+  return 1;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -205,15 +204,15 @@ Java_java_io_VMFile_setReadOnly (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_setFileReadonly (filename);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return result == CPNATIVE_OK ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -241,15 +240,15 @@ Java_java_io_VMFile_exists (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_isFileExists (filename);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return result == CPNATIVE_OK ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -279,15 +278,15 @@ Java_java_io_VMFile_isFile (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_checkType (filename, &entryType);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK && entryType == CPFILE_FILE) ? 1 : 0);
+  return result == CPNATIVE_OK && entryType == CPFILE_FILE ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -316,15 +315,15 @@ Java_java_io_VMFile_isDirectory (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
   
   result = cpio_checkType (filename, &entryType);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK && entryType == CPFILE_DIRECTORY) ? 1 : 0);
+  return result == CPNATIVE_OK && entryType == CPFILE_DIRECTORY ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -353,26 +352,26 @@ Java_java_io_VMFile_length (JNIEnv * env,
      on failure */
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
-    return CP_JLONG0;
+    return 0;
 
   /* open file for reading, get size and close file */
   result = cpio_openFile (filename, &tmpfd, CPFILE_FLAG_READ, 0);
   if (result != CPNATIVE_OK)
-    return CP_JLONG0;
+    return 0;
 
   result = cpio_getFileSize (tmpfd, &length);
   if (result != CPNATIVE_OK)
     {
       cpio_closeFile (tmpfd);
-      return CP_JLONG0;
+      return 0;
     }
 
   result = cpio_closeFile (tmpfd);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return (result == CPNATIVE_OK) ? length : CP_JLONG0;
+  return result == CPNATIVE_OK ? length : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return CP_JLONG0;
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -401,15 +400,15 @@ Java_java_io_VMFile_lastModified (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return CP_JLONG0;
+      return 0;
     }
 
   result = cpio_getModificationTime (filename, &mtime);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK) ? mtime : CP_JLONG0);
+  return result == CPNATIVE_OK ? mtime : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (CP_JLONG0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -437,15 +436,15 @@ Java_java_io_VMFile_setLastModified (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_setModificationTime (filename, newtime);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return result == CPNATIVE_OK ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -474,15 +473,15 @@ Java_java_io_VMFile_delete (JNIEnv * env,
   filename = (*env)->GetStringUTFChars (env, name, 0);
   if (filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_removeFile (filename);
   (*env)->ReleaseStringUTFChars (env, name, filename);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return result == CPNATIVE_OK ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -510,15 +509,15 @@ Java_java_io_VMFile_mkdir (JNIEnv * env,
   pathname = (*env)->GetStringUTFChars (env, name, 0);
   if (pathname == NULL)
     {
-      return (0);
+      return 0;
     }
 
   result = cpio_mkdir (pathname);
   (*env)->ReleaseStringUTFChars (env, name, pathname);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return (result == CPNATIVE_OK) ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -546,23 +545,23 @@ Java_java_io_VMFile_renameTo (JNIEnv * env,
   old_filename = (*env)->GetStringUTFChars (env, t, 0);
   if (old_filename == NULL)
     {
-      return (0);
+      return 0;
     }
 
   new_filename = (*env)->GetStringUTFChars (env, d, 0);
   if (new_filename == NULL)
     {
       (*env)->ReleaseStringUTFChars (env, t, old_filename);
-      return (0);
+      return 0;
     }
 
   result = cpio_rename (old_filename, new_filename);
   (*env)->ReleaseStringUTFChars (env, d, new_filename);
   (*env)->ReleaseStringUTFChars (env, t, old_filename);
 
-  return ((result == CPNATIVE_OK) ? 1 : 0);
+  return (result == CPNATIVE_OK) ? 1 : 0;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }
 
@@ -601,7 +600,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
   dirname = (*env)->GetStringUTFChars (env, name, 0);
   if (dirname == NULL)
     {
-      return (0);
+      return 0;
     }
 
   /* open directory for reading */
@@ -611,7 +610,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 
   if (result != CPNATIVE_OK)
     {
-      return (0);
+      return 0;
     }
 
   /* allocate filelist */
@@ -619,7 +618,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
   if (filelist == NULL)
     {
       result = cpio_closeDir (handle);
-      return (0);
+      return 0;
     }
   filelist_count = 0;
   max_filelist_count = REALLOC_SIZE;
@@ -646,7 +645,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 		    }
 		  JCL_free (env, filelist);
 		  result = cpio_closeDir (handle);
-		  return (0);
+		  return 0;
 		}
 	      filelist = tmp_filelist;
 	      max_filelist_count += REALLOC_SIZE;
@@ -676,7 +675,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 	  JCL_free (env, filelist[i]);
 	}
       JCL_free (env, filelist);
-      return (0);
+      return 0;
     }
   filearray = (*env)->NewObjectArray (env, filelist_count, str_clazz, 0);
   if (filearray == NULL)
@@ -686,7 +685,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 	  JCL_free (env, filelist[i]);
 	}
       JCL_free (env, filelist);
-      return (0);
+      return 0;
     }
   for (i = 0; i < filelist_count; i++)
     {
@@ -701,7 +700,7 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
 	      JCL_free (env, filelist[i]);
 	    }
 	  JCL_free (env, filelist);
-	  return (0);
+	  return 0;
 	}
 
       /* save into array */
@@ -718,8 +717,8 @@ Java_java_io_VMFile_list (JNIEnv * env, jobject obj
     }
   JCL_free (env, filelist);
 
-  return (filearray);
+  return filearray;
 #else /* not WITHOUT_FILESYSTEM */
-  return (0);
+  return 0;
 #endif /* not WITHOUT_FILESYSTEM */
 }

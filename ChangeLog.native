@@ -1,3 +1,12 @@
+2006-02-19  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/java-io/java_io_VMFile.c,
+	native/jni/java-nio/gnu_java_nio_channels_FileChannelImpl.c,
+	native/jni/midi-dssi/dssi_data.h,
+	native/jni/native-lib/cpio.c,
+	native/jni/native-lib/cpmath.h: Removed cpmath
+	dependency. Fixed coding style.
+
 2006-02-18  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* native/jni/java-lang/java_lang_VMProcess.c: Removed TARGET
