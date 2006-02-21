@@ -1,5 +1,21 @@
 2006-02-21  Anthony Balkissoon  <abalkiss@redhat.com>
 
+	* java/math/BigDecimal.java:
+	(mathContext): New field.
+	(precision): Likewise.
+	(BigDecimal(int)): New constructor.
+	(BigDecimal(long)): Likewise.
+	(BigDecimal(BigInteger)): Added API docs.
+	(BigDecimal(BigInteger, int)): Removed incorrect NumberFormatException
+	and added API docs.
+	(plus): New method.
+	(round): Likewise.
+	(precision): Likewise.
+	(valueOf): Likewise.
+	(numDigitsInLong): New implementation method.
+
+2006-02-21  Anthony Balkissoon  <abalkiss@redhat.com>
+
 	* java/math/MathContext.java: New class.
 	* java/math/RoundingMode: New Enum.
 

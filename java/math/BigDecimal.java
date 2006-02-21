@@ -41,6 +41,8 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
 {
   private BigInteger intVal;
   private int scale;
+  private MathContext mathContext;
+  private int precision = 0;
   private static final long serialVersionUID = 6108874887143696463L;
 
   /**
@@ -73,15 +75,47 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   public static final int ROUND_HALF_EVEN = 6;
   public static final int ROUND_UNNECESSARY = 7;
 
+  /**
+   * Constructs a new BigDecimal whose unscaled value is val and whose
+   * scale is zero.
+   * @param val the value of the new BigDecimal
+   * @since 1.5
+   */
+  public BigDecimal (int val)
+  {
+    this.intVal = BigInteger.valueOf(val);
+    this.scale = 0;
+  }
+  
+  /**
+   * Constructs a new BigDecimal whose unscaled value is val and whose
+   * scale is zero.
+   * @param val the value of the new BigDecimal
+   */
+  public BigDecimal (long val)
+  {
+    this.intVal = BigInteger.valueOf(val);
+    this.scale = 0;
+  }
+  
+  /**
+   * Constructs a BigDecimal whose unscaled value is num and whose
+   * scale is zero.
+   * @param num the value of the new BigDecimal
+   */
   public BigDecimal (BigInteger num) 
   {
     this (num, 0);
   }
 
-  public BigDecimal (BigInteger num, int scale) throws NumberFormatException 
+  /**
+   * Constructs a BigDecimal whose unscaled value is num and whose
+   * scale is scale.
+   * @param num
+   * @param scale
+   */
+  public BigDecimal (BigInteger num, int scale)
   {
-    if (scale < 0) 
-      throw new NumberFormatException ("scale of " + scale + " is < 0");
     this.intVal = num;
     this.scale = scale;
   }
@@ -455,7 +489,108 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   {
     return new BigDecimal (intVal.negate (), scale);
   }
+  
+  /**
+   * Returns this BigDecimal.  This is included for symmetry with the 
+   * method negate().
+   * @return this
+   * @since 1.5
+   */
+  public BigDecimal plus()
+  {
+    return this;
+  }
+  
+  /**
+   * Returns a BigDecimal which is this BigDecimal rounded according to the
+   * MathContext rounding settings.
+   * @param mc the MathContext that tells us how to round
+   * @return the rounded BigDecimal
+   */
+  public BigDecimal round(MathContext mc)
+  {
+    int mcPrecision = mc.getPrecision();
+    int numToChop = precision - mcPrecision;
+    // If mc specifies not to chop any digits or if we've already chopped 
+    // enough digits (say by using a MathContext in the constructor for this
+    // BigDecimal) then just return this.
+    if (mcPrecision == 0 || numToChop <= 0)
+      return this;
+    
+    // Make a new BigDecimal which is the correct power of 10 to chop off
+    // the required number of digits and then call divide.
+    BigDecimal div = 
+      new BigDecimal(BigInteger.valueOf((long)Math.pow(10, numToChop)));
+    BigDecimal rounded = divide(div, scale, mc.getRoundingMode().ordinal());
+    rounded.scale -= numToChop;
+    return rounded;
+  }
+  
+  /**
+   * Returns the precision of this BigDecimal (the number of digits in the
+   * unscaled value).  The precision of a zero value is 1.
+   * @return the number of digits in the unscaled value, or 1 if the value 
+   * is zero.
+   */
+  public int precision()
+  {
+    if (precision == 0)
+      precision = numDigitsInLong(intVal.longValue());
+    return precision;
+  }
 
+  /**
+   * This method determines the number of digits in the long value l. 
+   * @param l the long value
+   * @return the number of digits in l
+   */
+  private static int numDigitsInLong(long l)
+  {
+    // We divide up the range in a binary fashion, this first if
+    // takes care of numbers with 1 to 9 digits.
+    if (l < 1000000000L)
+    {
+      // This if is for numbers with 1 to 5 digits.
+      if (l < 100000L)
+        {
+          if (l < 100L)
+            return (l < 10L) ? 1 : 2;
+          if (l < 10000L)
+            return (l < 1000L) ? 3 : 4;
+          return 5;
+        }
+      // Here we handle numbers with 6 to 9 digits.
+      if (l < 10000000L)
+        return (l < 1000000L) ? 6 : 7;
+      return (l < 100000000L) ? 8 : 9;
+    }
+    // If we are at this point that means we didn't enter the loop for
+    // numbers with 1 to 9 digits, so our number has 10 to 19 digits. 
+    // This first if handles numbers with 10 to 14 digits.
+    if (l < 100000000000000L)
+      {
+        // This handles numbers with 10 to 12 digits.
+        if (l < 1000000000000L)
+          {
+            if (l < 100000000000L)
+              return (l < 10000000000L) ? 10 : 11;
+            return 12;
+          }
+        // This handles numbers with 13 or 14 digits.
+        return (l < 10000000000000L) ? 13 : 14;
+      }
+    // Finally we handle numbers with 15 to 19 digits.
+    if (l < 100000000000000000L)
+      {
+        // 15 to 17 digits.
+        if (l < 1000000000000000L)
+          return 15;
+        return (l < 10000000000000000L) ? 16 : 17;
+      }
+    // 18 or 19 digits.
+    return (l < 1000000000000000000L) ? 18 : 19;
+  }
+  
   public String toString () 
   {
     String bigStr = intVal.toString();
@@ -523,5 +658,21 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     throws ArithmeticException, IllegalArgumentException
   {
     return divide (ONE, scale, roundingMode);
+  }
+  
+  /**
+   * Returns a new BigDecimal constructed from the BigDecimal(String) 
+   * constructor using the Double.toString(double) method to obtain
+   * the String.
+   * @param val the double value used in Double.toString(double)
+   * @return a BigDecimal representation of val
+   * @throws NumberFormatException if val is NaN or infinite
+   * @since 1.5
+   */
+  public static BigDecimal valueOf(double val)
+  {
+    if (Double.isInfinite(val) || Double.isNaN(val))
+      throw new NumberFormatException("argument cannot be NaN or infinite.");
+    return new BigDecimal(Double.toString(val));
   }
 }
