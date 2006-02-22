@@ -170,6 +170,209 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       }
   }
 
+  /**
+   * Constructs a BigDecimal from the char subarray and rounding 
+   * according to the MathContext.
+   * @param in the char array
+   * @param offset the start of the subarray
+   * @param len the length of the subarray
+   * @param mc the MathContext for rounding
+   * @throws NumberFormatException if the char subarray is not a valid 
+   * BigDecimal representation
+   * @throws ArithmeticException if the result is inexact but the rounding 
+   * mode is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal(char[] in, int offset, int len, MathContext mc)
+  {
+    this(in, offset, len);
+    // If mc has precision other than zero then we must round.
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal temp = this.round(mc);
+        this.intVal = temp.intVal;
+        this.scale = temp.scale;
+        this.precision = temp.precision;
+      }
+  }
+  
+  /**
+   * Constructs a BigDecimal from the char array and rounding according
+   * to the MathContext. 
+   * @param in the char array
+   * @param mc the MathContext
+   * @throws NumberFormatException if <code>in</code> is not a valid BigDecimal
+   * representation
+   * @throws ArithmeticException if the result is inexact but the rounding mode
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal(char[] in, MathContext mc)
+  {
+    this(in, 0, in.length);
+    // If mc has precision other than zero then we must round.
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal temp = this.round(mc);
+        this.intVal = temp.intVal;
+        this.scale = temp.scale;
+        this.precision = temp.precision;
+      } 
+  }
+  
+  /**
+   * Constructs a BigDecimal from the given char array, accepting the same
+   * sequence of characters as the BigDecimal(String) constructor.
+   * @param in the char array
+   * @throws NumberFormatException if <code>in</code> is not a valid BigDecimal
+   * representation
+   * @since 1.5
+   */
+  public BigDecimal(char[] in)
+  {
+    this(in, 0, in.length);
+  }
+  
+  /**
+   * Constructs a BigDecimal from a char subarray, accepting the same sequence
+   * of characters as the BigDecimal(String) constructor.  
+   * @param in the char array
+   * @param offset the start of the subarray
+   * @param len the length of the subarray
+   * @throws NumberFormatException if <code>in</code> is not a valid
+   * BigDecimal representation.
+   * @since 1.5
+   */
+  public BigDecimal(char[] in, int offset, int len)
+  {
+    //  start is the index into the char array where the significand starts
+    int start = offset;
+    //  end is one greater than the index of the last character used
+    int end = offset + len;
+    //  point is the index into the char array where the exponent starts
+    //  (or, if there is no exponent, this is equal to end)
+    int point = offset;
+    //  dot is the index into the char array where the decimal point is 
+    //  found, or -1 if there is no decimal point
+    int dot = -1;
+    
+    //  The following examples show what these variables mean.  Note that
+    //  point and dot don't yet have the correct values, they will be 
+    //  properly assigned in a loop later on in this method.
+    //
+    //  Example 1
+    //
+    //         +  1  0  2  .  4  6  9
+    //  __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+    //
+    //  offset = 2, len = 8, start = 3, dot = 6, point = end = 10
+    //
+    //  Example 2
+    //
+    //         +  2  3  4  .  6  1  3  E  -  1
+    //  __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+    //
+    //  offset = 2, len = 11, start = 3, dot = 6, point = 10, end = 13
+    //
+    //  Example 3
+    //
+    //         -  1  2  3  4  5  e  7  
+    //  __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+    //
+    //  offset = 2, len = 8, start = 3, dot = -1, point = 8, end = 10 
+    
+    //  Determine the sign of the number.
+    boolean negative = false;
+    if (in[offset] == '+')
+      {
+        ++start;
+        ++point;
+      }
+    else if (in[offset] == '-')
+      {
+        ++start;
+        ++point;
+        negative = true;
+      }
+
+    //  Check each character looking for the decimal point and the 
+    //  start of the exponent.
+    while (point < end)
+      {
+        char c = in[point];
+        if (c == '.')
+          {
+            // If dot != -1 then we've seen more than one decimal point.
+            if (dot != -1)
+              throw new NumberFormatException("multiple `.'s in number");
+            dot = point;
+          }
+        // Break when we reach the start of the exponent.
+        else if (c == 'e' || c == 'E')
+          break;
+        // Throw an exception if the character was not a decimal or an 
+        // exponent and is not a digit.
+        else if (!Character.isDigit(c))
+          throw new NumberFormatException("unrecognized character at " + point
+                                          + ": " + c);
+        ++point;
+      }
+
+    // val is a StringBuilder from which we'll create a BigInteger
+    // which will be the unscaled value for this BigDecimal
+    StringBuilder val = new StringBuilder(point - start - 1);
+    if (dot != -1)
+      {
+        // If there was a decimal we must combine the two parts that 
+        // contain only digits and we must set the scale properly.
+        val.append(in, start, dot - start);
+        val.append(in, dot + 1, point - dot - 1);
+        scale = point - 1 - dot;
+      }
+    else
+      {
+        // If there was no decimal then the unscaled value is just the number
+        // formed from all the digits and the scale is zero.
+        val.append(in, start, point - start);
+        scale = 0;
+      }
+    if (val.length() == 0)
+      throw new NumberFormatException("no digits seen");
+
+    // Prepend a negative sign if necessary.
+    if (negative)
+      val.insert(0, '-');
+    intVal = new BigInteger(val.toString());
+
+    // Now parse exponent.
+    // If point < end that means we broke out of the previous loop when we
+    // saw an 'e' or an 'E'.
+    if (point < end)
+      {
+        point++;
+        // Ignore a '+' sign.
+        if (in[point] == '+')
+          point++;
+
+        // Throw an exception if there were no digits found after the 'e'
+        // or 'E'.
+        if (point >= end)
+          throw new NumberFormatException("no exponent following e or E");
+
+        try
+          {
+            // Adjust the scale according to the exponent.  
+            // Remember that the value of a BigDecimal is
+            // unscaledValue x Math.pow(10, -scale)
+            scale -= Integer.parseInt(new String(in, point, end - point));
+          }
+        catch (NumberFormatException ex)
+          {
+            throw new NumberFormatException("malformed exponent");
+          }
+      }
+  }
+  
   public BigDecimal (String num) throws NumberFormatException 
   {
     int len = num.length();
@@ -233,18 +436,8 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
           throw new NumberFormatException ("no exponent following e or E");
 	
         try 
-	  {
-	    int exp = Integer.parseInt (num.substring (point));
-	    exp -= scale;
-	    if (signum () == 0)
-	      scale = 0;
-	    else if (exp > 0)
-	      {
-		intVal = intVal.multiply (BigInteger.valueOf (10).pow (exp));
-		scale = 0;
-	      }
-	    else
-	      scale = - exp;
+	  {	    
+        scale -= Integer.parseInt (num.substring (point));
 	  }
         catch (NumberFormatException ex) 
 	  {
