@@ -1,6 +1,15 @@
 2006-02-23  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java:
+	(toString): Fixed a problem where the negative sign was being displayed
+	twice in the exponent.
+	(toEngineeringString): New method.
+	(toPlainString): Likewise.
+	(pow): Likewise.
+
+2006-02-23  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigDecimal.java:
 	(toString): Rewrote this method to behave as specified.  Added API
 	comments to explain behaviour.
 	(scaleByPowerOfTen): New method.

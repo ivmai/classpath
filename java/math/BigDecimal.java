@@ -850,17 +850,173 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
         // decimal after the first digit.
         if (bigStr.length() > 1)
           val.insert(1, '.');
-        // And then append 'E' and the exponent - adjExp.
+        // And then append 'E' and the exponent (adjExp).
         val.append('E');
-        if (adjExp < 0)
-          val.append('-');
-        else
+        if (adjExp >= 0)
           val.append('+');
         val.append(adjExp);
       }
     return val.toString();
   }
 
+  /**
+   * Returns the String representation of this BigDecimal, using engineering
+   * notation if necessary.  This is similar to toString() but when exponents 
+   * are used the exponent is made to be a multiple of 3 such that the integer
+   * part is between 1 and 999.
+   * 
+   * @return a String representation of this BigDecimal in engineering notation
+   * @since 1.5
+   */
+  public String toEngineeringString()
+  {
+    // bigStr is the String representation of the unscaled value.  If
+    // scale is zero we simply return this.
+    String bigStr = intVal.toString();
+    if (scale == 0)
+      return bigStr;
+
+    // This is the adjusted exponent described above.
+    int adjExp = -scale + (numDigitsInLong(intVal.longValue()) - 1);
+    StringBuilder val = new StringBuilder();
+
+    if (scale >= 0 && adjExp >= -6)
+      {
+        // Convert to character form without scientific notation.
+        boolean negative = (bigStr.charAt(0) == '-');
+        int point = bigStr.length() - scale - (negative ? 1 : 0);
+        if (point <= 0)
+          {
+            // Zeros need to be prepended to the StringBuilder.
+            if (negative)
+              val.append('-');
+            // Prepend a '0' and a '.' and then as many more '0's as necessary.
+            val.append('0').append('.');
+            while (point < 0)
+              {
+                val.append('0');
+                point++;
+              }
+            // Append the unscaled value.
+            val.append(bigStr.substring(negative ? 1 : 0));
+          }
+        else
+          {
+            // No zeros need to be prepended so the String is simply the 
+            // unscaled value with the decimal point inserted.
+            val.append(bigStr);
+            val.insert(point + (negative ? 1 : 0), '.');
+          }
+      }
+    else
+      {
+        // We must use scientific notation to represent this BigDecimal.
+        // The exponent must be a multiple of 3 and the integer part
+        // must be between 1 and 999.
+        val.append(bigStr);        
+        int zeros = adjExp % 3;
+        int dot = 1;
+        if (adjExp > 0)
+          {
+            // If the exponent is positive we just move the decimal to the
+            // right and decrease the exponent until it is a multiple of 3.
+            dot += zeros;
+            adjExp -= zeros;
+          }
+        else
+          {
+            // If the exponent is negative then we move the dot to the right
+            // and decrease the exponent (increase its magnitude) until 
+            // it is a multiple of 3.  Note that this is not adjExp -= zeros
+            // because the mod operator doesn't give us the distance to the 
+            // correct multiple of 3.  (-5 mod 3) is -2 but the distance from
+            // -5 to the correct multiple of 3 (-6) is 1, not 2.
+            if (zeros == -2)
+              {
+                dot += 1;
+                adjExp -= 1;
+              }
+            else if (zeros == -1)
+              {
+                dot += 2;
+                adjExp -= 2;
+              }
+          }
+
+        // Either we have to append zeros because, for example, 1.1E+5 should
+        // be 110E+3, or we just have to put the decimal in the right place.
+        if (dot > val.length())
+          {
+            while (dot > val.length())
+              val.append('0');
+          }
+        else if (bigStr.length() > dot)
+          val.insert(dot, '.');
+        
+        // And then append 'E' and the exponent (adjExp).
+        val.append('E');
+        if (adjExp >= 0)
+          val.append('+');
+        val.append(adjExp);
+      }
+    return val.toString();
+  }
+  
+  /**
+   * Returns a String representation of this BigDecimal without using 
+   * scientific notation.  This is how toString() worked for releases 1.4
+   * and previous.  Zeros may be added to the end of the String.  For
+   * example, an unscaled value of 1234 and a scale of -3 would result in 
+   * the String 1234000, but the toString() method would return 
+   * 1.234E+6.
+   * @return a String representation of this BigDecimal
+   * @since 1.5
+   */
+  public String toPlainString()
+  {
+    // If the scale is zero we simply return the String representation of the 
+    // unscaled value.
+    String bigStr = intVal.toString();
+    if (scale == 0)
+      return bigStr;
+
+    // Remember if we have to put a negative sign at the start.
+    boolean negative = (bigStr.charAt(0) == '-');
+
+    int point = bigStr.length() - scale - (negative ? 1 : 0);
+
+    StringBuffer sb = new StringBuffer(bigStr.length() + 2
+                                       + (point <= 0 ? (-point + 1) : 0));
+    if (point <= 0)
+      {
+        // We have to prepend zeros and a decimal point.
+        if (negative)
+          sb.append('-');
+        sb.append('0').append('.');
+        while (point < 0)
+          {
+            sb.append('0');
+            point++;
+          }
+        sb.append(bigStr.substring(negative ? 1 : 0));
+      }
+    else if (point < bigStr.length())
+      {
+        // No zeros need to be prepended or appended, just put the decimal
+        // in the right place.
+        sb.append(bigStr);
+        sb.insert(point + (negative ? 1 : 0), '.');
+      }
+    else
+      {
+        // We must append zeros instead of using scientific notation.
+        sb.append(bigStr);
+        for (int i = bigStr.length(); i < point; i++)
+          sb.append('0');
+      }
+    return sb.toString();
+  }
+  
   public BigInteger toBigInteger () 
   {
     return scale == 0 ? intVal :
@@ -927,4 +1083,21 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     result.precision = precision;
     return result;
   }
+  
+  /**
+   * Returns a BigDecimal whose value is <code>this</code> to the power of 
+   * <code>n</code>. 
+   * @param n the power
+   * @return the new BigDecimal
+   * @since 1.5
+   */
+  public BigDecimal pow(int n)
+  {
+    if (n < 0 || n > 999999999)
+      throw new ArithmeticException("n must be between 0 and 999999999");
+    BigDecimal result = new BigDecimal(intVal.pow(n), scale * n);
+    return result;
+  }
+  
+
 }
