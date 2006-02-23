@@ -783,37 +783,82 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     // 18 or 19 digits.
     return (l < 1000000000000000000L) ? 18 : 19;
   }
-  
-  public String toString () 
+
+  /**
+   * Returns the String representation of this BigDecimal, using scientific
+   * notation if necessary.  The following steps are taken to generate
+   * the result:
+   * 
+   * 1. the BigInteger unscaledValue's toString method is called and if
+   * <code>scale == 0<code> is returned.
+   * 2. an <code>int adjExp</code> is created which is equal to the negation
+   * of <code>scale</code> plus the number of digits in the unscaled value, 
+   * minus one.
+   * 3. if <code>scale >= 0 && adjExp >= -6</code> then we represent this 
+   * BigDecimal without scientific notation.  A decimal is added if the 
+   * scale is positive and zeros are prepended as necessary.
+   * 4. if scale is negative or adjExp is less than -6 we use scientific
+   * notation.  If the unscaled value has more than one digit, a decimal 
+   * as inserted after the first digit, the character 'E' is appended
+   * and adjExp is appended.
+   */
+  public String toString()
   {
+    // bigStr is the String representation of the unscaled value.  If
+    // scale is zero we simply return this.
     String bigStr = intVal.toString();
-    if (scale == 0) 
+    if (scale == 0)
       return bigStr;
 
-    boolean negative = (bigStr.charAt(0) == '-');
+    // This is the adjusted exponent described above.
+    int adjExp = -scale + (numDigitsInLong(intVal.longValue()) - 1);
+    StringBuilder val = new StringBuilder();
 
-    int point = bigStr.length() - scale - (negative ? 1 : 0);
-
-    StringBuffer sb = new StringBuffer(bigStr.length() + 2 +
-				       (point <= 0 ? (-point + 1) : 0));
-    if (point <= 0)
+    if (scale >= 0 && adjExp >= -6)
       {
-        if (negative)
-          sb.append('-');
-        sb.append('0').append('.');
-        while (point < 0)
+        // Convert to character form without scientific notation.
+        boolean negative = (bigStr.charAt(0) == '-');
+        int point = bigStr.length() - scale - (negative ? 1 : 0);
+        if (point <= 0)
           {
-            sb.append('0');
-            point++;
+            // Zeros need to be prepended to the StringBuilder.
+            if (negative)
+              val.append('-');
+            // Prepend a '0' and a '.' and then as many more '0's as necessary.
+            val.append('0').append('.');
+            while (point < 0)
+              {
+                val.append('0');
+                point++;
+              }
+            // Append the unscaled value.
+            val.append(bigStr.substring(negative ? 1 : 0));
           }
-        sb.append(bigStr.substring(negative ? 1 : 0));
+        else
+          {
+            // No zeros need to be prepended so the String is simply the 
+            // unscaled value with the decimal point inserted.
+            val.append(bigStr);
+            val.insert(point + (negative ? 1 : 0), '.');
+          }
       }
     else
       {
-	sb.append(bigStr);
-	sb.insert(point + (negative ? 1 : 0), '.');
+        // We must use scientific notation to represent this BigDecimal.
+        val.append(bigStr);
+        // If there is more than one digit in the unscaled value we put a 
+        // decimal after the first digit.
+        if (bigStr.length() > 1)
+          val.insert(1, '.');
+        // And then append 'E' and the exponent - adjExp.
+        val.append('E');
+        if (adjExp < 0)
+          val.append('-');
+        else
+          val.append('+');
+        val.append(adjExp);
       }
-    return sb.toString();
+    return val.toString();
   }
 
   public BigInteger toBigInteger () 
@@ -867,5 +912,19 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     if (Double.isInfinite(val) || Double.isNaN(val))
       throw new NumberFormatException("argument cannot be NaN or infinite.");
     return new BigDecimal(Double.toString(val));
+  }
+  
+  /**
+   * Returns a BigDecimal whose numerical value is the numerical value
+   * of this BigDecimal multiplied by 10 to the power of <code>n</code>. 
+   * @param n the power of ten
+   * @return the new BigDecimal
+   * @since 1.5
+   */
+  public BigDecimal scaleByPowerOfTen(int n)
+  {
+    BigDecimal result = new BigDecimal(intVal, scale - n);
+    result.precision = precision;
+    return result;
   }
 }
