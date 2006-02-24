@@ -99,6 +99,66 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   }
   
   /**
+   * Constructs a BigDecimal from the long in the same way as BigDecimal(long)
+   * and then rounds according to the MathContext.
+   * @param val the long from which we create the initial BigDecimal
+   * @param mc the MathContext that specifies the rounding behaviour
+   * @since 1.5
+   */
+  public BigDecimal (long val, MathContext mc)
+  {
+    this(val);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }    
+  }
+  
+  /**
+   * Constructs a BigDecimal whose value is given by num rounded according to 
+   * mc.  Since num is already a BigInteger, the rounding refers only to the 
+   * precision setting in mc, if mc.getPrecision() returns an int lower than
+   * the number of digits in num, then rounding is necessary.
+   * @param num the unscaledValue, before rounding
+   * @param mc the MathContext that specifies the precision
+   * @since 1.5
+   */
+  public BigDecimal (BigInteger num, MathContext mc)
+  {
+    this (num, 0);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }
+  }
+  
+  /**
+   * Constructs a BigDecimal from the String val according to the same
+   * rules as the BigDecimal(String) constructor and then rounds 
+   * according to the MathContext mc.
+   * @param val the String from which we construct the initial BigDecimal
+   * @param mc the MathContext that specifies the rounding
+   * @since 1.5
+   */
+  public BigDecimal (String val, MathContext mc)
+  {
+    this (val);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }
+  }
+  
+  /**
    * Constructs a BigDecimal whose unscaled value is num and whose
    * scale is zero.
    * @param num the value of the new BigDecimal
@@ -120,6 +180,25 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     this.scale = scale;
   }
 
+  /**
+   * Constructs a BigDecimal in the same way as BigDecimal(double) and then
+   * rounds according to the MathContext.
+   * @param num the double from which the initial BigDecimal is created
+   * @param mc the MathContext that specifies the rounding behaviour
+   * @since 1.5
+   */
+  public BigDecimal (double num, MathContext mc)
+  {
+    this (num);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }
+  }
+  
   public BigDecimal (double num) throws NumberFormatException 
   {
     if (Double.isInfinite (num) || Double.isNaN (num))
@@ -703,7 +782,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   public BigDecimal round(MathContext mc)
   {
     int mcPrecision = mc.getPrecision();
-    int numToChop = precision - mcPrecision;
+    int numToChop = precision() - mcPrecision;
     // If mc specifies not to chop any digits or if we've already chopped 
     // enough digits (say by using a MathContext in the constructor for this
     // BigDecimal) then just return this.
@@ -716,6 +795,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       new BigDecimal(BigInteger.valueOf((long)Math.pow(10, numToChop)));
     BigDecimal rounded = divide(div, scale, mc.getRoundingMode().ordinal());
     rounded.scale -= numToChop;
+    rounded.precision = mcPrecision;
     return rounded;
   }
   
@@ -1161,5 +1241,16 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     return result;
   }
   
-
+  /**
+   * Returns a BigDecimal whose value is the absolute value of this BigDecimal
+   * with rounding according to the given MathContext.
+   * @param mc the MathContext
+   * @return the new BigDecimal
+   */
+  public BigDecimal abs(MathContext mc)
+  {
+    BigDecimal result = abs();
+    result = result.round(mc);
+    return result;
+  }
 }

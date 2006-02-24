@@ -1,5 +1,17 @@
 2006-02-24  Anthony Balkissoon  <abalkiss@redhat.com>
 
+	* java/math/BigDecimal.java:
+	(BigDecimal(long, MathContext)): New constructor.
+	(BigDecimal(BigInteger, MathContext)): Likewise.
+	(BigDecimal(String, MathContext)): Likewise.
+	(BigDecimal(double, MathContext)): Likewise.
+	(round): Fixed a typo where the precision field was used instead of a
+	call to the precision method, and also store the new precision in the
+	returned BigDecimal.
+	(abs(MathContext)): New method.
+
+2006-02-24  Anthony Balkissoon  <abalkiss@redhat.com>
+
 	* java/math/BigDecimal.java
 	(toBigInteger): Fixed problem where this method couldn't handle 
 	negative values for scale.
