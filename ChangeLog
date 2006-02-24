@@ -1,3 +1,11 @@
+2006-02-24  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigDecimal.java
+	(toBigInteger): Fixed problem where this method couldn't handle 
+	negative values for scale.
+	(toBigIntegerExact): New method.
+	(stripTrailingZeros): Likewise.
+
 2006-02-23  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java:

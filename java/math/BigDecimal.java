@@ -1017,15 +1017,77 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     return sb.toString();
   }
   
+  /**
+   * Converts this BigDecimal to a BigInteger.  Any fractional part will
+   * be discarded.
+   * @return a BigDecimal whose value is equal to floor[this]
+   */
   public BigInteger toBigInteger () 
   {
-    return scale == 0 ? intVal :
-      intVal.divide (BigInteger.valueOf (10).pow (scale));
+    // If scale > 0 then we must divide, if scale > 0 then we must multiply,
+    // and if scale is zero then we just return intVal;
+    if (scale > 0)
+      return intVal.divide (BigInteger.valueOf (10).pow (scale));
+    else if (scale < 0)
+      return intVal.multiply(BigInteger.valueOf(10).pow(-scale));
+    return intVal;
+  }
+  
+  /**
+   * Converts this BigDecimal into a BigInteger, throwing an 
+   * ArithmeticException if the conversion is not exact.
+   * @return a BigInteger whose value is equal to the value of this BigDecimal
+   * @since 1.5
+   */
+  public BigInteger toBigIntegerExact()
+  {
+    if (scale > 0)
+      {
+        // If we have to divide, we must check if the result is exact.
+        BigInteger[] result = 
+          intVal.divideAndRemainder(BigInteger.valueOf(10).pow(scale));
+        if (result[1].equals(BigInteger.ZERO))
+          return result[0];
+        throw new ArithmeticException("No exact BigInteger representation");
+      }
+    else if (scale < 0)
+      // If we're multiplying instead, then we needn't check for exactness.
+      return intVal.multiply(BigInteger.valueOf(10).pow(-scale));
+    // If the scale is zero we can simply return intVal.
+    return intVal;
   }
 
   public int intValue () 
   {
     return toBigInteger ().intValue ();
+  }
+  
+  /**
+   * Returns a BigDecimal which is numerically equal to this BigDecimal but 
+   * with no trailing zeros in the representation.  For example, if this 
+   * BigDecimal has [unscaledValue, scale] = [6313000, 4] this method returns
+   * a BigDecimal with [unscaledValue, scale] = [6313, 1].  As another 
+   * example, [12400, -2] would become [124, -4].
+   * @return a numerically equal BigDecimal with no trailing zeros
+   */
+  public BigDecimal stripTrailingZeros()  
+  {
+    String intValStr = intVal.toString();
+    int newScale = scale;
+    int pointer = intValStr.length() - 1;
+    // This loop adjusts pointer which will be used to give us the substring
+    // of intValStr to use in our new BigDecimal, and also accordingly
+    // adjusts the scale of our new BigDecimal.
+    while (intValStr.charAt(pointer) == '0')
+      {
+        pointer --;
+        newScale --;
+      }
+    // Create a new BigDecimal with the appropriate substring and then
+    // set its scale.
+    BigDecimal result = new BigDecimal(intValStr.substring(0, pointer + 1));    
+    result.scale = newScale;
+    return result;
   }
 
   public long longValue ()
