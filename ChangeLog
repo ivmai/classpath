@@ -1,5 +1,15 @@
 2006-02-27  Anthony Balkissoon  <abalkiss@redhat.com>
 
+	* java/math/BigDecimal.java: Replaced occurences of BigInteger.valueOf
+	with BigInteger.ZERO, BigInteger.ONE, BigInteger.TEN where appropriate.
+	(add(BigDecimal, MathContext)): New method.
+	(subtract(BigDecimal, MathContext)): Likewise.
+	(precision): Fixed to correctly handle BigIntegers with more than 19
+	digits.
+	(pow(int, MathContext)): New method.
+
+2006-02-27  Anthony Balkissoon  <abalkiss@redhat.com>
+
 	* java/math/BigDecimal.java: Added @throws clause to constructors.
 	(mathContext): Removed this unneeded field.
 	(BigDecimal(int, MathContext)): New constructor.

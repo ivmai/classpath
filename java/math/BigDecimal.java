@@ -49,21 +49,21 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
    * @since 1.5
    */
   public static final BigDecimal ZERO = 
-    new BigDecimal (BigInteger.valueOf (0), 0);
+    new BigDecimal (BigInteger.ZERO, 0);
 
   /**
    * The constant one as a BigDecimal with scale zero.
    * @since 1.5
    */
   public static final BigDecimal ONE = 
-    new BigDecimal (BigInteger.valueOf (1), 0);
+    new BigDecimal (BigInteger.ONE, 0);
 
   /**
    * The constant ten as a BigDecimal with scale zero.
    * @since 1.5
    */
   public static final BigDecimal TEN = 
-    new BigDecimal (BigInteger.valueOf (10), 0);
+    new BigDecimal (BigInteger.TEN, 0);
 
   public static final int ROUND_UP = 0;
   public static final int ROUND_DOWN = 1;
@@ -603,16 +603,46 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     BigInteger op1 = intVal;
     BigInteger op2 = val.intVal;
     if (scale < val.scale)
-      op1 = op1.multiply (BigInteger.valueOf (10).pow (val.scale - scale));
+      op1 = op1.multiply (BigInteger.TEN.pow (val.scale - scale));
     else if (scale > val.scale)
-      op2 = op2.multiply (BigInteger.valueOf (10).pow (scale - val.scale));
+      op2 = op2.multiply (BigInteger.TEN.pow (scale - val.scale));
 
     return new BigDecimal (op1.add (op2), Math.max (scale, val.scale));
+  }
+  
+  /**
+   * Returns a BigDecimal whose value is found first by calling the 
+   * method add(val) and then by rounding according to the MathContext mc.
+   * @param val the augend
+   * @param mc the MathContext for rounding
+   * @throws ArithmeticException if the value is inexact but the rounding is
+   * RoundingMode.UNNECESSARY
+   * @return <code>this</code> + <code>val</code>, rounded if need be
+   * @since 1.5
+   */
+  public BigDecimal add (BigDecimal val, MathContext mc)
+  {
+    return add(val).round(mc);
   }
 
   public BigDecimal subtract (BigDecimal val) 
   {
     return this.add(val.negate());
+  }
+
+  /**
+   * Returns a BigDecimal whose value is found first by calling the 
+   * method subtract(val) and then by rounding according to the MathContext mc.
+   * @param val the subtrahend
+   * @param mc the MathContext for rounding
+   * @throws ArithmeticException if the value is inexact but the rounding is
+   * RoundingMode.UNNECESSARY
+   * @return <code>this</code> - <code>val</code>, rounded if need be
+   * @since 1.5
+   */
+  public BigDecimal subtract (BigDecimal val, MathContext mc)
+  {
+    return subtract(val).round(mc);
   }
 
   public BigDecimal multiply (BigDecimal val) 
@@ -661,11 +691,11 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       {
 	// Effectively increase the scale of val to avoid an
 	// ArithmeticException for a negative power.
-        valIntVal = valIntVal.multiply (BigInteger.valueOf (10).pow (-power));
+        valIntVal = valIntVal.multiply (BigInteger.TEN.pow (-power));
 	power = 0;
       }
 
-    BigInteger dividend = intVal.multiply (BigInteger.valueOf (10).pow (power));
+    BigInteger dividend = intVal.multiply (BigInteger.TEN.pow (power));
     
     BigInteger parts[] = dividend.divideAndRemainder (valIntVal);
 
@@ -674,7 +704,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       return new BigDecimal (unrounded, newScale);
 
     if (roundingMode == ROUND_UNNECESSARY)
-      throw new ArithmeticException ("newScale is not large enough");
+      throw new ArithmeticException ("Rounding necessary");
 
     int sign = intVal.signum () * valIntVal.signum ();
 
@@ -726,9 +756,9 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       return intVal.compareTo (val.intVal);
 
     BigInteger thisParts[] = 
-      intVal.divideAndRemainder (BigInteger.valueOf (10).pow (scale));
+      intVal.divideAndRemainder (BigInteger.TEN.pow (scale));
     BigInteger valParts[] =
-      val.intVal.divideAndRemainder (BigInteger.valueOf (10).pow (val.scale));
+      val.intVal.divideAndRemainder (BigInteger.TEN.pow (val.scale));
     
     int compare;
     if ((compare = thisParts[0].compareTo (valParts[0])) != 0)
@@ -737,15 +767,15 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     // quotients are the same, so compare remainders
 
     // remove trailing zeros
-    if (thisParts[1].equals (BigInteger.valueOf (0)) == false)
-      while (thisParts[1].mod (BigInteger.valueOf (10)).equals
-	     (BigInteger.valueOf (0)))
-      thisParts[1] = thisParts[1].divide (BigInteger.valueOf (10));
+    if (thisParts[1].equals (BigInteger.ZERO) == false)
+      while (thisParts[1].mod (BigInteger.TEN).equals
+	     (BigInteger.ZERO))
+      thisParts[1] = thisParts[1].divide (BigInteger.TEN);
     // again...
-    if (valParts[1].equals(BigInteger.valueOf (0)) == false)
-      while (valParts[1].mod (BigInteger.valueOf (10)).equals
-	     (BigInteger.valueOf (0)))
-	valParts[1] = valParts[1].divide (BigInteger.valueOf (10));
+    if (valParts[1].equals(BigInteger.ZERO) == false)
+      while (valParts[1].mod (BigInteger.TEN).equals
+	     (BigInteger.ZERO))
+	valParts[1] = valParts[1].divide (BigInteger.TEN);
 
     // and compare them
     return thisParts[1].compareTo (valParts[1]);
@@ -799,7 +829,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       return new BigDecimal (intVal, scale - n);
 
     return new BigDecimal (intVal.multiply 
-			   (BigInteger.valueOf (10).pow (n - scale)), 0);
+			   (BigInteger.TEN.pow (n - scale)), 0);
   }
 
   public int signum () 
@@ -887,8 +917,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     
     // Make a new BigDecimal which is the correct power of 10 to chop off
     // the required number of digits and then call divide.
-    BigDecimal div = 
-      new BigDecimal(BigInteger.valueOf((long)Math.pow(10, numToChop)));
+    BigDecimal div = new BigDecimal(BigInteger.TEN.pow(numToChop));
     BigDecimal rounded = divide(div, scale, mc.getRoundingMode().ordinal());
     rounded.scale -= numToChop;
     rounded.precision = mcPrecision;
@@ -904,8 +933,31 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   public int precision()
   {
     if (precision == 0)
-      precision = numDigitsInLong(intVal.longValue());
+      {
+        precision = numDigitsInLong(intVal.longValue());
+        // If numDigitsInLong returns 19 then we use numDigitsInBigInteger
+        // to determine if there are actually more than 19 digits in intVal.
+        if (precision == 19)
+          precision = numDigitsInBigInteger(intVal);
+      }
+    
     return precision;
+  }
+  
+  /**
+   * This method is used to determine the precision of BigIntegers with 19 or
+   * more digits.
+   * @param b the BigInteger
+   * @return the number of digits in <code>b</code>
+   */
+  int numDigitsInBigInteger(BigInteger b)
+  {
+    int i = 19;
+    BigInteger comp = BigInteger.TEN.pow(i);
+    while (b.compareTo(comp) >= 0)      
+      comp = BigInteger.TEN.pow(++i);
+          
+    return i;
   }
 
   /**
@@ -1204,9 +1256,9 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     // If scale > 0 then we must divide, if scale > 0 then we must multiply,
     // and if scale is zero then we just return intVal;
     if (scale > 0)
-      return intVal.divide (BigInteger.valueOf (10).pow (scale));
+      return intVal.divide (BigInteger.TEN.pow (scale));
     else if (scale < 0)
-      return intVal.multiply(BigInteger.valueOf(10).pow(-scale));
+      return intVal.multiply(BigInteger.TEN.pow(-scale));
     return intVal;
   }
   
@@ -1222,14 +1274,14 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       {
         // If we have to divide, we must check if the result is exact.
         BigInteger[] result = 
-          intVal.divideAndRemainder(BigInteger.valueOf(10).pow(scale));
+          intVal.divideAndRemainder(BigInteger.TEN.pow(scale));
         if (result[1].equals(BigInteger.ZERO))
           return result[0];
         throw new ArithmeticException("No exact BigInteger representation");
       }
     else if (scale < 0)
       // If we're multiplying instead, then we needn't check for exactness.
-      return intVal.multiply(BigInteger.valueOf(10).pow(-scale));
+      return intVal.multiply(BigInteger.TEN.pow(-scale));
     // If the scale is zero we can simply return intVal.
     return intVal;
   }
@@ -1336,6 +1388,23 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
       throw new ArithmeticException("n must be between 0 and 999999999");
     BigDecimal result = new BigDecimal(intVal.pow(n), scale * n);
     return result;
+  }
+  
+  /**
+   * Returns a BigDecimal whose value is determined by first calling pow(n)
+   * and then by rounding according to the MathContext mc.
+   * @param n the power
+   * @param mc the MathContext
+   * @return the new BigDecimal
+   * @throws ArithmeticException if n < 0 or n > 999999999 or if the result is
+   * inexact but the rounding is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal pow(int n, MathContext mc)
+  {
+    // FIXME: The specs claim to use the X3.274-1996 algorithm.  We
+    // currently do not.
+    return pow(n).round(mc);
   }
   
   /**
