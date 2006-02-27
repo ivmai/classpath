@@ -41,7 +41,6 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
 {
   private BigInteger intVal;
   private int scale;
-  private MathContext mathContext;
   private int precision = 0;
   private static final long serialVersionUID = 6108874887143696463L;
 
@@ -88,6 +87,27 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   }
   
   /**
+   * Constructs a BigDecimal using the BigDecimal(int) constructor and then
+   * rounds according to the MathContext.
+   * @param val the value for the initial (unrounded) BigDecimal
+   * @param mc the MathContext specifying the rounding
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal (int val, MathContext mc)
+  {
+    this (val);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }    
+  }
+  
+  /**
    * Constructs a new BigDecimal whose unscaled value is val and whose
    * scale is zero.
    * @param val the value of the new BigDecimal
@@ -103,6 +123,8 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
    * and then rounds according to the MathContext.
    * @param val the long from which we create the initial BigDecimal
    * @param mc the MathContext that specifies the rounding behaviour
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY
    * @since 1.5
    */
   public BigDecimal (long val, MathContext mc)
@@ -124,7 +146,9 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
    * the number of digits in num, then rounding is necessary.
    * @param num the unscaledValue, before rounding
    * @param mc the MathContext that specifies the precision
-   * @since 1.5
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY
+   * * @since 1.5
    */
   public BigDecimal (BigInteger num, MathContext mc)
   {
@@ -144,6 +168,8 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
    * according to the MathContext mc.
    * @param val the String from which we construct the initial BigDecimal
    * @param mc the MathContext that specifies the rounding
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY   
    * @since 1.5
    */
   public BigDecimal (String val, MathContext mc)
@@ -179,12 +205,36 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     this.intVal = num;
     this.scale = scale;
   }
+  
+  /**
+   * Constructs a BigDecimal using the BigDecimal(BigInteger, int) 
+   * constructor and then rounds according to the MathContext.
+   * @param num the unscaled value of the unrounded BigDecimal
+   * @param scale the scale of the unrounded BigDecimal
+   * @param mc the MathContext specifying the rounding
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal (BigInteger num, int scale, MathContext mc)
+  {
+    this (num, scale);
+    if (mc.getPrecision() != 0)
+      {
+        BigDecimal result = this.round(mc);
+        this.intVal = result.intVal;
+        this.scale = result.scale;
+        this.precision = result.precision;
+      }
+  }
 
   /**
    * Constructs a BigDecimal in the same way as BigDecimal(double) and then
    * rounds according to the MathContext.
    * @param num the double from which the initial BigDecimal is created
    * @param mc the MathContext that specifies the rounding behaviour
+   * @throws ArithmeticException if the result is inexact but the rounding type
+   * is RoundingMode.UNNECESSARY 
    * @since 1.5
    */
   public BigDecimal (double num, MathContext mc)
@@ -569,6 +619,21 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   {
     return new BigDecimal (intVal.multiply (val.intVal), scale + val.scale);
   }
+  
+  /**
+   * Returns a BigDecimal whose value is (this x val) before it is rounded
+   * according to the MathContext mc. 
+   * @param val the multiplicand
+   * @param mc the MathContext for rounding
+   * @return a new BigDecimal with value approximately (this x val)
+   * @throws ArithmeticException if the value is inexact but the rounding mode
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal multiply (BigDecimal val, MathContext mc)
+  {
+    return multiply(val).round(mc);
+  }
 
   public BigDecimal divide (BigDecimal val, int roundingMode) 
     throws ArithmeticException, IllegalArgumentException 
@@ -763,6 +828,23 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   }
   
   /**
+   * Returns a BigDecimal whose value is found first by negating this via
+   * the negate() method, then by rounding according to the MathContext mc.
+   * @param mc the MathContext for rounding
+   * @return a BigDecimal whose value is approximately (-this)
+   * @throws ArithmeticException if the value is inexact but the rounding mode
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal negate(MathContext mc)
+  {
+    BigDecimal result = negate();
+    if (mc.getPrecision() != 0)
+      result = result.round(mc);
+    return result;
+  }
+  
+  /**
    * Returns this BigDecimal.  This is included for symmetry with the 
    * method negate().
    * @return this
@@ -771,6 +853,20 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   public BigDecimal plus()
   {
     return this;
+  }
+  
+  /**
+   * Returns a BigDecimal whose value is found by rounding <code>this</code> 
+   * according to the MathContext.  This is the same as round(MathContext).
+   * @param mc the MathContext for rounding
+   * @return a BigDecimal whose value is <code>this</code> before being rounded
+   * @throws ArithmeticException if the value is inexact but the rounding mode
+   * is RoundingMode.UNNECESSARY
+   * @since 1.5
+   */
+  public BigDecimal plus(MathContext mc)
+  {
+    return round(mc);
   }
   
   /**
@@ -817,8 +913,9 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
    * @param l the long value
    * @return the number of digits in l
    */
-  private static int numDigitsInLong(long l)
+  private static int numDigitsInLong(long l1)
   {
+    long l = l1 >= 0 ? l1 : -l1; 
     // We divide up the range in a binary fashion, this first if
     // takes care of numbers with 1 to 9 digits.
     if (l < 1000000000L)

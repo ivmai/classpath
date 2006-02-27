@@ -1,3 +1,14 @@
+2006-02-27  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigDecimal.java: Added @throws clause to constructors.
+	(mathContext): Removed this unneeded field.
+	(BigDecimal(int, MathContext)): New constructor.
+	(BigDecimal(BigInteger, int, MathContext)): Likewise.
+	(multiply(BigDecimal, MathContext)): New method.
+	(negate(MathContext)): Likewise.
+	(plus(MathContext)): Likewise.
+	(numDigitsInLong): Fixed to properly handle negatives.
+	
 2006-02-24  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java:
