@@ -1,3 +1,13 @@
+2006-02-28  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigDecimal.java:
+	(divide(BigDecimal, int, RoundingMode)): New method.
+	(divide(BigDecimal, RoundingMode)): Likewise.
+	(divide(BigDecimal, int, int)): Removed incorrect throwing of exception
+	when the new scale is < 0.
+	(setScale(int, RoundingMode)): New method.
+	(ulp): Likewise.
+
 2006-02-27  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java: Replaced occurences of BigInteger.valueOf

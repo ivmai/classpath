@@ -670,16 +670,44 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   {
     return divide (val, scale, roundingMode);
   }
+  
+  /**
+   * Returns a BigDecimal whose value is (this / val), with the specified scale
+   * and rounding according to the RoundingMode 
+   * @param val the divisor
+   * @param scale the scale of the BigDecimal returned
+   * @param roundingMode the rounding mode to use
+   * @return a BigDecimal whose value is approximately (this / val)
+   * @throws ArithmeticException if divisor is zero or the rounding mode is
+   * UNNECESSARY but the specified scale cannot represent the value exactly
+   * @since 1.5
+   */
+  public BigDecimal divide(BigDecimal val, 
+                           int scale, RoundingMode roundingMode)
+  {
+    return divide (val, scale, roundingMode.ordinal());
+  }
 
+  /**
+   * Returns a BigDecimal whose value is (this / val) rounded according to the
+   * RoundingMode
+   * @param val the divisor
+   * @param roundingMode the rounding mode to use
+   * @return a BigDecimal whose value is approximately (this / val)
+   * @throws ArithmeticException if divisor is zero or the rounding mode is
+   * UNNECESSARY but the specified scale cannot represent the value exactly
+   */
+  public BigDecimal divide (BigDecimal val, RoundingMode roundingMode)
+  {
+    return divide (val, scale, roundingMode.ordinal());
+  }
+  
   public BigDecimal divide(BigDecimal val, int newScale, int roundingMode)
     throws ArithmeticException, IllegalArgumentException 
   {
     if (roundingMode < 0 || roundingMode > 7)
       throw 
 	new IllegalArgumentException("illegal rounding mode: " + roundingMode);
-
-    if (newScale < 0)
-      throw new ArithmeticException ("scale is negative: " + newScale);
 
     if (intVal.signum () == 0)	// handle special case of 0.0/0.0
       return newScale == 0 ? ZERO : new BigDecimal (ZERO.intVal, newScale);
@@ -1346,6 +1374,23 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   }
   
   /**
+   * Returns a BigDecimal whose value is the same as this BigDecimal but whose
+   * representation has a scale of <code>newScale</code>.  If the scale is
+   * reduced then rounding may occur, according to the RoundingMode.
+   * @param newScale
+   * @param roundingMode
+   * @return a BigDecimal whose scale is as given, whose value is 
+   * <code>this</code> with possible rounding
+   * @throws ArithmeticException if the rounding mode is UNNECESSARY but 
+   * rounding is required 
+   * @since 1.5
+   */
+  public BigDecimal setScale(int newScale, RoundingMode roundingMode)
+  {
+    return setScale(newScale, roundingMode.ordinal());
+  }
+  
+  /**
    * Returns a new BigDecimal constructed from the BigDecimal(String) 
    * constructor using the Double.toString(double) method to obtain
    * the String.
@@ -1418,5 +1463,16 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     BigDecimal result = abs();
     result = result.round(mc);
     return result;
+  }
+  
+  /**
+   * Returns the size of a unit in the last place of this BigDecimal.  This
+   * returns a BigDecimal with [unscaledValue, scale] = [1, this.scale()].
+   * @return the size of a unit in the last place of <code>this</code>.
+   * @since 1.5
+   */
+  public BigDecimal ulp()
+  {
+    return new BigDecimal(BigInteger.ONE, scale);
   }
 }
