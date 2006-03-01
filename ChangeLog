@@ -1,6 +1,15 @@
 2006-03-01  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java:
+	(precision): Fixed overflow problem with large numbers.
+	(longValueExact): New method.
+	(intValueExact): Likewise.
+	(byteValueExact): Likewise.
+	(shortValueExact): Likewise.
+
+2006-03-01  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigDecimal.java:
 	(remainder(BigDecimal)): New method.
 	(divideAndRemainder(BigDecimal)): Likewise.
 	(divideToIntegralValue(BigDecimal)): Likewise.

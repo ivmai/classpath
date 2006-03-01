@@ -1023,13 +1023,11 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   {
     if (precision == 0)
       {
-        precision = numDigitsInLong(intVal.longValue());
-        // If numDigitsInLong returns 19 then we use numDigitsInBigInteger
-        // to determine if there are actually more than 19 digits in intVal.
-        if (precision == 19)
+        if (intVal.compareTo(BigInteger.TEN.pow(18)) == 1)
           precision = numDigitsInBigInteger(intVal);
-      }
-    
+        else
+          precision = numDigitsInLong(intVal.longValue());
+      }    
     return precision;
   }
   
@@ -1051,7 +1049,7 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
 
   /**
    * This method determines the number of digits in the long value l. 
-   * @param l the long value
+   * @param l1 the long value
    * @return the number of digits in l
    */
   private static int numDigitsInLong(long l1)
@@ -1535,5 +1533,80 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
   public BigDecimal ulp()
   {
     return new BigDecimal(BigInteger.ONE, scale);
+  }
+  
+  /**
+   * Converts this BigDecimal to a long value.
+   * @return the long value
+   * @throws ArithmeticException if rounding occurs or if overflow occurs
+   * @since 1.5
+   */
+  public long longValueExact()
+  {
+    // Set scale will throw an exception if rounding occurs.
+    BigDecimal temp = setScale(0, ROUND_UNNECESSARY);
+    BigInteger tempVal = temp.intVal;
+    // Check for overflow.
+    long result = intVal.longValue();
+    if (tempVal.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 1
+        || (result < 0 && signum() == 1) || (result > 0 && signum() == -1))
+      throw new ArithmeticException("this BigDecimal is too " +
+            "large to fit into the return type");
+    
+    return intVal.longValue();
+  }
+  
+  /**
+   * Converts this BigDecimal into an int by first calling longValueExact
+   * and then checking that the <code>long</code> returned from that
+   * method fits into an <code>int</code>.
+   * @return an int whose value is <code>this</code>
+   * @throws ArithmeticException if this BigDecimal has a fractional part
+   * or is too large to fit into an int.
+   * @since 1.5
+   */
+  public int intValueExact()
+  {
+    long temp = longValueExact();
+    int result = (int)temp;
+    if (result != temp)
+      throw new ArithmeticException ("this BigDecimal cannot fit into an int");
+    return result;
+  }
+  
+  /**
+   * Converts this BigDecimal into a byte by first calling longValueExact
+   * and then checking that the <code>long</code> returned from that
+   * method fits into a <code>byte</code>.
+   * @return a byte whose value is <code>this</code>
+   * @throws ArithmeticException if this BigDecimal has a fractional part
+   * or is too large to fit into a byte.
+   * @since 1.5
+   */
+  public byte byteValueExact()
+  {
+    long temp = longValueExact();
+    byte result = (byte)temp;
+    if (result != temp)
+      throw new ArithmeticException ("this BigDecimal cannot fit into a byte");
+    return result;
+  }
+  
+  /**
+   * Converts this BigDecimal into a short by first calling longValueExact
+   * and then checking that the <code>long</code> returned from that
+   * method fits into a <code>short</code>.
+   * @return a short whose value is <code>this</code>
+   * @throws ArithmeticException if this BigDecimal has a fractional part
+   * or is too large to fit into a short.
+   * @since 1.5
+   */
+  public short shortValueExact()
+  {
+    long temp = longValueExact();
+    short result = (short)temp;
+    if (result != temp)
+      throw new ArithmeticException ("this BigDecimal cannot fit into a short");
+    return result;
   }
 }
