@@ -777,6 +777,67 @@ public class BigDecimal extends Number implements Comparable<BigDecimal>
     // roundingMode == ROUND_DOWN
     return new BigDecimal (unrounded, newScale);
   }
+  
+  /**
+   * Returns a BigDecimal whose value is the remainder in the quotient
+   * this / val.  This is obtained by 
+   * subtract(divideToIntegralValue(val).multiply(val)).  
+   * @param val the divisor
+   * @return a BigDecimal whose value is the remainder
+   * @throws ArithmeticException if val == 0
+   * @since 1.5
+   */
+  public BigDecimal remainder(BigDecimal val)
+  {
+    return subtract(divideToIntegralValue(val).multiply(val));
+  }
+  
+  /**
+   * Returns a BigDecimal array, the first element of which is the integer part
+   * of this / val, and the second element of which is the remainder of 
+   * that quotient.
+   * @param val the divisor
+   * @return the above described BigDecimal array
+   * @throws ArithmeticException if val == 0
+   * @since 1.5
+   */
+  public BigDecimal[] divideAndRemainder(BigDecimal val)
+  {
+    BigDecimal[] result = new BigDecimal[2];
+    result[0] = divideToIntegralValue(val);
+    result[1] = subtract(result[0].multiply(val));
+    return result;
+  }
+  
+  /**
+   * Returns a BigDecimal whose value is the integer part of the quotient 
+   * this / val.  The preferred scale is this.scale - val.scale.
+   * @param val the divisor
+   * @return a BigDecimal whose value is the integer part of this / val.
+   * @throws ArithmeticException if val == 0
+   * @since 1.5
+   */
+  public BigDecimal divideToIntegralValue(BigDecimal val)
+  {
+    return divide(val, ROUND_DOWN).floor().setScale(scale - val.scale, ROUND_DOWN);
+  }
+  
+  /**
+   * Mutates this BigDecimal into one with no fractional part, whose value is 
+   * equal to the largest integer that is <= to this BigDecimal.  Note that
+   * since this method is private it is okay to mutate this BigDecimal.
+   * @return the BigDecimal obtained through the floor operation on this 
+   * BigDecimal.
+   */
+  private BigDecimal floor()
+  {
+    if (scale <= 0)
+      return this;
+    String intValStr = intVal.toString();
+    intValStr = intValStr.substring(0, intValStr.length() - scale);
+    intVal = new BigInteger(intValStr).multiply(BigInteger.TEN.pow(scale));
+    return this;
+  }
     
   public int compareTo (BigDecimal val) 
   {
