@@ -1,5 +1,5 @@
 /* JobMediaSheets.java -- 
-   Copyright (C) 2003, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -118,7 +118,7 @@ public class JobMediaSheets extends IntegerSyntax
    *
    * @return The name "job-media-sheets".
    */
-  public String getName()
+  public final String getName()
   {
     return "job-media-sheets";
   }

@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.20-generics],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.21-pre-generics],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -568,6 +568,7 @@ doc/api/Makefile
 external/Makefile
 external/sax/Makefile
 external/w3c_dom/Makefile
+external/relaxngDatatype/Makefile
 gnu/classpath/Configuration.java
 include/Makefile
 native/Makefile
@@ -594,6 +595,7 @@ scripts/classpath.spec
 lib/Makefile
 lib/gen-classlist.sh
 lib/copy-vmresources.sh
+tools/Makefile
 examples/Makefile
 examples/Makefile.jawt])
 AC_CONFIG_COMMANDS([gen-classlist],[chmod 755 lib/gen-classlist.sh])

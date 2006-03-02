@@ -925,7 +925,7 @@ public class Thread implements Runnable
     if (sm != null)
       {
         sm.checkAccess(this);
-        if (this != currentThread())
+        if (this != currentThread() || !(t instanceof ThreadDeath))
           sm.checkPermission(new RuntimePermission("stopThread"));
       }
     VMThread vt = vmThread;

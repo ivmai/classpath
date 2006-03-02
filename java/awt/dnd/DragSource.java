@@ -90,7 +90,7 @@ public class DragSource implements Serializable
    */
   public static DragSource getDefaultDragSource()
   {
-    return null;
+    return new DragSource();
   }
 
   public static boolean isDragImageSupported()
@@ -172,13 +172,34 @@ public class DragSource implements Serializable
     return flavorMap;
   }
 
+  /**
+   * Dummy DragGestureRecognizer when Toolkit doesn't support drag and drop.
+   */
+  static class NoDragGestureRecognizer extends DragGestureRecognizer
+  {
+    NoDragGestureRecognizer(DragSource ds, Component c, int actions,
+                            DragGestureListener dgl)
+    {
+      super(ds, c, actions, dgl);
+    }
+
+    protected void registerListeners() { }
+    protected void unregisterListeners() { }
+  }
+
   public <T extends DragGestureRecognizer> T
     createDragGestureRecognizer(Class<T> recognizer, Component c, int actions,
                                 DragGestureListener dgl)
   {
-    return Toolkit.getDefaultToolkit ()
+    DragGestureRecognizer dgr;
+    dgr = Toolkit.getDefaultToolkit ()
                   .createDragGestureRecognizer (recognizer, this, c, actions,
                                                 dgl);
+
+    if (dgr == null)
+      dgr = new NoDragGestureRecognizer(this, c, actions, dgl);
+
+    return (T) dgr;
   }
 
   public DragGestureRecognizer

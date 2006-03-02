@@ -1,5 +1,5 @@
 /* MediaPrintableArea.java -- 
-   Copyright (C) 2005  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -96,9 +96,9 @@ public final class MediaPrintableArea
   /** y in micrometers. */
   private int y;
   /** width in micrometers. */
-  private int width;
+  private int w;
   /** height in micrometers. */
-  private int height;
+  private int h;
   
   /**
    * Creates a new <code>MediaPrintableArea</code> object with the given
@@ -120,8 +120,8 @@ public final class MediaPrintableArea
 
     this.x = (int) (x * units + 0.5f);
     this.y = (int) (y * units + 0.5f);
-    this.width = (int) (w * units + 0.5f);
-    this.height = (int) (h * units + 0.5f);
+    this.w = (int) (w * units + 0.5f);
+    this.h = (int) (h * units + 0.5f);
   }
 
   /**
@@ -144,8 +144,8 @@ public final class MediaPrintableArea
 
     this.x = x * units;
     this.y = y * units;
-    this.width = w * units;
-    this.height = h * units;
+    this.w = w * units;
+    this.h = h * units;
   }
 
   /**
@@ -181,7 +181,7 @@ public final class MediaPrintableArea
     if (units < 1)
       throw new IllegalArgumentException("units may not be less than 1");
 
-    return height / ((float)units);
+    return h / ((float)units);
   }
 
   /**
@@ -197,7 +197,7 @@ public final class MediaPrintableArea
     if (units < 1)
       throw new IllegalArgumentException("units may not be less than 1");
 
-    return width / ((float)units);
+    return w / ((float)units);
   }
 
   /**
@@ -249,7 +249,7 @@ public final class MediaPrintableArea
     MediaPrintableArea tmp = (MediaPrintableArea) obj;
 
     return (x == tmp.getX(1) && y == tmp.getY(1)
-            && width == tmp.getWidth(1) && height == tmp.getHeight(1));
+            && w == tmp.getWidth(1) && h == tmp.getHeight(1));
   }
 
   /**
@@ -271,7 +271,7 @@ public final class MediaPrintableArea
    */
   public int hashCode()
   {
-    return x ^ y + width ^ height;
+    return x ^ y + w ^ h;
   }
   
   /**

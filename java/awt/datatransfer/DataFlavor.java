@@ -161,38 +161,42 @@ private String humanPresentableName;
 						 ClassLoader classLoader)
     throws ClassNotFoundException
   {
+    // Bootstrap
     try
       {
-        return(Class.forName(className));
+        return Class.forName(className);
       }
-    catch(Exception e) { ; }
-    // Commented out for Java 1.1
-    /*
-    try
+    catch(ClassNotFoundException cnfe)
       {
-        return(className.getClass().getClassLoader().findClass(className));
+	// Ignored.
       }
-    catch(Exception e) { ; }
   
+    // System
     try
       {
-        return(ClassLoader.getSystemClassLoader().findClass(className));
+	ClassLoader loader = ClassLoader.getSystemClassLoader();
+        return Class.forName(className, true, loader);
       }
-    catch(Exception e) { ; }
-    */
-  
-    // FIXME: What is the context class loader?
-    /*
+    catch(ClassNotFoundException cnfe)
+      {
+	// Ignored.
+      }
+ 
+    // Context
     try
       {
+	ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        return Class.forName(className, true, loader);
       }
-    catch(Exception e) { ; }
-    */
-  
+    catch(ClassNotFoundException cnfe)
+      {
+	// Ignored.
+      }
+ 
     if (classLoader != null)
-      return(classLoader.loadClass(className));
-    else
-      throw new ClassNotFoundException(className);
+      return Class.forName(className, true, classLoader);
+
+    throw new ClassNotFoundException(className);
   }
   
   private static Class getRepresentationClassFromMime(String mimeString,
@@ -207,7 +211,13 @@ private String humanPresentableName;
             }
           catch(Exception e)
             {
-              throw new IllegalArgumentException("classname: " + e.getMessage());
+	      IllegalArgumentException iae;
+              iae = new IllegalArgumentException("mimeString: "
+						 + mimeString
+			      			 + " classLoader: "
+						 + classLoader);
+	      iae.initCause(e);
+	      throw iae;
             }
         }
       else

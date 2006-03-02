@@ -599,6 +599,9 @@ public abstract class URLConnection
    */
   public void setAllowUserInteraction(boolean allow)
   {
+    if (connected)
+      throw new IllegalStateException("Already connected");
+    
     allowUserInteraction = allow;
   }
 
@@ -777,7 +780,7 @@ public abstract class URLConnection
    *
    * @param key The name of the property
    *
-   * @return Value of the property
+   * @return Value of the property, or <code>null</code> if key is null.
    *
    * @exception IllegalStateException If already connected
    *

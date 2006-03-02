@@ -1,5 +1,5 @@
 /* HTTPURLConnection.java --
-   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -70,13 +70,6 @@ public class HTTPURLConnection
   extends HttpsURLConnection
   implements HandshakeCompletedListener
 {
-
-  /**
-   * Pool of reusable connections, used if keepAlive is true.
-   */
-  private static final LinkedHashMap connectionPool = new LinkedHashMap();
-  static int maxConnections;
-
   /*
    * The underlying connection.
    */
@@ -134,9 +127,6 @@ public class HTTPURLConnection
       agent = System.getProperty("http.agent");
       String ka = System.getProperty("http.keepAlive");
       keepAlive = !(ka != null && "false".equals(ka));
-      String mc = System.getProperty("http.maxConnections");
-      maxConnections = (mc != null && mc.length() > 0) ?
-        Math.max(Integer.parseInt(mc), 1) : 5;
       return null;
     }
 
@@ -254,8 +244,24 @@ public class HTTPURLConnection
               }
           }
         
-        if (response.getCodeClass() == 3 && getInstanceFollowRedirects())
+        if (response.isRedirect() && getInstanceFollowRedirects())
           {
+	    // Read the response body, if there is one.  If the
+	    // redirect points us back at the same server, we will use
+	    // the cached connection, so we must make sure there is no
+	    // pending data in it.
+            InputStream body = response.getBody();
+	    if (body != null)
+	      {
+		byte[] ignore = new byte[1024];
+		while (true)
+		  {
+		    int n = body.read(ignore, 0, ignore.length);
+		    if (n == -1)
+		      break;
+		  }
+	      }
+
             // Follow redirect
             String location = response.getHeader("Location");
 	    if (location != null)
@@ -333,16 +339,13 @@ public class HTTPURLConnection
           {
             responseSink = response.getBody();
             
-            if (response.getCode() == 404)
-	      {
-		errorSink = responseSink;
-		throw new FileNotFoundException(url.toString());
-	      }
+            if (response.isError())
+	      errorSink = responseSink;
           }
       }
     while (retry);
     connected = true;
-  }
+  }  
 
   /**
    * Returns a connection, from the pool if necessary.
@@ -353,16 +356,7 @@ public class HTTPURLConnection
     HTTPConnection connection;
     if (keepAlive)
       {
-        Object key = HTTPConnection.getPoolKey(host, port, secure);
-        synchronized (connectionPool)
-          {
-            connection = (HTTPConnection) connectionPool.remove(key);
-            if (connection == null)
-              {
-                connection = new HTTPConnection(host, port, secure);
-                connection.setPool(connectionPool);
-              }
-          }
+        connection = HTTPConnection.Pool.instance.get(host, port, secure);
       }
     else
       {
@@ -427,21 +421,31 @@ public class HTTPURLConnection
 
   public String getRequestProperty(String key)
   {
+    if (key == null)
+      return null;
+    
     return requestHeaders.getValue(key);
   }
 
   public Map getRequestProperties()
   {
+    if (connected)
+      throw new IllegalStateException("Already connected");
+    
     return requestHeaders;
   }
 
   public void setRequestProperty(String key, String value)
   {
+    super.setRequestProperty(key, value);
+    
     requestHeaders.put(key, value);
   }
 
   public void addRequestProperty(String key, String value)
   {
+    super.addRequestProperty(key, value);
+    
     String old = requestHeaders.getValue(key);
     if (old == null)
       {
@@ -493,6 +497,17 @@ public class HTTPURLConnection
       {
         throw new ProtocolException("doInput is false");
       }
+    
+    if (response.isError())
+      {
+        int code = response.getCode();
+        if (code == 404 || code == 410)
+          throw new FileNotFoundException(url.toString());
+      
+        throw new IOException("Server returned HTTP response code " + code
+                              + " for URL " + url.toString());
+      }
+    
     return responseSink;
   }
 

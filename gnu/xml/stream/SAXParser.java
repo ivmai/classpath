@@ -649,8 +649,11 @@ public class SAXParser
                   lexicalHandler.endDTD();
               }
           }
+        reset();
+        if (opened)
+          in.close();
       }
-    catch (XMLStreamException e)
+    catch (Exception e)
       {
         if (!startDocumentDone && contentHandler != null)
           contentHandler.startDocument();
@@ -660,13 +663,13 @@ public class SAXParser
           errorHandler.fatalError(e2);
         if (contentHandler != null)
           contentHandler.endDocument();
-        throw e2;
-      }
-    finally
-      {
+        reset();
         if (opened)
           in.close();
-        reset();
+        if (e instanceof IOException)
+          throw (IOException) e;
+        else
+          throw e2;
       }
   }
 
@@ -901,7 +904,16 @@ public class SAXParser
             InputSource input =
               entityResolver.resolveEntity(publicId, systemId);
             if (input != null)
-              return input.getByteStream();
+              {
+                InputStream in = input.getByteStream();
+                if (in == null)
+                  {
+                    String newSystemId = input.getSystemId();
+                    if (newSystemId != null && !newSystemId.equals(systemId))
+                      in = XMLParser.resolve(newSystemId);
+                  }
+                return in;
+              }
           }
         catch (SAXException e)
           {

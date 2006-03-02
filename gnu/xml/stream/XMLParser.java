@@ -710,7 +710,7 @@ public class XMLParser
 
   public int getNamespaceCount()
   {
-    if (!namespaceAware)
+    if (!namespaceAware || namespaces.isEmpty())
       return 0;
     switch (event)
       {
@@ -984,10 +984,10 @@ public class XMLParser
     if (event == XMLStreamConstants.END_ELEMENT)
       {
         // Pop namespace context
-        if (namespaceAware)
+        if (namespaceAware && !namespaces.isEmpty())
           namespaces.removeFirst();
         // Pop base context
-        if (baseAware)
+        if (baseAware && !bases.isEmpty())
           bases.removeFirst();
       }
     if (!startEntityStack.isEmpty())
@@ -1484,7 +1484,6 @@ public class XMLParser
   {
     if (!externalEntities)
       return;
-    InputStream in = null;
     String url = absolutize(input.systemId, ids.systemId);
     // Check for recursion
     for (Iterator i = inputStack.iterator(); i.hasNext(); )
@@ -1497,7 +1496,8 @@ public class XMLParser
       }
     if (name == null || "".equals(name))
       report = false;
-    if (in == null && url != null && resolver != null)
+    InputStream in = null;
+    if (resolver != null)
       {
         if (resolver instanceof XMLResolver2)
           in = ((XMLResolver2) resolver).resolve(ids.publicId, url);
@@ -1535,12 +1535,13 @@ public class XMLParser
    * @param base the current base URL
    * @param href the (absolute or relative) URL to resolve
    */
-  static String absolutize(String base, String href)
+  public static String absolutize(String base, String href)
+    throws MalformedURLException
   {
     if (href == null)
       return null;
     int ci = href.indexOf(':');
-    if (ci > 1 && isLowercaseAscii(href.substring(0, ci)))
+    if (ci > 1 && isURLScheme(href.substring(0, ci)))
       {
         // href is absolute already
         return href;
@@ -1565,40 +1566,23 @@ public class XMLParser
         if (!base.endsWith("/"))
           base += "/";
       }
-    if (href.startsWith("/"))
-      {
-        if (base.startsWith("file:"))
-          return "file://" + href;
-        int i = base.indexOf("://");
-        if (i != -1)
-          {
-            i = base.indexOf('/', i + 3);
-            if (i != -1)
-              base = base.substring(0, i);
-          }
-      }
-    else
-      {
-        while (href.startsWith(".."))
-          {
-            int i = base.lastIndexOf('/', base.length() - 2);
-            if (i != -1)
-              base = base.substring(0, i + 1);
-            href = href.substring(2);
-            if (href.startsWith("/"))
-              href = href.substring(1);
-          }
-      }
-    return base + href;
+    return new URL(new URL(base), href).toString();
   }
 
-  private static boolean isLowercaseAscii(String text)
+  /**
+   * Indicates whether the specified characters match the scheme portion of
+   * a URL.
+   * @see RFC 1738 section 2.1
+   */
+  private static boolean isURLScheme(String text)
   {
     int len = text.length();
     for (int i = 0; i < len; i++)
       {
         char c = text.charAt(i);
-        if (c < 97 || c > 122)
+        if (c == '+' || c == '.' || c == '-')
+          continue;
+        if (c < 65 || (c > 90 && c < 97) || c > 122)
           return false;
       }
     return true;
@@ -1607,7 +1591,7 @@ public class XMLParser
   /**
    * Returns an input stream for the given URL.
    */
-  private InputStream resolve(String url)
+  static InputStream resolve(String url)
     throws IOException
   {
     try
@@ -1617,6 +1601,12 @@ public class XMLParser
     catch (MalformedURLException e)
       {
         return null;
+      }
+    catch (IOException e)
+      {
+        IOException e2 = new IOException("error resolving " + url);
+        e2.initCause(e);
+        throw e2;
       }
   }
 
@@ -1891,7 +1881,10 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     requireWhitespace();
+    boolean saved = expandPE;
+    expandPE = (inputStack.size() > 1);
     String name = readNmtoken(true);
+    expandPE = saved;
     requireWhitespace();
     readContentspec(name);
     skipWhitespace();
@@ -2106,7 +2099,10 @@ public class XMLParser
     throws IOException, XMLStreamException
   {
     requireWhitespace();
+    boolean saved = expandPE;
+    expandPE = (inputStack.size() > 1);
     String elementName = readNmtoken(true);
+    expandPE = saved;
     boolean white = tryWhitespace();
     while (!tryRead('>'))
       {
@@ -2419,11 +2415,11 @@ public class XMLParser
               }
             else
               {
-                if (!isNameStartCharacter(cp[0]))
+                if (!isNameStartCharacter(cp[0], input.xml11))
                   error("malformed reference in entity value", value);
                 for (int i = 1; i < cp.length; i++)
                   {
-                    if (!isNameCharacter(cp[i]))
+                    if (!isNameCharacter(cp[i], input.xml11))
                       error("malformed reference in entity value", value);
                   }
               }
@@ -2838,8 +2834,6 @@ public class XMLParser
           error("Duplicate default namespace declaration");
         if (XMLConstants.XML_NS_URI.equals(attr.value))
           error("can't bind XML namespace");
-        if ("".equals(attr.value) && !input.xml11)
-          error("illegal use of 1.1-style prefix unbinding in 1.0 document");
         ctx.put(XMLConstants.DEFAULT_NS_PREFIX, attr.value);
         return true;
       }
@@ -3087,7 +3081,15 @@ public class XMLParser
                 break;
               case 0x3c: // '<'
                 reset();
-                read(tmpBuf, 0, i);
+                // read i characters
+                int count = 0, remaining = i;
+                do
+                  {
+                    int r = read(tmpBuf, 0, remaining);
+                    count += r;
+                    remaining -= r;
+                  }
+                while (count < i);
                 i = len;
                 if (coalescing && tryRead(TEST_CDATA))
                   readUntil(TEST_END_CDATA); // read CDATA section into buf
@@ -3258,15 +3260,7 @@ public class XMLParser
                       reset();
                     char[] ref = readCharacterRef(hex ? 16 : 10);
                     for (int i = 0; i < ref.length; i++)
-                      {
-                        char x = ref[i];
-                        if ((flags & (LIT_ATTRIBUTE | LIT_PUBID)) != 0 &&
-                            (x == 0x0a || x == 0x0d))
-                          x = 0x20; // normalize
-                        else if ((flags & LIT_ATTRIBUTE) != 0 && x == 0x09)
-                          x = 0x20; // normalize
-                        literalBuf.append(x);
-                      }
+                      literalBuf.append(ref[i]);
                     entities = true;
                     continue;
                   }
@@ -3469,13 +3463,13 @@ public class XMLParser
     int c = readCh();
     if (isName)
       {
-        if (!isNameStartCharacter(c))
+        if (!isNameStartCharacter(c, input.xml11))
           error("not a name start character",
                 "U+" + Integer.toHexString(c));
       }
     else
       {
-        if (!isNameCharacter(c))
+        if (!isNameCharacter(c, input.xml11))
           error("not a name character",
                 "U+" + Integer.toHexString(c));
       }
@@ -3510,7 +3504,7 @@ public class XMLParser
             reset();
             return intern(buf.toString());
           default:
-            if (!isNameCharacter(c))
+            if (!isNameCharacter(c, input.xml11))
               error("not a name character",
                     "U+" + Integer.toHexString(c));
             else
@@ -3523,7 +3517,7 @@ public class XMLParser
   /**
    * Indicates whether the specified Unicode character is an XML 1.1 Char.
    */
-  private boolean isXML11Char(int c)
+  public static boolean isXML11Char(int c)
   {
     return ((c >= 0x0001 && c <= 0xD7FF) ||
             (c >= 0xE000 && c < 0xFFFD) || // NB exclude 0xfffd
@@ -3534,7 +3528,7 @@ public class XMLParser
    * Indicates whether the specified Unicode character is an XML 1.1
    * RestrictedChar.
    */
-  private boolean isXML11RestrictedChar(int c)
+  public static boolean isXML11RestrictedChar(int c)
   {
     return ((c >= 0x0001 && c <= 0x0008) ||
             (c >= 0x000B && c <= 0x000C) ||
@@ -3556,17 +3550,17 @@ public class XMLParser
           return false;
         if (isName)
           {
-            if (!isNameStartCharacter(cp[0]))
+            if (!isNameStartCharacter(cp[0], input.xml11))
               return false;
           }
         else
           {
-            if (!isNameCharacter(cp[0]))
+            if (!isNameCharacter(cp[0], input.xml11))
               return false;
           }
         for (int i = 1; i < cp.length; i++)
           {
-            if (!isNameCharacter(cp[i]))
+            if (!isNameCharacter(cp[i], input.xml11))
               return false;
           }
         return true;
@@ -3581,9 +3575,9 @@ public class XMLParser
    * Indicates whether the specified Unicode character is a Name start
    * character.
    */
-  private boolean isNameStartCharacter(int c)
+  public static boolean isNameStartCharacter(int c, boolean xml11)
   {
-    if (input.xml11)
+    if (xml11)
       return ((c >= 0x0041 && c <= 0x005a) ||
               (c >= 0x0061 && c <= 0x007a) ||
               c == 0x3a |
@@ -3608,9 +3602,9 @@ public class XMLParser
    * Indicates whether the specified Unicode character is a Name non-initial
    * character.
    */
-  private boolean isNameCharacter(int c)
+  public static boolean isNameCharacter(int c, boolean xml11)
   {
-    if (input.xml11)
+    if (xml11)
       return ((c >= 0x0041 && c <= 0x005a) ||
               (c >= 0x0061 && c <= 0x007a) ||
               (c >= 0x0030 && c <= 0x0039) ||
