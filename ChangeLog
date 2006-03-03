@@ -1,3 +1,12 @@
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* java/beans/EventSetDescriptor.java (EventSetDescriptor):
+	Genericized.
+	(getListenerType): Likewise.
+	* java/beans/Introspector.java (getBeanInfo): Genericized.
+	* java/beans/DefaultPersistenceDelegate.java (initialize):
+	Genericized.
+
 2006-03-01  Anthony Balkissoon  <abalkiss@redhat.com>
 
 	* java/math/BigDecimal.java:

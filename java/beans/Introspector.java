@@ -246,7 +246,7 @@ public class Introspector {
    * @throws IntrospectionException If something goes wrong while retrieving
    *    the bean data.
    */
-  public static BeanInfo getBeanInfo(Class beanClass, int flag)
+  public static BeanInfo getBeanInfo(Class<?> beanClass, int flag)
     throws IntrospectionException
   {
     IntrospectionIncubator ii;
