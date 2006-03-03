@@ -1,5 +1,9 @@
 2006-03-03  Tom Tromey  <tromey@redhat.com>
 
+	* java/awt/MenuBar.java (shortcuts): Genericized.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
 	* java/beans/EventSetDescriptor.java (EventSetDescriptor):
 	Genericized.
 	(getListenerType): Likewise.
