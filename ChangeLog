@@ -1,3 +1,1108 @@
+2006-03-05  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac (VERSION): Set to 0.90-pre-generics.
+	* Merge with CVS trunk from classpath-0_90-branch-point.
+
+2006-03-04  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/SpringLayout.java (Constraints): New constructor.
+	* javax/swing/Spring.java (width): New method.
+	(height): Likewise.
+	(scale): Likewise.
+
+2006-03-04  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/net/protocol/http/HTTPConnection.java (Pool.get): Remove
+	existing connection from pool before returning.
+
+2006-03-04  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/xml/stream/SAXParser.java (parse(InputSource)): Ignore
+	exceptions thrown by handlers while cleaning up and rethrow original
+	exception.
+
+2006-03-04  Tom Tromey  <tromey@redhat.com>
+
+	* java/beans/PropertyDescriptor.java (createPropertyEditor): New
+	method.
+	(findConstructor): Likewise.
+	(instantiateClass): Likewise.
+
+2006-03-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/java/rmi/dgc/DGCImpl.java:  More comments, boilerplate fix.
+	(dirty): Do not synchronize on Hashtable. Use the passed (requested) 
+	lease value and not always the default one.
+ 	(LeaseRecord): Remember the array of objects, marked as dirty.
+ 	java/rmi/dgc/Lease.java: Boilerplate fix.
+
+2006-03-05  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* java/util/jar/Attributes.java (putValue): Made it public and updated
+	method documentation.
+
+2006-03-04  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/Container.java (remove(int)): Always call removeNotify()
+	on removed Component.
+
+2006-03-04  Mark Wielaard  <mark@klomp.org>
+
+	Fixes bug #26460 reported by Beat Wolf <asraniel@fryx.ch>.
+	* javax/swing/JEditorPane.java (setText): Check for empty String
+	with equals(), not equality (==).
+
+2006-03-04  Mark Wielaard  <mark@klomp.org>
+
+	* javax/swing/text/html/HTMLDocument.java: Qualify ElementSpec as
+	DefaultStyledDocument.ElementSpec for gcj 4.0.x.
+
+2006-03-04  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/text/GapContent.java
+	(getArray): Mark as final.
+
+2006-03-04  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/text/StyleConstants.java
+	(CharacterConstants.Background): Marked final,
+	(CharacterConstants.BidiLevel): Likewise,
+	(CharacterConstants.Bold): Likewise,
+	(CharacterConstants.ComponentAttribute): Likewise,
+	(CharacterConstants.Family): Likewise,
+	(CharacterConstants.Size): Likewise,
+	(CharacterConstants.Foreground): Likewise,
+	(CharacterConstants.IconAttribute): Likewise,
+	(CharacterConstants.Italic): Likewise,
+	(CharacterConstants.StrikeThrough): Likewise,
+	(CharacterConstants.Subscript): Likewise,
+	(CharacterConstants.Superscript): Likewise,
+	(CharacterConstants.Underline): Likewise,
+	(ColorConstants.Foreground): Likewise,
+	(ColorConstants.Background): Likewise,
+	(FontConstants.Bold): Likewise,
+	(FontConstants.Family): Likewise,
+	(FontConstants.Italic): Likewise,
+	(FontConstants.Size): Likewise,
+	(ParagraphConstants.Alignment): Likewise,
+	(ParagraphConstants.FirstLineIndent): Likewise,
+	(ParagraphConstants.LeftIndent): Likewise,
+	(ParagraphConstants.LineSpacing): Likewise,
+	(ParagraphConstants.Orientation): Likewise,
+	(ParagraphConstants.RightIndent): Likewise,
+	(ParagraphConstants.SpaceAbove): Likewise,
+	(ParagraphConstants.SpaceBelow): Likewise,
+	(ParagraphConstants.TabSet): Likewise.	
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* javax/net/ssl/SSLException.java: Added missing @since.
+	Wrote javadoc.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* javax/net/ssl/SSLException.java (SSLException): New constructors.
+	(serialVersionUID): New field.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* java/security/spec/InvalidKeySpecException.java
+	(InvalidKeySpecException): New constructors.
+	* java/security/cert/CertificateParsingException.java
+	(CertificateParsingException): New constructors.
+	* java/security/cert/CertificateEncodingException.java
+	(CertificateEncodingException): New constructors.
+	* java/security/cert/CertificateException.java (CertificateException):
+	New constructors.
+	* java/security/cert/CRLException.java (CRLException): New
+	constructors.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* java/security/SignatureException.java (SignatureException): New
+	constructors.
+	* java/security/ProviderException.java (ProviderException): New
+	constructors.
+	* java/security/NoSuchAlgorithmException.java
+	(NoSuchAlgorithmException): New constructors.
+	* java/security/KeyStoreException.java (KeyStoreException): New
+	constructors.
+	* java/security/KeyManagementException.java (KeyManagementException):
+	New constructors.
+	* java/security/InvalidKeyException.java (InvalidKeyException): New
+	constructors.
+	* java/security/KeyException.java (KeyException): New constructors.
+	* java/security/InvalidAlgorithmParameterException.java
+	(InvalidAlgorithmParameterException): New constructors.
+	* java/security/DigestException.java (DigestException): New
+	constructors.
+	* java/security/GeneralSecurityException.java
+	(GeneralSecurityException): New constructors.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/CaretEvent.java: Reformatting and fixed API doc 
+	warnings,
+	* javax/swing/event/DocumentEvent.java: Likewise,
+	* javax/swing/event/EventListenerList.java: Likewise,
+	* javax/swing/event/MenuDragMouseEvent.java: Likewise,
+	* javax/swing/event/MenuKeyEvent.java: Likewise,
+	* javax/swing/event/TableColumnModelEvent.java: Likewise,
+	* javax/swing/event/TreeExpansionEvent.java: Likewise,
+	* javax/swing/event/TreeModelEvent.java: Likewise,
+	* javax/swing/event/TreeSelectionEvent.java: Likewise,
+	* javax/swing/event/UndoableEditEvent.java: Likewise.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* java/awt/Insets.java (set): New method.
+	(equals): Added @since.
+
+2006-03-03  David Daney  <ddaney@avtrex.com>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java
+	(getRequestProperties): Rewrote.
+	(addRequestProperty): Rewrote.
+	(getHeaderFields): Rewrote.
+	(getHeaderField): Rewrote.
+	(getHeaderFieldKey): Rewrote.
+	(getHeaderField): Removed useless cast.
+	* gnu/java/net/protocol/http/Headers.java: Entire class rewritten.
+	* gnu/java/net/protocol/http/Request.java (dispatch): Use new Headers
+	interface.
+	(notifyHeaderHandlers): Use new Headers interface.
+
+2006-03-03  Tom Tromey  <tromey@redhat.com>
+
+	* javax/naming/NamingException.java (getExplanation): Javadoc fix.
+	* javax/naming/spi/ResolveResult.java,
+	javax/naming/event/NamingExceptionEvent.java,
+	javax/naming/event/NamingEvent.java,
+	javax/naming/directory/SearchResult.java,
+	javax/naming/directory/SearchControls.java,
+	javax/naming/directory/SchemaViolationException.java,
+	javax/naming/directory/NoSuchAttributeException.java,
+	javax/naming/directory/ModificationItem.java,
+	javax/naming/directory/InvalidSearchFilterException.java,
+	javax/naming/directory/InvalidSearchControlsException.java,
+	javax/naming/directory/InvalidAttributesException.java,
+	javax/naming/directory/InvalidAttributeIdentifierException.java,
+	javax/naming/directory/AttributeModificationException.java,
+	javax/naming/directory/AttributeInUseException.java,
+	javax/naming/TimeLimitExceededException.java,
+	javax/naming/SizeLimitExceededException.java,
+	javax/naming/PartialResultException.java,
+	javax/naming/Reference.java,
+	javax/naming/ServiceUnavailableException.java,
+	javax/naming/OperationNotSupportedException.java,
+	javax/naming/NotContextException.java,
+	javax/naming/NoPermissionException.java,
+	javax/naming/NoInitialContextException.java,
+	javax/naming/NameNotFoundException.java,
+	javax/naming/NameAlreadyBoundException.java,
+	javax/naming/NameClassPair.java,
+	javax/naming/MalformedLinkException.java,
+	javax/naming/LinkLoopException.java,
+	javax/naming/LinkException.java,
+	javax/naming/LimitExceededException.java,
+	javax/naming/InvalidNameException.java,
+	javax/naming/InterruptedNamingException.java,
+	javax/naming/InsufficientResourcesException.java,
+	javax/naming/ContextNotEmptyException.java,
+	javax/naming/ConfigurationException.java,
+	javax/naming/CannotProceedException.java,
+	javax/naming/CommunicationException.java,
+	javax/naming/Binding.java,
+	javax/naming/AuthenticationNotSupportedException.java,
+	javax/naming/AuthenticationException.java: Added serialVersionUID.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/TableColumnModelEvent.java: Reformatted.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/TableModelListener.java: Updated API docs.
+
+2006-03-03  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/Component.java (addNotify): Expand documentation.
+
+2006-03-03  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java (GtkComponentPeer):
+	Always call setParentAndBounds().
+	(setComponentBounds): Always call setBounds().
+	(setBounds): Call setVisible().
+	(setVisible): If no pixels are showing then don't make it visible.
+	* gnu/java/awt/peer/gtk/GtkContainerPeer.java (endValidate): No need
+	to call setParentAndBounds() anymore.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JInternalFrame.java
+	(JInternalFrame): Set frame invisible.
+	(show): Reformatted.
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java
+	(installDefaults): Do not set invisible here.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Toolkit.java
+	(getScreenInsets): Return (0,0,0,0) here.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/FlowView.java
+	(FlowStrategy.layoutRow): Added check for rowCount == 0.
+	(FlowStrategy.getLogicalView): Made method protected.
+
+2006-03-03  Chris Burdess  <dog@gnu.org>
+
+	* gnu/xml/validation/relaxng/AnyNameNameClass.java,
+	  gnu/xml/validation/relaxng/AttributePattern.java,
+	  gnu/xml/validation/relaxng/ChoiceNameClass.java,
+	  gnu/xml/validation/relaxng/ChoicePattern.java,
+	  gnu/xml/validation/relaxng/DataPattern.java,
+	  gnu/xml/validation/relaxng/Define.java,
+	  gnu/xml/validation/relaxng/ElementPattern.java,
+	  gnu/xml/validation/relaxng/EmptyPattern.java,
+	  gnu/xml/validation/relaxng/FullSyntaxBuilder.java,
+	  gnu/xml/validation/relaxng/Grammar.java,
+	  gnu/xml/validation/relaxng/GrammarException.java,
+	  gnu/xml/validation/relaxng/GrammarValidator.java,
+	  gnu/xml/validation/relaxng/GroupPattern.java,
+	  gnu/xml/validation/relaxng/InterleavePattern.java,
+	  gnu/xml/validation/relaxng/ListPattern.java,
+	  gnu/xml/validation/relaxng/NSNameNameClass.java,
+	  gnu/xml/validation/relaxng/NameClass.java,
+	  gnu/xml/validation/relaxng/NameNameClass.java,
+	  gnu/xml/validation/relaxng/NotAllowedPattern.java,
+	  gnu/xml/validation/relaxng/OneOrMorePattern.java,
+	  gnu/xml/validation/relaxng/Param.java,
+	  gnu/xml/validation/relaxng/Pattern.java,
+	  gnu/xml/validation/relaxng/RELAXNGSchemaFactory.java,
+	  gnu/xml/validation/relaxng/RefPattern.java,
+	  gnu/xml/validation/relaxng/TextPattern.java,
+	  gnu/xml/validation/relaxng/ValuePattern.java: New RELAX NG grammar
+	  builder and data model.
+	* gnu/xml/validation/xmlschema/AnyAttribute.java,
+	  gnu/xml/validation/xmlschema/AttributeDeclaration.java,
+	  gnu/xml/validation/xmlschema/AttributeUse.java,
+	  gnu/xml/validation/xmlschema/ComplexType.java,
+	  gnu/xml/validation/xmlschema/ElementDeclaration.java,
+	  gnu/xml/validation/xmlschema/Particle.java,
+	  gnu/xml/validation/xmlschema/ValidationException.java,
+	  gnu/xml/validation/xmlschema/XMLSchema.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaBuilder.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaSchemaFactory.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaValidator.java,
+	  gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java: New
+	  W3C XML Schema builder and schema components.
+	* javax/xml/validation/SchemaFactory.java: Recognise RELAX NG and W3C
+	  XML Schema namespace URIs.
+
+2006-03-03  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* NEWS: Add entry for --enable-collections.
+	* configure.ac: Add --enable-collections option.
+	* lib/Makefile.am (collections.jar): New target.
+	(glibj_DATA): Add $(COLLECTIONS).
+	* lib/mkcollections.pl.in (destpath): Set from COLLECTION_PREFIX
+	configure substitution.
+	(classpath): Read from command line.
+	(javautilclasses): Remove BasicMapEntry.  Add RandomAccess.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/SpringLayout.java: Fixed API doc warnings.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/ListSelectionEvent.java
+	(toString): Implemented,
+	plus updated API docs all over.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/ListSelectionEvent.java: Reformatted and fixed
+	API doc warnings,
+	* javax/swing/event/ListSelectionListener.java: Updated API docs.
+
+2006-03-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/java/rmi/dgc/DGCImpl.java,
+	java/rmi/dgc/DGC.java,
+	java/rmi/dgc/Lease.java: Formatted and commented.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* NEWS: Added comment about text highlighting and copy+paste
+	in Swing.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JTabbedPane.java
+	(remove(int)): Call super.remove(int) instead of remove(Component).
+	Avoids a stack overflow.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JTable.java
+	(distributeSpillResizing): Avoid ArithmeticException by checking
+	divisor.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/text/package.html: Added package description.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/CellRendererPane.java: Minor API doc fix,
+	* javax/swing/ComboBoxModel.java: Updated API docs.
+
+2006-03-03  Chris Burdess  <dog@gnu.org>
+
+	Fixes PR 26503
+	* gnu/xml/stream/EntityReferenceImpl.java,
+	  gnu/xml/stream/FilteredEventReader.java,
+	  gnu/xml/stream/SAXParser.java,
+	  gnu/xml/stream/XIncludeFilter.java,
+	  gnu/xml/stream/XMLEventAllocatorImpl.java,
+	  gnu/xml/stream/XMLEventFactoryImpl.java,
+	  gnu/xml/stream/XMLEventImpl.java,
+	  gnu/xml/stream/XMLEventReaderImpl.java,
+	  gnu/xml/stream/XMLEventWriterImpl.java,
+	  gnu/xml/stream/XMLInputFactoryImpl.java,
+	  gnu/xml/stream/XMLOutputFactoryImpl.java,
+	  gnu/xml/stream/XMLParser.java,
+	  javax/xml/stream/EventFilter.java,
+	  javax/xml/stream/Location.java,
+	  javax/xml/stream/StreamFilter.java,
+	  javax/xml/stream/XMLEventFactory.java,
+	  javax/xml/stream/XMLEventReader.java,
+	  javax/xml/stream/XMLEventWriter.java,
+	  javax/xml/stream/XMLInputFactory.java,
+	  javax/xml/stream/XMLOutputFactory.java,
+	  javax/xml/stream/XMLReporter.java,
+	  javax/xml/stream/XMLResolver.java,
+	  javax/xml/stream/XMLStreamConstants.java,
+	  javax/xml/stream/XMLStreamReader.java,
+	  javax/xml/stream/events/EntityDeclaration.java,
+	  javax/xml/stream/events/EntityReference.java,
+	  javax/xml/stream/events/XMLEvent.java,
+	  javax/xml/stream/util/EventReaderDelegate.java,
+	  javax/xml/stream/util/ReaderDelegate.java: Updated to final version of
+	  StAX API as specified in JWSDP 2.0.
+	* gnu/xml/stream/EndEntityImpl.java,
+	  gnu/xml/stream/LocationImpl.java,
+	  gnu/xml/stream/StartEntityImpl.java,
+	  gnu/xml/stream/XMLStreamReaderImpl.java,
+	  javax/xml/stream/XMLFilter.java,
+	  javax/xml/stream/XMLIterator.java,
+	  javax/xml/stream/events/EndEntity.java,
+	  javax/xml/stream/events/StartEntity.java: Removed legacy files.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/CellEditor.java: API doc updates,
+	* javax/swing/DefaultCellEditor.java: Likewise.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractListModel.java:
+	(AbstractListModel): Added API docs,
+	(fireContentsChanged): Minor API doc correction,
+	(fireIntervalAdded): Likewise,
+	(fireIntervalRemoved): Likewise.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* NEWS: Added paragraph about Swing improvements.
+
+2006-03-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractAction.java: Updated API docs all over,
+	* javax/swing/AbstractCellRenderer.java: Minor reformatting, plus
+	(stopCellEditing): Minor API doc correction,
+	* javax/swing/UnsupportedLookAndFeelException.java
+	(UnsupportedLookAndFeelException): Changed argument name, updated API
+	docs.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/metal/MetalUtils.java
+	(fillMetalPattern): Added switch to not use Graphics2D methods,
+	even if they are available.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicHTML.java
+	(isHTMLString): Check for string beeing null.
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java
+	(BasicInternalFrameListener.internalFrameActivated): Implemented.
+	(BasicInternalFrameListener.internalFrameDeactivated): Implemented.
+	(InternalFrameLayout): Don't touch the glass pane here.
+	(installUI): Fix handling of glass pane.
+	* javax/swing/plaf/basic/BasicLabelUI.java
+	(vr): New field.
+	(ir): New field.
+	(tr): New field.
+	(BasicLabelUI): Initialize new fields.
+	(getPreferredSize): Avoid creating new Rectangles by using
+	SwingUtilities method.
+	(paint): Avoid creating new Rectangles by reusing
+	new fields. Added some preliminary handling of HTML inside the
+	label.
+	(installComponents): Handle HTML by calling BasicHTML.updateRenderer.
+	(uninstallComponents): Clear HTML renderer.
+	(propertyChange): Check for HTML text and install renderer if
+	appropriate.
+	* javax/swing/plaf/basic/BasicListUI.java
+	(getCellBounds): Avoid creating new Rectangle by using SwingUtilities
+	method.
+	* javax/swing/plaf/basic/BasicTextUI.java
+	(RootView.getStartOffset): Implemented.
+	(RootView.getEndOffset): Implemented.
+	(RootView.getDocument): Implemented.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/DefaultStyledDocument.java
+	(ElementBuffer.inserUpdate): Added check for zero-length
+	element.
+	* javax/swing/text/DefaultStyledDocument.java
+	(setIndex): Improved exception message.
+	* javax/swing/text/TableView.java
+	Made class abstract.
+	(TableRow.replace): Probably extend columnRequirements
+	arrays.
+	(TableRow.layoutMinorAxis): Call super.layoutMinorAxis instead
+	of super.layoutMajorAxis.
+	(columnRequirements): Made field package private.
+	(TableView): Do not load any child views here.
+	(layoutColumns): Implemented this method.
+	(updateColumnRequirements): New helper method.
+	* javax/swing/text/Utilities.java
+	(getBreakLocation): Also take offset into account when
+	finding end location.
+	* javax/swing/text/html/HTMLDocument.java
+	(HTMLReader.parseStack): New field.
+	(HTMLReader.blockOpen): Properly handle p-implied tags.
+	(HTMLReader.blockClose): Properly handle p-implied and empty tags.
+	(HTMLReader.addContent): Insert p-implied when adding content to
+	a block element.
+	* javax/swing/text/html/HTMLEditorKit.java
+	(HTMLFactory.create): Create HTMLTableView for <table> tags and
+	ParagraphView for TD tags. Print out warning for tags that don't have
+	matching view yet and create NullView for them.
+	(read): Only set document base when document != null.
+	* javax/swing/text/html/HTMLTableView.java:
+	New class
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicHTML.java
+	(HTMLRootView): New inner class.
+	(createHTMLView): Embed view inside a HTMLRootView.
+
+2006-03-03  Wolfgang Baer  <WBaer@gmx.de>
+
+	* gnu/java/net/protocol/jar/Connection.java: 
+	(connect): Throw FileNotFoundException.
+	(getInputStream): Remove duplicated code.
+
+2006-03-03  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/RepaintManager.java
+	(commitBuffer): Added null check for clip.
+
+2006-03-02  Lillian Angel <langel@redhat.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkMenuPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkMenuPeer_delItem): Fixed
+	to use GtkWidget instead of GTKMenu.
+
+2006-03-02  Lillian Angel <langel@redhat.com>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkMenuPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkMenuPeer_delItem): Changed to 
+	use the submenu to get the list of children. This now works
+	in the same way as addItem.
+
+2006-03-02  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/lang/StringBuilder.java:
+	(codePointAt): New method.
+	(codePointBefore): Likewise.
+	(codePointCount): Likewise.
+	(trimToSize): Likewise.
+
+2006-03-02  Tom Tromey  <tromey@redhat.com>
+
+	* java/rmi/server/RMIClassLoader.java (getProviderInstance): Wrote.
+
+2006-03-02  Tom Tromey  <tromey@redhat.com>
+
+	* java/rmi/server/RMIClassLoader.java (loadProxyClass): New method.
+	(getProviderInstance): 
+
+2006-03-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* native/jni/java-net/gnu_java_net_VMPlainSocketImpl.c:
+	Fix regression caused by move to VM variant.
+	PR classpath/22926.
+	
+2006-03-01  Tom Tromey  <tromey@redhat.com>
+
+	* vm/reference/java/net/VMNetworkInterface.java: Organized imports.
+	* vm/reference/java/net/VMInetAddress.java: Organized imports.
+	* vm/reference/java/lang/reflect/VMProxy.java (getProxyClass): Added
+	imports for javadoc.
+	(getProxyClass): Javadoc fixes.
+	(getProxyData): Likewise.
+	(generateProxyClass): Likewise.
+	* vm/reference/java/lang/VMSystem.java (setIn): Javadoc fix.
+	(setOut): Likewise.
+	(setErr): Likewise.
+	* vm/reference/java/lang/VMProcess.java: Javadoc fixes.
+	* vm/reference/java/lang/VMClassLoader.java (getResources): Javadoc
+	fix.
+	* vm/reference/java/lang/VMClass.java (getComponentType): Import for
+	javadoc.
+	(getModifiers): Likewise.
+	(getDeclaredClasses): Javadoc fix.
+	(getDeclaredFields): Likewise.
+	(getDeclaredMethods): Likewise.
+	(getDeclaredConstructors): Likewise.
+	* vm/reference/gnu/classpath/VMSystemProperties.java (preInit):
+	Javadoc fix.
+
+2006-03-01  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/net/protocol/http/ResponseHeaderHandler.java: Javadoc fix.
+	* gnu/java/net/protocol/http/HTTPConnection.java: Organized imports.
+	(getVersion): Javadoc fix.
+	(get): Likewise.
+	* gnu/java/net/protocol/http/Headers.java: Organized imports.
+	* gnu/java/net/protocol/ftp/FTPURLConnection.java: Organized imports.
+
+2006-03-01  David Daney  <ddaney@avtrex.com>
+
+	* java/net/URL.java (URL(URL, String, URLStreamHandler)): Treat spec
+	as relative if it contains a colon but no protocol handler can be
+	found.
+
+2006-03-01  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/AbstractDocument.java
+	(LeafElement.LeafElement): Handle delta with respect to content
+	length not document length.
+	* javax/swing/text/CompositeView.java
+	(getViewIndex): Handle bias correctly.
+	* javax/swing/text/DefaultCaret.java
+	(paint): Align caret position to document bounds to avoid trouble
+	when removing large portions of content.
+	* javax/swing/text/DefaultStyledDocument.java
+	(ElementBuffer.insertFirstContentTag): Use pos instead of offset.
+	(ElementBuffer.createFracture): Copy old childs attribute. The
+	ElementSpec usually doesn't carry attribute information.
+	Use pos instead of offset.
+	(ElementBuffer.insertFracture): Use pos instead of offset.
+	(createDefaultRootElement): Don't use create* and instead directly
+	instantiate the elements.
+	(handleInsertAfterNewline): Compare the paragraphs startOffset
+	rather than previous paragraphs endOffset.
+	* javax/swing/text/JTextComponent.java
+	(getScrollableTracksViewportWidth): Remove unnecessary cast to
+	JViewport.
+	(getScrollableTracksViewportHeight): Remove unnecessary cast to
+	JViewport.
+	* javax/swing/text/PlainView.java
+	(damageLineRange): Avoid creating new Rectangle by using
+	SwingUtilities.
+	* javax/swing/text/View.java
+	(forwardUpdate): Correct the use of bias.
+	(modelToView): Avoid new Rectangles by using SwingUtilities.
+	(dump): Made (temprorarily) protected for use in BasicTextUI.
+	(dump(int)): Dump out the element of the view.
+
+2006-03-01  Lillian Angel  <langel@redhat.com>
+
+	* NEWS: javax.imageio.plugins.bmp implementation.
+
+2006-03-01  Lillian Angel  <langel@redhat.com>
+
+	* javax/imageio/ImageWriteParam.java: 
+	Added documentation for fields.
+	* javax/imageio/plugins/bmp/BMPImageWriteParam.java:
+	New class implemented.
+
+2006-03-01  Tom Tromey  <tromey@redhat.com>
+
+	* NEWS: Mention java.util.prefs update.
+
+2006-03-01  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/nio/channels/FileChannelImpl.java (position): Fixed typo.
+	* java/nio/charset/UnmappableCharacterException.java:
+	(serialVersionUID): New field.
+	* java/nio/charset/MalformedInputException.java:
+	(serialVersionUID): New field.
+	* java/nio/charset/CoderMalfunctionError.java:
+	(serialVersionUID): New field.
+	* java/nio/charset/CharacterCodingException.java:
+	(serialVersionUID): New field.
+	* java/nio/channels/UnsupportedAddressTypeException.java:
+	(serialVersionUID): New field.
+	* java/nio/channels/UnresolvedAddressException.java:
+	(serialVersionUID): New field.
+	* java/nio/channels/OverlappingFileLockException.java:
+	(serialVersionUID): New field.
+	* java/nio/channels/NotYetConnectedException.java:
+	(serialVersionUID): New field.
+	* java/nio/channels/NotYetBoundException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/NonWritableChannelException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/NonReadableChannelException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/NoConnectionPendingException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/IllegalSelectorException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/IllegalBlockingModeException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/FileLockInterruptionException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/ConnectionPendingException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/ClosedSelectorException.java (serialVersionUID):
+	New field.
+	* java/nio/channels/ClosedChannelException.java (serialVersionUID):
+	New field.
+	* java/nio/channels/ClosedByInterruptException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/CancelledKeyException.java (serialVersionUID): 
+	New field.
+	* java/nio/channels/AsynchronousCloseException.java
+	(serialVersionUID): New field.
+	* java/nio/channels/AlreadyConnectedException.java (serialVersionUID):
+	New field.
+	* java/nio/ReadOnlyBufferException.java (serialVersionUID): New field.
+	* java/nio/InvalidMarkException.java (serialVersionUID): New field.
+	* java/nio/BufferUnderflowException.java (serialVersionUID): New
+	field.
+	* java/nio/BufferOverflowException.java (serialVersionUID): New field.
+	* java/nio/channels/spi/AbstractInterruptibleChannel.java (end):
+	Javadoc fix.  Added import.
+	* java/nio/channels/DatagramChannel.java (isConnected): Javadoc fix.
+	(validOps): Likewise.
+	* gnu/java/nio/charset/iconv/IconvProvider.java: Organized imports.
+	* gnu/java/nio/charset/iconv/IconvEncoder.java: Organized imports.
+	* gnu/java/nio/charset/iconv/IconvDecoder.java: Organized imports.
+	* java/nio/channels/Channels.java: Added import.
+	* java/nio/channels/FileChannel.java (lock): Typo fix.
+	(tryLock): Likewise.
+
+2006-03-01  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/prefs/Preferences.java (defaultFactoryClass): Use
+	FileBasedFactory.
+	* gnu/java/util/prefs/FileBasedPreferences.java: New file.
+	* java/util/prefs/AbstractPreferences.java (removeSpi): Typo fix.
+	(clear): Likewise.
+	(putSpi): Likewise.
+	(newNode): Likewise.
+	(node): Likewise.
+	* gnu/java/util/prefs/MemoryBasedFactory.java: Typo fix.
+	* gnu/java/util/prefs/FileBasedFactory.java (systemPreferences): New
+	field.
+	(systemRoot): Use it.
+	(userPreferences): New field.
+	(userRoot): Use it.
+
+2006-03-01  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/util/ResourceBundle.java
+	(tryBundle): Catch and ignore all Exceptions.
+
+2006-02-28  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicScrollBarUI.java
+	(getPreferredSize): Fixed add a fixed space between the buttons
+	instead of something related to min/max.
+	(installComponents): Create and install buttons here.
+	(installDefaults): Don't create buttons here.
+	* javax/swing/plaf/metal/MetalScrollBarUI.java
+	(getMinimumThumbSize): Return (0,0) when UI is not yet installed.
+	(getPreferredSize): New method.
+
+2006-02-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* examples/gnu/classpath/examples/swing/Demo.java
+	(mkMenuBar): Removed 'Toggles', 'Checkbox' and 'Radio' actions, 
+	connected 'Spinner' action to SpinnerDemo, 
+	(mkCheckbox): Removed,
+	(mkRadio): Likewise,
+	(mkSpinner): Likewise,
+	(mkToggle): Likewise,
+	(mkButtonBar): Removed 'Toggles', 'Checkbox' and 'Radio' actions,
+	connected 'Spinner' action to SpinnerDemo.
+
+2006-02-28  Wolfgang Baer  <WBaer@gmx.de>
+
+	* javax/print/ServiceUIFactory.java: Added documentation to class.
+
+2006-02-28  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	PR classpath/26434
+	* javax/swing/DefaultListSelectionModel.java:
+	(addSelectionInterval): Return early if either of the arguments is -1.
+	(removeSelectionInterval): Likewise.
+	(setSelectionInterval): Likewise.
+
+2006-02-28  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/text/DefaultFormatter.java
+	(stringToValue): Added NPE check.
+
+2006-02-28  Roman Kennke  <kennke@aicas.com>
+
+	PR classpath/25675
+	* javax/swing/JList.java
+	(getPreferredScrollableViewportSize): Restored specified behaviour.
+	* javax/swing/plaf/metal/MetalFileChooserUI.java
+	(createList): Set filelist panel's preferredSize, so that it doesn't
+	get size into infinity for big lists.
+
+2006-02-28  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/ViewportLayout.java
+	(layoutContainer): Should not extend container to be 
+	minimum size. Mauve test shows that the preferred size
+	and the size of the viewport can be set smaller than
+	the minimum.
+
+2006-02-28  Lillian Angel  <langel@redhat.com>
+
+	PR classpath/25675
+	* javax/swing/JList.java
+	(getPreferredScrollableViewportSize): Added a check to determine
+	if orientation is VERTICAL_WRAP. If it is, we should only 
+	show 3 columns. 
+
+2006-02-28  Lillian Angel  <langel@redhat.com>
+
+	PR classpath/26003
+	* javax/swing/ViewportLayout.java:
+	Patch submitted by Audrius Meskauskas
+	(addLayoutComponent): Added documentation.
+	(removeLayoutComponent): Likewise.
+	(preferredLayoutSize): Likewise.
+	(minimumLayoutSize): Likewise.
+	(layoutContainer): Fixed code, so view is set
+	to the right position when inside a scrollpane.	
+
+2006-02-28  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* java/math/BigInteger.java:
+	Committed patch by Rafael: 
+	developer.classpath.org/pipermail/classpath-patches/
+	2006-February/000473.html
+	(signum): Return early 0 if words == null and ival == 0.
+	(readObject): Handle special case of magnitude.length or signum being
+	0.
+	(writeObject): If signum is zero return a zero-sized byte[].
+
+2006-02-28  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkFileDialogPeer.java
+	(create): Initially set the directory to the current working directory.
+	(setDirectory): Removed else-if. No need for this check.
+
+2006-02-28  Tom Tromey  <tromey@redhat.com>
+
+	* .project: Run java builder before header generation.
+
+2006-02-28  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/util/prefs/MemoryBasedPreferences.java (childrenNamesSpi):
+	Javadoc fix.
+	* gnu/java/util/prefs/EventDispatcher.java: New file.
+	* gnu/java/util/prefs/NodeWriter.java (NodeWriter): Removed.
+	(NodeWriter): Specify UTF-8.
+	(writeHeader): Emit DOCTYPE.
+	* java/util/prefs/Preferences.java (getFactory): Add cause to
+	exception.
+	(exportNode): Documented.
+	(exportSubtree): Likewise.
+	(importPreferences): Likewise.
+	* java/util/prefs/NodeChangeEvent.java (readObject): New method.
+	(writeObject): Likewise.
+	* java/util/prefs/PreferenceChangeEvent.java (readObject): New method.
+	(writeObject): Likewise.
+	* java/util/prefs/AbstractPreferences.java (putBoolean): Use 1.4 code.
+	(nodeListeners): New field.
+	(preferenceListeners): Likewise.
+	(addNodeChangeListener): Implemented.
+	(addPreferenceChangeListener): Likewise.
+	(removeNodeChangeListener): Likewise.
+	(removePreferenceChangeListener): Likewise.
+	(fire): New methods.
+	(put): Fire event.
+	(remove): Likewise.
+	(purge): Likewise.  Fixed synchronization.
+	(removeNode): Fixed synchronization.
+	(getNode): Fire event.
+	(flushNode): Fixed synchronization.
+
+2006-02-28  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/BranchElement.java
+	(startOffset): New field.
+	(endOffset): New field.
+	(BranchElement): Initialize new fields.
+	(getEndOffset): Rewritten to possibly return cached values
+	if element has no children.
+	(getStartOffset): Rewritten to possibly return cached values
+	if element has no children.
+	* javax/swing/text/LeafElement.java
+	(startDelta): New field.
+	(endDelta): New field.
+	(LeafElement): Handle possible delta of start/endOffset when
+	these parameters lie outside the document range.
+	(getStartOffset): Handle possible startDelta.
+	(getEndOffset): Handle possible startDelta.
+
+2006-02-28  Anthony Balkissoon  <abalkiss@redhat.com>
+
+	* NEWS: Added line about Unicode 4.0.0 support.
+
+2006-02-28  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/SwingUtilities.java
+	(layoutCompoundLabel): Set textIconGap to 0 when icon == null.
+
+2006-03-01  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/classpath/debug/Simple1LineFormatter.java: New file.
+
+2006-03-01  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/java/security/sig/rsa/RSAPKCS1V1_5SignatureX509Codec.java:
+	Amended class documentation.
+	(encodeSignature): Emit the ASN.1 raw bytes not the DER-encoded BIT
+	STRING.
+	(decodeSignature): Parse the ASN.1 raw bytes of a BIT STRING and not
+	a BIT STRING construct.
+	* gnu/java/security/sig/dss/DSSSignatureX509Codec.java: Amended class
+	documentation.
+	(encodeSignature): Emit the ASN.1 raw bytes not the DER-encoded BIT
+	STRING.
+	(decodeSignature): Parse the ASN.1 raw bytes of a BIT STRING and not
+	a BIT STRING construct.
+	* gnu/java/security/jce/sig/SignatureAdapter.java (log): New field.
+	(engineVerify): Added logging.
+
+2006-02-28  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(dispatchEventImpl): Let the Toolkit dispatch global events.
+	* java/awt/Container.java
+	(dispatchEventImpl): Let the LightweightDispatcher handle events
+	first.
+	* java/awt/EventQueue.java
+	(dispatchEvent): Don't do the global event dispatching here. This
+	is moved to the Component.
+	(globalDispatchEvent): Moved this method to Toolkit.
+	* java/awt/LightweightDispatcher.java
+	(instances): New field.
+	(getInstance): New method. Delivers an instance of
+	LightweightDispatcher.
+	(LightweightDispatcher): Made default constructor private.
+	(dispatchEvent): New method. Replaces the eventDispatched method.
+	This now returns true when the event was actually dispatched.
+	(eventDispatched): Replaced by dispatchEvent.
+	(handleMouseEvent): Send MOUSE_CLICKED to the same component that
+	received the last MOUSE_RELEASED.
+	* java/awt/Toolkit.java
+	(Toolkit): Don't register LightweightDispatcher as global event
+	handler.
+	(globalDispatchEvent): Moved here from EventQueue.
+
+2006-02-27  David Daney  <ddaney@avtrex.com>
+
+	PR classpath/25851
+	* gnu/java/net/protocol/http/HTTPURLConnection.java (imports) Cleaned
+	up.
+	(getRequestProperties): Rewrote.
+
+2006-02-27  David Daney  <ddaney@avtrex.com>
+
+	PR classpath/26312
+	* gnu/java/net/protocol/http/ChunkedInputStream.java (imports): Cleaned
+	up.
+	(ChunkedInputStream): Extend InputStream.
+	(in): New field.
+	(headers): Moved to top of class.
+	(constructor): Save referenct to in.
+	(read(byte[])): Removed method.
+	(read(byte[], int, int)): Made synchronized and throw IOException
+	on error parsing chunk header.
+	(available): New method.
+	(close): New method.
+
+2006-02-27  David Daney  <ddaney@avtrex.com>
+
+	* gnu/java/net/protocol/http/HTTPURLConnection.java
+	(imports): Cleaned up.
+	(GetHTTPPropertiesAction): Removed, and moved contents to ...
+	(constructor): ... Here, using SystemProperties instead of System.
+	
+2006-02-27  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkFileDialogPeer.java
+	(setDirectory): GtkFileChooser requires an absolute directory
+	name. Added a check to make the directory passed to nativeSetDirectory
+	is absolute.
+
+2006-02-27  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/SwingUtilities.java
+	(computeIntersection): Changed to store result in rect, instead of
+	creating new Rectangle instances. Fixed API docs accordingly.
+	(computeUnion): Changed to store result in rect, instead of
+	creating new Rectangle instances. Fixed API docs accordingly.
+
+2006-02-27  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JViewport.java
+	(static_init): Changed default scrollmode to BLIT.
+	(paintSimple): Added some clipping to avoid painting problems.
+	(paintBlit): Added some clipping to avoid painting problems.
+
+2006-02-27  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(rectCache): Made field static to save memory.
+	(getVisibleRect): Don't use rectCache and create new Rectangle
+	instance instead.
+	(repaint(Rectangle)): Directly call RepaintManager.addDirtyRegion().
+	(repaint(long,int,int,int,int)): Directly call
+	RepaintManager.addDirtyRegion(). The visibleRect check is now
+	performed in the RepaintManager.
+
+2006-02-27  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/RepaintManager.java
+	(currentRepaintManagers): Made field private.
+	(rectCache): New field.
+	(addDirtyRegion): Clip dirty rectangle with visible rectangle of
+	component. Changed Rectangle handling to avoid unnecessary new
+	Rectangle instances.
+	(getOffscreenBuffer): Create buffer with size of the root window.
+	Respect the maximum buffer size here.
+	(commitBuffer): Align the regions so that they are inside the buffer
+	image and inside the clip. This avoids problems with a bug in GTKImage.
+	Fixed Rectangle handling to avoid creation of new Rectangle instances.
+
+2006-02-26  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* native/fdlibm/e_acos.c,
+	* native/fdlibm/e_asin.c,
+	* native/fdlibm/e_atan2.c,
+	* native/fdlibm/e_cosh.c,
+	* native/fdlibm/e_exp.c,
+	* native/fdlibm/e_fmod.c,
+	* native/fdlibm/e_hypot.c,
+	* native/fdlibm/e_log.c,
+	* native/fdlibm/e_log10.c,
+	* native/fdlibm/e_rem_pio2.c,
+	* native/fdlibm/e_remainder.c,
+	* native/fdlibm/e_sinh.c,
+	* native/fdlibm/e_sqrt.c,
+	* native/fdlibm/k_cos.c,
+	* native/fdlibm/k_sin.c,
+	* native/fdlibm/k_tan.c,
+	* native/fdlibm/s_atan.c,
+	* native/fdlibm/s_cbrt.c,
+	* native/fdlibm/s_ceil.c,
+	* native/fdlibm/s_copysign.c,
+	* native/fdlibm/s_cos.c,
+	* native/fdlibm/s_expm1.c,
+	* native/fdlibm/s_fabs.c,
+	* native/fdlibm/s_finite.c,
+	* native/fdlibm/s_floor.c,
+	* native/fdlibm/s_log1p.c,
+	* native/fdlibm/s_rint.c,
+	* native/fdlibm/s_scalbn.c,
+	* native/fdlibm/s_sin.c,
+	* native/fdlibm/s_tan.c,
+	* native/fdlibm/s_tanh.c:
+	Fixed to call our macros rather than __HI and __LO.
+	* native/fdlibm/fdlibm.h:
+	Reintroduced previous extraction code.
+	(EXTRACT_WORDS(ix0,ix1,d)): Readded.
+	(GET_HIGH_WORD(i,d)): Readded.
+	(GET_LOW_WORD(i,d)): Readded.
+	(INSERT_WORDS(d,ix0,ix1)): Readded.
+	(SET_HIGH_WORD(d,i)): Readded.
+	(SET_LOW_WORD(d,i)): Readded.
+	* native/jni/gtk-peer/gthread-jni.c:
+	Use Glib macros to convert integers/pointers portably.
+	
+2006-02-26  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* java/security/SecureRandom.java (SecureRandom): Use GNU-CRYPTO class
+	as the fallback SPI.
+	* gnu/java/security/provider/Gnu.java (run): Replaced mappings with new
+	ones referencing GNU-CRYPTO classes.
+	* gnu/java/security/provider/PKIXCertPathValidatorImpl.java
+	(engineValidate): Use GNU-CRYPTO class.
+	* gnu/java/security/provider/DiffieHellmanKeyFactoryImpl: Removed.
+	* gnu/java/security/provider/DiffieHellmanKeyPairGeneratorImpl: Likewise.
+	* gnu/java/security/provider/DSAKeyFactory: Likewise.
+	* gnu/java/security/provider/DSAKeyPairGenerator: Likewise.
+	* gnu/java/security/provider/DSAParameters: Likewise.
+	* gnu/java/security/provider/DSASignature: Likewise.
+	* gnu/java/security/provider/EncodedKeyFactory: Likewise.
+	* gnu/java/security/provider/GnuDHPublicKey: Likewise.
+	* gnu/java/security/provider/GnuDSAPrivateKey: Likewise.
+	* gnu/java/security/provider/GnuDSAPublicKey: Likewise.
+	* gnu/java/security/provider/GnuRSAPrivateKey: Likewise.
+	* gnu/java/security/provider/GnuRSAPublicKey: Likewise.
+	* gnu/java/security/provider/MD2withRSA: Likewise.
+	* gnu/java/security/provider/MD4withRSA: Likewise.
+	* gnu/java/security/provider/MD5: Likewise.
+	* gnu/java/security/provider/MD5withRSA: Likewise.
+	* gnu/java/security/provider/RSA: Likewise.
+	* gnu/java/security/provider/RSAKeyFactory: Likewise.
+	* gnu/java/security/provider/SHA: Likewise.
+	* gnu/java/security/provider/SHA1PRNG: Likewise.
+	* gnu/java/security/provider/SHA1withRSA: Likewise.
+	* gnu/javax/crypto/GnuDHPrivateKey: Likewise.
+
+2006-02-26  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/java/security/jce/sig/EncodedKeyFactory.java (log): New field.
+	(engineGeneratePublic): Added logging.
+	(engineGeneratePrivate): Likewise.
+	* gnu/java/security/key/rsa/RSAKeyPairX509Codec.java (log): New field.
+	(encodePublicKey): Added logging.
+	Clarified in method documentation that params is optional, but is
+	always NULL if present.
+	(decodePublicKey): Added logging.
+	Handle optional NULL element.
+
+2006-02-26  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* java/util/logging/FileHandler.java: Fixed a javadoc reference.
+
 2006-03-03  Tom Tromey  <tromey@redhat.com>
 
 	* java/awt/MenuBar.java (shortcuts): Genericized.
@@ -568,7 +1673,7 @@
   
 2006-02-22  Robert Schuster  <robertschuster@fsfe.org>
   
-        * javax/swing/text/PlainDocument.java:
+        * javax/swing/text/PlainView.java:
         (getPreferredSpan): Added missing 'break'.
         statement which corrects an unwanted fall through.
         (updateDamage): Update maxLineLength correctly when text is

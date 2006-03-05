@@ -411,8 +411,7 @@ public class Container extends Component
         for (int j = 0; j < list.length; j++)
               r.removeComponentListener(list[j]);
         
-        if (r.isShowing())
-          r.removeNotify();
+        r.removeNotify();
 
         System.arraycopy(component, index + 1, component, index,
                          ncomponents - index - 1);
@@ -1714,13 +1713,18 @@ public class Container extends Component
 
   void dispatchEventImpl(AWTEvent e)
   {
-    if ((e.id <= ContainerEvent.CONTAINER_LAST
-             && e.id >= ContainerEvent.CONTAINER_FIRST)
-        && (containerListener != null
-            || (eventMask & AWTEvent.CONTAINER_EVENT_MASK) != 0))
-      processEvent(e);
-    else
-      super.dispatchEventImpl(e);
+    boolean dispatched =
+      LightweightDispatcher.getInstance().dispatchEvent(e);
+    if (! dispatched)
+      {
+        if ((e.id <= ContainerEvent.CONTAINER_LAST
+            && e.id >= ContainerEvent.CONTAINER_FIRST)
+            && (containerListener != null
+                || (eventMask & AWTEvent.CONTAINER_EVENT_MASK) != 0))
+          processEvent(e);
+        else
+          super.dispatchEventImpl(e);
+      }
   }
 
   /**

@@ -52,7 +52,7 @@ import java.util.Map;
  * is {@link Object#notifyAll notifyAll()}'d each time the state changes.
  * The state of all instances is managed by a single dedicated thread
  * which does the actual fork()/exec() and wait() system calls. User
- * threads {@link Object#wait wait()} on the instance when creating the
+ * threads {@link Object#wait()} on the instance when creating the
  * process or waiting for it to terminate.
  *
  * <p>
@@ -62,7 +62,7 @@ import java.util.Map;
  *
  * @author Archie Cobbs
  * @see Process
- * @see Runtime#exec
+ * @see Runtime#exec(String)
  */
 final class VMProcess extends Process
 {

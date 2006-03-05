@@ -3426,10 +3426,11 @@ public abstract class Component
   }
 
   /**
-   * Called to inform this component it has been added to a container.
-   * A native peer - if any - is created at this time. This method is
-   * called automatically by the AWT system and should not be called by
-   * user level code.
+   * Called when the parent of this Component is made visible or when
+   * the Component is added to an already visible Container and needs
+   * to be shown.  A native peer - if any - is created at this
+   * time. This method is called automatically by the AWT system and
+   * should not be called by user level code.
    *
    * @see #isDisplayable()
    * @see #removeNotify()
@@ -4922,6 +4923,10 @@ p   * <li>the set of backward traversal keys
 
   void dispatchEventImpl(AWTEvent e)
   {
+    // Give toolkit a chance to dispatch the event
+    // to globally registered listeners.
+    Toolkit.getDefaultToolkit().globalDispatchEvent(e);
+
     // This boolean tells us not to process focus events when the focus
     // opposite component is the same as the focus component.
     boolean ignoreFocus = 
