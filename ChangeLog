@@ -1,5 +1,10 @@
 2006-03-06  Mark Wielaard  <mark@klomp.org>
 
+	* configure.ac: Set version to 0.90-generics.
+	* NEWS: Fix typos.
+
+2006-03-06  Mark Wielaard  <mark@klomp.org>
+
 	Fixes bug #26568 reported by Paul Jenner <psj@harker.dyndns.org>
 	* native/fdlibm/fdlibm.h (__ieee754_rem_pio2): Return an int32_t.
 	(isnan): Define explicitly isnan if it is not a macro.
