@@ -1,3 +1,7 @@
+2006-03-06  Mark Wielaard  <mark@klomp.org>
+
+	* NEWS: Add updates for 0.90 release.
+
 2006-03-05  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac (VERSION): Set to 0.90-pre-generics.
