@@ -1,3 +1,29 @@
+2006-03-06  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/GapContent.java:
+	(insertString): Throw exception when argument is below
+	zero.
+
+2006-03-06  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/PlainDocument.java:
+	(insertUpdate): Extended if-expression, added
+	code to generate another Element when newly inserted characters
+	and old ones will be on the same line.
+
+2006-03-06  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/DefaultCaret.java:
+	(mouseDragged): Do selection when shift is pressed.
+	(mouseClicked): Implemented.
+
+2006-03-06  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/PlainDocument.java: Fix copyright header,
+	added author tags.
+	(insertUpdate): Do not copy the whole document any more, added some
+	more variables to prevent needless method calls.
+
 2006-03-06  Christian Thalinger <twisti@complang.tuwien.ac.at>
 
 	* configure.ac: Check for FREETYPE2.  This is a reverted patch and
