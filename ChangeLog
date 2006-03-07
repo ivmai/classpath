@@ -1,3 +1,9 @@
+2006-03-07  Michael Koch  <konqueror@gmx.de>
+
+	* gnu/java/net/DefaultProxySelector.java,
+	java/net/Proxy.java, java/net/ProxySelector.java:
+	New files.
+
 2006-03-06  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac: Set version to 0.90-generics.
