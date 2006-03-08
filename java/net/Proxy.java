@@ -51,7 +51,7 @@ public class Proxy
    */
   public enum Type { DIRECT, HTTP, SOCKS };
 
-  public static Proxy NO_PROXY = new Proxy(Type.DIRECT, null);
+  public static final Proxy NO_PROXY = new Proxy(Type.DIRECT, null);
 
   private Type type;
   private SocketAddress address;
@@ -96,7 +96,7 @@ public class Proxy
    * @return <code>true</code> if both objects or equals,
    * <code>false</code> otherwise.
    */
-  public boolean equals(Object obj)
+  public final boolean equals(Object obj)
   {
     if (! (obj instanceof Proxy))
       return false;
@@ -112,7 +112,7 @@ public class Proxy
    *
    * @return the hashcode
    */
-  public int hashCode()
+  public final int hashCode()
   {
     return type.hashCode() ^ address.hashCode();
   }
