@@ -207,9 +207,7 @@ public class SynthLookAndFeel
    * @throws IllegalArgumentException if one of the parameters is
    *         <code>null</code>
    */
-  // FIXME: The signature in the JDK has a Class<?> here. Should be fixed as
-  // soon as we switch to the generics branch.
-  public void load(InputStream in, Class resourceBase)
+  public void load(InputStream in, Class<?> resourceBase)
     throws ParseException, IllegalArgumentException
   {
     // FIXME: Implement this correctly.

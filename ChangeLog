@@ -1,3 +1,10 @@
+2006-03-13  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/text/html/StyleSheet.java (removeAttributes):
+	Genericized.
+	* javax/swing/plaf/synth/SynthLookAndFeel.java (load): Genericized.
+	* java/rmi/server/RMIClassLoader.java (loadProxyClass): Genericized.
+
 2006-03-08  Michael Koch  <konqueror@gmx.de>
 
 	* java/net/Proxy.java (NO_PROXY): Made final.

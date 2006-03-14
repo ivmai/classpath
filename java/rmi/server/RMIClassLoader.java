@@ -88,8 +88,8 @@ public class RMIClassLoader
     return spi.loadClass(codebase, name, defaultLoader);
   }
 
-  public static Class loadProxyClass (String codeBase, String[] interfaces,
-                                      ClassLoader defaultLoader)
+  public static Class<?> loadProxyClass (String codeBase, String[] interfaces,
+                                         ClassLoader defaultLoader)
     throws MalformedURLException, ClassNotFoundException
   {
     RMIClassLoaderSpi spi = getProviderInstance();
