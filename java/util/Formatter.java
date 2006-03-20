@@ -55,7 +55,8 @@ import java.text.DecimalFormatSymbols;
 import gnu.classpath.SystemProperties;
 
 /** @since 1.5 */
-public class Formatter implements Closeable, Flushable
+public final class Formatter 
+  implements Closeable, Flushable
 {
   private Appendable out;
   private Locale locale;
