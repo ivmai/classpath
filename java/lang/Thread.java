@@ -131,9 +131,18 @@ public class Thread implements Runnable
 
   /** The context classloader for this Thread. */
   private ClassLoader contextClassLoader;
+  
+  /** This thread's ID.  */
+  private final long threadId;
+  
+  /** The park blocker.  See LockSupport.  */
+  Object parkBlocker;
 
   /** The next thread number to use. */
   private static int numAnonymousThreadsCreated;
+  
+  /** The next thread ID to use.  */
+  private static long nextThreadId;
 
   /** The default exception handler.  */
   private static UncaughtExceptionHandler defaultHandler;
@@ -349,6 +358,11 @@ public class Thread implements Runnable
     this.name = name.toString();
     this.runnable = target;
     this.stacksize = size;
+    
+    synchronized (Thread.class)
+      {
+        this.threadId = nextThreadId++;
+      }
 
     priority = current.priority;
     daemon = current.daemon;
@@ -378,6 +392,10 @@ public class Thread implements Runnable
     this.priority = priority;
     this.daemon = daemon;
     this.contextClassLoader = ClassLoader.getSystemClassLoader();
+    synchronized (Thread.class)
+    {
+      this.threadId = nextThreadId++;
+    }
   }
 
   /**
@@ -1020,28 +1038,99 @@ public class Thread implements Runnable
     return locals;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Assigns the given <code>UncaughtExceptionHandler</code> to this
+   * thread.  This will then be called if the thread terminates due
+   * to an uncaught exception, pre-empting that of the
+   * <code>ThreadGroup</code>.
+   *
+   * @param h the handler to use for this thread.
+   * @throws SecurityException if the current thread can't modify this thread.
+   * @since 1.5 
+   */
   public void setUncaughtExceptionHandler(UncaughtExceptionHandler h)
   {
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
+    if (sm != null)
+      sm.checkAccess(this);    
     exceptionHandler = h;
   }
 
-  /** @since 1.5 */
+  /** 
+   * <p>
+   * Returns the handler used when this thread terminates due to an
+   * uncaught exception.  The handler used is determined by the following:
+   * </p>
+   * <ul>
+   * <li>If this thread has its own handler, this is returned.</li>
+   * <li>If not, then the handler of the thread's <code>ThreadGroup</code>
+   * object is returned.</li>
+   * <li>If both are unavailable, then <code>null</code> is returned.</li>
+   * </ul>
+   * 
+   * @return the appropriate <code>UncaughtExceptionHandler</code> or
+   *         <code>null</code> if one can't be obtained.
+   * @since 1.5 
+   */
   public UncaughtExceptionHandler getUncaughtExceptionHandler()
   {
     return exceptionHandler;
   }
 
-  /** @since 1.5 */
-  public static void setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler h)
+  /** 
+   * <p>
+   * Sets the default uncaught exception handler used when one isn't
+   * provided by the thread or its associated <code>ThreadGroup</code>.
+   * This exception handler is used when the thread itself does not
+   * have an exception handler, and the thread's <code>ThreadGroup</code>
+   * does not override this default mechanism with its own.  As the group
+   * calls this handler by default, this exception handler should not defer
+   * to that of the group, as it may lead to infinite recursion.
+   * </p>
+   * <p>
+   * Uncaught exception handlers are used when a thread terminates due to
+   * an uncaught exception.  Replacing this handler allows default code to
+   * be put in place for all threads in order to handle this eventuality.
+   * </p>
+   *
+   * @param h the new default uncaught exception handler to use.
+   * @throws SecurityException if a security manager is present and
+   *                           disallows the runtime permission
+   *                           "setDefaultUncaughtExceptionHandler".
+   * @since 1.5 
+   */
+  public static void 
+    setDefaultUncaughtExceptionHandler(UncaughtExceptionHandler h)
   {
+    SecurityManager sm = SecurityManager.current; // Be thread-safe.
+    if (sm != null)
+      sm.checkPermission(new RuntimePermission("setDefaultUncaughtExceptionHandler"));    
     defaultHandler = h;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the handler used by default when a thread terminates
+   * unexpectedly due to an exception, or <code>null</code> if one doesn't
+   * exist.
+   *
+   * @return the default uncaught exception handler.
+   * @since 1.5 
+   */
   public static UncaughtExceptionHandler getDefaultUncaughtExceptionHandler()
   {
     return defaultHandler;
+  }
+  
+  /** 
+   * Returns the unique identifier for this thread.  This ID is generated
+   * on thread creation, and may be re-used on its death.
+   *
+   * @return a positive long number representing the thread's ID.
+   * @since 1.5 
+   */
+  public long getId()
+  {
+    return threadId;
   }
 
   /**
@@ -1102,7 +1191,26 @@ public class Thread implements Runnable
     void uncaughtException(Thread thr, Throwable exc);
   }
 
-  /** @since 1.5 */
+  /** 
+   * <p>
+   * Represents the current state of a thread, according to the VM rather
+   * than the operating system.  It can be one of the following:
+   * </p>
+   * <ul>
+   * <li>NEW -- The thread has just been created but is not yet running.</li>
+   * <li>RUNNABLE -- The thread is currently running or can be scheduled
+   * to run.</li>
+   * <li>BLOCKED -- The thread is blocked waiting on an I/O operation
+   * or to obtain a lock.</li>
+   * <li>WAITING -- The thread is waiting indefinately for another thread
+   * to do something.</li>
+   * <li>TIMED_WAITING -- The thread is waiting for a specific amount of time
+   * for another thread to do something.</li>
+   * <li>TERMINATED -- The thread has exited.</li>
+   * </ul>
+   *
+   * @since 1.5 
+   */
   public enum State
   {
     BLOCKED, NEW, RUNNABLE, TERMINATED, TIMED_WAITING, WAITING;

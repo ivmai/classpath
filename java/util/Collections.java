@@ -1943,7 +1943,7 @@ public class Collections
     {
       if (entries == null)
 	{
-	  Map.Entry<K,V> entry = new AbstractMap.BasicMapEntry<K, V>(k, v)
+	  Map.Entry<K,V> entry = new AbstractMap.SimpleEntry<K, V>(k, v)
 	  {
 	    /**
 	     * Sets the value of the map entry to the supplied value.

@@ -39,6 +39,8 @@ exception statement from your version. */
 
 package java.util;
 
+import java.io.Serializable;
+
 /**
  * An abstract implementation of Map to make it easier to create your own
  * implementations. In order to create an unmodifiable Map, subclass
@@ -67,7 +69,41 @@ package java.util;
  */
 public abstract class AbstractMap<K, V> implements Map<K, V>
 {
-  /** An "enum" of iterator types. */
+  /** @since 1.6 */
+  public static class SimpleImmutableEntry<K, V>
+    implements Entry<K, V>, Serializable
+  {
+    K key;
+    V value;
+
+    public SimpleImmutableEntry(K key, V value)
+    {
+      this.key = key;
+      this.value = value;
+    }
+
+    public SimpleImmutableEntry(Entry<? extends K, ? extends V> entry)
+    {
+      this(entry.getKey(), entry.getValue());
+    }
+
+    public K getKey()
+    {
+      return key;
+    }
+
+    public V getValue()
+    {
+      return value;
+    }
+
+    public V setValue(V value)
+    {
+      throw new UnsupportedOperationException("setValue not supported on immutable entry");
+    }
+  }
+
+/** An "enum" of iterator types. */
   // Package visible for use by subclasses.
   static final int KEYS = 0,
                    VALUES = 1,
@@ -629,10 +665,10 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    *
    * @author Jon Zeppieri
    * @author Eric Blake (ebb9@email.byu.edu)
+   * 
+   * @since 1.6
    */
-  // XXX - FIXME Use fully qualified implements as gcj 3.1 workaround.
-  //       Bug still exists in 3.4.1
-  static class BasicMapEntry<K, V> implements Map.Entry<K, V>
+  public static class SimpleEntry<K, V> implements Entry<K, V>, Serializable
   {
     /**
      * The key. Package visible for direct manipulation.
@@ -649,10 +685,15 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      * @param newKey the key
      * @param newValue the value
      */
-    BasicMapEntry(K newKey, V newValue)
+    public SimpleEntry(K newKey, V newValue)
     {
       key = newKey;
       value = newValue;
+    }
+    
+    public SimpleEntry(Entry<? extends K, ? extends V> entry)
+    {
+      this(entry.getKey(), entry.getValue());
     }
 
     /**
@@ -668,14 +709,14 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      * @param o the object to compare
      * @return <code>true</code> if it is equal
      */
-    public final boolean equals(Object o)
+    public boolean equals(Object o)
     {
       if (! (o instanceof Map.Entry))
         return false;
       // Optimize for our own entries.
-      if (o instanceof BasicMapEntry)
+      if (o instanceof SimpleEntry)
         {
-          BasicMapEntry e = (BasicMapEntry) o;
+          SimpleEntry e = (SimpleEntry) o;
           return (AbstractMap.equals(key, e.key)
                   && AbstractMap.equals(value, e.value));
         }
@@ -751,5 +792,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
     {
       return key + "=" + value;
     }
-  } // class BasicMapEntry
+  } // class SimpleEntry
+  
+  
 }

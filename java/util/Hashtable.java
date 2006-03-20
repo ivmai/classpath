@@ -175,7 +175,7 @@ public class Hashtable<K, V> extends Dictionary<K, V>
    * `null' is not allowed for keys and values.
    */
   private static final class HashEntry<K, V>
-    extends AbstractMap.BasicMapEntry<K, V>
+    extends AbstractMap.SimpleEntry<K, V>
   {
     /** The next entry in the linked list. */
     HashEntry<K, V> next;
@@ -512,10 +512,10 @@ public class Hashtable<K, V> extends Dictionary<K, V>
     for (Map.Entry<K,V> e : addMap.entrySet())
       {
         // Optimize in case the Entry is one of our own.
-        if (e instanceof AbstractMap.BasicMapEntry)
+        if (e instanceof AbstractMap.SimpleEntry)
           {
-            AbstractMap.BasicMapEntry<? extends K, ? extends V> entry
-	      = (AbstractMap.BasicMapEntry<? extends K, ? extends V>) e;
+            AbstractMap.SimpleEntry<? extends K, ? extends V> entry
+	      = (AbstractMap.SimpleEntry<? extends K, ? extends V>) e;
             put(entry.key, entry.value);
           }
         else

@@ -137,6 +137,11 @@ final class VMSystem
    */
    public static native long currentTimeMillis();
 
+   public static long nanoTime()
+   {
+     return currentTimeMillis() * 1000;
+   }
+
   /**
    * Returns a list of 'name=value' pairs representing the current environment
    * variables.

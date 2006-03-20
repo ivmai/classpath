@@ -162,7 +162,7 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    *
    * @author Eric Blake (ebb9@email.byu.edu)
    */
-  private static final class Node<K, V> extends AbstractMap.BasicMapEntry<K, V>
+  private static final class Node<K, V> extends AbstractMap.SimpleEntry<K, V>
   {
     // All fields package visible for use by nested classes.
     /** The color of this node. */
