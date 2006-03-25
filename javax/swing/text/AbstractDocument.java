@@ -690,8 +690,11 @@ public abstract class AbstractDocument implements Document, Serializable
     try
       {
         writeLock();
-        UndoableEdit temp = content.remove(offset, length);
+        
+        // The order of the operations below is critical!        
         removeUpdate(event);
+        UndoableEdit temp = content.remove(offset, length);
+        
         postRemoveUpdate(event);
         fireRemoveUpdate(event);
       }
@@ -1342,11 +1345,11 @@ public abstract class AbstractDocument implements Document, Serializable
     public Object getAttribute(Object key)
     {
       Object result = attributes.getAttribute(key);
-      if (result == null && element_parent != null)
+      if (result == null)
         {
-          AttributeSet parentSet = element_parent.getAttributes();
-          if (parentSet != null)
-            result = parentSet.getAttribute(key);
+          AttributeSet resParent = getResolveParent();
+          if (resParent != null)
+            result = resParent.getAttribute(key);
         }
       return result;
     }
@@ -1383,9 +1386,7 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public AttributeSet getResolveParent()
     {
-      if (attributes.getResolveParent() != null)
-        return attributes.getResolveParent();
-      return element_parent.getAttributes();
+      return attributes.getResolveParent();
     }
 
     /**
@@ -1585,6 +1586,18 @@ public abstract class AbstractDocument implements Document, Serializable
     private Element[] children = new Element[0];
 
     /**
+     * The cached startOffset value. This is used in the case when a
+     * BranchElement (temporarily) has no child elements.
+     */
+    private int startOffset;
+
+    /**
+     * The cached endOffset value. This is used in the case when a
+     * BranchElement (temporarily) has no child elements.
+     */
+    private int endOffset;
+
+    /**
      * Creates a new <code>BranchElement</code> with the specified
      * parent and attributes.
      *
@@ -1595,6 +1608,8 @@ public abstract class AbstractDocument implements Document, Serializable
     public BranchElement(Element parent, AttributeSet attributes)
     {
       super(parent, attributes);
+      startOffset = -1;
+      endOffset = -1;
     }
 
     /**
@@ -1667,7 +1682,7 @@ public abstract class AbstractDocument implements Document, Serializable
       // return 0
       if (offset < getStartOffset())
         return 0;
-      
+
       // XXX: There is surely a better algorithm
       // as beginning from first element each time.
       for (int index = 0; index < children.length - 1; ++index)
@@ -1707,12 +1722,15 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getEndOffset()
     {
-      int end = 0;
-      if (getElementCount() == 0)
-        end = getLength(); // FIXME: That ain't correct, fix it.
+      if (children.length == 0)
+        {
+          if (endOffset == -1)
+            throw new NullPointerException("BranchElement has no children.");
+        }
       else
-        end = children[children.length - 1].getEndOffset();
-      return end;
+        endOffset = children[children.length - 1].getEndOffset();
+
+      return endOffset;
     }
 
     /**
@@ -1733,16 +1751,20 @@ public abstract class AbstractDocument implements Document, Serializable
      *
      * @return the start offset of this element inside the document model
      *
-     * @throws NullPointerException if this branch element has no children
+     * @throws NullPointerException if this branch element has no children and
+     *         no startOffset value has been cached
      */
     public int getStartOffset()
     {
-      int start = 0;
-      if (getElementCount() == 0)
-        start = 0; // FIXME: That ain't correct, fix it.
+      if (children.length == 0)
+        {
+          if (startOffset == -1)
+            throw new NullPointerException("BranchElement has no children.");
+        }
       else
-        start = children[0].getStartOffset();
-      return start;
+        startOffset = children[0].getStartOffset();
+
+      return startOffset;
     }
 
     /**
@@ -2040,12 +2062,28 @@ public abstract class AbstractDocument implements Document, Serializable
     /** The serialization UID (compatible with JDK1.5). */
     private static final long serialVersionUID = -8906306331347768017L;
 
-    /** Manages the start offset of this element. */
-    Position startPos;
+    /**
+     * Manages the start offset of this element.
+     */
+    private Position startPos;
 
-    /** Manages the end offset of this element. */
-    Position endPos;
+    /**
+     * Manages the end offset of this element.
+     */
+    private Position endPos;
 
+    /**
+     * This gets possible added to the startOffset when a startOffset
+     * outside the document range is requested.
+     */
+    private int startDelta;
+
+    /**
+     * This gets possible added to the endOffset when a endOffset
+     * outside the document range is requested.
+     */
+    private int endDelta;
+    
     /**
      * Creates a new <code>LeafElement</code>.
      *
@@ -2058,20 +2096,18 @@ public abstract class AbstractDocument implements Document, Serializable
                        int end)
     {
       super(parent, attributes);
-	{
-	  try
+      int len = content.length();
+      startDelta = 0;
+      if (start > len)
+        startDelta = start - len;
+      endDelta = 0;
+      if (end > len)
+        endDelta = end - len;
+      try
 	    {
-	      if (parent != null)
-		{
-		  startPos = parent.getDocument().createPosition(start);
-		  endPos = parent.getDocument().createPosition(end);
+		  startPos = createPosition(start - startDelta);
+		  endPos = createPosition(end - endDelta);
 		}
-	      else
-		{
-		  startPos = createPosition(start);
-		  endPos = createPosition(end);
-		}
-	    }
 	  catch (BadLocationException ex)
 	    {
 	      AssertionError as;
@@ -2082,7 +2118,6 @@ public abstract class AbstractDocument implements Document, Serializable
 	      as.initCause(ex);
 	      throw as;
 	    }
-	}
     }
 
     /**
@@ -2154,7 +2189,7 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getEndOffset()
     {
-      return endPos.getOffset();
+      return endPos.getOffset() + endDelta;
     }
 
     /**
@@ -2180,7 +2215,7 @@ public abstract class AbstractDocument implements Document, Serializable
      */
     public int getStartOffset()
     {
-      return startPos.getOffset();
+      return startPos.getOffset() + startDelta;
     }
 
     /**

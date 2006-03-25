@@ -136,7 +136,7 @@ public class HTMLDocument extends DefaultStyledDocument
    * 
    * @param data - the date that replaces the content of the document
    */
-  protected void create(ElementSpec[] data)
+  protected void create(DefaultStyledDocument.ElementSpec[] data)
   {
     // Once the super behaviour is properly implemented it should be sufficient
     // to simply call super.create(data).
@@ -150,7 +150,7 @@ public class HTMLDocument extends DefaultStyledDocument
    */
   protected AbstractElement createDefaultRoot()
   {
-    AttributeContext ctx = getAttributeContext();
+    AbstractDocument.AttributeContext ctx = getAttributeContext();
 
     // Create html element.
     AttributeSet atts = ctx.getEmptySet();
@@ -475,7 +475,7 @@ public class HTMLDocument extends DefaultStyledDocument
   {
     public BlockElement (Element parent, AttributeSet a)
     {
-      super (parent, a);
+      super(parent, a);
     }
     
     /**
@@ -563,7 +563,13 @@ public class HTMLDocument extends DefaultStyledDocument
     
     /** A stack for character attribute sets **/
     Stack charAttrStack = new Stack();
-    
+
+    /**
+     * The parse stack. This stack holds HTML.Tag objects that reflect the
+     * current position in the parsing process.
+     */
+    private Stack parseStack = new Stack();
+   
     /** A mapping between HTML.Tag objects and the actions that handle them **/
     HashMap tagToAction;
     
@@ -1286,13 +1292,27 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       printBuffer();
       DefaultStyledDocument.ElementSpec element;
-      attr.addAttribute(StyleConstants.NameAttribute, t);
-      element = new DefaultStyledDocument.ElementSpec(attr,
+
+      // If the previous tag is content and the parent is p-implied, then
+      // we must also close the p-implied.
+      if (parseStack.size() > 0 && parseStack.peek() == HTML.Tag.IMPLIED)
+        {
+          element = new DefaultStyledDocument.ElementSpec(null,
+                                    DefaultStyledDocument.ElementSpec.EndTagType);
+          parseBuffer.addElement(element);
+          parseStack.pop();
+        }
+
+      parseStack.push(t);
+      AbstractDocument.AttributeContext ctx = getAttributeContext();
+      AttributeSet copy = attr.copyAttributes();
+      copy = ctx.addAttribute(copy, StyleConstants.NameAttribute, t);
+      element = new DefaultStyledDocument.ElementSpec(copy,
                                DefaultStyledDocument.ElementSpec.StartTagType);
       parseBuffer.addElement(element);
       printBuffer();
     }
-    
+
     /**
      * Instructs the parse buffer to close the block element associated with 
      * the given HTML.Tag
@@ -1303,10 +1323,40 @@ public class HTMLDocument extends DefaultStyledDocument
     {
       printBuffer();
       DefaultStyledDocument.ElementSpec element;
+
+      // If the previous tag is a start tag then we insert a synthetic
+      // content tag.
+      DefaultStyledDocument.ElementSpec prev;
+      prev = (DefaultStyledDocument.ElementSpec)
+	      parseBuffer.get(parseBuffer.size() - 1);
+      if (prev.getType() == DefaultStyledDocument.ElementSpec.StartTagType)
+        {
+          AbstractDocument.AttributeContext ctx = getAttributeContext();
+          AttributeSet attributes = ctx.getEmptySet();
+          attributes = ctx.addAttribute(attributes, StyleConstants.NameAttribute,
+                                        HTML.Tag.CONTENT);
+          element = new DefaultStyledDocument.ElementSpec(attributes,
+			  DefaultStyledDocument.ElementSpec.ContentType,
+                                    new char[0], 0, 0);
+          parseBuffer.add(element);
+        }
+      // If the previous tag is content and the parent is p-implied, then
+      // we must also close the p-implied.
+      else if (parseStack.peek() == HTML.Tag.IMPLIED)
+        {
+          element = new DefaultStyledDocument.ElementSpec(null,
+                                 DefaultStyledDocument.ElementSpec.EndTagType);
+          parseBuffer.addElement(element);
+          if (parseStack.size() > 0)
+            parseStack.pop();
+        }
+
       element = new DefaultStyledDocument.ElementSpec(null,
 				DefaultStyledDocument.ElementSpec.EndTagType);
       parseBuffer.addElement(element);
       printBuffer();
+      if (parseStack.size() > 0)
+        parseStack.pop();
     }
     
     /**
@@ -1335,17 +1385,39 @@ public class HTMLDocument extends DefaultStyledDocument
     protected void addContent(char[] data, int offs, int length,
                               boolean generateImpliedPIfNecessary)
     {
+      AbstractDocument.AttributeContext ctx = getAttributeContext();
+      DefaultStyledDocument.ElementSpec element;
+      AttributeSet attributes = null;
+
+      // Content must always be embedded inside a paragraph element,
+      // so we create this if the previous element is not one of
+      // <p>, <h1> .. <h6>.
+      boolean createImpliedParagraph = false;
+      HTML.Tag parent = (HTML.Tag) parseStack.peek();
+      if (parent != HTML.Tag.P && parent != HTML.Tag.H1
+          && parent != HTML.Tag.H2
+          && parent != HTML.Tag.H3 && parent != HTML.Tag.H4
+          && parent != HTML.Tag.H5 && parent != HTML.Tag.H6
+          && parent != HTML.Tag.TD)
+        {
+          attributes = ctx.getEmptySet();
+          attributes = ctx.addAttribute(attributes,
+                                        StyleConstants.NameAttribute,
+                                        HTML.Tag.IMPLIED);
+          element = new DefaultStyledDocument.ElementSpec(attributes,
+                       DefaultStyledDocument.ElementSpec.StartTagType);
+          parseBuffer.add(element);
+          parseStack.push(HTML.Tag.IMPLIED);
+        }
+
       // Copy the attribute set, don't use the same object because 
       // it may change
-      AbstractDocument.AttributeContext ctx = getAttributeContext();
-      AttributeSet attributes = null;
       if (charAttr != null)
         attributes = charAttr.copyAttributes();
       else
         attributes = ctx.getEmptySet();
       attributes = ctx.addAttribute(attributes, StyleConstants.NameAttribute,
                                     HTML.Tag.CONTENT);
-      DefaultStyledDocument.ElementSpec element;
       element = new DefaultStyledDocument.ElementSpec(attributes,
                                 DefaultStyledDocument.ElementSpec.ContentType,
                                 data, offs, length);

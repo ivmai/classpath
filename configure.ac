@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.21-pre],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.91-pre],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -37,6 +37,20 @@ AC_PREREQ(2.59)
 AM_INIT_AUTOMAKE([1.9.0 gnu std-options tar-ustar])
 AC_CONFIG_HEADERS([include/config.h])
 AC_PREFIX_DEFAULT(/usr/local/classpath)
+
+dnl -----------------------------------------------------------
+dnl Enable collections.jar (disabled by default)
+dnl -----------------------------------------------------------
+AC_ARG_ENABLE([collections],
+              [AS_HELP_STRING(--enable-collections,create collections.jar [default=no])],
+              [case x"${enableval}" in
+                xyes) COMPILE_COLLECTIONS=yes; COLLECTIONS_PREFIX="\"gnu/java/util/collections\"" ;;
+                xno) COMPILE_COLLECTIONS=no ;;
+		x) COMPILE_COLLECTIONS=yes; COLLECTIONS_PREFIX="\"gnu/java/util/collections\"" ;;
+                *) COMPILE_COLLECTIONS=yes; COLLECTIONS_PREFIX="\"${enableval}\"" ;;
+              esac],
+              [COMPILE_COLLECTIONS=no])
+AM_CONDITIONAL(CREATE_COLLECTIONS, test "x${COMPILE_COLLECTIONS}" = xyes)
 
 dnl -----------------------------------------------------------
 dnl Enable JNI libraries (enabled by default)
@@ -185,13 +199,13 @@ dnl -----------------------------------------------------------
 AC_ARG_WITH([native-libdir],
 	    [AS_HELP_STRING(--with-native-libdir,sets the installation directore for native libraries [default='${libdir}/${PACKAGE}'])],
 	    [
-	     nativelibdir=${withval}
+	     nativeexeclibdir=${withval}
 	    ],
 	    [
-	     nativelibdir='${libdir}/${PACKAGE}'
+	     nativeexeclibdir='${libdir}/${PACKAGE}'
 	    ])
 
-AC_SUBST(nativelibdir)
+AC_SUBST(nativeexeclibdir)
 
 dnl -----------------------------------------------------------
 dnl Sets the Java library installation dir.
@@ -233,6 +247,14 @@ AC_PROG_LIBTOOL
 dnl AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
+
+if test "x${COMPILE_COLLECTIONS}" = xyes; then
+  AC_PATH_PROG(PERL, [perl])
+  AC_SUBST(PERL)
+  AC_SUBST(COLLECTIONS_PREFIX)
+  AC_CONFIG_FILES([lib/mkcollections.pl])
+  AC_CONFIG_COMMANDS([mkcollections.pl],[chmod 755 lib/mkcollections.pl])
+fi
 
 if test "x${COMPILE_JNI}" = xyes; then
   GCC_ATTRIBUTE_UNUSED
@@ -357,12 +379,15 @@ if test "x${COMPILE_JNI}" = xyes; then
       PKG_CHECK_MODULES(CAIRO, cairo >= 0.5.0)
     fi
 
+    PKG_CHECK_MODULES(FREETYPE2, freetype2)
     PKG_CHECK_MODULES(PANGOFT2, pangoft2)
-  
+
     AC_SUBST(GTK_CFLAGS)
     AC_SUBST(GTK_LIBS)
     AC_SUBST(CAIRO_LIBS)
     AC_SUBST(CAIRO_CFLAGS)
+    AC_SUBST(FREETYPE2_LIBS)
+    AC_SUBST(FREETYPE2_CFLAGS)
     AC_SUBST(PANGOFT2_LIBS)
     AC_SUBST(PANGOFT2_CFLAGS)
   fi

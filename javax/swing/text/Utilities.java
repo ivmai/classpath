@@ -41,11 +41,7 @@ package javax.swing.text;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.text.BreakIterator;
-
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 /**
  * A set of utilities to deal with text. This is used by several other classes
@@ -103,8 +99,10 @@ public class Utilities
     int pixelWidth = 0;
     int pos = s.offset;
     int len = 0;
+    
+    int end = s.offset + s.count;
 
-    for (int offset = s.offset; offset < (s.offset + s.count); ++offset)
+    for (int offset = s.offset; offset < end; ++offset)
       {
         char c = buffer[offset];
         if (c == '\t' || c == '\n')
@@ -144,7 +142,7 @@ public class Utilities
     if (len > 0)
       g.drawChars(buffer, pos, len, pixelX, pixelY + ascent);            
     
-    return pixelX;
+    return pixelX + pixelWidth;
   }
 
   /**
@@ -516,10 +514,10 @@ public class Utilities
   {
     int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset);
     BreakIterator breaker = BreakIterator.getWordInstance();
-    breaker.setText(s.toString());
-    
+    breaker.setText(s);
+
     // If mark is equal to the end of the string, just use that position
-    if (mark == s.count)
+    if (mark >= s.count)
       return mark;
     
     // Try to find a word boundary previous to the mark at which we 
@@ -596,7 +594,7 @@ public class Utilities
     int offsXNext = c.modelToView(offs+1).getLocation().x;
     
     // Chose the one which is nearer to us and return its offset.
-    if (Math.abs(offsX-x) < Math.abs(offsXNext-x))
+    if (Math.abs(offsX-x) <= Math.abs(offsXNext-x))
       return offs;
     else
       return offs+1;
@@ -633,14 +631,14 @@ public class Utilities
     
     if (offs == c.getDocument().getLength())
       return offs;
-    
+
     // Find out the real x positions of the calculated character and its
     // neighbour.
     int offsX = c.modelToView(offs).getLocation().x;
     int offsXNext = c.modelToView(offs+1).getLocation().x;
     
     // Chose the one which is nearer to us and return its offset.
-    if (Math.abs(offsX-x) < Math.abs(offsXNext-x))
+    if (Math.abs(offsX-x) <= Math.abs(offsXNext-x))
       return offs;
     else
       return offs+1;

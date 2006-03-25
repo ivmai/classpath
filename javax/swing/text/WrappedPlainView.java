@@ -45,7 +45,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.Position.Bias;
 
@@ -64,8 +63,11 @@ public class WrappedPlainView extends BoxView implements TabExpander
   /** The color for disabled components **/
   Color disabledColor;
   
-  /** Stores the font metrics **/
-  protected FontMetrics metrics;
+  /**
+   * Stores the font metrics. This is package private to avoid synthetic
+   * accessor method.
+   */
+  FontMetrics metrics;
   
   /** Whether or not to wrap on word boundaries **/
   boolean wordWrap;
@@ -270,8 +272,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
   protected int calculateBreakPosition(int p0, int p1)
   {
     Container c = getContainer();
-    Rectangle alloc = c.isValid() ? c.getBounds()
-                                 : new Rectangle(c.getPreferredSize());
+    Rectangle alloc = new Rectangle(0, 0, getWidth(), getHeight());
     updateMetrics();
     try
       {
@@ -441,7 +442,7 @@ public class WrappedPlainView extends BoxView implements TabExpander
       while (currStart < end)
         {
           currEnd = calculateBreakPosition(currStart, end);
-          drawLine(currStart, currEnd, g, rect.x, rect.y);
+          drawLine(currStart, currEnd, g, rect.x, rect.y + metrics.getAscent());
           rect.y += lineHeight;          
           if (currEnd == currStart)
             currStart ++;

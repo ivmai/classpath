@@ -366,7 +366,8 @@ public class DefaultCaret extends Rectangle
    * <ul>
    * <li>If we receive a double click, the caret position (dot) is set
    *   to the position associated to the mouse click and the word at
-   *   this location is selected.</li>
+   *   this location is selected. If there is no word at the pointer
+   *   the gap is selected instead.</li>
    * <li>If we receive a triple click, the caret position (dot) is set
    *   to the position associated to the mouse click and the line at
    *   this location is selected.</li>
@@ -376,7 +377,60 @@ public class DefaultCaret extends Rectangle
    */
   public void mouseClicked(MouseEvent event)
   {
-    // TODO: Implement double- and triple-click behaviour here.
+    int count = event.getClickCount();
+    
+    if (count >= 2)
+      {
+        int newDot = getComponent().viewToModel(event.getPoint());
+        JTextComponent t = getComponent();
+
+        try
+          {
+            if (count == 3)
+              {
+                setDot(Utilities.getRowStart(t, newDot));
+                moveDot( Utilities.getRowEnd(t, newDot));
+              }
+            else
+              {
+                int nextWord = Utilities.getNextWord(t, newDot);
+                
+                // When the mouse points at the offset of the first character
+                // in a word Utilities().getPreviousWord will not return that
+                // word but we want to select that. We have to use
+                // Utilities.nextWord() to get it.
+                if (newDot == nextWord)
+                  {
+                    setDot(nextWord);
+                    moveDot(Utilities.getNextWord(t, nextWord));
+                  }
+                else
+                  {
+                    int previousWord = Utilities.getPreviousWord(t, newDot);
+                    int previousWordEnd = Utilities.getWordEnd(t, previousWord);
+                    
+                    // If the user clicked in the space between two words,
+                    // then select the space.
+                    if (newDot >= previousWordEnd && newDot <= nextWord)
+                      {
+                        setDot(previousWordEnd);
+                        moveDot(nextWord);
+                      }
+                    // Otherwise select the word under the mouse pointer.
+                    else
+                      {
+                        setDot(previousWord);
+                        moveDot(previousWordEnd);
+                      }
+                  }
+              }
+          }
+        catch(BadLocationException ble)
+          {
+            // TODO: Swallowing ok here?
+          }
+      }
+    
   }
 
   /**
@@ -411,7 +465,10 @@ public class DefaultCaret extends Rectangle
    */
   public void mousePressed(MouseEvent event)
   {
-    positionCaret(event);
+    if (event.isShiftDown())
+      moveCaret(event);
+    else
+      positionCaret(event);
   }
 
   /**
@@ -577,7 +634,39 @@ public class DefaultCaret extends Rectangle
   {
     return mark;
   }
-
+  
+  private void clearHighlight()
+  {
+    Highlighter highlighter = textComponent.getHighlighter();
+    
+    if (highlighter == null)
+      return;
+    
+    if (selectionVisible)
+      {
+    try
+      {
+        if (highlightEntry == null)
+          highlightEntry = highlighter.addHighlight(0, 0, getSelectionPainter());
+        else
+          highlighter.changeHighlight(highlightEntry, 0, 0);
+      }
+    catch (BadLocationException e)
+      {
+        // This should never happen.
+        throw new InternalError();
+      }
+      }
+    else
+      {
+    if (highlightEntry != null)
+      {
+        highlighter.removeHighlight(highlightEntry);
+        highlightEntry = null;
+      }
+      }
+  }
+  
   private void handleHighlight()
   {
     Highlighter highlighter = textComponent.getHighlighter();
@@ -588,7 +677,7 @@ public class DefaultCaret extends Rectangle
     int p0 = Math.min(dot, mark);
     int p1 = Math.max(dot, mark);
     
-    if (selectionVisible && p0 != p1)
+    if (selectionVisible)
       {
 	try
 	  {
@@ -661,7 +750,10 @@ public class DefaultCaret extends Rectangle
     if (comp == null)
       return;
 
-    int dot = getDot();
+    // Make sure the dot has a sane position.
+    dot = Math.min(dot, textComponent.getDocument().getLength());
+    dot = Math.max(dot, 0);
+
     Rectangle rect = null;
 
     try
@@ -670,10 +762,10 @@ public class DefaultCaret extends Rectangle
       }
     catch (BadLocationException e)
       {
-        AssertionError ae;
-	ae = new AssertionError("Unexpected bad caret location: " + dot);
-	ae.initCause(e);
-        throw ae;
+    	AssertionError ae;
+    	ae = new AssertionError("Unexpected bad caret location: " + dot);
+    	ae.initCause(e);
+    	throw ae;
       }
 
     if (rect == null)
@@ -818,6 +910,7 @@ public class DefaultCaret extends Rectangle
         if (doc != null)
           this.dot = Math.min(dot, doc.getLength());
         this.dot = Math.max(this.dot, 0);
+        
         handleHighlight();
         adjustVisibility(this);
         appear();
@@ -842,7 +935,8 @@ public class DefaultCaret extends Rectangle
           this.dot = Math.min(dot, doc.getLength());
         this.dot = Math.max(this.dot, 0);
         this.mark = this.dot;
-        handleHighlight();
+        
+        clearHighlight();
         adjustVisibility(this);
         appear();
       }

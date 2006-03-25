@@ -1,5 +1,5 @@
 /* gnu/regexp/REMatch.java
-   Copyright (C) 1998-2001, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -66,14 +66,14 @@ public final class REMatch implements Serializable, Cloneable {
     int index; // used while matching to mark current match position in input
     int[] start; // start positions (relative to offset) for each (sub)exp.
     int[] end;   // end positions for the same
-    REMatch next; // other possibility (to avoid having to use arrays)
     boolean empty; // empty string matched. This flag is used only within
 		   // RETokenRepeated.
+
+    BacktrackStack backtrackStack;
 
     public Object clone() {
 	try {
 	    REMatch copy = (REMatch) super.clone();
-	    copy.next = null;
 
 	    copy.start = (int[]) start.clone();
 	    copy.end = (int[]) end.clone();
@@ -88,8 +88,7 @@ public final class REMatch implements Serializable, Cloneable {
 	start = other.start;
 	end = other.end;
 	index = other.index;
-	// need to deep clone?
-	next = other.next;
+	backtrackStack = other.backtrackStack;
     }
 
     REMatch(int subs, int anchor, int eflags) {
@@ -115,7 +114,7 @@ public final class REMatch implements Serializable, Cloneable {
 		end[i] = -1;
 	    }
 	}
-	next = null; // cut off alternates
+	backtrackStack = null;
     }
     
     /** Clears the current match and moves the offset to the new index. */
@@ -125,7 +124,7 @@ public final class REMatch implements Serializable, Cloneable {
 	for (int i = 0; i < start.length; i++) {
 	    start[i] = end[i] = -1;
 	}
-	next = null; // cut off alternates
+	backtrackStack = null;
     }
     
     /**
@@ -277,41 +276,19 @@ public final class REMatch implements Serializable, Cloneable {
 	return output.toString();
     }
 
-    static class REMatchList {
-        REMatch head;
-	REMatch tail;
-        REMatchList() {
-	    head = tail = null;
-	}
-	/* Not used now. But we may need this some day?
-	void addHead(REMatch newone) {
-            if (head == null) {
-                head = newone;
-                tail = newone;
-                while (tail.next != null) {
-                    tail = tail.next;
-                }
-            }
-	    else {
-                REMatch tmp = newone;
-                while (tmp.next != null) tmp = tmp.next;
-                tmp.next = head;
-	        head = newone;
-	    }
-	}
-	*/
-	void addTail(REMatch newone) {
-            if (head == null) {
-                head = newone;
-                tail = newone;
-            }
-            else {
-                tail.next = newone;
-            }
-            while (tail.next != null) {
-                tail = tail.next;
-            }
-	}
+/*  The following are used for debugging purpose
+    static String d(REMatch m) {
+	if (m == null) return "null";
+        else return "[" + m.index + "]";
     }
+
+    String substringUptoIndex(CharIndexed input) {
+	StringBuffer sb = new StringBuffer();
+	for (int i = 0; i < index; i++) {
+	    sb.append(input.charAt(i));
+	}
+	return sb.toString();
+    }
+*/
 
 }

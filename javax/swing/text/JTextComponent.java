@@ -1138,6 +1138,7 @@ public abstract class JTextComponent extends JComponent
     setFocusable(true);
     setEditable(true);
     enableEvents(AWTEvent.KEY_EVENT_MASK);
+    setOpaque(true);
     updateUI();
   }
 
@@ -1614,7 +1615,7 @@ public abstract class JTextComponent extends JComponent
   public boolean getScrollableTracksViewportHeight()
   {
     if (getParent() instanceof JViewport)
-      return ((JViewport) getParent()).getHeight() > getPreferredSize().height;
+      return getParent().getHeight() > getPreferredSize().height;
 
     return false;
   }
@@ -1622,7 +1623,7 @@ public abstract class JTextComponent extends JComponent
   public boolean getScrollableTracksViewportWidth()
   {
     if (getParent() instanceof JViewport)
-      return ((JViewport) getParent()).getWidth() > getPreferredSize().width;
+      return getParent().getWidth() > getPreferredSize().width;
 
     return false;
   }

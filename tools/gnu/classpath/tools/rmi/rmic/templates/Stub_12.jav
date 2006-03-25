@@ -12,7 +12,7 @@ import java.rmi.UnexpectedException;
  *
  * It is normally generated with rmic.
  */
-public final class _#name_Stub 
+public final class #name_Stub 
     extends RemoteStub
     implements #interfaces
 {
@@ -40,7 +40,7 @@ public final class _#name_Stub
         catch (NoSuchMethodException nex)
           {
              NoSuchMethodError err = new NoSuchMethodError(
-               "_#name_Stub class initialization failed");
+               "#name_Stub class initialization failed");
              err.initCause(nex);
              throw err;
           }  
@@ -52,7 +52,7 @@ public final class _#name_Stub
      *
      * @para the reference to the remote object.
      */
-    public _#name_Stub(RemoteRef reference) 
+    public #name_Stub(RemoteRef reference) 
     {
        super(reference);
     }    

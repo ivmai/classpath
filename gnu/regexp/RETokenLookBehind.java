@@ -55,7 +55,7 @@ final class RETokenLookBehind extends REToken
     return 0;
   }
 
-  boolean match(CharIndexed input, REMatch mymatch)
+  REMatch matchThis(CharIndexed input, REMatch mymatch)
   {
     int max = re.getMaximumLength();
     CharIndexed behind = input.lookBehind(mymatch.index, max);
@@ -68,22 +68,12 @@ final class RETokenLookBehind extends REToken
     REToken re1 = (REToken) re.clone();
     re1.chain(stopper);
     if (re1.match(behind, trymatch)) {
-      if (negative) return false;
-      if (next(input, trymatch1))
-        newMatch = trymatch1;
+      if (negative) return null;
+      return mymatch;
     }
-
-    if (newMatch != null) {
-      if (negative) return false;
-      //else
-      mymatch.assignFrom(newMatch);
-      return true;
-    }
-    else { // no match
-      if (negative)
-        return next(input, mymatch);
-      //else
-      return false;
+    else {
+      if (negative) return mymatch;
+      return null;
     }
   }
 
@@ -105,8 +95,8 @@ final class RETokenLookBehind extends REToken
 	    this.index = index;
 	}
 
-	boolean match(CharIndexed input, REMatch mymatch) {
-	    return index == mymatch.index;
+	REMatch matchThis(CharIndexed input, REMatch mymatch) {
+	    return (index == mymatch.index ? mymatch : null);
 	}
 
         void dump(StringBuffer os) {}

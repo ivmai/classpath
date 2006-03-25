@@ -1,5 +1,6 @@
 /* Component.java -- a graphics component
-   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004  Free Software Foundation
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006
+   Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -40,6 +41,7 @@ package java.awt;
 
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
+import java.awt.event.AdjustmentEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
@@ -904,7 +906,7 @@ public abstract class Component
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
-        if (isShowing())
+        if (isShowing() && isLightweight())
           repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
@@ -1388,18 +1390,20 @@ public abstract class Component
     int oldy = this.y;
     int oldwidth = this.width;
     int oldheight = this.height;
-
-    if (this.x == x && this.y == y
-        && this.width == width && this.height == height)
+    
+    if (this.x == x && this.y == y && this.width == width
+        && this.height == height)
       return;
-    invalidate ();
+
+    invalidate();
+    
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     if (peer != null)
       peer.setBounds (x, y, width, height);
-
+    
     // Erase old bounds and repaint new bounds for lightweights.
     if (isLightweight() && isShowing())
       {
@@ -3422,10 +3426,11 @@ public abstract class Component
   }
 
   /**
-   * Called to inform this component it has been added to a container.
-   * A native peer - if any - is created at this time. This method is
-   * called automatically by the AWT system and should not be called by
-   * user level code.
+   * Called when the parent of this Component is made visible or when
+   * the Component is added to an already visible Container and needs
+   * to be shown.  A native peer - if any - is created at this
+   * time. This method is called automatically by the AWT system and
+   * should not be called by user level code.
    *
    * @see #isDisplayable()
    * @see #removeNotify()
@@ -3434,6 +3439,8 @@ public abstract class Component
   {
     if (peer == null)
       peer = getToolkit().createComponent(this);
+    else if (parent != null && parent.isLightweight())
+      new HeavyweightInLightweightListener(parent);
     /* Now that all the children has gotten their peers, we should
        have the event mask needed for this component and its
        lightweight subcomponents. */
@@ -4876,6 +4883,25 @@ p   * <li>the set of backward traversal keys
                                     0, 0, oldKey, oldMods);
           }
       }
+    else if (e instanceof AdjustmentEvent)
+      {
+	AdjustmentEvent ae = (AdjustmentEvent) e;
+	int type = ae.getAdjustmentType();
+	int oldType;
+	if (type == AdjustmentEvent.BLOCK_DECREMENT)
+	  oldType = Event.SCROLL_PAGE_UP;
+	else if (type == AdjustmentEvent.BLOCK_INCREMENT)
+	  oldType = Event.SCROLL_PAGE_DOWN;
+	else if (type == AdjustmentEvent.TRACK)
+	  oldType = Event.SCROLL_ABSOLUTE;
+	else if (type == AdjustmentEvent.UNIT_DECREMENT)
+	  oldType = Event.SCROLL_LINE_UP;
+	else if (type == AdjustmentEvent.UNIT_INCREMENT)
+	  oldType = Event.SCROLL_LINE_DOWN;
+	else
+	  oldType = type;
+	translated = new Event(target, oldType, new Integer(ae.getValue()));
+      }
     else if (e instanceof ActionEvent)
       translated = new Event (target, Event.ACTION_EVENT,
                               ((ActionEvent) e).getActionCommand ());
@@ -4896,6 +4922,10 @@ p   * <li>the set of backward traversal keys
 
   void dispatchEventImpl(AWTEvent e)
   {
+    // Give toolkit a chance to dispatch the event
+    // to globally registered listeners.
+    Toolkit.getDefaultToolkit().globalDispatchEvent(e);
+
     // This boolean tells us not to process focus events when the focus
     // opposite component is the same as the focus component.
     boolean ignoreFocus = 
@@ -5106,9 +5136,76 @@ p   * <li>the set of backward traversal keys
     s.writeObject(null);
   }
 
-
+  
   // Nested classes.
+  
+  /**
+   * This class fixes the bounds for a Heavyweight component that
+   * is placed inside a Lightweight container. When the lightweight is
+   * moved or resized, setBounds for the lightweight peer does nothing.
+   * Therefore, it was never moved on the screen. This class is 
+   * attached to the lightweight, and it adjusts the position and size
+   * of the peer when notified.
+   * This is the same for show and hide.
+   */
+  class HeavyweightInLightweightListener
+      implements ComponentListener
+  {
+    
+    /**
+     * Constructor. Adds component listener to lightweight parent.
+     * 
+     * @param parent - the lightweight container.
+     */
+    public HeavyweightInLightweightListener(Container parent)
+    {
+      parent.addComponentListener(this);
+    }
+    
+    /**
+     * This method is called when the component is resized.
+     * 
+     * @param event the <code>ComponentEvent</code> indicating the resize
+     */
+    public void componentResized(ComponentEvent event)
+    {
+      // Nothing to do here, componentMoved will be called.
+    }
 
+    /**
+     * This method is called when the component is moved.
+     * 
+     * @param event the <code>ComponentEvent</code> indicating the move
+     */
+    public void componentMoved(ComponentEvent event)
+    {
+      if (peer != null)
+        peer.setBounds(x, y, width, height);
+    }
+
+    /**
+     * This method is called when the component is made visible.
+     * 
+     * @param event the <code>ComponentEvent</code> indicating the visibility
+     */
+    public void componentShown(ComponentEvent event)
+    {
+      if (isShowing())
+        peer.show();
+    }
+
+    /**
+     * This method is called when the component is hidden.
+     * 
+     * @param event the <code>ComponentEvent</code> indicating the visibility
+     */
+    public void componentHidden(ComponentEvent event)
+    {
+      if (!isShowing())
+        peer.hide();
+    }
+  }
+  
   /**
    * This class provides accessibility support for subclasses of container.
    *

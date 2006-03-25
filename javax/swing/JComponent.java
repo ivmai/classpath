@@ -550,11 +550,21 @@ public abstract class JComponent extends Container implements Serializable
   private boolean paintingTile;
 
   /**
+   * A temporary buffer used for fast dragging of components.
+   */
+  private Image dragBuffer;
+
+  /**
+   * Indicates if the dragBuffer is already initialized.
+   */
+  private boolean dragBufferInitialized;
+
+  /**
    * A cached Rectangle object to be reused. Be careful when you use that,
    * so that it doesn't get modified in another context within the same
    * method call chain.
    */
-  private transient Rectangle rectCache;
+  private static transient Rectangle rectCache;
 
   /**
    * The default locale of the component.
@@ -1389,16 +1399,15 @@ public abstract class JComponent extends Container implements Serializable
    * Return the component's visible rectangle in a new {@link Rectangle},
    * rather than via a return slot.
    *
-   * @return The component's visible rectangle
+   * @return the component's visible rectangle
    *
    * @see #computeVisibleRect(Rectangle)
    */
   public Rectangle getVisibleRect()
   {
-    if (rectCache == null)
-      rectCache = new Rectangle();
-    computeVisibleRect(rectCache);
-    return rectCache;
+    Rectangle r = new Rectangle();
+    computeVisibleRect(r);
+    return r;
   }
 
   /**
@@ -1557,17 +1566,54 @@ public abstract class JComponent extends Container implements Serializable
       }
     else
       {
+        if (getClientProperty("bufferedDragging") != null
+            && dragBuffer == null)
+          {
+            initializeDragBuffer();
+          }
+        else if (getClientProperty("bufferedDragging") == null
+            && dragBuffer != null)
+          {
+            dragBuffer = null;
+          }
+
         if (g.getClip() == null)
           g.setClip(0, 0, getWidth(), getHeight());
-        Graphics g2 = getComponentGraphics(g);
-        paintComponent(g2);
-        paintBorder(g2);
-        paintChildren(g2);
-        Rectangle clip = g2.getClipBounds();
-        if (clip.x == 0 && clip.y == 0 && clip.width == getWidth()
-            && clip.height == getHeight())
-          RepaintManager.currentManager(this).markCompletelyClean(this);
+        if (dragBuffer != null && dragBufferInitialized)
+          {
+            g.drawImage(dragBuffer, 0, 0, this);
+          }
+        else
+          {
+            Graphics g2 = getComponentGraphics(g);
+            paintComponent(g2);
+            paintBorder(g2);
+            paintChildren(g2);
+            Rectangle clip = g2.getClipBounds();
+            if (clip.x == 0 && clip.y == 0 && clip.width == getWidth()
+                && clip.height == getHeight())
+              RepaintManager.currentManager(this).markCompletelyClean(this);
+          }
       }
+  }
+
+  /**
+   * Initializes the drag buffer by creating a new image and painting this
+   * component into it.
+   */
+  private void initializeDragBuffer()
+  {
+    dragBufferInitialized = false;
+    // Allocate new dragBuffer if the current one is too small.
+    if (dragBuffer == null || dragBuffer.getWidth(this) < getWidth()
+        || dragBuffer.getHeight(this) < getHeight())
+      {
+        dragBuffer = createImage(getWidth(), getHeight());
+      }
+    Graphics g = dragBuffer.getGraphics();
+    paint(g);
+    g.dispose();
+    dragBufferInitialized = true;
   }
 
   /**
@@ -1994,14 +2040,14 @@ public abstract class JComponent extends Container implements Serializable
    * Return the condition that determines whether a registered action
    * occurs in response to the specified keystroke.
    *
+   * As of 1.3 KeyStrokes can be registered with multiple simultaneous
+   * conditions.
+   *
    * @param ks The keystroke to return the condition of
    *
    * @return One of the values {@link #UNDEFINED_CONDITION}, {@link
    *     #WHEN_ANCESTOR_OF_FOCUSED_COMPONENT}, {@link #WHEN_FOCUSED}, or {@link
    *     #WHEN_IN_FOCUSED_WINDOW}
-   *
-   * @deprecated As of 1.3 KeyStrokes can be registered with multiple
-   *     simultaneous conditions.
    *
    * @see #registerKeyboardAction(ActionListener, KeyStroke, int)   
    * @see #unregisterKeyboardAction   
@@ -2029,8 +2075,6 @@ public abstract class JComponent extends Container implements Serializable
    * @param ks The keystroke to retrieve the action of
    *
    * @return The action associated with the specified keystroke
-   *
-   * @deprecated Use {@link #getActionMap()}
    */
   public ActionListener getActionForKeyStroke(KeyStroke ks)
   {
@@ -2204,12 +2248,8 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void repaint(long tm, int x, int y, int width, int height)
   {
-    // TODO: Maybe add this visibleRect stuff to RepaintManager.
-     Rectangle r = getVisibleRect();
-     Rectangle dirty = SwingUtilities.computeIntersection(x, y, width, height, r);
-     RepaintManager.currentManager(this).addDirtyRegion(this, dirty.x, dirty.y,
-                                                        dirty.width,
-                                                        dirty.height);
+     RepaintManager.currentManager(this).addDirtyRegion(this, x, y, width,
+                                                        height);
   }
 
   /**
@@ -2221,7 +2261,8 @@ public abstract class JComponent extends Container implements Serializable
    */
   public void repaint(Rectangle r)
   {
-    repaint(0, r.x, r.y, r.width, r.height);
+    RepaintManager.currentManager(this).addDirtyRegion(this, r.x, r.y, r.width,
+                                                       r.height);
   }
 
   /**
