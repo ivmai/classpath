@@ -70,6 +70,8 @@ exception statement from your version. */
 #include <sys/select.h>
 #endif
 
+#include <utime.h>
+
 #include "cpnative.h"
 #include "cpio.h"
 
@@ -323,3 +325,97 @@ JNIEXPORT int cpio_setFileSize (int native_fd, jlong new_size)
 
   return CPNATIVE_OK;
 }
+
+int cpio_setFileReadonly (const char *filename)
+{
+  struct stat statbuf;
+
+  if (stat(filename, &statbuf) < 0)
+    return errno;
+ 
+  if (chmod(filename, statbuf.st_mode & ~(S_IRUSR | S_IRGRP | S_IROTH)) < 0)
+    return errno;
+
+  return 0;
+}
+
+int cpio_isFileExists (const char *filename)
+{
+  struct stat statbuf;
+
+  if (stat(filename, &statbuf) < 0)
+    {
+      return errno;
+    }
+
+  return 0;
+}
+
+int cpio_checkType (const char *filename, jint *entryType)
+{
+  struct stat statbuf;
+
+  if (stat(filename, &statbuf) < 0)
+    return errno;
+
+  if (S_ISDIR(statbuf.st_mode))
+    *entryType = CPFILE_DIRECTORY;
+  else
+    *entryType = CPFILE_FILE;
+
+  return 0;
+}
+
+int cpio_getModificationTime (const char *filename, jlong *mtime)
+{
+  struct stat statbuf;
+
+  if (stat(filename, &statbuf) < 0)
+    return errno;
+
+  *mtime = statbuf.st_mtime * 1000;
+
+  return 0;
+}
+
+int cpio_setModificationTime (const char *filename, jlong mtime)
+{
+  struct stat statbuf;
+  struct utimbuf buf;
+
+  if (stat(filename, &statbuf) < 0)
+    return errno;
+
+  buf.actime = statbuf.st_atime;
+  buf.modtime = mtime / 1000;
+
+  if (utime(filename, &buf) < 0)
+    return errno;
+
+  return 0;
+}
+
+int cpio_removeFile (const char *filename)
+{
+  if (unlink(filename) < 0)
+    return errno;
+
+  return 0;
+}
+
+int cpio_mkdir (const char *path)
+{
+  if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
+    return errno;
+  
+  return 0;
+}
+
+int cpio_rename (const char *old_name, const char *new_name)
+{
+  if (rename(old_name, new_name) < 0)
+    return errno;
+
+  return 0;
+}
+

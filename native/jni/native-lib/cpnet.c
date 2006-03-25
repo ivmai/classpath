@@ -588,14 +588,14 @@ jint cpnet_getHostByName (JNIEnv *env, const char *hostname, cpnet_address ***ad
       for (i = 0; i < counter; i++)
 	{
 	  addr_arr[i] = cpnet_newIPV4Address(env);
-	  cpnet_bytesToIPV4Address(addr_arr[i], (jbyte *)hret.h_addr_list[counter]);
+	  cpnet_bytesToIPV4Address(addr_arr[i], (jbyte *)hret.h_addr_list[i]);
 	}
       break;
     case AF_INET6:
       for (i = 0; i < counter; i++)
 	{
 	  addr_arr[i] = cpnet_newIPV6Address(env);
-	  cpnet_bytesToIPV6Address(addr_arr[i], (jbyte *)hret.h_addr_list[counter]);
+	  cpnet_bytesToIPV6Address(addr_arr[i], (jbyte *)hret.h_addr_list[i]);
 	}
       break;
     default:

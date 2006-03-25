@@ -1,7 +1,24 @@
+2006-03-25  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/java-io/Makefile.am,
+	native/jni/java-lang/Makefile.am,
+	native/jni/java-net/Makefile.am,
+	native/jni/java-nio/Makefile.am: Link to libclasspathnative.la now.
+
+	* native/jni/native-lib/Makefile.am: Added cpproc.c
+
+	* native/jni/native-lib/cpio.c: Implemented missing functions for
+	CPIO.
+
+	* native/jni/native-lib/cpnet.c
+	(cpnet_getHostByName): Fixed address array initialization.
+	
+	* native/jni/native-lib/cpproc.c: Implemented.
+	
 2006-03-19  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* Synchronized to GNU Classpath 2006-03-18.
-	
+
 2006-02-19  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* configure.ac: Invoke GCC_ATTRIBUTE_UNUSED.
