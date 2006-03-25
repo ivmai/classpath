@@ -1,5 +1,5 @@
 /* URLConnection.java -- Abstract superclass for reading from URL's
-   Copyright (C) 1998, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2002, 2003, 2004, 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -169,7 +169,7 @@ public abstract class URLConnection
 
   /**
    * Creates a URL connection to a given URL. A real connection is not made.
-   * Use #connect to do this.
+   * Use <code>connect()</code> to do this.
    *
    * @param url The Object to create the URL connection to
    *
@@ -278,8 +278,8 @@ public abstract class URLConnection
   /**
    * Return a String representing the header value at the specified index.
    * This allows the caller to walk the list of header fields.  The analogous
-   * getHeaderFieldKey(int) method allows access to the corresponding key
-   * for this header field
+   * {@link #getHeaderField(int)} method allows access to the corresponding 
+   * key for this header field
    *
    * @param index The index into the header field list to retrieve the value for
    *
@@ -306,9 +306,10 @@ public abstract class URLConnection
   }
 
   /**
-   * Returns a map of all sent header fields
-   *
-   * @return all header fields
+   * Returns an unmodifiable Map containing all sent header fields.
+   * 
+   * @return The map of header fields. The map consists of String keys with 
+   * an unmodifiable List of String objects as value.
    *
    * @since 1.4
    */
@@ -356,7 +357,7 @@ public abstract class URLConnection
    * @param defaultValue The default date if the header field is not found
    * or can't be converted.
    *
-   * @return Returns the date value of the header filed or the default value
+   * @return The date value of the header filed or the default value
    * if the field is missing or malformed
    */
   public long getHeaderFieldDate(String name, long defaultValue)
@@ -389,8 +390,8 @@ public abstract class URLConnection
   /**
    * Returns a String representing the header key at the specified index.
    * This allows the caller to walk the list of header fields.  The analogous
-   * getHeaderField(int) method allows access to the corresponding value for
-   * this tag.
+   * {@link #getHeaderField(int)} method allows access to the corresponding 
+   * value for this tag.
    *
    * @param index The index into the header field list to retrieve the key for.
    *
@@ -723,7 +724,9 @@ public abstract class URLConnection
   }
 
   /**
-   * Sets the value of the named request property
+   * Sets the value of the named request property. 
+   * This method does overwrite the value of existing properties with 
+   * the new value.
    *
    * @param key The name of the property
    * @param value The value of the property
@@ -758,8 +761,8 @@ public abstract class URLConnection
    * @exception IllegalStateException If already connected
    * @exception NullPointerException If key is null
    *
-   * @see URLConnection#getRequestProperty(String key)
-   * @see URLConnection#setRequestProperty(String key, String value)
+   * @see URLConnection#getRequestProperty(String)
+   * @see URLConnection#setRequestProperty(String, String)
    *
    * @since 1.4
    */
@@ -784,8 +787,8 @@ public abstract class URLConnection
    *
    * @exception IllegalStateException If already connected
    *
-   * @see URLConnection#setRequestProperty(String key, String value)
-   * @see URLConnection#addRequestProperty(String key, String value)
+   * @see URLConnection#setRequestProperty(String, String)
+   * @see URLConnection#addRequestProperty(String, String)
    */
   public String getRequestProperty(String key)
   {
@@ -799,8 +802,9 @@ public abstract class URLConnection
 
   /**
    * Returns an unmodifiable Map containing the request properties.
-   *
-   * @return The map of properties
+   * 
+   * @return The map of properties. The map consists of String keys with an 
+   * unmodifiable List of String objects as value.
    *
    * @exception IllegalStateException If already connected
    *
@@ -827,7 +831,7 @@ public abstract class URLConnection
    * @deprecated 1.3 The method setRequestProperty should be used instead.
    * This method does nothing now.
    *
-   * @see URLConnection#setRequestProperty(String key, String value)
+   * @see URLConnection#setRequestProperty(String, String)
    */
   public static void setDefaultRequestProperty(String key, String value)
   {
@@ -846,7 +850,7 @@ public abstract class URLConnection
    * @deprecated 1.3 The method getRequestProperty should be used instead.
    * This method does nothing now.
    *
-   * @see URLConnection#getRequestProperty(String key)
+   * @see URLConnection#getRequestProperty(String)
    */
   public static String getDefaultRequestProperty(String key)
   {
