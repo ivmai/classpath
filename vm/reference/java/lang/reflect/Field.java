@@ -40,6 +40,8 @@ package java.lang.reflect;
 
 import gnu.java.lang.reflect.FieldSignatureParser;
 
+import gnu.java.lang.ClassHelper;
+
 /**
  * The Field class represents a member variable of a class. It also allows
  * dynamic access to a member, via reflection. This works for both
@@ -173,7 +175,7 @@ extends AccessibleObject implements Member
     // 64 is a reasonable buffer initial size for field
     StringBuilder sb = new StringBuilder(64);
     Modifier.toString(getModifiers(), sb).append(' ');
-    sb.append(getType().getName()).append(' ');
+    sb.append(ClassHelper.getUserName(getType())).append(' ');
     sb.append(getDeclaringClass().getName()).append('.');
     sb.append(getName());
     return sb.toString();

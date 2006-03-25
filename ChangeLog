@@ -107,6 +107,75 @@
 
 	* NEWS: Add updates for 0.90 release.
 
+2006-03-05  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/GapContent.java:
+	(insertString): Throw exception when argument is below
+	zero.
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+        
+	* javax/swing/filechooser/FileFilter.java:
+	(accept): Fixed API doc tag,
+       (getDescription): Likewise,
+	* javax/swing/filechooser/FileView.java:       
+	(isTraversable): Fixed API doc tag.
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/colorchooser/ColorSelectionModel.java: Reformatted and
+        added API docs all over.
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/ComboBoxUI.java: Fixed typo in class description,
+        and corrected a bad API doc tag.
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/undo/StateEditable.java
+	(restoreState): Fixed bad API doc tag,
+	* javax/swing/undo/UndoableEdit.java: Copied API doc comments from
+	AbstractUndoableEdit.java,
+	* javax/swing/undo/UndoableEditSupport.java
+	(createCompoundEdit): Fixed bad API doc tag,
+	* javax/swing/undo/UndoManager.java
+	(editToBeUndone): Fixed bad API doc tag,
+	(editToBeRedone): Likewise.
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/DefaultFocusManager.java: Fixed bad API doc tags,
+	* javax/swing/FocusManager.java: Likewise.
+
+
+2006-03-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+        
+	* javax/swing/plaf/metal/MetalComboBoxButton.java
+	(MetalComboBoxButton(JComboBox, Icon, boolean, CellRendererPane,
+	JList)): Fixed API doc tag,
+	* javax/swing/plaf/metal/MetalInternalFrameTitlePane
+	(createLayout): Fixed API doc warning.
+	
+2006-03-05  Tom Tromey  <tromey@redhat.com>
+
+	* vm/reference/java/lang/reflect/Constructor.java (toString): Use
+        ClassHelper.getUserName.
+	* vm/reference/java/lang/reflect/Method.java (toString): Use
+	ClassHelper.getUserName.
+	(getUserTypeName): Removed.
+	* gnu/java/lang/ClassHelper.java (getUserName): New method.
+	* vm/reference/java/lang/reflect/Field.java (toString): Use
+	ClassHelper.getUserName.
+
+2006-03-05  Olivier Jolly  <olivier.jolly@pcedev.com>
+
+	Fixes PR 22813
+	* java/net/URLClassLoader.java (FileURLLoader.getResource):   
+	Allows directories as valid resources.
+
 2006-03-05  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac (VERSION): Set to 0.90-pre-generics.

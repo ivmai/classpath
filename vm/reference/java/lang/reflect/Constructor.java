@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.lang.reflect;
 
+import gnu.java.lang.ClassHelper;
 import gnu.java.lang.reflect.MethodSignatureParser;
 import java.util.Arrays;
 
@@ -192,9 +193,9 @@ public final class Constructor<T>
     Class[] c = getParameterTypes();
     if (c.length > 0)
       {
-        sb.append(c[0].getName());
+        sb.append(ClassHelper.getUserName(c[0]));
         for (int i = 1; i < c.length; i++)
-          sb.append(',').append(c[i].getName());
+          sb.append(',').append(ClassHelper.getUserName(c[i]));
       }
     sb.append(')');
     c = getExceptionTypes();
