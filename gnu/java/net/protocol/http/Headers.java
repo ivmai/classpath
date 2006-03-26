@@ -232,21 +232,19 @@ class Headers
   }
   
   /**
-   * Add all headers from a set of headers to this set. If any of the
-   * headers to be added have the same name as existing headers, the
-   * value of the header will be replaced by the new value. If multiple 
-   * headers of the same name exist only the last one's value is replaced.
+   * Add all headers from a set of headers to this set. Any existing header 
+   * with the same (case insensitive) name as one of the new headers will 
+   * be overridden.
    *
    * @param o the headers to be added
-   * 
-   * @see #put(String, String)
    */
   public void putAll(Headers o)
   {
     for (Iterator it = o.iterator(); it.hasNext(); )
       {
         HeaderElement e = (HeaderElement)it.next();
-        put(e.name, e.value);
+	remove(e.name);
+	addValue(e.name, e.value);
       }
   }
 

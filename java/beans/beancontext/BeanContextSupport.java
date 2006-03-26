@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package java.beans.beancontext;
 
+import gnu.classpath.NotImplementedException;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -64,15 +66,19 @@ public class BeanContextSupport extends BeanContextChildSupport
   VetoableChangeListener
 {
   private static final long serialVersionUID = -4879613978649577204L;
-  
+
+  // This won't show up in japi, but we mark it as a stub anyway,
+  // so that searches for NotImplementedException will find it.
   private void readObject (ObjectInputStream s)
-    throws ClassNotFoundException, IOException
+    throws ClassNotFoundException, IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
+  // This won't show up in japi, but we mark it as a stub anyway,
+  // so that searches for NotImplementedException will find it.
   private void writeObject (ObjectOutputStream s)
-    throws ClassNotFoundException, IOException
+    throws ClassNotFoundException, IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -80,16 +86,26 @@ public class BeanContextSupport extends BeanContextChildSupport
   protected class BCSChild implements Serializable
   {
     private static final long serialVersionUID = -5815286101609939109L;
+
+    BCSChild()
+    {
+    }
   }
 
   protected static final class BCSIterator implements Iterator
   {
+    BCSIterator()
+    {
+    }
+
     public boolean hasNext ()
+      throws NotImplementedException
     {
       throw new Error ("Not implemented");
     }
 
     public Object next ()
+      throws NotImplementedException
     {
       throw new Error ("Not implemented");
     }
@@ -181,129 +197,152 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   public boolean avoidingGui ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected Iterator bcsChildren ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected void bcsPreDeserializationHook (ObjectInputStream ois)
-    throws ClassNotFoundException, IOException 
+    throws ClassNotFoundException, IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected void bcsPreSerializationHook (ObjectOutputStream oos)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected void childDeserializedHook (Object child, BeanContextSupport.BCSChild bcsc)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected void childJustAddedHook (Object child, BeanContextSupport.BCSChild bcsc)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected void childJustRemovedHook (Object child, BeanContextSupport.BCSChild bcsc)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final boolean classEquals (Class first, Class second)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void clear ()
   {
+    // This is probably the right thing to do.
+    // The JDK docs are really bad here.
     throw new UnsupportedOperationException();
   }
 
   public boolean contains (Object o)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public boolean containsAll (Collection c)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public boolean containsKey (Object o)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected final Object[] copyChildren ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected BeanContextSupport.BCSChild createBCSChild (Object targetChild, Object peer)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected final void deserialize (ObjectInputStream ois, Collection coll)
-    throws ClassNotFoundException, IOException
+    throws ClassNotFoundException, IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void dontUseGui ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected final void fireChildrenAdded (BeanContextMembershipEvent bcme)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected final void fireChildrenRemoved (BeanContextMembershipEvent bcme)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public BeanContext getBeanContextPeer ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final BeanContextChild getChildBeanContextChild (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final BeanContextMembershipListener getChildBeanContextMembershipListener (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final PropertyChangeListener getChildPropertyChangeListener (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final Serializable getChildSerializable (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final VetoableChangeListener getChildVetoableChangeListener (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected static final Visibility getChildVisibility (Object child)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -314,11 +353,13 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   public URL getResource (String name, BeanContextChild bcc)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public InputStream getResourceAsStream (String name, BeanContextChild bcc)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -330,22 +371,25 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   public Object instantiateChild (String beanName)
-    throws IOException, ClassNotFoundException
+    throws IOException, ClassNotFoundException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public boolean isDesignTime ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public boolean isEmpty ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public boolean isSerializing ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -356,22 +400,25 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   public boolean needsGui ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void okToUseGui ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void propertyChange (PropertyChangeEvent pce)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public final void readChildren (ObjectInputStream ois)
-    throws IOException, ClassNotFoundException
+    throws IOException, ClassNotFoundException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -382,6 +429,7 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   protected boolean remove (Object targetChild, boolean callChildSetBC)
+    throws NotImplementedException
   {
     if (targetChild == null)
       throw new IllegalArgumentException();
@@ -395,6 +443,7 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   public void removeBeanContextMembershipListener (BeanContextMembershipListener bcml)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -405,23 +454,25 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   protected final void serialize (ObjectOutputStream oos, Collection coll)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void setDesignTime (boolean dtime)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void setLocale (Locale newLocale)
-    throws PropertyVetoException
+    throws PropertyVetoException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public int size ()
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
@@ -437,23 +488,25 @@ public class BeanContextSupport extends BeanContextChildSupport
   }
 
   protected boolean validatePendingAdd (Object targetChild)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   protected boolean validatePendingRemove (Object targetChild)
+    throws NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public void vetoableChange (PropertyChangeEvent pce)
-    throws PropertyVetoException
+    throws PropertyVetoException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }
 
   public final void writeChildren (ObjectOutputStream oos)
-    throws IOException
+    throws IOException, NotImplementedException
   {
     throw new Error ("Not implemented");
   }

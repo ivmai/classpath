@@ -41,6 +41,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.Stack;
 import java.util.Vector;
 
 /**
@@ -235,6 +236,13 @@ public class RE extends REToken {
    */
   public static final int REG_REPLACE_USE_BACKSLASHESCAPE = 0x0200;
 
+  /**
+   * Compilation flag. Allow whitespace and comments in pattern.
+   * This is equivalent to the "/x" operator in Perl.
+   */
+
+  public static final int REG_X_COMMENTS = 0x0400;
+
   /** Returns a string representing the version of the gnu.regexp package. */
   public static final String version() {
     return VERSION;
@@ -372,6 +380,31 @@ public class RE extends REToken {
       if (quot)
       	unit.bk = false;
 
+      if (((cflags & REG_X_COMMENTS) > 0) && (!unit.bk) && (!quot)) {
+	if (Character.isWhitespace(unit.ch)) {
+	     continue;
+	}
+	if (unit.ch == '#') {
+	  for (int i = index; i < pLength; i++) {
+	    if (pattern[i] == '\n') {
+	      index = i + 1;
+	      continue;
+	    }
+	    else if (pattern[i] == '\r') {
+	      if (i + 1 < pLength && pattern[i + 1] == '\n') {
+		index = i + 2;
+	      }
+	      else {
+		index = i + 1;
+	      }
+	      continue;
+	    }
+	  }
+	  index = pLength;
+	  continue;
+	}
+      }
+
       // ALTERNATION OPERATOR
       //  \| or | (if RE_NO_BK_VBAR) or newline (if RE_NEWLINE_ALT)
       //  not available if RE_LIMITED_OPS is set
@@ -496,7 +529,7 @@ public class RE extends REToken {
 	  case 'm':
 	  case 's':
 	  // case 'u':  not supported
-	  // case 'x':  not supported
+	  case 'x':
 	  case '-':
             if (!syntax.get(RESyntax.RE_EMBEDDED_FLAGS)) break;
 	    // Set or reset syntax flags.
@@ -536,7 +569,13 @@ public class RE extends REToken {
 		  flagIndex++;
 		  break;
 	  	// case 'u': not supported
-	  	// case 'x': not supported
+	  	case 'x':
+		  if (negate)
+		    newCflags &= ~REG_X_COMMENTS;
+		  else
+		    newCflags |= REG_X_COMMENTS;
+		  flagIndex++;
+		  break;
 	  	case '-':
 		  negate = true;
 		  flagIndex++;
@@ -1396,11 +1435,10 @@ public class RE extends REToken {
       return (input.charAt(0) == CharIndexed.OUT_OF_BOUNDS);
     REMatch m = new REMatch(numSubs, index, eflags);
     if (firstToken.match(input, m)) {
-	while (m != null) {
+	if (m != null) {
 	    if (input.charAt(m.index) == CharIndexed.OUT_OF_BOUNDS) {
 		return true;
 	    }
-	    m = m.next;
 	}
     }
     return false;
@@ -1508,7 +1546,7 @@ public class RE extends REToken {
   }
   
     /* Implements abstract method REToken.match() */
-    boolean match(CharIndexed input, REMatch mymatch) { 
+    boolean match(CharIndexed input, REMatch mymatch) {
 	if (firstToken == null) {
 	    return next(input, mymatch);
 	}
@@ -1518,7 +1556,19 @@ public class RE extends REToken {
 
 	return firstToken.match(input, mymatch);
     }
-  
+
+    REMatch findMatch(CharIndexed input, REMatch mymatch) {
+        if (mymatch.backtrackStack == null)
+	  mymatch.backtrackStack = new BacktrackStack();
+	boolean b = match(input, mymatch);
+	if (b) {
+	    // mymatch.backtrackStack.push(new REMatch.Backtrack(
+	    //     this, input, mymatch, null));
+	    return mymatch;
+	}
+	return null;
+    }
+
   /**
    * Returns the first match found in the input.  If no match is found,
    * null is returned.
@@ -1942,12 +1992,14 @@ public class RE extends REToken {
    }
 
   void dump(StringBuffer os) {
-    os.append('(');
+    os.append("(?#startRE subIndex=" + subIndex + ")");
     if (subIndex == 0)
       os.append("?:");
     if (firstToken != null)
       firstToken.dumpAll(os);
-    os.append(')');
+    if (subIndex == 0)
+      os.append(")");
+    os.append("(?#endRE subIndex=" + subIndex + ")");
   }
 
   // Cast input appropriately or throw exception

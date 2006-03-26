@@ -131,6 +131,7 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new RuntimePermission("setIO"));
+    
     VMSystem.setIn(in);
   }
 
@@ -406,7 +407,7 @@ public final class System
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
-    else if (key.length() == 0)
+    if (key.length() == 0)
       throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.getProperty(key);
   }
@@ -424,13 +425,13 @@ public final class System
    */
   public static String getProperty(String key, String def)
   {
-    // This handles both the null pointer exception and the illegal
-    // argument exception.
-    if (key.equals(""))
-      throw new IllegalArgumentException("empty key");
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPropertyAccess(key);
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.length() == 0)
+      throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.getProperty(key, def);
   }
 
@@ -448,13 +449,13 @@ public final class System
    */
   public static String setProperty(String key, String value)
   {
-    // This handles both the null pointer exception and the illegal
-    // argument exception.
-    if (key.equals(""))
-      throw new IllegalArgumentException("empty key");
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new PropertyPermission(key, "write"));
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.length() == 0)
+      throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.setProperty(key, value);
   }
 
@@ -471,13 +472,13 @@ public final class System
    */
   public static String clearProperty(String key)
   {
-    // This handles both the null pointer exception and the illegal
-    // argument exception.
-    if (key.equals(""))
-      throw new IllegalArgumentException("empty key");
     SecurityManager sm = SecurityManager.current; // Be thread-safe.
     if (sm != null)
       sm.checkPermission(new PropertyPermission(key, "write"));
+    // This handles both the null pointer exception and the illegal
+    // argument exception.
+    if (key.length() == 0)
+      throw new IllegalArgumentException("key can't be empty");
     return SystemProperties.remove(key);
   }
 

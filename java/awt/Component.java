@@ -906,7 +906,7 @@ public abstract class Component
 
         // The JDK repaints the component before invalidating the parent.
         // So do we.
-        if (isShowing())
+        if (isShowing() && isLightweight())
           repaint();
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
@@ -3101,7 +3101,6 @@ public abstract class Component
           mouseListener.mouseReleased(e);
         break;
       }
-      e.consume();
   }
 
   /**
@@ -4935,6 +4934,10 @@ p   * <li>the set of backward traversal keys
     
     if (eventTypeEnabled (e.id))
       {
+        if (e.id != PaintEvent.PAINT && e.id != PaintEvent.UPDATE
+            && !ignoreFocus)
+          processEvent(e);
+        
         // the trick we use to communicate between dispatch and redispatch
         // is to have KeyboardFocusManager.redispatch synchronize on the
         // object itself. we then do not redispatch to KeyboardFocusManager
@@ -4955,14 +4958,11 @@ p   * <li>the set of backward traversal keys
                     .dispatchEvent(e))
                     return;
               case MouseEvent.MOUSE_PRESSED:
-                if (isLightweight())
-                  requestFocus();
+                if (isLightweight() && !e.isConsumed())
+                    requestFocus();
                 break;
               }
           }
-        if (e.id != PaintEvent.PAINT && e.id != PaintEvent.UPDATE
-            && !ignoreFocus)
-          processEvent(e);
       }
 
     if (peer != null)
@@ -5003,6 +5003,9 @@ p   * <li>the set of backward traversal keys
       case MouseEvent.MOUSE_DRAGGED:
         return (mouseMotionListener != null
                 || (eventMask & AWTEvent.MOUSE_MOTION_EVENT_MASK) != 0);
+      case MouseEvent.MOUSE_WHEEL:
+        return (mouseWheelListener != null
+                || (eventMask & AWTEvent.MOUSE_WHEEL_EVENT_MASK) != 0);
         
       case FocusEvent.FOCUS_GAINED:
       case FocusEvent.FOCUS_LOST:
@@ -5290,7 +5293,7 @@ p   * <li>the set of backward traversal keys
      */
     public String getAccessibleName()
     {
-      return accessibleName == null ? getName() : accessibleName;
+      return accessibleName;
     }
 
     /**

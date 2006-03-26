@@ -1038,7 +1038,7 @@ public final class ImageIO
    * The image data will be cached in the current cache directory if
    * caching is enabled.
    *
-   * @param input an object to which to write image data
+   * @param output an object to which to write image data
    *
    * @return an ImageOutputStream that can send data to output, or
    * null

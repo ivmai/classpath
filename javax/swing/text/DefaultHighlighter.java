@@ -100,7 +100,7 @@ public class DefaultHighlighter extends LayeredHighlighter
             // 2. All lines between the ones where p0 and p1 lie on
             // are completely highlighted. The allocation area is used to find
             // out the bounds.
-            // 3. The final line is damaged from the left bound to the
+            // 3. The final line is painted from the left border to the
             // position of p1.
             
             // Highlight first line until the end.
@@ -129,7 +129,7 @@ public class DefaultHighlighter extends LayeredHighlighter
                     if (nextPosBelow == posBelow)
                       break;
                   }
-                // Now posBelow is an offset on the last line which has to be damaged
+                // Now posBelow is an offset on the last line which has to be painted
                 // completely. (newPosBelow is on the same line as p1)
                  
                 // Retrieve the rectangle of posBelow and use its y and height
@@ -138,11 +138,10 @@ public class DefaultHighlighter extends LayeredHighlighter
                 Rectangle end = ui.modelToView(t, posBelow);
                 grow.height = end.y + end.height - grow.y;
                 
-                // Mark that area as damage.
                 paintHighlight(g, grow);
               }
             
-            // Damage last line from its beginning to the position of p1.
+            // Paint last line from its beginning to the position of p1.
             l1.width = l1.x + l1.width - rect.x;
             l1.x = rect.x;
             paintHighlight(g, l1);

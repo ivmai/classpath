@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.swing;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -121,7 +123,8 @@ public class UIManager implements Serializable
 
   /** The installed look and feel(s). */
   static LookAndFeelInfo [] installed = {
-    new LookAndFeelInfo("Metal", "javax.swing.plaf.metal.MetalLookAndFeel")
+    new LookAndFeelInfo("Metal", "javax.swing.plaf.metal.MetalLookAndFeel"),
+    new LookAndFeelInfo("GNU", "gnu.javax.swing.plaf.gnu.GNULookAndFeel")
   };
 
   /** The installed auxiliary look and feels. */
@@ -611,6 +614,7 @@ public class UIManager implements Serializable
    * setInstalledLookAndFeels(javax.swing.UIManager.LookAndFeelInfo[]).
    */
   public static void installLookAndFeel(LookAndFeelInfo info)
+    throws NotImplementedException
   {
     // FIXME: not yet implemented
   }
@@ -631,6 +635,7 @@ public class UIManager implements Serializable
    * Replaces the current array of installed LookAndFeelInfos.
    */
   public static void setInstalledLookAndFeels(UIManager.LookAndFeelInfo[] infos)
+    throws NotImplementedException
   {
     // FIXME: not yet implemented.
   }
