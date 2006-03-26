@@ -44,7 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ProcessBuilder
+public final class ProcessBuilder
 {
   private File directory = new File(System.getProperty("user.dir"));
   private List<String> command;
