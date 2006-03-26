@@ -124,22 +124,18 @@ public class DataFlavor implements java.io.Externalizable, Cloneable
   public static final String javaRemoteObjectMimeType =
     "application/x-java-remote-object";
 
-/*************************************************************************/
-
-/*
- * Instance Variables
- */
-
-// The MIME type for this flavor
-private final String mimeType;
-
-// The representation class for this flavor
-private final Class<?> representationClass;
-
-// The human readable name of this flavor
-private String humanPresentableName;
-
-/*************************************************************************/
+  /*
+   * Instance Variables
+   */
+  
+  // The MIME type for this flavor
+  private final String mimeType;
+  
+  // The representation class for this flavor
+  private final Class<?> representationClass;
+  
+  // The human readable name of this flavor
+  private String humanPresentableName;
 
   /*
    * Static Methods
@@ -321,25 +317,20 @@ private String humanPresentableName;
     humanPresentableName = null;
   }
 
-/*************************************************************************/
-
-/**
- * Private constructor.
- */
-  private
-    DataFlavor(Class<?> representationClass,
-	       String mimeType,
-	       String humanPresentableName)
-    {
-      this.representationClass = representationClass;
-      this.mimeType = mimeType;
-      if (humanPresentableName != null)
-	this.humanPresentableName = humanPresentableName;
-      else
-	this.humanPresentableName = mimeType;
-    }
-
-/*************************************************************************/
+  /**
+   * Private constructor.
+   */
+  private DataFlavor(Class<?> representationClass,
+                    String mimeType,
+                    String humanPresentableName)
+  {
+    this.representationClass = representationClass;
+    this.mimeType = mimeType;
+    if (humanPresentableName != null)
+      this.humanPresentableName = humanPresentableName;
+    else
+      this.humanPresentableName = mimeType;
+  }
 
   /**
    * Initializes a new instance of <code>DataFlavor</code>.  The class
@@ -351,15 +342,14 @@ private String humanPresentableName;
    * @param representationClass The representation class for this object.
    * @param humanPresentableName The display name of the object.
    */
-  public
-    DataFlavor(Class<?> representationClass, String humanPresentableName)
-    {
-      this(representationClass,
-	   "application/x-java-serialized-object"
-	   + "; class="
-	   + representationClass.getName(),
-	   humanPresentableName);
-    }
+  public DataFlavor(Class<?> representationClass, String humanPresentableName)
+  {
+    this(representationClass,
+         "application/x-java-serialized-object"
+         + "; class="
+         + representationClass.getName(),
+         humanPresentableName);
+  }
 
   /**
    * Initializes a new instance of <code>DataFlavor</code> with the
@@ -427,8 +417,6 @@ private String humanPresentableName;
   {
     this(mimeType, null);
   }
-
-/*************************************************************************/
 
   /**
    * Returns the MIME type of this flavor.

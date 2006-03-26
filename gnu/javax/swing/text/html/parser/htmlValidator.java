@@ -446,8 +446,9 @@ public abstract class htmlValidator
         if (a.getModifier() == DTDConstants.REQUIRED)
           if (parameters.getAttribute(a.getName()) == null)
             {
-              s_error("Missing required attribute '" + a.getName() +
-		      "' for <" + tag.getHTMLTag() + ">");
+              s_error("Missing required attribute '" + a.getName() + "' for <" +
+                      tag.getHTMLTag() + ">"
+                     );
             }
         a = a.next;
       }

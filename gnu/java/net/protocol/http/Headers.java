@@ -243,8 +243,8 @@ class Headers
     for (Iterator it = o.iterator(); it.hasNext(); )
       {
         HeaderElement e = (HeaderElement)it.next();
-	remove(e.name);
-	addValue(e.name, e.value);
+        remove(e.name);
+        addValue(e.name, e.value);
       }
   }
 
