@@ -49,7 +49,15 @@ public class Proxy
   /**
    * Represents the proxy type.
    */
-  public enum Type { DIRECT, HTTP, SOCKS };
+  public enum Type 
+  { 
+    DIRECT, HTTP, SOCKS 
+
+    /**
+     * For compatability with Sun's JDK
+     */
+    private static final long serialVersionUID = -2231209257930100533L;
+  };
 
   public static final Proxy NO_PROXY = new Proxy(Type.DIRECT, null);
 

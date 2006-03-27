@@ -47,6 +47,11 @@ package java.math;
 public enum RoundingMode
 {
   UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN, UNNECESSARY;
+
+  /**
+   * For compatability with Sun's JDK
+   */
+  private static final long serialVersionUID = 432302042773881265L;
   
   /**
    * Returns the RoundingMode object corresponding to the legacy rounding modes
