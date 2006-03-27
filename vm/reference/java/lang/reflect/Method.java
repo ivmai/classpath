@@ -302,6 +302,8 @@ extends AccessibleObject implements Member, GenericDeclaration
   public TypeVariable<Method>[] getTypeParameters()
   {
     String sig = getSignature();
+    if (sig == null)
+      return new TypeVariable[0];
     MethodSignatureParser p = new MethodSignatureParser(this, sig);
     return p.getTypeParameters();
   }

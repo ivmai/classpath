@@ -265,6 +265,8 @@ public final class Constructor<T>
   public TypeVariable<Constructor<T>>[] getTypeParameters()
   {
     String sig = getSignature();
+    if (sig == null)
+      return new TypeVariable[0];
     MethodSignatureParser p = new MethodSignatureParser(this, sig);
     return p.getTypeParameters();
   }
