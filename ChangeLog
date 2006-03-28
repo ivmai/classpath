@@ -1,5 +1,9 @@
 2006-03-27  Tom Tromey  <tromey@redhat.com>
 
+	* java/lang/reflect/ParameterizedType.java: Javadoc fix.
+
+2006-03-27  Tom Tromey  <tromey@redhat.com>
+
 	* vm/reference/java/lang/reflect/Method.java (METHOD_MODIFIERS):
 	New constant.
 	(getModifiersInternal): Renamed from getModifiers.
