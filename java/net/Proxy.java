@@ -51,7 +51,7 @@ public class Proxy
    */
   public enum Type 
   { 
-    DIRECT, HTTP, SOCKS 
+    DIRECT, HTTP, SOCKS;
 
     /**
      * For compatability with Sun's JDK
