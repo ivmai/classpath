@@ -82,6 +82,9 @@ public final class Constructor<T>
   private Class<T> clazz;
   private int slot;
   
+  private static final int CONSTRUCTOR_MODIFIERS
+    = Modifier.PRIVATE | Modifier.PROTECTED | Modifier.PUBLIC;
+
   /**
    * This class is uninstantiable except from native code.
    */
@@ -115,6 +118,13 @@ public final class Constructor<T>
   }
 
   /**
+   * Return the raw modifiers for this constructor.  In particular
+   * this will include the synthetic and varargs bits.
+   * @return the constructor's modifiers
+   */
+  private native int getModifiersInternal();
+
+  /**
    * Gets the modifiers this constructor uses.  Use the <code>Modifier</code>
    * class to interpret the values. A constructor can only have a subset of the
    * following modifiers: public, private, protected.
@@ -122,7 +132,31 @@ public final class Constructor<T>
    * @return an integer representing the modifiers to this Member
    * @see Modifier
    */
-  public native int getModifiers();
+  public int getModifiers()
+  {
+    return getModifiersInternal() & CONSTRUCTOR_MODIFIERS;
+  }
+
+  /**
+   * Return true if this constructor is synthetic, false otherwise.
+   * A synthetic member is one which is created by the compiler,
+   * and which does not appear in the user's source code.
+   * @since 1.5
+   */
+  public boolean isSynthetic()
+  {
+    return (getModifiersInternal() & Modifier.SYNTHETIC) != 0;
+  }
+
+  /**
+   * Return true if this is a varargs constructor, that is if
+   * the constructor takes a variable number of arguments.
+   * @since 1.5
+   */
+  public boolean isVarArgs()
+  {
+    return (getModifiersInternal() & Modifier.VARARGS) != 0;
+  }
 
   /**
    * Get the parameter list for this constructor, in declaration order. If the
@@ -207,7 +241,46 @@ public final class Constructor<T>
       }
     return sb.toString();
   }
- 
+
+  static <X extends GenericDeclaration>
+  void addTypeParameters(StringBuilder sb, TypeVariable<X>[] typeArgs)
+  {
+    if (typeArgs.length == 0)
+      return;
+    sb.append('<');
+    for (int i = 0; i < typeArgs.length; ++i)
+      {
+        if (i > 0)
+          sb.append(',');
+        sb.append(typeArgs[i]);
+      }
+    sb.append("> ");
+  }
+
+  public String toGenericString()
+  {
+    StringBuilder sb = new StringBuilder(128);
+    Modifier.toString(getModifiers(), sb).append(' ');
+    addTypeParameters(sb, getTypeParameters());
+    sb.append(getDeclaringClass().getName()).append('(');
+    Type[] types = getGenericParameterTypes();
+    if (types.length > 0)
+      {
+        sb.append(types[0]);
+        for (int i = 1; i < types.length; ++i)
+          sb.append(',').append(types[i]);
+      }
+    sb.append(')');
+    types = getGenericExceptionTypes();
+    if (types.length > 0)
+      {
+        sb.append(" throws ").append(types[0]);
+        for (int i = 1; i < types.length; i++)
+          sb.append(',').append(types[i]);
+      }
+    return sb.toString();
+  }
+
   /**
    * Create a new instance by invoking the constructor. Arguments are
    * automatically unwrapped and widened, if needed.<p>
