@@ -38,6 +38,7 @@ exception statement from your version. */
 package java.lang;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 /**
  * @since 1.5
@@ -76,7 +77,10 @@ public abstract class Enum<T extends Enum<T>>
 
     try
       {
-	return (S) etype.getDeclaredField(s).get(null);
+        Field f = etype.getDeclaredField(s);
+        if (! f.isEnumConstant())
+          throw new IllegalArgumentException(s);
+        return (S) f.get(null);
       }
     catch (NoSuchFieldException exception)
       {
@@ -106,6 +110,8 @@ public abstract class Enum<T extends Enum<T>>
 
   public final int compareTo(T e)
   {
+    if (getDeclaringClass() != e.getDeclaringClass())
+      throw new ClassCastException();
     return ordinal - e.ordinal;
   }
 

@@ -1,5 +1,12 @@
 2006-03-27  Tom Tromey  <tromey@redhat.com>
 
+	PR classpath/25189:
+	* java/lang/Enum.java (valueOf): Ensure that the named field
+	is an enum constant.
+	(compareTo): Check class of enum.
+
+2006-03-27  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/reflect/ParameterizedType.java: Javadoc fix.
 
 2006-03-27  Tom Tromey  <tromey@redhat.com>
