@@ -87,9 +87,10 @@ public interface ObjectStreamConstants
   byte TC_EXCEPTION = (byte)123;       //0x7B
   byte TC_LONGSTRING = (byte)124;      //0x7C
   byte TC_PROXYCLASSDESC = (byte)125;  //0x7D
+  byte TC_ENUM = (byte)126;            //0x7E
 
   byte TC_BASE = TC_NULL;
-  byte TC_MAX = TC_PROXYCLASSDESC;
+  byte TC_MAX = TC_ENUM;
 
   int baseWireHandle = 0x7e0000;
 
