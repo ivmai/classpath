@@ -1,5 +1,17 @@
 2006-04-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* java/util/Collections.java:
+	(binarySearch(List, T)): Fixed signature.
+	(unmodifiableList(List)): Likewise.
+	(UnmodifiableList(List)): Fixed constructor.
+	(UnmodifiableRandomAccessList(List)): Likewise.
+	(unmodifiableMap(Map)): Fixed signature.
+	(UnmodifiableMap(Map)): Fixed constructor.
+	(unmodifiableSortedMap(Map)): Fixed signature.
+	(UnmodifiableSortedMap(Map)): Fixed constructor.
+	
+2006-04-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* java/io/ObjectOutputStream.java:
 	(writeObject(Object)): Added enum support.
 	(writeClassDescriptor(ObjectStreamClass)): Likewise.

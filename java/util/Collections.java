@@ -651,8 +651,8 @@ public class Collections
    * @throws NullPointerException if a null element has compareTo called
    * @see #sort(List)
    */
-  public static <T extends Object & Comparable<? super T>>
-		int binarySearch(List<? extends T> l, T key)
+  public static <T> int binarySearch(List<? extends Comparable<? super T>> l, 
+				     T key)
   {
     return binarySearch(l, key, null);
   }
@@ -4499,7 +4499,7 @@ public class Collections
    * @see Serializable
    * @see RandomAccess
    */
-  public static <T> List<T> unmodifiableList(List<T> l)
+  public static <T> List<T> unmodifiableList(List<? extends T> l)
   {
     if (l instanceof RandomAccess)
       return new UnmodifiableRandomAccessList<T>(l);
@@ -4534,10 +4534,10 @@ public class Collections
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    UnmodifiableList(List<T> l)
+    UnmodifiableList(List<? extends T> l)
     {
       super(l);
-      list = l;
+      list = (List<T>) l;
     }
 
     /**
@@ -4744,7 +4744,7 @@ public class Collections
      * @param l the list to wrap
      * @throws NullPointerException if l is null
      */
-    UnmodifiableRandomAccessList(List<T> l)
+    UnmodifiableRandomAccessList(List<? extends T> l)
     {
       super(l);
     }
@@ -4868,7 +4868,8 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  public static <K, V> Map<K, V> unmodifiableMap(Map<K, V> m)
+  public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K,
+						 ? extends V> m)
   {
     return new UnmodifiableMap<K, V>(m);
   }
@@ -4912,9 +4913,9 @@ public class Collections
      * @param m the map to wrap
      * @throws NullPointerException if m is null
      */
-    UnmodifiableMap(Map<K, V> m)
+    UnmodifiableMap(Map<? extends K, ? extends V> m)
     {
-      this.m = m;
+      this.m = (Map<K,V>) m;
       if (m == null)
         throw new NullPointerException();
     }
@@ -5336,7 +5337,8 @@ public class Collections
    * @return a read-only view of the map
    * @see Serializable
    */
-  public static <K, V> SortedMap<K, V> unmodifiableSortedMap(SortedMap<K, V> m)
+  public static <K, V> SortedMap<K, V> unmodifiableSortedMap(SortedMap<K,
+							     ? extends V> m)
   {
     return new UnmodifiableSortedMap<K, V>(m);
   }
@@ -5368,10 +5370,10 @@ public class Collections
      * @param sm the map to wrap
      * @throws NullPointerException if sm is null
      */
-    UnmodifiableSortedMap(SortedMap<K, V> sm)
+    UnmodifiableSortedMap(SortedMap<K, ? extends V> sm)
     {
       super(sm);
-      this.sm = sm;
+      this.sm = (SortedMap<K,V>) sm;
     }
 
     /**
