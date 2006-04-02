@@ -98,6 +98,7 @@ public interface ObjectStreamConstants
   byte SC_SERIALIZABLE = 0x02;
   byte SC_EXTERNALIZABLE = 0x04;
   byte SC_BLOCK_DATA = 0x08;
+  byte SC_ENUM = 0x10;
 
   SerializablePermission SUBSTITUTION_PERMISSION
     = new SerializablePermission("enableSubstitution");
