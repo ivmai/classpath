@@ -590,12 +590,13 @@ public abstract class IIOMetadataFormatImpl implements IIOMetadataFormat
                                                    enumeratedValues));
   }
 
-  protected <T> void addObjectValue (String elementName, Class<T> classType,
-                                     T defaultValue,
-                                     Comparable<? super T> minValue,
-                                     Comparable<? super T> maxValue,
-                                     boolean minInclusive,
-                                     boolean maxInclusive)
+  protected <T extends Object & Comparable<? super T>>
+  void addObjectValue (String elementName, Class<T> classType,
+                       T defaultValue,
+                       Comparable<? super T> minValue,
+                       Comparable<? super T> maxValue,
+                       boolean minInclusive,
+                       boolean maxInclusive)
   {
     IIOMetadataNode node = (IIOMetadataNode) nodes.get (elementName);
     addNodeObject (node, new NodeObjectBounded (node,
