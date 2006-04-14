@@ -1,3 +1,10 @@
+2006-04-14  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java (getListeners):
+	Genericized.
+	* javax/swing/tree/AbstractLayoutCache.java (getVisiblePathsFrom):
+	Genericized.
+
 2006-04-10  Tom Tromey  <tromey@redhat.com>
 
 	* javax/imageio/metadata/IIOMetadataFormatImpl.java (addObjectValue):
