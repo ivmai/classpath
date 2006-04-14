@@ -2353,7 +2353,19 @@ public class Arrays
     return new Arrays.ArrayList(a);
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of long numbers.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents longs in their wrapper class, <code>Long</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of long numbers for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(long[] v)
   {
     if (v == null)
@@ -2367,7 +2379,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of integer numbers.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents ints in their wrapper class, <code>Integer</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of integer numbers for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(int[] v)
   {
     if (v == null)
@@ -2378,7 +2402,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of short numbers.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents shorts in their wrapper class, <code>Short</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of short numbers for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(short[] v)
   {
     if (v == null)
@@ -2389,7 +2425,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of characters.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents chars in their wrapper class, <code>Character</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of characters for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(char[] v)
   {
     if (v == null)
@@ -2400,7 +2448,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of bytes.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents bytes in their wrapper class, <code>Byte</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of bytes for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(byte[] v)
   {
     if (v == null)
@@ -2411,7 +2471,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of booleans.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents booleans in their wrapper class,
+   * <code>Boolean</code>.  For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of booleans for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(boolean[] v)
   {
     if (v == null)
@@ -2422,7 +2494,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of floats.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents floats in their wrapper class, <code>Float</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of floats for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(float[] v)
   {
     if (v == null)
@@ -2433,7 +2517,19 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of doubles.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  This has the same
+   * data, but represents doubles in their wrapper class, <code>Double</code>.
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of doubles for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(double[] v)
   {
     if (v == null)
@@ -2448,7 +2544,18 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
+  /** 
+   * Returns the hashcode of an array of objects.  If two arrays
+   * are equal, according to <code>equals()</code>, they should have the
+   * same hashcode.  The hashcode returned by the method is equal to that
+   * obtained by the corresponding <code>List</code> object.  
+   * For <code>null</code>, 0 is returned.
+   *
+   * @param v an array of integer numbers for which the hash code should be
+   *          computed.
+   * @return the hash code of the array, or 0 if null was given.
+   * @since 1.5 
+   */
   public static int hashCode(Object[] v)
   {
     if (v == null)
@@ -2462,7 +2569,6 @@ public class Arrays
     return result;
   }
 
-  /** @since 1.5 */
   public static int deepHashCode(Object[] v)
   {
     if (v == null)
@@ -2547,7 +2653,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2569,7 +2675,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2591,7 +2697,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2613,7 +2719,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2635,7 +2741,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2657,7 +2763,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2679,7 +2785,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2701,7 +2807,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */
@@ -2723,7 +2829,7 @@ public class Arrays
   /**
    * Returns a String representation of the argument array.  Returns "null"
    * if <code>a</code> is null.
-   * @param a the array to represent
+   * @param v the array to represent
    * @return a String representing this array
    * @since 1.5
    */

@@ -42,28 +42,6 @@ import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-abstract class TypeImpl implements Type
-{
-    abstract Type resolve();
-
-    static void resolve(Type[] types)
-    {
-        for (int i = 0; i < types.length; i++)
-        {
-            types[i] = resolve(types[i]);
-        }
-    }
-
-    static Type resolve(Type type)
-    {
-        if (type instanceof TypeImpl)
-        {
-            type = ((TypeImpl) type).resolve();
-        }
-        return type;
-    }
-}
-
 final class TypeVariableImpl extends TypeImpl implements TypeVariable
 {
     private GenericDeclaration decl;

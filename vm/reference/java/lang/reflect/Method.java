@@ -39,7 +39,9 @@ exception statement from your version. */
 package java.lang.reflect;
 
 import gnu.java.lang.ClassHelper;
+
 import gnu.java.lang.reflect.MethodSignatureParser;
+
 import java.util.Arrays;
 
 /**
@@ -352,6 +354,10 @@ extends AccessibleObject implements Member, GenericDeclaration
   {
     return invokeNative(o, args, declaringClass, slot);
   }
+
+  /*
+   * NATIVE HELPERS
+   */
 
   private native Object invokeNative(Object o, Object[] args,
                                      Class declaringClass, int slot)

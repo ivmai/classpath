@@ -1,5 +1,5 @@
 /* Thread -- an independent thread of executable code
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation
 
 This file is part of GNU Classpath.
@@ -1220,4 +1220,5 @@ public class Thread implements Runnable
      */
     private static final long serialVersionUID = 605505746047245783L;
   }
+
 }

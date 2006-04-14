@@ -1075,8 +1075,6 @@ public abstract class Component
     Component p = parent;
     if (p != null)
       return p.getFont();
-    if (peer != null)
-      return peer.getGraphics().getFont();
     return null;
   }
 
@@ -2314,6 +2312,10 @@ public abstract class Component
     Event oldEvent = translateEvent(e);
     if (oldEvent != null)
       postEvent (oldEvent);
+
+    // Give toolkit a chance to dispatch the event
+    // to globally registered listeners.
+    Toolkit.getDefaultToolkit().globalDispatchEvent(e);
 
     // Some subclasses in the AWT package need to override this behavior,
     // hence the use of dispatchEventImpl().
@@ -4079,14 +4081,9 @@ public abstract class Component
    */
   public Container getFocusCycleRootAncestor ()
   {
-    if (this instanceof Window
-	&& ((Container) this).isFocusCycleRoot ())
-      return (Container) this;
-
     Container parent = getParent ();
 
-    while (parent != null
-	   && !parent.isFocusCycleRoot ())
+    while (parent != null && !parent.isFocusCycleRoot())
       parent = parent.getParent ();
 
     return parent;
@@ -4114,9 +4111,32 @@ public abstract class Component
    */
   public void nextFocus ()
   {
-    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
+    // Find the nearest valid (== showing && focusable && enabled) focus
+    // cycle root ancestor and the focused component in it.
+    Container focusRoot = getFocusCycleRootAncestor();
+    Component focusComp = this;
+    while (focusRoot != null
+           && ! (focusRoot.isShowing() && focusRoot.isFocusable()
+                 && focusRoot.isEnabled()))
+      {
+        focusComp = focusRoot;
+        focusRoot = focusComp.getFocusCycleRootAncestor();
+      }
 
-    manager.focusNextComponent (this);
+    if (focusRoot != null)
+      {
+        // First try to get the componentBefore from the policy.
+        FocusTraversalPolicy policy = focusRoot.getFocusTraversalPolicy();
+        Component nextFocus = policy.getComponentAfter(focusRoot, focusComp);
+
+        // If this fails, then ask for the defaultComponent.
+        if (nextFocus == null)
+          nextFocus = policy.getDefaultComponent(focusRoot);
+
+        // Request focus on this component, if not null.
+        if (nextFocus != null)
+          nextFocus.requestFocus();
+      }
   }
 
   /**
@@ -4128,9 +4148,32 @@ public abstract class Component
    */
   public void transferFocusBackward ()
   {
-    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
+    // Find the nearest valid (== showing && focusable && enabled) focus
+    // cycle root ancestor and the focused component in it.
+    Container focusRoot = getFocusCycleRootAncestor();
+    Component focusComp = this;
+    while (focusRoot != null
+           && ! (focusRoot.isShowing() && focusRoot.isFocusable()
+                 && focusRoot.isEnabled()))
+      {
+        focusComp = focusRoot;
+        focusRoot = focusComp.getFocusCycleRootAncestor();
+      }
 
-    manager.focusPreviousComponent (this);
+    if (focusRoot != null)
+      {
+        // First try to get the componentBefore from the policy.
+        FocusTraversalPolicy policy = focusRoot.getFocusTraversalPolicy();
+        Component nextFocus = policy.getComponentBefore(focusRoot, focusComp);
+
+        // If this fails, then ask for the defaultComponent.
+        if (nextFocus == null)
+          nextFocus = policy.getDefaultComponent(focusRoot);
+
+        // Request focus on this component, if not null.
+        if (nextFocus != null)
+          nextFocus.requestFocus();
+      }
   }
 
   /**
@@ -4144,9 +4187,63 @@ public abstract class Component
    */
   public void transferFocusUpCycle ()
   {
-    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager ();
+    // Find the nearest focus cycle root ancestor that is itself
+    // focusable, showing and enabled.
+    Container focusCycleRoot = getFocusCycleRootAncestor();
+    while (focusCycleRoot != null &&
+           ! (focusCycleRoot.isShowing() && focusCycleRoot.isFocusable()
+              && focusCycleRoot.isEnabled()))
+      {
+        focusCycleRoot = focusCycleRoot.getFocusCycleRootAncestor();
+      }
 
-    manager.upFocusCycle (this);
+    KeyboardFocusManager fm =
+      KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+    if (focusCycleRoot != null)
+      {
+        // If we found a focus cycle root, then we make this the new
+        // focused component, and make it's focus cycle root the new
+        // global focus cycle root. If the found root has no focus cycle
+        // root ancestor itself, then the component will be both the focused
+        // component and the new global focus cycle root.
+        Container focusCycleAncestor =
+          focusCycleRoot.getFocusCycleRootAncestor();
+        Container globalFocusCycleRoot;
+        if (focusCycleAncestor == null)
+          globalFocusCycleRoot = focusCycleRoot;
+        else
+          globalFocusCycleRoot = focusCycleAncestor;
+
+        fm.setGlobalCurrentFocusCycleRoot(globalFocusCycleRoot);
+        focusCycleRoot.requestFocus();
+      }
+    else
+      {
+        // If this component has no applicable focus cycle root, we try
+        // find the nearest window and set this as the new global focus cycle
+        // root and the default focus component of this window the new focused
+        // component.
+        Container cont;
+        if (this instanceof Container)
+          cont = (Container) this;
+        else
+          cont = getParent();
+
+        while (cont != null && !(cont instanceof Window))
+          cont = cont.getParent();
+
+        if (cont != null)
+          {
+            FocusTraversalPolicy policy = cont.getFocusTraversalPolicy();
+            Component focusComp = policy.getDefaultComponent(cont);
+            if (focusComp != null)
+              {
+                fm.setGlobalCurrentFocusCycleRoot(cont);
+                focusComp.requestFocus();
+              }
+          }
+      }
   }
 
   /**
@@ -4876,7 +4973,7 @@ p   * <li>the set of backward traversal keys
                 oldKey = Event.UP;
                 break;
               default:
-                oldKey = newKey;
+                oldKey = (int) ((KeyEvent) e).getKeyChar();
               }
 
             translated = new Event (target, when, oldID,
@@ -4922,10 +5019,6 @@ p   * <li>the set of backward traversal keys
 
   void dispatchEventImpl(AWTEvent e)
   {
-    // Give toolkit a chance to dispatch the event
-    // to globally registered listeners.
-    Toolkit.getDefaultToolkit().globalDispatchEvent(e);
-
     // This boolean tells us not to process focus events when the focus
     // opposite component is the same as the focus component.
     boolean ignoreFocus = 
@@ -4979,6 +5072,15 @@ p   * <li>the set of backward traversal keys
 
     switch (type)
       {
+      case HierarchyEvent.HIERARCHY_CHANGED:
+        return (hierarchyListener != null 
+            || (eventMask & AWTEvent.HIERARCHY_EVENT_MASK) != 0);
+        
+      case HierarchyEvent.ANCESTOR_MOVED:
+      case HierarchyEvent.ANCESTOR_RESIZED:
+        return (hierarchyBoundsListener != null 
+            || (eventMask & AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK) != 0);
+        
       case ComponentEvent.COMPONENT_HIDDEN:
       case ComponentEvent.COMPONENT_MOVED:
       case ComponentEvent.COMPONENT_RESIZED:
@@ -5333,8 +5435,10 @@ p   * <li>the set of backward traversal keys
         s.add(AccessibleState.FOCUSABLE);
       if (isFocusOwner())
         s.add(AccessibleState.FOCUSED);
-      if (isOpaque())
-        s.add(AccessibleState.OPAQUE);
+      // Note: While the java.awt.Component has an 'opaque' property, it
+      // seems that it is not added to the accessible state set here, even
+      // if this property is true. However, it is handled for
+      // javax.swing.JComponent, so we add it there.
       if (Component.this.isShowing())
         s.add(AccessibleState.SHOWING);
       if (Component.this.isVisible())
@@ -5618,7 +5722,7 @@ p   * <li>the set of backward traversal keys
      */
     public Point getLocation()
     {
-      return Component.this.isShowing() ? Component.this.getLocation() : null;
+      return Component.this.getLocation();
     }
 
     /**
@@ -5642,7 +5746,7 @@ p   * <li>the set of backward traversal keys
      */
     public Rectangle getBounds()
     {
-      return Component.this.isShowing() ? Component.this.getBounds() : null;
+      return Component.this.getBounds();
     }
 
     /**
@@ -5665,7 +5769,7 @@ p   * <li>the set of backward traversal keys
      */
     public Dimension getSize()
     {
-      return Component.this.isShowing() ? Component.this.getSize() : null;
+      return Component.this.getSize();
     }
 
     /**

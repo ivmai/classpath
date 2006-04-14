@@ -16,41 +16,32 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with GNU Classpath; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
-
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
-
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. */
+02110-1301 USA. */
 
 
 package gnu.classpath.tools.jarsigner;
+
+import gnu.classpath.SystemProperties;
+import gnu.classpath.tools.HelpPrinter;
+import gnu.java.security.OID;
+import gnu.java.security.Registry;
+import gnu.javax.security.auth.callback.ConsoleCallbackHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PrivilegedAction;
 import java.security.Provider;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Locale;
@@ -61,11 +52,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
-import gnu.classpath.SystemProperties;
-import gnu.java.security.OID;
-import gnu.java.security.Registry;
-import gnu.javax.security.auth.callback.ConsoleCallbackHandler;
 
 /**
  * The GNU Classpath implementation of the <i>jarsigner</i> tool.
@@ -103,32 +89,27 @@ public class Main
   private String jarFileName;
   private String alias;
 
-  private Provider provider;
+  protected Provider provider;
+  private boolean providerInstalled;
   private char[] ksPasswordChars;
   private KeyStore store;
   private char[] passwordChars;
   private PrivateKey signerPrivateKey;
   private Certificate[] signerCertificateChain;
 
-  private Main(String[] args) throws KeyStoreException, InstantiationException,
-      IllegalAccessException, ClassNotFoundException, NoSuchAlgorithmException,
-      CertificateException, IOException, UnrecoverableKeyException,
-      UnsupportedCallbackException
+  private Main()
   {
     super();
-
-    processArgs(args);
   }
 
-  public static final void main(String[] args) throws IOException,
-      CRLException, CertificateException
+  public static final void main(String[] args)
   {
     log.entering("Main", "main", args);
 
-    Main tool;
+    Main tool = new Main();
     try
       {
-        tool = new Main(args);
+        tool.processArgs(args);
         tool.start();
       }
     catch (SecurityException x)
@@ -142,6 +123,8 @@ public class Main
         System.err.println("jarsigner error: " + x);
       }
 
+    tool.teardown();
+
     log.exiting("Main", "main");
     // System.exit(0);
   }
@@ -149,23 +132,19 @@ public class Main
   // helper methods -----------------------------------------------------------
 
   /**
-   * @param args
-   * @throws KeyStoreException 
-   * @throws ClassNotFoundException 
-   * @throws IllegalAccessException 
-   * @throws InstantiationException 
-   * @throws IOException 
-   * @throws CertificateException 
-   * @throws NoSuchAlgorithmException 
-   * @throws UnsupportedCallbackException 
-   * @throws UnrecoverableKeyException 
+   * Read the command line arguments setting the tool's parameters in
+   * preparation for the user desired action.
+   * 
+   * @param args an array of options (strings).
+   * @throws Exception if an exceptio occurs during the process.
    */
-  private void processArgs(String[] args) throws KeyStoreException,
-      InstantiationException, IllegalAccessException, ClassNotFoundException,
-      NoSuchAlgorithmException, CertificateException, IOException,
-      UnrecoverableKeyException, UnsupportedCallbackException
+  private void processArgs(String[] args) throws Exception
   {
     log.entering("Main", "processArgs", args);
+
+    HelpPrinter.checkHelpKey(args, HELP_PATH);
+    if (args == null || args.length == 0)
+      HelpPrinter.printHelpAndExit(HELP_PATH);
 
     int limit = args.length;
     log.finest("args.length=" + limit);
@@ -252,7 +231,15 @@ public class Main
     log.exiting("Main", "processArgs");
   }
 
-  private void start() throws IOException, CRLException, CertificateException
+  /**
+   * Invokes the <code>start()</code> method of the concrete handler.
+   * <p>
+   * Depending on the result of processing the command line arguments, this
+   * handler may be one for signing the jar, or verifying it.
+   * 
+   * @throws Exception if an exception occurs during the process.
+   */
+  private void start() throws Exception
   {
     log.entering("Main", "start");
 
@@ -270,10 +257,63 @@ public class Main
     log.exiting("Main", "start");
   }
 
+  /**
+   * Ensures that the underlying JVM is left in the same state as we found it
+   * when we first launched the tool. Specifically, if we have installed a new
+   * security provider then now is the time to remove it.
+   * <p>
+   * Note (rsn): this may not be necessary if we terminate the JVM; i.e. call
+   * {@link System#exit(int)} at the end of the tool's invocation. Nevertheless
+   * it's good practive to return the JVM to its initial state.
+   */
+  private void teardown()
+  {
+    log.entering("Main", "teardown");
+
+    if (providerInstalled)
+      {
+        final String providerName = provider.getName();
+        log.info("About to remove provider: " + providerName);
+        // remove it. again we need to override security checks
+        AccessController.doPrivileged(new PrivilegedAction()
+        {
+          public Object run()
+          {
+            Security.removeProvider(providerName);
+            return null;
+          }
+        });
+      }
+
+    log.exiting("Main", "teardown");
+  }
+
+  /**
+   * After processing the command line arguments, this method is invoked to
+   * process the common parameters which may have been encountered among the
+   * actual arguments.
+   * <p>
+   * Common parameters are those which are allowed in both signing and
+   * verification modes.
+   * 
+   * @throws InstantiationException if a security provider class name is
+   *           specified but that class name is that of either an interface or
+   *           an abstract class.
+   * @throws IllegalAccessException if a security provider class name is
+   *           specified but no 0-arguments constructor is defined for that
+   *           class.
+   * @throws ClassNotFoundException if a security provider class name is
+   *           specified but no such class was found in the classpath.
+   * @throws IOException if the JAR file name for signing, or verifying, does
+   *           not exist, exists but denotes a directory, or is not readable.
+   */
   private void setupCommonParams() throws InstantiationException,
       IllegalAccessException, ClassNotFoundException, IOException
   {
     log.entering("Main", "setupCommonParams");
+
+    if (jarFileName == null)
+      HelpPrinter.printHelpAndExit(HELP_PATH);
 
     File jar = new File(jarFileName);
     if (! jar.exists())
@@ -286,7 +326,16 @@ public class Main
       throw new IOException("JAR file [" + jarFileName + "] is NOT readable");
 
     if (providerClassName != null && providerClassName.length() > 0)
-      provider = (Provider) Class.forName(providerClassName).newInstance();
+      {
+        provider = (Provider) Class.forName(providerClassName).newInstance();
+        // is it already installed?
+        String providerName = provider.getName();
+        Provider installedProvider = Security.getProvider(providerName);
+        if (installedProvider != null)
+          log.info("Provider " + providerName + " is already installed");
+        else // install it
+          installNewProvider();
+      }
 
     if (! verbose && certs)
       {
@@ -297,6 +346,51 @@ public class Main
     log.exiting("Main", "setupCommonParams");
   }
 
+  /**
+   * Install the user defined security provider in the underlying JVM.
+   * <p>
+   * Also record this fact so we can remove it when we exit the tool.
+   */
+  private void installNewProvider()
+  {
+    log.entering("Main", "installNewProvider");
+
+    String providerName = provider.getName();
+    log.info("About to install new provider: " + providerName);
+    // we need to override security checks
+    Boolean result = (Boolean) AccessController.doPrivileged(new PrivilegedAction()
+    {
+      public Object run()
+      {
+        int actualPosition = Security.insertProviderAt(provider, 1);
+        return new Boolean(actualPosition != - 1);
+      }
+    });
+    log.info("Provider " + providerName + " installed successfully? " + result);
+    providerInstalled = result.booleanValue();
+
+    log.exiting("Main", "installNewProvider");
+  }
+
+  /**
+   * After processing the command line arguments, this method is invoked to
+   * process the parameters which may have been encountered among the actual
+   * arguments, and which are specific to the signing action of the tool.
+   * 
+   * @throws KeyStoreException if no implementation of the designated (or
+   *           default type) of a key store is availabe.
+   * @throws IOException if an I/O related exception occurs during the process.
+   * @throws NoSuchAlgorithmException if an implementation of an algorithm used
+   *           by the key store is not available.
+   * @throws CertificateException if an exception occurs while reading a
+   *           certificate from the key store.
+   * @throws UnsupportedCallbackException if no implementation of a password
+   *           callback is available.
+   * @throws UnrecoverableKeyException if the wrong password was used to unlock
+   *           the key store.
+   * @throws SecurityException if the designated alias is not known to the key
+   *           store or is not an Alias of a Key Entry.
+   */
   private void setupSigningParams() throws KeyStoreException, IOException,
       NoSuchAlgorithmException, CertificateException,
       UnsupportedCallbackException, UnrecoverableKeyException
@@ -324,10 +418,7 @@ public class Main
     else
       ksType = ksType.trim();
 
-    if (provider != null)
-      store = KeyStore.getInstance(ksType, provider);
-    else
-      store = KeyStore.getInstance(ksType);
+    store = KeyStore.getInstance(ksType);
 
     if (ksPassword == null)
       {
@@ -344,6 +435,9 @@ public class Main
     URL url = new URL(ksURL);
     InputStream stream = url.openStream();
     store.load(stream, ksPasswordChars);
+
+    if (alias == null)
+      HelpPrinter.printHelpAndExit(HELP_PATH);
 
     if (! store.containsAlias(alias))
       throw new SecurityException("Designated alias [" + alias

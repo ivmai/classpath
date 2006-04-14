@@ -5,8 +5,8 @@ JAVA_DEPEND = java.dep
 ## this file and restart the make process again
 sinclude $(JAVA_DEPEND)
 
-propertydirs :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java org META-INF -type d ! -name CVS -print)
-propertyfiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java org -name \*\.properties -print)
+propertydirs :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java javax org META-INF -type d ! -name CVS -print)
+propertyfiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) gnu java javax org -name \*\.properties -print)
 metafiles :=  $(shell cd $(top_srcdir)/resource && $(FIND) META-INF -name CVS -prune -o -type f -print)
 iconfiles :=  $(shell cd $(top_srcdir) && $(FIND) gnu/javax/swing/plaf/gtk/icons -name *.png -type f -print)
 
@@ -87,9 +87,18 @@ endif # INSTALL_CLASS_FILES
 
 .PHONY: genclasses
 
+if USE_PREBUILT_GLIBJ_ZIP
+
+glibj.zip:
+	cp $(PATH_TO_GLIBJ_ZIP) .
+
+else
+
 glibj.zip: classes compile-classes resources
 	if test "$(ZIP)" != ""; then $(ZIP) -r -D glibj.zip gnu java javax org META-INF > /dev/null; fi
 	if test "$(FASTJAR)" != ""; then $(FASTJAR) cf glibj.zip gnu java javax org META-INF; fi
+
+endif # USE_PREBUILT_GLIBJ_ZIP
 
 resources: copy-vmresources.sh
 	if ! [ -e gnu ]; then mkdir gnu; fi
@@ -147,6 +156,7 @@ $(JAVA_DEPEND): genclasses
 #	  GCJ='$(GCJ)' \
 #	  compile_classpath='$(top_builddir):$(compile_classpath)' \
 #	  top_srcdir=$(top_srcdir)
+#   	  touch compile-classes
 #else
 compile-classes: classes $(JAVA_SRCS) Makefile
 	$(JAVAC)
@@ -155,7 +165,7 @@ compile-classes: classes $(JAVA_SRCS) Makefile
 
 EXTRA_DIST = standard.omit mkcollections.pl.in Makefile.gcj split-for-gcj.sh
 CLEANFILES = compile-classes resources classes \
-	glibj.zip classes.1 \
+	glibj.zip classes.1 classes.2 \
 	$(top_builddir)/gnu/java/locale/LocaleData.java \
 	$(JAVA_DEPEND)
 

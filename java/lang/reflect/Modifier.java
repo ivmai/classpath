@@ -173,7 +173,7 @@ public class Modifier
   static final int SYNTHETIC = 0x1000;
 
   /**
-   * Flag indicating an enum constant.
+   * Flag indicating an enum constant or an enum class.
    */
   static final int ENUM = 0x4000;
 
@@ -319,42 +319,12 @@ public class Modifier
    */
   static StringBuilder toString(int mod, StringBuilder r)
   {
-    if (isPublic(mod))
-      r.append("public ");
-    if (isProtected(mod))
-      r.append("protected ");
-    if (isPrivate(mod))
-      r.append("private ");
-    if (isAbstract(mod))
-      r.append("abstract ");
-    if (isStatic(mod))
-      r.append("static ");
-    if (isFinal(mod))
-      r.append("final ");
-    if (isTransient(mod))
-      r.append("transient ");
-    if (isVolatile(mod))
-      r.append("volatile ");
-    if (isSynchronized(mod))
-      r.append("synchronized ");
-    if (isNative(mod))
-      r.append("native ");
-    if (isStrict(mod))
-      r.append("strictfp ");
-    if (isInterface(mod))
-      r.append("interface ");
-    
-    // Trim trailing space.
-    if ((mod & ALL_FLAGS) != 0)
-      r.setLength(r.length() - 1);
+    r.append(toString(mod, new StringBuffer()));
     return r;
   }
 
   /**
    * Package helper method that can take a StringBuffer.
-   * This is indeed a duplicate of the method that takes a StringBuilder
-   * since some runtimes override the given Method, Constructor and Field
-   * classes that and use a StringBuffer.
    * @param mod the modifier
    * @param r the StringBuffer to which the String representation is appended
    * @return r, with information appended

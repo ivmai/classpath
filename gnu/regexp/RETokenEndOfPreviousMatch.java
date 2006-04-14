@@ -1,5 +1,5 @@
-/* ObjectReferenceFactoryOperations.java --
-   Copyright (C) 2005 Free Software Foundation, Inc.
+/*  gnu/regexp/RETokenEndOfPreviousMatch.java
+    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,35 +35,38 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package gnu.regexp;
 
-package org.omg.PortableInterceptor;
+class RETokenEndOfPreviousMatch extends RETokenStart {
 
-import org.omg.CORBA.portable.ValueBase;
+    RETokenEndOfPreviousMatch(int subIndex) {
+	super(subIndex, null);
+    }
 
-/**
- * Defines the operations, applicable to the ObjectReferenceFactory.
- *
- * @since 1.5
- *
- * @author Audrius Meskauskas, Lithuania (AudriusA@Bioinformatics.org)
- */
-public interface ObjectReferenceFactoryOperations
-  extends ValueBase
-{
-  /**
-   * Create an object with the given repository and object ids. This interface
-   * does not specify where and how the returned object must be connected and
-   * activated. The derived {@link ObjectReferenceTemplate} interface assumes
-   * the the object must be connected to the POA that is specific to that
-   * template (name can be obtained).
-   * 
-   * If the object with this objectId already exists in the given context, it is
-   * found and returned; the new object is <i>not</i> created.
-   * 
-   * @param repositoryId the repository id of the object being created, defines
-   * the type of the object.
-   * 
-   * @param objectId the byte array, defining the identity of the object.
-   */
-  org.omg.CORBA.Object make_object(String repositoryId, byte[] objectId);
+    int getMaximumLength() {
+        return 0;
+    }
+    
+    REMatch matchThis(CharIndexed input, REMatch mymatch) {
+	REMatch lastMatch = input.getLastMatch();
+	if (lastMatch == null) return super.matchThis(input, mymatch);
+	if (input.getAnchor()+mymatch.index ==
+		lastMatch.anchor+lastMatch.index) {
+	    return mymatch;
+	}
+	else {
+	    return null;
+	}
+    }
+
+    boolean returnsFixedLengthmatches() { return true; }
+
+    int findFixedLengthMatches(CharIndexed input, REMatch mymatch, int max) {
+        if (matchThis(input, mymatch) != null) return max;
+	else return 0;
+    }
+    
+    void dump(StringBuffer os) {
+	os.append("\\G");
+    }
 }

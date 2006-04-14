@@ -39,9 +39,8 @@ exception statement from your version. */
 package java.lang.reflect;
 
 import gnu.java.lang.ClassHelper;
-import gnu.java.lang.reflect.FieldSignatureParser;
 
-import gnu.java.lang.ClassHelper;
+import gnu.java.lang.reflect.FieldSignatureParser;
 
 /**
  * The Field class represents a member variable of a class. It also allows

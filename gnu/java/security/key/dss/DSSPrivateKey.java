@@ -49,12 +49,10 @@ import java.security.interfaces.DSAPrivateKey;
 /**
  * <p>An object that embodies a DSS (Digital Signature Standard) private key.</p>
  *
- * @version $Revision: 1.2.2.2 $
  * @see #getEncoded
  */
 public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey
 {
-
   // Constants and variables
   // -------------------------------------------------------------------------
 

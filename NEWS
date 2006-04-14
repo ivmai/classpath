@@ -1,5 +1,7 @@
 New in release 0.91 (UNRELEASED)
 
+* Experimental activation (java.rmi.activation) support, including RMI
+  activation daemon and persistent naming service tools.
 * Experimental printing support: The API implementation of the javax.print 
   packages has been finished and work on the printing provider implementation
   started. Currently supported features from the Java Print Service API are 
@@ -23,6 +25,12 @@ Runtime interface changes:
   array creation method from java.lang.reflect.Array.  
 * A new class, gnu.classpath.Unsafe, is provided for handling the
   new low-level operations required by java.util.concurrent.
+* The reference implementations of Method, Constructor, and Field
+  now have a new native getModifiersInternal() method.  The public
+  getModifiers() method in each case has been rewritten in terms of
+  this method.
+* The reference implementation of VMThread has been updated to handle
+  the new Thread.UncaughtExceptionHandler support.
 
 New in release 0.90 (March 6, 2006)
 

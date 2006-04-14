@@ -853,12 +853,9 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     /**
      * Returns true if the Iterator has more elements.
      * @return true if there are more elements
-     * @throws ConcurrentModificationException if the HashMap was modified
      */
     public boolean hasNext()
     {
-      if (knownMod != modCount)
-        throw new ConcurrentModificationException();
       return count > 0;
     }
 

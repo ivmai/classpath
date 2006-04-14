@@ -49,12 +49,10 @@ import java.security.interfaces.DSAPublicKey;
 /**
  * <p>An object that embodies a DSS (Digital Signature Standard) public key.</p>
  * 
- * @version $Revision: 1.2.2.2 $
  * @see #getEncoded
  */
 public class DSSPublicKey extends DSSKey implements PublicKey, DSAPublicKey
 {
-
   // Constants and variables
   // -------------------------------------------------------------------------
 

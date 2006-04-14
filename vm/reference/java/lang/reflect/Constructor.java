@@ -39,7 +39,9 @@ exception statement from your version. */
 package java.lang.reflect;
 
 import gnu.java.lang.ClassHelper;
+
 import gnu.java.lang.reflect.MethodSignatureParser;
+
 import java.util.Arrays;
 
 /**

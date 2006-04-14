@@ -25,9 +25,7 @@ dnl  AM_CONDITIONAL(FOUND_KJC, test "x${user_specified_javac}" = xkjc)
 
 dnl  if test "x${GCJ}" = x && test "x${JIKES}" = x && test "x${user_specified_javac}" != xkjc && test "x${user_specified_javac}" != xgcjx; then
   if test "x${ECJ}" = x && test "x${user_specified_javac}" != xecj && test "x${user_specified_javac}" != xgcjx; then
-      # FIXME: use autoconf error function
-      echo "configure: cannot find javac, try -with-ecj or --with-gcjx" 1>&2
-      exit 1    
+      AC_MSG_ERROR([cannot find javac, try --with-ecj or --with-gcjx])
   fi
 ])
 

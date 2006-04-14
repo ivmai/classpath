@@ -265,7 +265,7 @@ public final class Class<T>
     ClassLoader loader = VMClass.getClassLoader(this);
     // Check if we may get the classloader
     SecurityManager sm = SecurityManager.current;
-    if (sm != null)
+    if (loader != null && sm != null)
       {
         // Get the calling classloader
 	ClassLoader cl = VMStackWalker.getCallingClassLoader();
@@ -1139,7 +1139,7 @@ public final class Class<T>
       }
     try
       {
-        return constructor.newInstance();
+        return constructor.newInstance(null);
       }
     catch (InvocationTargetException e)
       {
@@ -1302,7 +1302,9 @@ public final class Class<T>
    */
   public T cast(Object obj)
   {
-    return (T)VMClass.cast(obj, this);
+    if (obj != null && ! isInstance(obj))
+      throw new ClassCastException();
+    return (T) obj;
   }
 
   /**
