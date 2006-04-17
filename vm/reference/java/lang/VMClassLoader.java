@@ -42,9 +42,10 @@ package java.lang;
 import gnu.classpath.SystemProperties;
 import gnu.classpath.Configuration;
 
+import gnu.java.lang.InstrumentationImpl;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.InstrumentationImpl;
 import java.lang.instrument.Instrumentation;
 import java.net.MalformedURLException;
 import java.net.URL;

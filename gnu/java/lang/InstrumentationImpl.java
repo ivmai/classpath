@@ -37,7 +37,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package java.lang;
+package gnu.java.lang;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.ClassFileTransformer;
@@ -59,7 +59,7 @@ import java.util.Iterator;
  * @author Nicolas Geoffray (nicolas.geoffray@menlina.com)
  * @since 1.5
  */
-final class InstrumentationImpl implements Instrumentation
+public final class InstrumentationImpl implements Instrumentation
 {
 
   /* List of transformers */
@@ -210,9 +210,9 @@ final class InstrumentationImpl implements Instrumentation
    * 
    * @return the new class file
    */
-  protected byte[] callTransformers(ClassLoader loader, String className,
-      Class<?> classBeingRedefined, ProtectionDomain protectionDomain, 
-      byte[] classfileBuffer)
+  public byte[] callTransformers(ClassLoader loader, String className,
+				 Class<?> classBeingRedefined, ProtectionDomain protectionDomain, 
+				 byte[] classfileBuffer)
   {
     byte[] newBuffer = null;
     byte[] oldBuffer = classfileBuffer;

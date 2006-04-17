@@ -37,7 +37,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package java.lang;
+package gnu.java.lang;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
