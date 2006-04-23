@@ -1,4 +1,4 @@
-2006-04-21  Jeroen Frijters  <jeroen@frijters.net>
+2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
 
 	* java/lang/ClassLoader.java (definePackage): Added argument to
 	Package constructor.
