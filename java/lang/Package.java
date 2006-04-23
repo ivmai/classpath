@@ -101,6 +101,9 @@ public class Package
   /** If sealed the origin of the package classes, otherwise null */
   private final URL sealed;
 
+  /** The class loader that defined this package */
+  private ClassLoader loader;
+
   /**
    * A package local constructor for the Package class. All parameters except
    * the <code>name</code> of the package may be <code>null</code>.
@@ -118,7 +121,8 @@ public class Package
    */
   Package(String name,
 	  String specTitle, String specVendor, String specVersion,
-	  String implTitle, String implVendor, String implVersion, URL sealed)
+	  String implTitle, String implVendor, String implVersion, URL sealed,
+          ClassLoader loader)
   {
     if (name == null)
       throw new IllegalArgumentException("null Package name");
@@ -131,6 +135,7 @@ public class Package
     this.specVendor = specVendor;
     this.specVersion = specVersion;
     this.sealed = sealed;
+    this.loader = loader;
   }
 
   /**
@@ -368,7 +373,15 @@ public class Package
    */
   public Annotation[] getDeclaredAnnotations()
   {
-    return VMPackage.getDeclaredAnnotations(this);
+    try
+      {
+        Class pkgInfo = Class.forName(name + ".package-info", false, loader);
+        return pkgInfo.getDeclaredAnnotations();
+      }
+    catch (ClassNotFoundException _)
+      {
+        return new Annotation[0];
+      }
   }
 
   /**

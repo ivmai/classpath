@@ -1,5 +1,16 @@
 2006-04-21  Jeroen Frijters  <jeroen@frijters.net>
 
+	* java/lang/ClassLoader.java (definePackage): Added argument to
+	Package constructor.
+	* java/lang/Package.java (Package): Added ClassLoader argument.
+	(loader): New field.
+	(getDeclaredAnnotations): Implemented without help from VMPackage.
+	* vm/reference/java/lang/VMClassLoader.java (static): Added argument
+	to Package constructor.
+	* vm/reference/java/lang/VMPackage.java: Removed.
+
+2006-04-21  Jeroen Frijters  <jeroen@frijters.net>
+
 	* java/lang/reflect/AccessibleObject.java:
 	Implemented AnnotatedElement.
 	(getAnnotation, getAnnotations, getDeclaredAnnotations,
