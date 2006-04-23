@@ -1,5 +1,11 @@
 2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
 
+	* java/lang/Class.java (getEnumConstants): Implemented without
+	delegating to VMClass.
+	* vm/reference/java/lang/VMClass.java (getEnumConstants): Removed.
+
+2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
+
 	* java/lang/ClassLoader.java (definePackage): Added argument to
 	Package constructor.
 	* java/lang/Package.java (Package): Added ClassLoader argument.

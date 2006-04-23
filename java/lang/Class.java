@@ -1374,7 +1374,31 @@ public final class Class<T>
    */
   public T[] getEnumConstants()
   {
-    return (T[])VMClass.getEnumConstants(this);
+    if (isEnum())
+      {
+	try
+	  {
+	    return (T[]) getMethod("values").invoke(null);
+	  }
+	catch (NoSuchMethodException exception)
+	  {
+	    throw new Error("Enum lacks values() method");
+	  }
+	catch (IllegalAccessException exception)
+	  {
+	    throw new Error("Unable to access Enum class");
+	  }
+	catch (InvocationTargetException exception)
+	  {
+	    throw new
+	      RuntimeException("The values method threw an exception",
+			       exception);
+	  }
+      }
+    else
+      {
+	return null;
+      }
   }
 
   /**

@@ -1,5 +1,5 @@
 /* VMClass.java -- VM Specific Class methods
-   Copyright (C) 2003, 2004, 2005 Free Software Foundation
+   Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -41,7 +41,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -330,46 +329,6 @@ final class VMClass
       }
     String fullName = getName(klass);
     return fullName.substring(fullName.lastIndexOf(".") + 1);
-  }
-
-  /**
-   * Returns the enumeration constants of this class, or
-   * null if this class is not an <code>Enum</code>.
-   *
-   * @param klass the class whose enumeration constants should be returned.
-   * @return an array of <code>Enum</code> constants
-   *         associated with this class, or null if this
-   *         class is not an <code>enum</code>.
-   * @since 1.5
-   */
-  static <T> T[] getEnumConstants(Class<T> klass)
-  {
-    if (isEnum(klass))
-      {
-	try
-	  {
-	    return (T[])
-	      klass.getMethod("values").invoke(null);
-	  }
-	catch (NoSuchMethodException exception)
-	  {
-	    throw new Error("Enum lacks values() method");
-	  }
-	catch (IllegalAccessException exception)
-	  {
-	    throw new Error("Unable to access Enum class");
-	  }
-	catch (InvocationTargetException exception)
-	  {
-	    throw new
-	      RuntimeException("The values method threw an exception",
-			       exception);
-	  }
-      }
-    else
-      {
-	return null;
-      }
   }
 
   /**
