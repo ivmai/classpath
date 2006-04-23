@@ -1,5 +1,10 @@
 2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
 
+	* java/lang/Package.java: Added compatibility constructor to ease
+	VM interface migration.
+
+2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
+
 	* java/lang/Class.java (getEnumConstants): Implemented without
 	delegating to VMClass.
 	* vm/reference/java/lang/VMClass.java (getEnumConstants): Removed.
