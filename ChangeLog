@@ -1,3 +1,11 @@
+2006-04-25  Tom Tromey  <tromey@redhat.com>
+
+	* javax/swing/JComboBox.java (AccessibleJComboBox): Now public.
+	* javax/swing/tree/VariableHeightLayoutCache.java
+	(getVisiblePathsFrom): Genericized.
+	* javax/swing/tree/FixedHeightLayoutCache.java (getVisiblePathsFrom):
+	Genericized.
+
 2006-04-23  Jeroen Frijters  <jeroen@frijters.net>
 
 	* java/lang/Package.java: Added compatibility constructor to ease

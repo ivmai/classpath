@@ -1219,7 +1219,7 @@ public class JComboBox extends JComponent implements ItemSelectable,
   {
     private static final long serialVersionUID = 8217828307256675666L;
 
-    protected AccessibleJComboBox()
+    public AccessibleJComboBox()
     {
       // Nothing to do here.
     }
