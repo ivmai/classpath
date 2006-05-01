@@ -48,6 +48,7 @@ import java.text.BreakIterator;
  * inside this package.
  *
  * @author Roman Kennke (roman@ontographics.com)
+ * @author Robert Schuster (robertschuster@fsfe.org)
  */
 public class Utilities
 {
@@ -238,34 +239,39 @@ public class Utilities
     // At the end of the for loop, this holds the requested model location
     int pos;
     int currentX = x0;
+    int width = 0;
     
     for (pos = 0; pos < s.count; pos++)
       {
         char nextChar = s.array[s.offset+pos];
         
         if (nextChar == 0)
-          {
-            if (! round && pos > 0)
-              pos--;
             break;
-          }
+        
         if (nextChar != '\t')
-          currentX += fm.charWidth(nextChar);
+          width = fm.charWidth(nextChar);
         else
           {
             if (te == null)
-              currentX += fm.charWidth(' ');
+              width = fm.charWidth(' ');
             else
-              currentX = (int) te.nextTabStop(currentX, pos);
+              width = ((int) te.nextTabStop(currentX, pos)) - currentX;
           }
         
-        if (currentX >= x)
+        if (round)
           {
-            if (! round && pos > 0)
-              pos--;
-            break;
+            if (currentX + (width>>1) > x)
+              break;
           }
+        else
+          {
+            if (currentX + width > x)
+              break;
+          }
+        
+        currentX += width;
       }
+
     return pos + p0;
   }
 
@@ -316,21 +322,31 @@ public class Utilities
     String text = c.getText();
     BreakIterator wb = BreakIterator.getWordInstance();
     wb.setText(text);
+        
     int last = wb.following(offs);
     int current = wb.next();
+    int cp;
+
     while (current != BreakIterator.DONE)
       {
         for (int i = last; i < current; i++)
           {
-            // FIXME: Should use isLetter(int) and text.codePointAt(int)
-            // instead, but isLetter(int) isn't implemented yet
-            if (Character.isLetter(text.charAt(i)))
+            cp = text.codePointAt(i);
+            
+            // Return the last found bound if there is a letter at the current
+            // location or is not whitespace (meaning it is a number or
+            // punctuation). The first case means that 'last' denotes the
+            // beginning of a word while the second case means it is the start
+            // of some else.
+            if (Character.isLetter(cp)
+                || !Character.isWhitespace(cp))
               return last;
           }
         last = current;
         current = wb.next();
       }
-    return BreakIterator.DONE;
+    
+    throw new BadLocationException("no more word", offs);
   }
 
   /**
@@ -359,9 +375,7 @@ public class Utilities
       {
         for (int i = last; i < offs; i++)
           {
-            // FIXME: Should use isLetter(int) and text.codePointAt(int)
-            // instead, but isLetter(int) isn't implemented yet
-            if (Character.isLetter(text.charAt(i)))
+            if (Character.isLetter(text.codePointAt(i)))
               return last;
           }
         last = current;
@@ -511,24 +525,28 @@ public class Utilities
                                            int x0, int x, TabExpander e,
                                            int startOffset)
   {
-    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset);
+    int mark = Utilities.getTabbedTextOffset(s, metrics, x0, x, e, startOffset, false);
     BreakIterator breaker = BreakIterator.getWordInstance();
     breaker.setText(s);
 
-    // If mark is equal to the end of the string, just use that position
-    if (mark >= s.count)
+    // If startOffset and s.offset differ then we need to use
+    // that difference two convert the offset between the two metrics. 
+    int shift = startOffset - s.offset;
+    
+    // If mark is equal to the end of the string, just use that position.
+    if (mark >= shift + s.count)
       return mark;
     
     // Try to find a word boundary previous to the mark at which we 
-    // can break the text
-    int preceding = breaker.preceding(mark + 1);
+    // can break the text.
+    int preceding = breaker.preceding(mark + 1 - shift);
     
     if (preceding != 0)
-      return preceding;
-    else
-      // If preceding is 0 we couldn't find a suitable word-boundary so
-      // just break it on the character boundary
-      return mark;
+      return preceding + shift;
+    
+    // If preceding is 0 we couldn't find a suitable word-boundary so
+    // just break it on the character boundary
+    return mark;
   }
 
   /**

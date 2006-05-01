@@ -1,5 +1,5 @@
 /* Class.java -- Representation of a Java class.
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation
 
 This file is part of GNU Classpath.
@@ -103,6 +103,23 @@ public final class Class<T>
    * Compatible with JDK 1.0+.
    */
   private static final long serialVersionUID = 3206093459760846163L;
+
+  /**
+   * Flag indicating a synthetic member.
+   * Note that this duplicates a constant in Modifier.
+   */
+  private static final int SYNTHETIC = 0x1000;
+
+  /**
+   * Flag indiciating an annotation class.
+   */
+  private static final int ANNOTATION = 0x2000;
+
+  /**
+   * Flag indicating an enum constant or an enum class.
+   * Note that this duplicates a constant in Modifier.
+   */
+  private static final int ENUM = 0x4000;
 
   /** The class signers. */
   private Object[] signers = null;
@@ -1409,7 +1426,8 @@ public final class Class<T>
    */
   public boolean isEnum()
   {
-    return VMClass.isEnum(this);
+    int mod = VMClass.getModifiers (this, true);
+    return (mod & ENUM) != 0;
   }
 
   /**
@@ -1421,7 +1439,8 @@ public final class Class<T>
    */
   public boolean isSynthetic()
   {
-    return VMClass.isSynthetic(this);
+    int mod = VMClass.getModifiers (this, true);
+    return (mod & SYNTHETIC) != 0;
   }
 
   /**
@@ -1432,7 +1451,8 @@ public final class Class<T>
    */
   public boolean isAnnotation()
   {
-    return VMClass.isAnnotation(this);
+    int mod = VMClass.getModifiers (this, true);
+    return (mod & ANNOTATION) != 0;
   }
 
   /**

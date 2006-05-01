@@ -469,7 +469,7 @@ public abstract class ClassLoader
       domain = StaticData.defaultProtectionDomain;
     
     return VMClassLoader.defineClassWithTransformers(this, name, data, offset,
-        len, domain);
+						     len, domain);
   }
 
   /**

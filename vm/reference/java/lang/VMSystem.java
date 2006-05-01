@@ -1,5 +1,5 @@
 /* VMSystem.java -- helper for java.lang.system
-   Copyright (C) 1998, 2002, 2004, 2005 Free Software Foundation
+   Copyright (C) 1998, 2002, 2004 Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -137,6 +137,31 @@ final class VMSystem
    */
    public static native long currentTimeMillis();
 
+  /**
+   * <p>
+   * Returns the current value of a nanosecond-precise system timer.
+   * The value of the timer is an offset relative to some arbitrary fixed
+   * time, which may be in the future (making the value negative).  This
+   * method is useful for timing events where nanosecond precision is
+   * required.  This is achieved by calling this method before and after the
+   * event, and taking the difference betweent the two times:
+   * </p>
+   * <p>
+   * <code>long startTime = System.nanoTime();</code><br />
+   * <code>... <emph>event code</emph> ...</code><br />
+   * <code>long endTime = System.nanoTime();</code><br />
+   * <code>long duration = endTime - startTime;</code><br />
+   * </p>
+   * <p>
+   * Note that the value is only nanosecond-precise, and not accurate; there
+   * is no guarantee that the difference between two values is really a
+   * nanosecond.  Also, the value is prone to overflow if the offset
+   * exceeds 2^63.
+   * </p>
+   *
+   * @return the time of a system timer in nanoseconds.
+   * @since 1.5 
+   */
    public static long nanoTime()
    {
      return currentTimeMillis() * 1000;
@@ -149,17 +174,6 @@ final class VMSystem
    * @return a list of 'name=value' pairs.
    */
   static native List environ();
-
-  /**
-   * Gets the value of an environment variable from the current
-   * environment.
-   * Always returning null is a valid (but not very useful) implementation.
-   *
-   * @param name The name of the environment variable (will not be null).
-   * @return The string value of the variable or null when the
-   *         environment variable is not defined.
-   */
-  static native String getenv(String k);
 
   /**
    * Helper method which creates the standard input stream.
@@ -182,7 +196,7 @@ final class VMSystem
   {
     return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)), true);
   }
-  
+
   /**
    * Helper method which creates the standard error stream.
    * VM implementors may choose to construct these streams differently.
@@ -193,5 +207,14 @@ final class VMSystem
   {
     return new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.err)), true);
   }
- 
+  
+  /**
+   * Gets the value of an environment variable.
+   * Always returning null is a valid (but not very useful) implementation.
+   *
+   * @param name The name of the environment variable (will not be null).
+   * @return The string value of the variable or null when the
+   *         environment variable is not defined.
+   */
+  static native String getenv(String name);
 }

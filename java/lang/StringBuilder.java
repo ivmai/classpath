@@ -1062,7 +1062,7 @@ public final class StringBuilder
     if (count < value.length)
       {
         char[] newValue = new char[count];
-        System.arraycopy(value, 0, newValue, 0, count);
+        VMSystem.arraycopy(value, 0, newValue, 0, count);
         value = newValue;
       }
   }

@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -306,15 +307,19 @@ final class VMProcess extends Process
     return new VMProcess(cmd, env, dir, false);
   }
 
-  static Process exec(List<String> cmd, Map<String, String> env,
+  static Process exec(List cmd, Map env,
 		      File dir, boolean redirect) throws IOException
   {
-    String[] acmd = cmd.toArray(new String[cmd.size()]);
+    String[] acmd = (String[]) cmd.toArray(new String[cmd.size()]);
     String[] aenv = new String[env.size()];
 
     int i = 0;
-    for (Map.Entry<String, String> entry : env.entrySet())
-      aenv[i++] = entry.getKey() + "=" + entry.getValue();
+    Iterator iter = env.entrySet().iterator();
+    while (iter.hasNext())
+      {
+	Map.Entry entry = (Map.Entry) iter.next();
+	aenv[i++] = entry.getKey() + "=" + entry.getValue();
+      }
 
     return new VMProcess(acmd, aenv, dir, redirect);
   }

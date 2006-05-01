@@ -263,7 +263,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
 	    }
 	  close (fds[1][1]);
 	}
-      if (pipe_count == 3)
+      if (pipe_count == 2)
 	{
 	  /* Duplicate stdout to stderr.  */
 	  if (dup2 (1, 2) == -1)
@@ -315,6 +315,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
     goto done;
   for (i = 0; i < pipe_count; i++)
     {
+      /* Mode is WRITE (2) for in and READ (1) for out and err. */
       const int fd = fds[i][i == 0];
       const int mode = ((i == 0)
 			? gnu_java_nio_channels_FileChannelImpl_WRITE
