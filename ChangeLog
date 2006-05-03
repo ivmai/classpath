@@ -1,3 +1,314 @@
+2006-05-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* include/Makefile.am:
+	Added rules for gnu.java.net.local.LocalSocketImpl.h
+	* include/java_lang_VMSystem.h:
+	Regenerated correctly.
+	
+2006-05-03  Sven de Marothy <sven@physto.se>
+       
+	PR 24023, 24701
+	* java/awt/Image.java:
+	(getScaledInstance): Default to AreaAveraging for "smooth", 
+	don't thrown an error on illegal flag values.
+	* java/awt/image/AreaAveragingScaleFilter.java: Implement.
+
+2006-05-03  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/FieldView.java:
+	(adjustAllocation): Added if-block to return null when shape argument
+	is null.
+	* javax/swing/text/PlainView.java:
+	(updateDamage): Added if-block to return early if a is null.
+
+2006-05-03  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/basic/BasicTextUI.java:
+	(changeUpdate): Added note.
+	(removeUpdate): Dito.
+	(insertUpdate): Dito.
+	(damageRange): Added if-block to return early.
+	(modelToView): Added check of getVisibleEditorRect's return value.
+	(getVisibleEditorRect): Return null instead of empty rectangle.
+	* javax/swing/text/DefaultCaret.java:
+	(clearHighlight): Removed if-clause to create a highlight entry if it
+	did not exist before.
+	* javax/swing/text/WrappedPlainView.java:
+	(WrappedLine.modelToView): Throw exception if allocation area is empty,
+	removed 2nd part of if-expression.
+	(WrappedLine.updateDamage): Added more documentation, added check
+	whether allocation area rectangle is null.
+
+2006-05-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/JSplitPane.java (setDividerLocation(int)):
+	Reset to preferred sizes if the argument is negative.
+
+2006-05-03  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JList.java: Added/updated API docs.
+
+2006-05-03  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/JComponent.java
+	(getRoot): New private function. Gets the root appropriate
+	for painting. If an applet exists as a parent, then it is returned.
+	(paintDoubleBuffered): Changed to use new function.
+	* javax/swing/RepaintManager.java
+	(getRoot): New private function. Gets the root appropriate
+	for painting. If an applet exists as a parent, then it is returned.
+	(getOffscreenBuffer): Changed to use new function.
+	* javax/swing/SwingUtilties.java
+	(getRoot): Reverted last patch to return Window, even if 
+	an Applet exists.
+
+2006-05-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/jce/keyring/GnuKeyring.java: Re-implemented using
+	a pair of one public keyring and one private keyring.
+	* gnu/javax/crypto/keyring/GnuPublicKeyring.java (log): New field.
+	(containsCertificate): Added logging.
+	(getCertificate): Likewise.
+	(putCertificate): Likewsie.
+	(load): Likewise.
+	(store): Likewise.
+	* gnu/javax/crypto/keyring/GnuPrivateKeyring.java (log): New field.
+	(containsPrivateKey): Added logging.
+	(getPrivateKey): Likewise.
+	(putPrivateKey): Likewise.
+	(containsPublicKey): Likewise.
+	(getPublicKey): Likewise.
+	(putPublicKey): Likewise.
+	(containsCertPath): Likewise.
+	(getCertPath): Likewise.
+	(putCertPath): Likewise.
+	(load): Likewise.
+	(store): Likewise.
+
+2006-05-03  Roman Kennke <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/AlphaCompositeContext.java: New class.
+	* java/awt/AlphaComposite.java
+	(createContext): Implemented.
+
+2006-05-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/java/awt/peer/gtk/GdkGraphics2D.java (drawRaster):
+	Set the current color again after drawing the raster.
+
+2006-05-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/WrappedPlainView.java (WrappedLine.modelToView):
+	Do not check pos < currLineEnd if currLineStart == currLineEnd.
+
+2006-05-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/gnu/classpath/tools/keytool/Command.java (getCallbackHandler):
+	Assign returned value to field handler.
+	* tools/gnu/classpath/tools/jarsigner/Main.java (getCallbackHandler):
+	Likewise.
+
+2006-05-02  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/ScrollPaneLayout.java (layoutContainer):
+	Return without action if there is no view in the viewport.
+	* javax/swing/text/WrappedPlainView.java 
+	(WrappedLine.getPreferredSpan): If metrics == null, update
+	metrics.
+	* javax/swing/tree/DefaultTreeModel.java (constructors):
+	Do not call setRoot, assign the root node directly.
+
+2006-05-02  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/SwingUtilities.java
+	(getRoot): Should return the Applet if it exists.
+	Only return the Window if an Applet has not been
+	encountered.
+
+2006-05-02  Lillian Angel  <langel@redhat.com>
+
+	* gnu/javax/swing/text/html/parser/support/Parser.java
+	(readAttributes): Reverted Audrius' last patch. There is 
+	a slight difference in code between the NUMTOKEN and SLASH case. 
+
+2006-05-02  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/JTextComponent.java:
+	(setText): Throw InternalError from catch-block.
+	* javax/swing/text/GapContent.java:
+	(removed): Removed if-expression, changed '>' to '>='.
+
+2006-05-02  Roman Kennke <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/AbstractGraphics2D.java
+	(AA_SAMPLING): New constant.
+	(alpha): New field. Used in the antialiasing renderer.
+	(edgeTable): New field. Used in the antialiasing renderer.
+	(AbstractGraphics2D): Initialize rendering hints wrt
+	anti-aliasing.
+	(draw): Clip after stroking. Commented out clipping for now,
+	it seems to be buggy.
+	(fill): Commented out clipping for now, it seems to be buggy.
+	(setComposite): Don't create composite context.
+	(setPaint): Only change paint when parameter is not null.
+	(translate): Call setClip() so subclasses can update their clip
+	too.
+	(clip): Call setClip() so subclasses can update their clip
+	too.
+	(drawGlyphVector): Added clipping, but left it commented out
+	because it's buggy.
+	(getClipBounds): Returns null when clip is null.
+	(drawLine): Call rawDrawLine with translation applied.
+	(filLRect): Call rawFillRect with translation applied.
+	(fillShape): Added support for anti-aliasing.
+	(rawSetForeground(int,int,int)): New method.
+	(rawFillShape): A couple of painting fixes.
+	(fillScanline): Implemented to call rawDrawLine.
+	(fillShapeAntialias): New method. Implements an anti-aliasing
+	shape filler.
+	(fillScanlineAA): New method. Used for the anti-aliasing
+	shape filler.
+	(fillScanlineAlpha): New method. Used for the anti-aliasing
+	shape filler.
+	(init): Initialize clip with the device bounds.
+	(updateOptimization): Fixed the optimization condition.
+
+2006-05-02  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/text/GapContent.java:
+	(GapContent): Restrict size argument by 2.
+	(insertString): Changed expression from >= to >.
+	(remove): Changed right side of expression to 'length - 1', changed
+	exception message.
+	(getChars): Throw exception if where below 0.
+	(replace): Replaced call to setPositionsInRange() with
+	resetMarksAtZero(), removed note.
+
+2006-05-02  Roman Kennke <kennke@aicas.com>
+
+	PR 27326
+	* javax/swing/MenuSelectionManager.java
+	(setSelectedPath): Rewritten.
+
+2006-05-02  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/javax/swing/text/html/parser/support/Parser.java
+	(readAttributes): Merge case NUMTOKEN: and case SLASH:
+	sections.
+
+2006-05-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/.cvsignore: Added keytool.sh.
+	* configure.ac: Added tools/keytool.sh to AC_CONFIG_FILES.
+
+2006-05-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* doc/tools.texinfo: New file.
+	* doc/Makefile.am: Generate tools documentation.
+
+2006-05-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/keytool.sh.in: New file.
+	* tools/gnu/classpath/tools/keytool/CertReqCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/Command.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/DeleteCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/ExportCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/GenKeyCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/IdentityDBCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/ImportCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/KeyCloneCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/KeyPasswdCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/ListCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/Main.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/Messages.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/PrintCertCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/SelfCertCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/StorePasswdCmd.java: Likewise.
+	* tools/gnu/classpath/tools/keytool/keytool.txt: Likewise.
+	* tools/gnu/classpath/tools/keytool/package.html: Likewise.
+	* resource/gnu/classpath/tools/keytool/MessageBundle.properties: Likewise.
+
+2006-05-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/gnu/classpath/tools/jarsigner/jarsigner.txt: Re-arranged to
+	resemble more closely man-page style text.
+	* tools/gnu/classpath/tools/jarsigner/SFHelper.java:
+	Mark (Eclipse) strings that need not be externalised.
+	(writeSF): Likewise.
+	(writeDSA): Likewise.
+	Use package-private Messages class to provide i18n-ready strings.
+	(startSigning):
+	Use package-private Messages class to provide i18n-ready strings.
+	(updateEntry): Likewise.
+	Mark (Eclipse) strings that need not be externalised.
+	(finishSigning): Likewise.
+	* tools/gnu/classpath/tools/jarsigner/Main.java:
+	Mark (Eclipse) strings that need not be externalised.
+	(main): Do not use constant strings as class name.
+	Use package-private Messages class to provide i18n-ready strings.
+	Reduced logging level so INFO becomes FINER, and WARNING becomes FINE.
+	(processArgs): Do not use constant strings as class name.
+	Mark (Eclipse) strings that need not be externalised.
+	Reduced logging level so INFO becomes FINER, and WARNING becomes FINE.
+	(start): Do not use constant strings as class name.
+	(teardown): Likewise.
+	Use ProviderUtil.
+	(setupCommonParams): Do not use constant strings as class name.
+	Use package-private Messages class to provide i18n-ready strings.
+	Reduced logging level so INFO becomes FINER, and WARNING becomes FINE.
+	(installNewProvider): Do not use constant strings as class name.
+	Use ProviderUtil.
+	(setupSigningParams): Do not use constant strings as class name.
+	Use package-private Messages class to provide i18n-ready strings.
+	Mark (Eclipse) strings that need not be externalised.
+	(getCallbackHandler): Use CallbackUtil.
+	* tools/gnu/classpath/tools/jarsigner/JarSigner.java (start):
+	Use package-private Messages class to provide i18n-ready strings.
+	Reduced logging level so INFO becomes FINER, and WARNING becomes FINE.
+	* tools/gnu/classpath/tools/jarsigner/JarVerifier.java (start): Likewise.
+	(verifySF): Likewise.
+	(verifySFEntries): Do not use constant strings as class name.
+	Use Boolean.valueOf instead of new Boolean().
+	(verifySFEntry): Mark (Eclipse) strings that need not be externalised.
+	* resource/gnu/classpath/tools/jarsigner/MessageBundle.properties:
+	New file.
+	* tools/gnu/classpath/tools/jarsigner/package.html: Likewise.
+	* tools/gnu/classpath/tools/jarsigner/Messages.java: Likewise.
+
+2006-05-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/gnu/classpath/tools/common/CallbackUtil.java: New file.
+	* tools/gnu/classpath/tools/common/ProviderUtil.java: Likewise.
+	* tools/gnu/classpath/tools/common/SecurityProviderInfo.java: Likewise.
+
+2006-05-01  Tom Tromey  <tromey@redhat.com>
+
+	* java/nio/ByteBufferImpl.java (compact): Don't reset position
+	in empty case.
+	* gnu/java/nio/ChannelReader.java (read): Synchronize.
+	(close): Synchronize.
+	* java/nio/ShortBufferImpl.java (compact): Rewrote.
+	* java/nio/LongBufferImpl.java (compact): Rewrote.
+	* java/nio/IntBufferImpl.java (compact): Rewrote.
+	* java/nio/FloatBufferImpl.java (compact): Rewrote.
+	* java/nio/DoubleBufferImpl.java (compact): Rewrote.
+	* java/nio/CharBufferImpl.java (compact): Rewrote.
+	* gnu/java/nio/ChannelWriter.java: New file.
+	* java/nio/channels/Channels.java (newWriter): Implemented.
+
+2006-05-01  Lillian Angel  <langel@redhat.com>
+
+	* java/util/SimpleTimeZone.java
+	(SimpleTimeZone): Do not throw exception if startMonth == endMonth.
+	(SimpleTimeZone): Likewise.
+	(checkRule): Rewritten to properly check all values (more efficently). 
+	This code is now more stable, at least less buggy than before. Fixed
+	API documentation.
+	(setStartRule): Moved checkRule call to end.
+	(setStartRule): Likewise.
+	(setEndRule): Likewise.
+	(setEndRule): Likewise.
+
 2006-05-01  Tom Tromey  <tromey@redhat.com>
 
 	* lib/.cvsignore: Added classes.2.
