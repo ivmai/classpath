@@ -1,3 +1,9 @@
+2006-05-07  Sven de Marothy <sven@physto.se>
+
+	Fixed PR27463
+	* javax/swing/plaf/metal/MetalInternalFrameTitlePane.java
+	(propertyChange): Handle FRAME_ICON_PROPERTY property.
+
 2006-05-06  Sven de Marothy <sven@physto.se>
 
 	Fixed PR27454
