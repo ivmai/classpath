@@ -1,3 +1,112 @@
+2006-05-07  Roman Kennke <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/RasterGraphics.java: New file.
+
+2006-05-07  Roman Kennke <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/AbstractGraphics2D.java
+	(fillShape): Determine user space bounds of shape and feed them
+	into the actual rendering pipeline.
+	(rawSetPixel): Made non-abstract for now. Maybe remove later.
+	(rawSetForeground): Likewise.
+	(getDestinationColorModel): Removed.
+	(getDeviceBounds): Made non-abstract. Provide useful default impl.
+	(rawFillShape): Handle paint context.
+	(fillScanline): Implement painting and compositing.
+	(fillShapeAntialias): Handle paint context.
+	(fillScanlineAA): Implemented preliminary antialiasing based on
+	composite context. Not working yet.
+	(fillScanlineAlpha): Removed.
+	(init): Fetch destination raster.
+	(getDestinationRaster): New abstract method.
+	(updateRaster): New backend method.
+
+2006-05-07  Roman Kennke <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/AlphaCompositeContext.java
+	(compose): Fixed loops, conditions and logic to make compositing
+	work correctly.
+
+2006-05-05  Roman Kennke <kennke@aicas.com>
+
+	* java/awt/image/ColorModel.java
+	(getNormalizedComponents): Implemented.
+
+2006-05-05  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicRadioButtonUI.java
+	(paint): Query the button model for it's state, not the
+	button itself.
+
+2006-05-05  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/JTable.java
+	(tableChanged): Sync selection model with table model changes.
+
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicButtonListener.java
+	(mouseEntered): Fixed conditions for changing states.
+
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/JOptionPane.java
+	(AccessibleJOptionPane.getAccessibleRole): Implemented method.
+
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/JLabel.java
+	(AccessibleJLabel.getSelectedText): Return null instead of "".
+	(AccessibleJLabel.getSelectionStart): Added comment why
+	return -1 is correct here.     	
+	(AccessibleJLabel.getSelectionEnd): Added comment why
+        return -1 is correct here.
+	(AccessibleJLabel.getCharacterAttribute): Added comment about
+	what to do here.
+	(AccessibleJLabel.getCharCount): Added comment about what
+        to do here.
+	(AccessibleJLabel.getCharacterBounds): Tagged as not
+	implemented.
+	(AccessibleJLabel.getIndexAtPoint): Tagged as not implemented.
+	(paramString): Return super.paramString() here, this provides
+        a more meaningful output.
+
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(paint): Added null check to avoid NPE when clip == null.
+
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/AbstractButton.java
+	(addImpl): New method. Installs an OverlayLayout if no
+	other layout has been installed before.
+	(setLayout): New method. Detect if a client app installs a
+	custom layout.
+	
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/table/DefaultTableCellModel.java
+	(noFocusBorder): Fixed width of empty border to 1.
+	(getTableCellRendererComponent): Don't change the colors for
+	focuses cells. Fixed border for focused cells.
+	
+2006-05-04  Roman Kennke <kennke@aicas.com>
+
+	* javax/swing/JTable.java
+	(moveToCellBeingEdited): Adjust bounding box
+	of editing component to exactly cover the grid.
+	* javax/swing/plaf/basic/BasicTableUI.java
+	(paint): Paint grid to the bottom and right of
+	the cells instead of left and top. Adjust bounding
+	box of cells accordingly.
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(initComponentDefaults): Fixed color of JTable
+	selection border.
+	* javax/swing/plaf/metal/OceanTheme.java
+	(addCustomEntriesToTable): Fixed color of JTable
+	selection border.
+
 2006-05-04  Raif S. Naffah  <raif@swiftdsl.com.au>
 
 	* tools/gnu/classpath/tools/keytool/ExportCmd.java (setup):
