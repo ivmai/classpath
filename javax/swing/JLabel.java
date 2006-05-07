@@ -38,8 +38,6 @@ exception statement from your version. */
 
 package javax.swing;
 
-import gnu.classpath.NotImplementedException;
-
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
@@ -69,15 +67,15 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
     implements AccessibleText, AccessibleExtendedComponent
   {
     /**
-     * Returns the selected text. This is null since JLabels
+     * Returns the selected text. This is an empty string since JLabels
      * are not selectable.
      *
-     * @return <code>null</code> because JLabels cannot have selected text
+     * @return the selected text
      */
     public String getSelectedText()
     {
-      // We return null here since JLabel's text is not selectable.
-      return null;
+      // We return "" here since JLabel's text is not selectable.
+      return "";
     }
 
     /**
@@ -87,7 +85,8 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      */
     public int getSelectionStart()
     {
-      // JLabel don't have selected text, so we return -1 here.
+      // TODO: Figure out what should be returned here, because JLabels don't
+      // allow selection. I guess -1 for now.
       return -1;
     }
 
@@ -98,7 +97,8 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      */
     public int getSelectionEnd()
     {
-      // JLabel don't have selected text, so we return -1 here.
+      // TODO: Figure out what should be returned here, because JLabels don't
+      // allow selection. I guess -1 for now.
       return -1;
     }
 
@@ -115,8 +115,6 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      */
     public AttributeSet getCharacterAttribute(int index)
     {
-      // FIXME: Return null here for simple labels, and query the HTML
-      // view for HTML labels.
       return new SimpleAttributeSet();
     }
 
@@ -261,7 +259,6 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      */
     public int getCharCount()
     {
-      // FIXME: Query HTML view for HTML labels.
       return text.length();
     }
 
@@ -274,7 +271,6 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      * @return the bounding box of the character at the specified index
      */
     public Rectangle getCharacterBounds(int index)
-      throws NotImplementedException
     {
       // FIXME: Implement this correctly.
       return new Rectangle();
@@ -290,7 +286,6 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
      *         point
      */
     public int getIndexAtPoint(Point point)
-      throws NotImplementedException
     {
       // FIXME: Implement this correctly.
       return 0;
@@ -459,7 +454,7 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
    */
   protected String paramString()
   {
-    return super.paramString();
+    return "JLabel";
   }
 
   /**
