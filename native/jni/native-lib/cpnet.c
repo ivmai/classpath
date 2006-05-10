@@ -37,6 +37,7 @@ exception statement from your version. */
 
 #include "config.h"
 #include <jni.h>
+#include <assert.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -46,8 +47,56 @@ exception statement from your version. */
 #include <netinet/tcp.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "cpnet.h"
+
+#define SOCKET_DEFAULT_TIMEOUT -1 /* milliseconds */
+
+static int socketTimeouts[FD_SETSIZE];
+
+static jint waitForWritable(jint fd)
+{
+  struct timeval tv;
+  fd_set writeset;
+  int ret;
+  
+ 
+  FD_ZERO(&writeset);
+  FD_SET(fd, &writeset);
+  if (socketTimeouts[fd] > 0)
+    {
+      tv.tv_sec = socketTimeouts[fd] / 1000;
+      tv.tv_usec = (socketTimeouts[fd] % 1000) * 1000;
+      ret = select(fd+1, NULL, &writeset, NULL, &tv);
+    }
+  else
+    ret = select(fd+1, NULL, &writeset, NULL, NULL);
+
+  return (ret <= 0) ? -1 : 0;
+}
+
+static jint waitForReadable(jint fd)
+{
+  struct timeval tv;
+  fd_set readset;
+  int ret;
+
+
+  FD_ZERO(&readset);
+  FD_SET(fd, &readset);
+  if (socketTimeouts[fd] > 0)
+    {
+      tv.tv_sec = socketTimeouts[fd] / 1000;
+      tv.tv_usec = (socketTimeouts[fd] % 1000) * 1000;
+      ret = select(fd+1, &readset, NULL, NULL, &tv);
+    }
+  else
+    ret = select(fd+1, &readset, NULL, NULL, NULL);
+
+  return (ret <= 0) ? -1 : 0;
+}
 
 jint cpnet_openSocketStream(JNIEnv *env UNUSED, jint *fd, jint family)
 {
@@ -56,6 +105,8 @@ jint cpnet_openSocketStream(JNIEnv *env UNUSED, jint *fd, jint family)
     return errno;
 
   fcntl(*fd, F_SETFD, FD_CLOEXEC);
+  assert(*fd < FD_SETSIZE);
+  socketTimeouts[*fd] = SOCKET_DEFAULT_TIMEOUT;
   return 0;
 }
 
@@ -66,6 +117,8 @@ jint cpnet_openSocketDatagram(JNIEnv *env UNUSED, jint *fd, jint family)
     return errno;
 
   fcntl(*fd, F_SETFD, FD_CLOEXEC);
+  assert(*fd < FD_SETSIZE);
+  socketTimeouts[*fd] = SOCKET_DEFAULT_TIMEOUT;
   return 0;
 }
 
@@ -101,6 +154,9 @@ jint cpnet_listen(JNIEnv *env UNUSED, jint fd, jint queuelen)
 
 jint cpnet_accept(JNIEnv *env UNUSED, jint fd, jint *newfd)
 {
+  if (waitForReadable (fd) < 0)
+    return ETIMEDOUT;
+
   *newfd = accept(fd, NULL, 0);
   if (*newfd != 0)
     return errno;
@@ -123,6 +179,7 @@ jint cpnet_connect(JNIEnv *env UNUSED, jint fd, cpnet_address *addr)
 {
   int ret;
 
+  /* TODO: implement socket time out */
   ret = connect(fd, (struct sockaddr *)addr->data, addr->len);
   if (ret != 0)
     return errno;
@@ -187,6 +244,9 @@ jint cpnet_send (JNIEnv *env UNUSED, jint fd, jbyte *data, jint len, jint *bytes
 {
   ssize_t ret;
 
+  if (waitForWritable(fd) < 0)
+    return ETIMEDOUT;
+
   ret = send(fd, data, len, MSG_NOSIGNAL);
   if (ret < 0)
     return errno;
@@ -200,6 +260,9 @@ jint cpnet_sendTo (JNIEnv *env UNUSED, jint fd, jbyte *data, jint len, cpnet_add
 {
   ssize_t ret;
 
+  if (waitForWritable(fd) < 0)
+    return ETIMEDOUT;
+
   ret = sendto(fd, data, len, MSG_NOSIGNAL, (struct sockaddr *)addr->data, addr->len);
   if (ret < 0)
     return errno;
@@ -211,6 +274,9 @@ jint cpnet_sendTo (JNIEnv *env UNUSED, jint fd, jbyte *data, jint len, cpnet_add
 jint cpnet_recv (JNIEnv *env UNUSED, jint fd, jbyte *data, jint len, jint *bytes_recv)
 {
   ssize_t ret;
+
+  if (waitForReadable(fd) < 0)
+    return ETIMEDOUT;
 
   ret = recv(fd, data, len, 0);
   if (ret < 0)
@@ -226,6 +292,9 @@ jint cpnet_recvFrom (JNIEnv *env, jint fd, jbyte *data, jint len, cpnet_address 
   socklen_t slen = 1024;
   ssize_t ret;
 
+  if (waitForReadable(fd) < 0)
+    return ETIMEDOUT;
+
   *addr = JCL_malloc(env, slen);
 
   slen -= sizeof(jint);
@@ -238,7 +307,7 @@ jint cpnet_recvFrom (JNIEnv *env, jint fd, jbyte *data, jint len, cpnet_address 
     }
 
   (*addr)->len = slen;
-  *bytes_recv = len;
+  *bytes_recv = ret;
 
   return 0;
 }
@@ -306,46 +375,16 @@ jint cpnet_getLinger (JNIEnv *env UNUSED, jint fd, jint *flag, jint *value)
   return ret;
 }
 
-jint cpnet_setSocketTimeout (JNIEnv *env UNUSED, jint fd UNUSED, jint value UNUSED)
+jint cpnet_setSocketTimeout (JNIEnv *env UNUSED, jint fd, jint value)
 {
-#if 0
-  /* This is not really the right default implementation. This will have to
-   * be changed. Most OSes do not completely/rightfully support SO_TIMEOUT.
-   */
-  struct timeval tval;
-  int ret;
-
-  tval.tv_sec = value / 1000;
-  tval.tv_usec = (value % 1000) * 1000;
-  ret = setsockopt (fd, SOL_SOCKET, SO_TIMEOUT, &tval, sizeof(tval));
-  if (ret != 0)
-    return errno;
-
+  socketTimeouts[fd] = value;
   return 0;
-#else
-  return ENOSYS;
-#endif
 }
 
-jint cpnet_getSocketTimeout (JNIEnv *env UNUSED, jint fd UNUSED, jint *value UNUSED)
+jint cpnet_getSocketTimeout (JNIEnv *env UNUSED, jint fd, jint *value)
 {
-#if 0
-  /* This is not really the right default implementation. This will have to
-   * be changed. Most OSes do not completely/rightfully support SO_TIMEOUT.
-   */
-  struct timeval tval;
-  int ret;
-
-  ret = getsockopt (fd, SOL_SOCKET, SO_TIMEOUT, &tval, sizeof(tval));
-  if (ret != 0)
-    return errno;
-
-  *value = (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
-
+  *value = socketTimeouts[fd];
   return 0;
-#else
-  return ENOSYS;
-#endif
 }
 
 jint cpnet_setSendBuf (JNIEnv *env UNUSED, jint fd, jint value)

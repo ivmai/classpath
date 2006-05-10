@@ -1,3 +1,17 @@
+2006-05-09  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* native/jni/native-lib/cpnet.c
+	(cpnet_getSocketTimeout, cpnet_setSocketTimeout): Reimplemented.
+	(waitForWritable, waitForReadable): New functions.
+	(socketTimeouts): New static global table to hold timeouts for all
+	socket fds.
+	(cpnet_accept,cpnet_bind,cpnet_sendTo,cpnet_recv,cpnet_recvFrom):
+	Added waitForXXXX safeguards to handle socket timeouts.
+
+	* native/jni/java-net/javanet.c
+	(_javanet_accept): Check for the right error value when a timeout
+	occurs.
+	
 2006-03-25  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* native/jni/java-io/Makefile.am,

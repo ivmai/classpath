@@ -795,7 +795,7 @@ _javanet_accept (JNIEnv * env, jobject this, jobject impl)
       result = cpnet_accept (env, fd, &newfd);
       if (result != CPNATIVE_OK && result != CPNATIVE_EINTR)
 	{
-	  if (result == EAGAIN)
+	  if (result == ETIMEDOUT)
 	    JCL_ThrowException (env, "java/net/SocketTimeoutException",
 				"Timeout");
 	  else
