@@ -1,3 +1,12 @@
+2006-05-09  Robert Schuster  <robertschuster@fsfe.org>
+
+	PR classpath/24216
+	* javax/swing/text/AbstractDocument.java:
+	(insertString): Added more documentation, added argument check.
+	(remove): Added more documentation.
+	(removeImpl): Added argument check.
+	(replace): Added more documentation, added argument check.
+
 2006-05-08  Lillian Angel  <langel@redhat.com>
 
 	* java/net/URLClassLoader.java
