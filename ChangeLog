@@ -1,3 +1,8 @@
+2006-05-14  Mark Wielaard  <mark@klomp.org>
+
+	* native/jni/java-net/javanet.c (_javanet_accept): Don't use C++
+	comments.
+
 2006-05-14  Chris Burdess  <dog@gnu.org>
 
 	* gnu/xml/dom/DomNode.java: Permit comments and PIs in doctype
