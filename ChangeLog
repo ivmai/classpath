@@ -1,3 +1,8 @@
+2006-05-14  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/tree/DefaultTreeSelectionModel.java (leadRow):
+	Initialise to -1.
+
 2006-05-14  Robert Schuster  <robertschuster@fsfe.org>
 
 	PR classpath/27595
