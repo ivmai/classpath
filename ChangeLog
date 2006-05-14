@@ -1,3 +1,7 @@
+2006-05-13  Tom Tromey  <tromey@redhat.com>
+
+	* java/nio/ByteBufferImpl.java (compact): Always set position.
+
 2006-05-11  Mark Wielaard  <mark@klomp.org>
 
 	* java/util/logging/Logger.java (global): Initialize inside static
