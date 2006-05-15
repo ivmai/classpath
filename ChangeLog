@@ -1,5 +1,9 @@
 2006-05-15  Tom Tromey  <tromey@redhat.com>
 
+	* java/text/MessageFormat.java (format): Now varargs.
+
+2006-05-15  Tom Tromey  <tromey@redhat.com>
+
 	* java/lang/Thread.java (State): Fixed typo.
 
 2006-05-15  Mark Wielaard  <mark@klomp.org>
