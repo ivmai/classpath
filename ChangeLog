@@ -1,3 +1,16 @@
+2006-05-15  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac (VERSION): Set to 0.91.
+
+2006-05-15  Mark Wielaard  <mark@klomp.org>
+
+	* NEWS: Add release date and VMClassLoader.getBootPackages()
+	changes.
+
+2006-05-15  Christian Thalinger  <twisti@complang.tuwien.ac.at>
+
+	* README: Added CACAO to list of VMs.
+
 2006-05-14  Mark Wielaard  <mark@klomp.org>
 
 	* native/jni/java-net/javanet.c (_javanet_accept): Don't use C++
