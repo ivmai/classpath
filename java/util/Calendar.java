@@ -1038,6 +1038,8 @@ public abstract class Calendar
   public void setTimeZone(TimeZone zone)
   {
     this.zone = zone;
+    computeTime();
+    computeFields();
   }
 
   /**
