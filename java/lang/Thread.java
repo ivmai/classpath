@@ -1204,7 +1204,7 @@ public class Thread implements Runnable
    * to run.</li>
    * <li>BLOCKED -- The thread is blocked waiting on an I/O operation
    * or to obtain a lock.</li>
-   * <li>WAITING -- The thread is waiting indefinately for another thread
+   * <li>WAITING -- The thread is waiting indefinitely for another thread
    * to do something.</li>
    * <li>TIMED_WAITING -- The thread is waiting for a specific amount of time
    * for another thread to do something.</li>
