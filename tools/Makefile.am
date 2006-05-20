@@ -13,6 +13,9 @@ error dunno how to setup the JCOMPILER and compile
 endif
 endif
 
+bin_SCRIPTS = appletviewer jarsigner keytool
+EXTRA_DIST = appletviewer.in appletviewer.c jarsigner.in keytool.in
+
 # All our example java source files
 TOOLS_JAVA_FILES = $(srcdir)/gnu/classpath/tools/*.java $(srcdir)/gnu/classpath/tools/*/*.java $(srcdir)/gnu/classpath/tools/*/*/*.java
 
@@ -24,7 +27,7 @@ TOOLS_ZIP = tools.zip
 BUILT_SOURCES = $(TOOLS_ZIP)
 
 # The templates that must be included into the generated zip file.
-GRMIC_TEMPLATES = $(srcdir)/gnu/classpath/tools/giop/grmic/templates/*.jav 
+GRMIC_TEMPLATES = $(srcdir)/gnu/classpath/tools/giop/grmic/templates/*.jav
 RMIC_TEMPLATES = $(srcdir)/gnu/classpath/tools/rmi/rmic/templates/*.jav
 
 TOOLS_TEMPLATES = $(GRMIC_TEMPLATES) $(RMIC_TEMPLATES)
@@ -68,11 +71,14 @@ dist-hook:
 $(TOOLS_ZIP): $(TOOLS_JAVA_FILES)
 	mkdir -p classes/gnu/classpath/tools/giop/grmic/templates
 	mkdir -p classes/gnu/classpath/tools/rmi/rmic/templates
+	mkdir -p classes/gnu/classpath/tools/appletviewer
+	mkdir -p classes/gnu/classpath/tools/jarsigner
+	mkdir -p classes/gnu/classpath/tools/keytool
 	cp $(RMIC_TEMPLATES) classes/gnu/classpath/tools/rmi/rmic/templates
-	cp $(GRMIC_TEMPLATES) classes/gnu/classpath/tools/giop/grmic/templates	
+	cp $(GRMIC_TEMPLATES) classes/gnu/classpath/tools/giop/grmic/templates
 	cp $(RMI_HELPS) classes/gnu/classpath/tools/rmi/
 	cp $(GIOP_HELPS) classes/gnu/classpath/tools/giop/
-	$(JCOMPILER) -d classes $(TOOLS_JAVA_FILES) 
+	$(JCOMPILER) -d classes $(TOOLS_JAVA_FILES)
 	(cd classes; \
 	if test "$(ZIP)" != ""; then $(ZIP) -r ../$(TOOLS_ZIP) .; fi; \
 	if test "$(FASTJAR)" != ""; then $(FASTJAR) cf ../$(TOOLS_ZIP) .; fi; \

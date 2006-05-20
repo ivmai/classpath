@@ -38,6 +38,7 @@
 
 package javax.swing.plaf.basic;
 
+import gnu.classpath.NotImplementedException;
 import gnu.javax.swing.tree.GnuPath;
 
 import java.awt.Color;
@@ -251,6 +252,9 @@ public class BasicTreeUI
 
   /** The max height of the nodes in the tree. */
   int maxHeight = 0;
+  
+  /** The hash color. */
+  Color hashColor;
 
   /** Listeners */
   PropertyChangeListener propertyChangeListener;
@@ -279,6 +283,11 @@ public class BasicTreeUI
    * not the double mouse click) on the selected tree node.
    */
   Timer startEditTimer;
+  
+  /**
+   * The zero size icon, used for expand controls, if they are not visible.
+   */
+  static Icon nullIcon;
 
   /**
    * The special value of the mouse event is sent indicating that this is not
@@ -331,7 +340,7 @@ public class BasicTreeUI
    */
   protected Color getHashColor()
   {
-    return UIManager.getColor("Tree.hash");
+    return hashColor;
   }
 
   /**
@@ -341,8 +350,7 @@ public class BasicTreeUI
    */
   protected void setHashColor(Color color)
   {
-    // FIXME: Putting something in the UIDefaults map is certainly wrong.
-    UIManager.put("Tree.hash", color);
+    hashColor = color;
   }
 
   /**
@@ -673,6 +681,20 @@ public class BasicTreeUI
     treeState.setRowHeight(maxHeight);
     return maxHeight;
   }
+  
+  /**
+   * Get the tree node icon.
+   */
+  Icon getNodeIcon(TreePath path)
+  {
+    Object node = path.getLastPathComponent();
+    if (treeModel.isLeaf(node))
+      return UIManager.getIcon("Tree.leafIcon");
+    else if (treeState.getExpandedState(path))
+      return UIManager.getIcon("Tree.openIcon");
+    else
+      return UIManager.getIcon("Tree.closedIcon");
+  }
 
   /**
    * Returns the path for passed in row. If row is not visible null is returned.
@@ -800,6 +822,7 @@ public class BasicTreeUI
    * default/listeners have been installed.
    */
   protected void prepareForUIInstall()
+  throws NotImplementedException
   {
     // TODO: Implement this properly.
   }
@@ -809,6 +832,7 @@ public class BasicTreeUI
    * installed.
    */
   protected void completeUIInstall()
+  throws NotImplementedException
   {
     // TODO: Implement this properly.
   }
@@ -818,6 +842,7 @@ public class BasicTreeUI
    * uninstalled.
    */
   protected void completeUIUninstall()
+  throws NotImplementedException
   {
     // TODO: Implement this properly.
   }
@@ -1132,14 +1157,10 @@ public class BasicTreeUI
   protected void updateRenderer()
   {
     if (tree != null)
-      {
-        if (tree.getCellRenderer() == null)
-          {
-            if (currentCellRenderer == null)
-              currentCellRenderer = createDefaultCellRenderer();
-            tree.setCellRenderer(currentCellRenderer);
-          }
-      }
+      currentCellRenderer = tree.getCellRenderer();
+
+    if (currentCellRenderer == null)
+      currentCellRenderer = createDefaultCellRenderer();
   }
 
   /**
@@ -1206,6 +1227,7 @@ public class BasicTreeUI
 
     rightChildIndent = UIManager.getInt("Tree.rightChildIndent");
     leftChildIndent = UIManager.getInt("Tree.leftChildIndent");
+    totalChildIndent = rightChildIndent + leftChildIndent;
     setRowHeight(UIManager.getInt("Tree.rowHeight"));
     tree.setRowHeight(getRowHeight());
     tree.setScrollsOnExpand(UIManager.getBoolean("Tree.scrollsOnExpand"));
@@ -1332,10 +1354,11 @@ public class BasicTreeUI
     treeSelectionModel = tree.getSelectionModel();
     setRootVisible(tree.isRootVisible());
     treeState.setRootVisible(tree.isRootVisible());
+    updateExpandedDescendants(new TreePath(new Object[] { treeModel.getRoot() }));
 
     completeUIInstall();
   }
-
+  
   /**
    * Uninstall the defaults for the tree
    */
@@ -1785,7 +1808,9 @@ public class BasicTreeUI
    *         the event.
    */
   protected boolean isToggleEvent(MouseEvent event)
+  throws NotImplementedException
   {
+    // FIXME: Not implemented.
     return true;
   }
 
@@ -1968,6 +1993,7 @@ public class BasicTreeUI
      * @param e the event that occurs when moving the component
      */
     public void componentMoved(ComponentEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -1977,6 +2003,7 @@ public class BasicTreeUI
      * the bounds
      */
     protected void startTimer()
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -1987,7 +2014,9 @@ public class BasicTreeUI
      * @return JScrollPane housing the JTree, or null if one isn't found.
      */
     protected JScrollPane getScrollPane()
+    throws NotImplementedException
     {
+      // FIXME: Not implemented.
       return null;
     }
 
@@ -1998,6 +2027,7 @@ public class BasicTreeUI
      * @param ae is the action performed
      */
     public void actionPerformed(ActionEvent ae)
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2080,7 +2110,7 @@ public class BasicTreeUI
     {
       repaintLeadRow();
     }
-    
+
     /**
      * Repaint the lead row.
      */
@@ -2122,6 +2152,7 @@ public class BasicTreeUI
      * @param e the key typed
      */
     public void keyTyped(KeyEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2132,6 +2163,7 @@ public class BasicTreeUI
      * @param e the key pressed
      */
     public void keyPressed(KeyEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2142,6 +2174,7 @@ public class BasicTreeUI
      * @param e the key released
      */
     public void keyReleased(KeyEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2271,6 +2304,7 @@ public class BasicTreeUI
      * @param e is the mouse event that occured
      */
     public void mouseDragged(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2282,6 +2316,7 @@ public class BasicTreeUI
      * @param e the mouse event that occured
      */
     public void mouseMoved(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2292,6 +2327,7 @@ public class BasicTreeUI
      * @param e is the mouse event that occured
      */
     public void mouseReleased(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2332,6 +2368,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseClicked(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2342,6 +2379,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mousePressed(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2352,6 +2390,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseReleased(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2362,6 +2401,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseEntered(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2372,6 +2412,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseExited(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2385,6 +2426,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseDragged(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2396,6 +2438,7 @@ public class BasicTreeUI
      * @param e mouse event that occured
      */
     public void mouseMoved(MouseEvent e)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2404,6 +2447,7 @@ public class BasicTreeUI
      * Removes event from the source
      */
     protected void removeFromSource()
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2450,10 +2494,11 @@ public class BasicTreeUI
 
       if (s != null)
         {
+          TreePath path = treeState.getPathForRow(row);
           size.x = getRowX(row, depth);
           size.width = SwingUtilities.computeStringWidth(fm, s);
-          size.width = size.width + getCurrentControlIcon(null).getIconWidth()
-                       + gap;
+          size.width = size.width + getCurrentControlIcon(path).getIconWidth()
+                       + gap + getNodeIcon(path).getIconWidth();
           size.height = getMaxHeight(tree);
           size.y = size.height * row;
         }
@@ -2468,8 +2513,7 @@ public class BasicTreeUI
      */
     protected int getRowX(int row, int depth)
     {
-      int iw = getCurrentControlIcon(null).getIconWidth();
-      return depth * (rightChildIndent + iw/2);
+      return BasicTreeUI.this.getRowX(row, depth);
     }
   }// NodeDimensionsHandler
 
@@ -2540,6 +2584,7 @@ public class BasicTreeUI
      *          the property that has changed.
      */
     public void propertyChange(PropertyChangeEvent event)
+    throws NotImplementedException
     {
       // TODO: What should be done here, if anything?
     }
@@ -2556,6 +2601,7 @@ public class BasicTreeUI
      * Constructor
      */
     public TreeCancelEditingAction(String name)
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2566,6 +2612,7 @@ public class BasicTreeUI
      * @param e event that occured
      */
     public void actionPerformed(ActionEvent e)
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2576,6 +2623,7 @@ public class BasicTreeUI
      * @return true if the action is enabled, false otherwise
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
       return false;
@@ -2606,6 +2654,8 @@ public class BasicTreeUI
     {
       validCachedPreferredSize = false;
       treeState.setExpandedState(event.getPath(), true);
+      // The maximal cell height may change
+      maxHeight = 0;
       tree.revalidate();
       tree.repaint();
     }
@@ -2619,6 +2669,8 @@ public class BasicTreeUI
     {
       validCachedPreferredSize = false;
       treeState.setExpandedState(event.getPath(), false);
+      // The maximal cell height may change
+      maxHeight = 0;
       tree.revalidate();
       tree.repaint();
     }
@@ -2642,6 +2694,7 @@ public class BasicTreeUI
      * @param name is the name of the direction
      */
     public TreeHomeAction(int direction, String name)
+    throws NotImplementedException
     {
       // TODO: Implement this properly
     }
@@ -2652,6 +2705,7 @@ public class BasicTreeUI
      * @param e is the event that occured
      */
     public void actionPerformed(ActionEvent e)
+    throws NotImplementedException
     {
       // TODO: Implement this properly
     }
@@ -2662,6 +2716,7 @@ public class BasicTreeUI
      * @return true if the action is enabled.
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
       // TODO: Implement this properly
       return false;
@@ -2686,6 +2741,7 @@ public class BasicTreeUI
      * @param name is the name of the direction
      */
     public TreeIncrementAction(int direction, String name)
+    throws NotImplementedException
     {
       // TODO: Implement this properly
     }
@@ -2775,6 +2831,7 @@ public class BasicTreeUI
      * @return true if the action is enabled.
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
       // TODO: Implement this properly
       return false;
@@ -2891,6 +2948,7 @@ public class BasicTreeUI
      * @param e is the event that occured
      */
     public void actionPerformed(ActionEvent e)
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2901,7 +2959,9 @@ public class BasicTreeUI
      * @return true if the action is enabled.
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
+      // FIXME: Not implemented.
       return false;
     }
   }// TreePageAction
@@ -2973,6 +3033,7 @@ public class BasicTreeUI
      * @param e the event that occured
      */
     public void actionPerformed(ActionEvent e)
+    throws NotImplementedException
     {
       // TODO: Implement this properly.
     }
@@ -2983,7 +3044,9 @@ public class BasicTreeUI
      * @return true if the action is enabled, false otherwise
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
+      // FIXME: Not implemented.
       return false;
     }
   } // TreeToggleAction
@@ -3067,6 +3130,7 @@ public class BasicTreeUI
      * @return true if the action is enabled, false otherwise
      */
     public boolean isEnabled()
+    throws NotImplementedException
     {
       // TODO: Implement this properly
       return false;
@@ -3094,9 +3158,35 @@ public class BasicTreeUI
    */
   Icon getCurrentControlIcon(TreePath path)
   {
-    if (tree.isExpanded(path))
-      return expandedIcon;
-    return collapsedIcon;
+    if (hasControlIcons())
+      {
+        if (tree.isExpanded(path))
+          return expandedIcon;
+        else
+          return collapsedIcon;
+      }
+    else
+      {
+        if (nullIcon == null)
+          nullIcon = new Icon()
+          {
+            public int getIconHeight()
+            {
+              return 0;
+            }
+
+            public int getIconWidth()
+            {
+              return 0;
+            }
+
+            public void paintIcon(Component c, Graphics g, int x, int y)
+            {
+              // No action here.
+            }
+          };
+        return nullIcon;
+      }
   }
 
   /**
@@ -3323,10 +3413,8 @@ public class BasicTreeUI
   {
     if (row != 0)
       {
-        Icon icon = getCurrentControlIcon(path);
-        int iconW = icon.getIconWidth();
         paintHorizontalLine(g, tree, bounds.y + bounds.height / 2,
-                            bounds.x - iconW/2 - gap, bounds.x - gap);
+                            bounds.x - leftChildIndent - gap, bounds.x - gap);
       }
   }
 
@@ -3379,15 +3467,13 @@ public class BasicTreeUI
     paintExpandControl(g, clipBounds, insets, bounds, path, row, isExpanded,
                        hasBeenExpanded, isLeaf);
 
-    TreeCellRenderer dtcr = tree.getCellRenderer();
-    if (dtcr == null)
-      dtcr = createDefaultCellRenderer();
+    TreeCellRenderer dtcr = currentCellRenderer;
 
     boolean focused = false;
-    if (treeSelectionModel!= null)
-      focused = treeSelectionModel.getLeadSelectionRow() == row 
-        && tree.isFocusOwner();
-    
+    if (treeSelectionModel != null)
+      focused = treeSelectionModel.getLeadSelectionRow() == row
+                && tree.isFocusOwner();
+
     Component c = dtcr.getTreeCellRendererComponent(tree, node, selected,
                                                     isExpanded, isLeaf, row,
                                                     focused);
@@ -3399,6 +3485,7 @@ public class BasicTreeUI
    * Prepares for the UI to uninstall.
    */
   protected void prepareForUIUninstall()
+  throws NotImplementedException
   {
     // TODO: Implement this properly.
   }
@@ -3439,5 +3526,15 @@ public class BasicTreeUI
     tree.repaint(bounds);
     editingComponent = null;
     tree.requestFocus();
+  }
+  
+  /**
+   * Returns the amount to indent the given row
+   * 
+   * @return amount to indent the given row.
+   */
+  protected int getRowX(int row, int depth)
+  {
+    return depth * totalChildIndent;
   }
 } // BasicTreeUI

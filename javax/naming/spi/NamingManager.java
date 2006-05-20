@@ -38,6 +38,8 @@ exception statement from your version. */
 
 package javax.naming.spi;
 
+import gnu.classpath.VMStackWalker;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
@@ -52,8 +54,18 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.StringRefAddr;
 
+/**
+ * Contains methods for creating context objects and objects referred to by
+ * location information. The location is specified in the scope of the
+ * certain naming or directory service.
+ */
 public class NamingManager
 {
+  /**
+   * The environment property into which getContinuationContext() stores the
+   * value of the CannotProceedException parameter. The value of this field
+   * is <i>java.naming.spi.CannotProceedException<i>.
+   */
   public static final String CPE = "java.naming.spi.CannotProceedException";
 
   private static InitialContextFactoryBuilder icfb;
@@ -66,11 +78,36 @@ public class NamingManager
   {
   }
 
+  /**
+   * Checks if the initial context factory builder has been set.
+   * 
+   * @return true if the builder has been set
+   * 
+   * @see #setInitialContextFactoryBuilder(InitialContextFactoryBuilder)
+   */
   public static boolean hasInitialContextFactoryBuilder ()
   {
     return icfb != null;
   }
   
+  /**
+   * Creates the initial context. If the initial object factory builder has
+   * been set with {@link #setObjectFactoryBuilder(ObjectFactoryBuilder)},
+   * the work is delegated to this builder. Otherwise, the method searches
+   * for the property Context.INITIAL_CONTEXT_FACTORY first in the passed
+   * table and then in the system properties. The value of this property is
+   * uses as a class name to install the context factory. The corresponding
+   * class must exist, be public and have the public parameterless constructor. 
+   * 
+   * @param environment the properties, used to create the context.
+   * 
+   * @return the created context
+   * 
+   * @throws NoInitialContextException if the initial builder is not set,
+   *           the property Context.INITIAL_CONTEXT_FACTORY is missing of the
+   *           class, named by this property, cannot be instantiated. 
+   * @throws NamingException if throws by the context factory
+   */
   public static Context getInitialContext (Hashtable<?, ?> environment)
     throws NamingException
   {
@@ -113,76 +150,191 @@ public class NamingManager
     return icf.getInitialContext (environment);
   }
 
-  static Context getURLContext (Object refInfo,
-				Name name,
-				Context nameCtx,
-				String scheme,
-				Hashtable<?, ?> environment) 
-    throws NamingException
+  /**
+   * <p>
+   * Creates the URL context for the given URL scheme id.
+   * </p>
+   * <p>
+   * The class name of the factory that creates the context has the naming
+   * pattern scheme-idURLContextFactory. For instance, the factory for the "ftp"
+   * sheme should be named "ftpURLContextFactory".
+   * </p>
+   * <p>
+   * The Context.URL_PKG_PREFIXES environment property contains the
+   * colon-separated list of the possible package prefixes. The package name is
+   * constructed concatenating the package prefix with the scheme id. This
+   * property is searched in the passed <i>environment</i> parameter and later
+   * in the system properties.
+   * </p>
+   * <p>
+   * If the factory class cannot be found in the specified packages, system will
+   * try to use the default internal factory for the given scheme.
+   * </p>
+   * <p>
+   * After the factory is instantiated, its method
+   * {@link ObjectFactory#getObjectInstance(Object, Name, Context, Hashtable)}
+   * is called to create and return the object instance.
+   * 
+   * @param refInfo passed to the factory
+   * @param name passed to the factory
+   * @param nameCtx passed to the factory
+   * @param scheme the url scheme that must be supported by the given context
+   * @param environment the properties for creating the factory and context (may
+   *          be null)
+   * @return the created context
+   * @throws NamingException if thrown by the factory when creating the context.
+   */
+  static Context getURLContext(Object refInfo, Name name, Context nameCtx,
+                               String scheme, Hashtable<?,?> environment)
+      throws NamingException
   {
-    String prefixes = null;
-    if (environment != null)
-      prefixes = (String) environment.get (Context.URL_PKG_PREFIXES);
-    if (prefixes == null)
-      prefixes = System.getProperty (Context.URL_PKG_PREFIXES);
-    if (prefixes == null)
+    // Specified as the default in the docs. Unclear if this is
+    // right for us.
+    String defaultPrefix = "com.sun.jndi.url";
+  
+    StringBuffer allPrefixes = new StringBuffer();
+
+    String prefixes;
+      if (environment != null)
+        {
+        prefixes = (String) environment.get(Context.URL_PKG_PREFIXES);
+        if (prefixes != null)
+          allPrefixes.append(prefixes);
+        }
+  
+    prefixes = System.getProperty(Context.URL_PKG_PREFIXES);
+    if (prefixes != null)
       {
-	// Specified as the default in the docs.  Unclear if this is
-	// right for us.
-	prefixes = "com.sun.jndi.url";
+        if (allPrefixes.length() > 0)
+          allPrefixes.append(':');
+        allPrefixes.append(prefixes);
       }
 
-    scheme = scheme + "." + scheme + "URLContextFactory";
+    if (allPrefixes.length() > 0)
+      allPrefixes.append(':');
+    allPrefixes.append(defaultPrefix);
 
-    StringTokenizer tokens = new StringTokenizer (prefixes, ":");
-    while (tokens.hasMoreTokens ())
-      {
-	String aTry = tokens.nextToken ();
-	try
-	  {
-	    Class factoryClass = Class.forName (aTry + "." + scheme,
-						true,
-						Thread.currentThread().getContextClassLoader());
-	    ObjectFactory factory =
-	      (ObjectFactory) factoryClass.newInstance ();
-	    Object obj = factory.getObjectInstance (refInfo, name,
-						    nameCtx, environment);
-	    Context ctx = (Context) obj;
-	    if (ctx != null)
-	      return ctx;
-	  }
-	catch (ClassNotFoundException _1)
-	  {
-	    // Ignore it.
-	  }
-	catch (ClassCastException _2)
-	  {
-	    // This means that the class we found was not an
-	    // ObjectFactory or that the factory returned something
-	    // which was not a Context.
-	  }
-	catch (InstantiationException _3)
-	  {
-	    // If we couldn't instantiate the factory we might get
-	    // this.
-	  }
-	catch (IllegalAccessException _4)
-	  {
-	    // Another possibility when instantiating.
-	  }
-	catch (NamingException _5)
-	  {
-	    throw _5;
-	  }
-	catch (Exception _6)
-	  {
-	    // Anything from getObjectInstance.
-	  }
-      }
-
+      scheme = scheme + "." + scheme + "URLContextFactory";
+  
+    StringTokenizer tokens = new StringTokenizer(allPrefixes.toString(), ":");
+    while (tokens.hasMoreTokens())
+        {
+        String aTry = tokens.nextToken();
+        try
+          {
+            String tryClass = aTry + "." + scheme;
+            Class factoryClass = forName(tryClass);
+            if (factoryClass != null)
+              {
+                ObjectFactory factory = (ObjectFactory) factoryClass.newInstance();
+                Object obj = factory.getObjectInstance(refInfo, name, nameCtx,
+                                                       environment);
+                Context ctx = (Context) obj;
+                if (ctx != null)
+                  return ctx;
+              }
+          }
+        catch (ClassNotFoundException _1)
+          {
+            // Ignore it.
+          }
+        catch (ClassCastException _2)
+          {
+            // This means that the class we found was not an
+            // ObjectFactory or that the factory returned something
+            // which was not a Context.
+          }
+        catch (InstantiationException _3)
+          {
+            // If we couldn't instantiate the factory we might get
+            // this.
+          }
+        catch (IllegalAccessException _4)
+          {
+            // Another possibility when instantiating.
+          }
+        catch (NamingException _5)
+          {
+            throw _5;
+          }
+        catch (Exception _6)
+          {
+            // Anything from getObjectInstance.
+          }
+	}
+    
     return null;
   }
 
+  /**
+   * Load the class with the given name. This method tries to use the context
+   * class loader first. If this fails, it searches for the suitable class
+   * loader in the caller stack trace. This method is a central point where all
+   * requests to find a class by name are delegated.
+   */
+  static Class forName(String className)
+  {
+    try
+      {
+        return Class.forName(className, true,
+                             Thread.currentThread().getContextClassLoader());
+      }
+    catch (ClassNotFoundException nex)
+      {
+        /**
+         * Returns the first user defined class loader on the call stack, or
+         * null when no non-null class loader was found.
+         */
+        Class[] ctx = VMStackWalker.getClassContext();
+        for (int i = 0; i < ctx.length; i++)
+          {
+            // Since we live in a class loaded by the bootstrap
+            // class loader, getClassLoader is safe to call without
+            // needing to be wrapped in a privileged action.
+            ClassLoader cl = ctx[i].getClassLoader();
+            try
+              {
+                if (cl != null)
+                  return Class.forName(className, true, cl);
+              }
+            catch (ClassNotFoundException nex2)
+              {
+                // Try next.
+              }
+          }
+      }
+    return null;
+  }  
+  
+  
+  /**
+   * <p>
+   * Creates the URL context for the given URL scheme id.
+   * </p>
+   * <p>
+   * The class name of the factory that creates the context has the naming
+   * pattern scheme-idURLContextFactory. For instance, the factory for the
+   * "ftp" scheme should be named "ftpURLContextFactory".
+   * The Context.URL_PKG_PREFIXES environment property contains the
+   * colon-separated list of the possible package prefixes. The package name
+   * is constructed by concatenating the package prefix with the scheme id.
+   * </p>
+   * <p>
+   * If the factory class cannot be found in the specified packages, the
+   * system will try to use the default internal factory for the given scheme.
+   * </p>
+   * <p>
+   * After the factory is instantiated, its method
+   * {@link ObjectFactory#getObjectInstance(Object, Name, Context, Hashtable)}
+   * is called to create and return the object instance.
+   * 
+   * @param scheme the url scheme that must be supported by the given context
+   * @param environment the properties for creating the factory and context
+   *                    (may be null)
+   * @return the created context
+   * @throws NamingException if thrown by the factory when creating the
+   *                         context.
+   */
   public static Context getURLContext (String scheme,
 				       Hashtable<?, ?> environment) 
        throws NamingException
@@ -190,6 +342,17 @@ public class NamingManager
     return getURLContext (null, null, null, scheme, environment);
   }
 
+  /**
+   * Sets the initial object factory builder.
+   * 
+   * @param builder the builder to set
+   * 
+   * @throws SecurityException if the builder cannot be installed due
+   *           security restrictions.
+   * @throws NamingException if the builder cannot be installed due other 
+   *           reasons
+   * @throws IllegalStateException if setting the builder repeatedly
+   */
   public static void setObjectFactoryBuilder (ObjectFactoryBuilder builder)
     throws NamingException
   {
@@ -198,7 +361,7 @@ public class NamingManager
       sm.checkSetFactory ();
     // Once the builder is installed it cannot be replaced.
     if (ofb != null)
-      throw new IllegalStateException ("builder already installed");
+      throw new IllegalStateException ("object factory builder already installed");
     if (builder != null)
       ofb = builder;
   }
@@ -312,7 +475,21 @@ public class NamingManager
     return obj == null ? refInfo : obj;
   }
 
-  public static void setInitialContextFactoryBuilder (InitialContextFactoryBuilder builder)
+  /**
+   * Sets the initial context factory builder.
+   * 
+   * @param builder the builder to set
+   * 
+   * @throws SecurityException if the builder cannot be installed due
+   *           security restrictions.
+   * @throws NamingException if the builder cannot be installed due other 
+   *           reasons
+   * @throws IllegalStateException if setting the builder repeatedly
+   * 
+   * @see #hasInitialContextFactoryBuilder()
+   */
+  public static void setInitialContextFactoryBuilder 
+    (InitialContextFactoryBuilder builder)
     throws NamingException
   {
     SecurityManager sm = System.getSecurityManager ();
@@ -320,11 +497,23 @@ public class NamingManager
       sm.checkSetFactory ();
     // Once the builder is installed it cannot be replaced.
     if (icfb != null)
-      throw new IllegalStateException ("builder already installed");
+      throw new IllegalStateException ("ctx factory builder already installed");
     if (builder != null)
       icfb = builder;
   }
-
+  
+  /**
+   * Creates a context in which the context operation must be continued.
+   * This method is used by operations on names that span multiple namespaces.
+   * 
+   * @param cpe the exception that triggered this continuation. This method
+   * obtains the environment ({@link CannotProceedException#getEnvironment()}
+   * and sets the environment property {@link #CPE} = cpe.
+   * 
+   * @return a non null context for continuing the operation
+   * 
+   * @throws NamingException if the naming problems have occured
+   */
   public static Context getContinuationContext (CannotProceedException cpe)
     throws NamingException
   {
