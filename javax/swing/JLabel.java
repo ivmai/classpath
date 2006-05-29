@@ -50,6 +50,7 @@ import java.awt.event.KeyEvent;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleExtendedComponent;
+import javax.accessibility.AccessibleRole;
 import javax.accessibility.AccessibleText;
 import javax.swing.plaf.LabelUI;
 import javax.swing.text.AttributeSet;
@@ -62,12 +63,39 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
 {
 
   /**
-   * Accessibility support for JLabel.
+   * Provides the accessibility features for the <code>JLabel</code>
+   * component.
    */
   protected class AccessibleJLabel
     extends JComponent.AccessibleJComponent
     implements AccessibleText, AccessibleExtendedComponent
   {
+    
+    /**
+     * Returns the accessible name.
+     * 
+     * @return The accessible name.
+     */
+    public String getAccessibleName()
+    {
+      if (accessibleName != null)
+        return accessibleName;
+      if (text != null)
+        return text;
+      else
+        return super.getAccessibleName();
+    }
+    
+    /**
+     * Returns the accessible role for the <code>JLabel</code> component.
+     *
+     * @return {@link AccessibleRole#LABEL}.
+     */
+    public AccessibleRole getAccessibleRole()
+    {
+      return AccessibleRole.LABEL;
+    }
+    
     /**
      * Returns the selected text. This is null since JLabels
      * are not selectable.
@@ -895,24 +923,25 @@ public class JLabel extends JComponent implements Accessible, SwingConstants
   {
     if (c != labelFor)
       {
+        Component oldLabelFor = labelFor;
+        labelFor = c;
+        firePropertyChange("labelFor", oldLabelFor, labelFor);
+
         // We put the label into the client properties for the labeled
         // component so that it can be read by the AccessibleJComponent.
         // The other option would be to reserve a default visible field
-        // in JComponent, but since this is relativly seldomly used, it
+        // in JComponent, but since this is relatively seldomly used, it
         // would be unnecessary waste of memory to do so.
-	Component oldLabelFor = labelFor;
         if (oldLabelFor instanceof JComponent)
           {
             ((JComponent) oldLabelFor).putClientProperty(LABEL_PROPERTY, null);
           }
 
-	labelFor = c;
-	if (labelFor instanceof JComponent)
+        if (labelFor instanceof JComponent)
           {
             ((JComponent) labelFor).putClientProperty(LABEL_PROPERTY, this);
           }
 
-	firePropertyChange("labelFor", oldLabelFor, labelFor);
       }
   }
 

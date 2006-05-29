@@ -1045,7 +1045,17 @@ public class JTable
     /**
      * The CheckBox that is used for rendering.
      */
-    private final JCheckBox checkBox = new JCheckBox();
+    private final JCheckBox checkBox;
+    
+    /**
+     * Creates a new checkbox based boolean cell renderer. The checkbox is
+     * centered by default.
+     */
+    BooleanCellRenderer()
+    {
+       checkBox = new JCheckBox();
+       checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+    }
    
     /**
      * Get the check box.
@@ -1251,6 +1261,12 @@ public class JTable
   private class IconCellRenderer
     extends DefaultTableCellRenderer
   {
+    IconCellRenderer()
+    {
+      setHorizontalAlignment(SwingConstants.CENTER);
+    }
+    
+    
     /**
      * Returns the component that is used for rendering the value.
      *
@@ -1352,14 +1368,14 @@ public class JTable
    * {@link TableCellEditor} objects. This table is consulted by the 
    * FIXME
    */
-  protected Hashtable defaultEditorsByColumnClass;
+  protected Hashtable defaultEditorsByColumnClass = new Hashtable();
 
   /**
    * A table mapping {@link java.lang.Class} objects to 
    * {@link TableCellEditor} objects. This table is consulted by the 
    * FIXME
    */
-  protected Hashtable defaultRenderersByColumnClass;
+  protected Hashtable defaultRenderersByColumnClass = new Hashtable();
 
   /**
    * The column that is edited, -1 if the table is not edited currently.
@@ -1618,7 +1634,13 @@ public class JTable
    * @see #setRowHeight(int, int)
    */
   private SizeSequence rowHeights;
-
+  
+  /**
+   * This editor serves just a marker that the value must be simply changed to
+   * the opposite one instead of starting the editing session.
+   */
+  private transient TableCellEditor booleanInvertingEditor; 
+  
   /**
    * Creates a new <code>JTable</code> instance.
    */
@@ -1751,12 +1773,6 @@ public class JTable
     if (autoCreateColumnsFromModel)
       createDefaultColumnsFromModel();
     this.columnModel.addColumnModelListener(this);
-    
-    this.defaultRenderersByColumnClass = new Hashtable();
-    createDefaultRenderers();
-
-    this.defaultEditorsByColumnClass = new Hashtable();
-    createDefaultEditors();
 
     this.autoResizeMode = AUTO_RESIZE_SUBSEQUENT_COLUMNS;
     setRowHeight(16);
@@ -1805,7 +1821,10 @@ public class JTable
   protected void createDefaultEditors()
   {
     JCheckBox box = new BooleanCellRenderer().getCheckBox();
-    setDefaultEditor(Boolean.class, new DefaultCellEditor(box));
+    box.setBorder(BorderFactory.createLineBorder(getGridColor(), 2));
+    box.setBorderPainted(true);
+    booleanInvertingEditor = new DefaultCellEditor(box);    
+    setDefaultEditor(Boolean.class, booleanInvertingEditor);
   }
   
   /**
@@ -1903,6 +1922,8 @@ public class JTable
    */
   public void columnMoved (TableColumnModelEvent event)
   {
+    if (isEditing())
+      editingCanceled(null);
     revalidate();
     repaint();
   }
@@ -2046,6 +2067,10 @@ public class JTable
    */
   public void valueChanged (ListSelectionEvent event)
   {
+    // If we are in the editing process, end the editing session.
+    if (isEditing())
+      editingStopped(null);
+    
     // Repaint the changed region.
     int first = Math.max(0, Math.min(getRowCount() - 1, event.getFirstIndex()));
     int last = Math.max(0, Math.min(getRowCount() - 1, event.getLastIndex()));
@@ -3313,7 +3338,7 @@ public class JTable
   public void doLayout()
   {
     TableColumn resizingColumn = null;
-
+    
     int ncols = getColumnCount();
     if (ncols < 1)
       return;
@@ -3339,7 +3364,7 @@ public class JTable
       {
         TableColumn col;
         TableColumn [] cols;
-
+        
         switch (getAutoResizeMode())
           {
           case AUTO_RESIZE_LAST_COLUMN:
@@ -3401,19 +3426,43 @@ public class JTable
         TableColumn [] cols = new TableColumn[ncols];
         for (int i = 0; i < ncols; ++i)
           cols[i] = columnModel.getColumn(i);
-        distributeSpill(cols, spill);        
+        distributeSpill(cols, spill);
       }
     
     if (editorComp!=null)
       moveToCellBeingEdited(editorComp);
     
-    // Repaint fixes the invalid view after the first keystroke if the cell
-    // editing is started immediately after the program start or cell
-    // resizing. 
-    repaint();
-    if (tableHeader!=null)
-      tableHeader.repaint();
+    int leftBoundary = getLeftResizingBoundary();
+    int width = getWidth() - leftBoundary;
+    repaint(leftBoundary, 0, width, getHeight());
+    if (tableHeader != null)
+      tableHeader.repaint(leftBoundary, 0, width, tableHeader.getHeight());
   }
+  
+  /**
+   * Get the left boundary of the rectangle which changes during the column
+   * resizing.
+   */
+  int getLeftResizingBoundary()
+  {
+    if (tableHeader == null || getAutoResizeMode() == AUTO_RESIZE_ALL_COLUMNS)
+      return 0;
+    else
+      {
+        TableColumn resizingColumn = tableHeader.getResizingColumn();
+        if (resizingColumn == null)
+          return 0;
+
+        int rc = convertColumnIndexToView(resizingColumn.getModelIndex());
+        int p = 0;
+
+        for (int i = 0; i < rc; i++)
+          p += columnModel.getColumn(i).getWidth();
+        
+        return p;
+      }
+  }
+  
   
   /**
    * @deprecated Replaced by <code>doLayout()</code>
@@ -3454,6 +3503,10 @@ public class JTable
   public void setUI(TableUI ui)
   {
     super.setUI(ui);
+    // The editors and renderers must be recreated because they constructors
+    // may use the look and feel properties.
+    createDefaultEditors();
+    createDefaultRenderers();
   }
 
   public void updateUI()
@@ -3670,6 +3723,10 @@ public class JTable
    */
   public void selectAll()
   {
+    // The table is empty - nothing to do!
+    if (getRowCount() == 0 || getColumnCount() == 0)
+      return;
+    
     // rowLead and colLead store the current lead selection indices
     int rowLead = selectionModel.getLeadSelectionIndex();
     int colLead = getColumnModel().getSelectionModel().getLeadSelectionIndex();
@@ -3819,30 +3876,47 @@ public class JTable
 
   /**
    * Programmatically starts editing the specified cell.
-   *
+   * 
    * @param row the row of the cell to edit.
    * @param column the column of the cell to edit.
    */
-  public boolean editCellAt (int row, int column)
+  public boolean editCellAt(int row, int column)
   {
     // Complete the previous editing session, if still active.
     if (isEditing())
       editingStopped(new ChangeEvent("editingStopped"));
-    
-    editingRow = row;
-    editingColumn = column;
 
-    setCellEditor(getCellEditor(row, column));
-    editorComp = prepareEditor(cellEditor, row, column);
+    TableCellEditor editor = getCellEditor(row, column);
     
-    // Remove the previous editor components, if present. Only one
-    // editor component at time is allowed in the table.
-    removeAll();
-    add(editorComp);    
-    moveToCellBeingEdited(editorComp);
-    scrollRectToVisible(editorComp.getBounds());
-    editorComp.requestFocusInWindow();
-    return true;
+    // The boolean values are inverted by the single click without the
+    // real editing session.
+    if (editor == booleanInvertingEditor && isCellEditable(row, column))
+      {
+        if (Boolean.TRUE.equals(getValueAt(row, column)))
+          setValueAt(Boolean.FALSE, row, column);
+        else
+          setValueAt(Boolean.TRUE, row, column);
+        return false;
+      }
+    else
+      {
+        editingRow = row;
+        editingColumn = column;
+
+        setCellEditor(editor);
+        editorComp = prepareEditor(cellEditor, row, column);
+
+        // Remove the previous editor components, if present. Only one
+        // editor component at time is allowed in the table.
+        removeAll();
+        add(editorComp);
+        moveToCellBeingEdited(editorComp);
+        scrollRectToVisible(editorComp.getBounds());
+        editorComp.requestFocusInWindow();
+        
+        // Deliver the should select event.
+        return editor.shouldSelectCell(null);        
+      }
   }
 
   /**
