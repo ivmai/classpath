@@ -1,3 +1,14 @@
+2006-06-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/ProcessBuilder.java:
+	Documented.
+	(environment): Create as a copy.
+	* java/lang/System.java:
+	(EnvironmentMap.EnvironmentMap(Map<String,String>)):
+	New constructor.
+	(EnvironmentMap.put(String,String)): Override superclass
+	method with checks for nulls and non-Strings.
+	
 2006-05-29  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
 
 	* gnu/java/awt/peer/gtk/GdkGraphics2D.java (copying constructor):
