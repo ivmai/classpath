@@ -549,7 +549,10 @@ public final class System
 	for (String pair : environ)
 	  {
 	    String[] parts = pair.split("=");
-	    variables.put(parts[0], parts[1]);
+	    if (parts.length == 2)
+	      variables.put(parts[0], parts[1]);
+	    else
+	      variables.put(parts[0], "");
 	  }
 	environmentMap = Collections.unmodifiableMap(variables);
       }

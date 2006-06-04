@@ -1,3 +1,9 @@
+2006-06-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/System.java:
+	(getenv()): Handle cases where split only
+	returns an array of size 1.
+	
 2006-06-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/annotation/IncompleteAnnotationException.java:
