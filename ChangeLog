@@ -1,3 +1,11 @@
+2006-06-04  Tom Tromey  <tromey@redhat.com>
+
+	* javax/naming/Context.java (list): Genericized.
+	(listBindings): Likewise.
+	* javax/naming/Reference.java (addrs): Genericized.
+	* javax/naming/InitialContext.java (myProps): Fixed type.
+	(init): Genericized.
+
 2006-06-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/util/DuplicateFormatFlagsException.java,

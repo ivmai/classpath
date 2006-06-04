@@ -73,7 +73,7 @@ public class InitialContext implements Context
   /**
    * The environment, associated with this initial context.
    */
-  protected Hashtable<String,Object> myProps;
+  protected Hashtable<Object,Object> myProps;
   
   /**
    * The list of the properties, to that the second alternative value must
@@ -166,13 +166,13 @@ public class InitialContext implements Context
    *          not later reuse this structure for other purposes.
    * @since 1.3
    */
-  protected void init(Hashtable environment) throws NamingException
+  protected void init(Hashtable<?, ?> environment) throws NamingException
   {
     // If is documented that the caller should not modify the environment.
     if (environment != null)
-      myProps = environment;
+      myProps = (Hashtable<Object, Object>) environment;
     else
-      myProps = new Hashtable<String,Object>();
+      myProps = new Hashtable<Object, Object>();
 
     Applet napplet = (Applet) myProps.get(Context.APPLET);
 
