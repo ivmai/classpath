@@ -50,6 +50,7 @@ import java.awt.Rectangle;
 import java.io.Serializable;
 
 import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.swing.plaf.RootPaneUI;
 
@@ -550,6 +551,7 @@ public class JRootPane extends JComponent implements Accessible
     JPanel p = new JPanel();
     p.setName(this.getName() + ".contentPane");
     p.setLayout(new BorderLayout());
+    p.setBackground(null);
     return p;
   }
 
@@ -624,12 +626,15 @@ public class JRootPane extends JComponent implements Accessible
   
   public void setDefaultButton(JButton newButton)
   {
-    if (defaultButton == newButton)
-      return;
-    
-    JButton oldButton = defaultButton;
-    defaultButton = newButton;
-    firePropertyChange("defaultButton", oldButton, newButton);
+    // We only change the default button if the new button is defaultCapable
+    // or null and the old and new button are different objects.
+    if (defaultButton != newButton
+        && (newButton == null || newButton.isDefaultCapable()))
+      {
+        JButton oldButton = defaultButton;
+        defaultButton = newButton;
+        firePropertyChange("defaultButton", oldButton, newButton);
+      }
   }
 
   /**
@@ -673,5 +678,18 @@ public class JRootPane extends JComponent implements Accessible
   public boolean isOptimizedDrawingEnable()
   {
     return ! glassPane.isVisible();
+  }
+
+  /**
+   * Returns the accessible context for this JRootPane. This will be
+   * an instance of {@link AccessibleJRootPane}.
+   *
+   * @return the accessible context for this JRootPane
+   */
+  public AccessibleContext getAccessibleContext()
+  {
+    if (accessibleContext == null)
+      accessibleContext = new AccessibleJRootPane();
+    return accessibleContext;
   }
 }

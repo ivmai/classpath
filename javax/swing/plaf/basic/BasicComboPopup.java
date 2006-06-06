@@ -38,9 +38,12 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
+import gnu.classpath.NotImplementedException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
@@ -185,6 +188,8 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
   {
     Dimension size = comboBox.getSize();
     size.height = getPopupHeightForRowCount(comboBox.getMaximumRowCount());
+    Insets i = getInsets();
+    size.width -= i.left + i.right;
     Rectangle bounds = computePopupBounds(0, comboBox.getBounds().height,
                                           size.width, size.height);
 
@@ -197,7 +202,8 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
 
     list.ensureIndexIsVisible(list.getSelectedIndex());
     setLightWeightPopupEnabled(comboBox.isLightWeightPopupEnabled());
-    show(comboBox, bounds.x, bounds.y);  }
+    show(comboBox, bounds.x, bounds.y);
+  }
 
   /**
    * This method hides drop down list of items
@@ -288,6 +294,7 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
    * This method uninstalls keyboard actions installed by the UI.
    */
   protected void uninstallKeyboardActions()
+    throws NotImplementedException
   {
     // FIXME: Need to implement
   }
@@ -555,6 +562,7 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
    * DOCUMENT ME!
    */
   protected void installKeyboardActions()
+    throws NotImplementedException
   {
     // FIXME: Need to implement
   }
@@ -710,7 +718,7 @@ public class BasicComboPopup extends JPopupMenu implements ComboPopup
 	totalHeight += dim.height;
       }
 
-    return totalHeight;
+    return totalHeight == 0 ? 100 : totalHeight;
   }
 
   /**

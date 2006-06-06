@@ -38,6 +38,8 @@ exception statement from your version. */
 #include <config.h>
 
 #include "java_lang_VMProcess.h"
+#include "gnu_java_nio_channels_FileChannelImpl.h"
+
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -54,17 +56,6 @@ exception statement from your version. */
 /* Internal functions */
 static char *copy_string (JNIEnv * env, jobject string);
 static char *copy_elem (JNIEnv * env, jobject stringArray, jint i);
-
-/* Some O/S's don't declare 'environ' */
-#if HAVE_CRT_EXTERNS_H
-/* Darwin does not have a variable named environ
-   but has a function which you can get the environ
-   variable with.  */
-#include <crt_externs.h>
-#define environ (*_NSGetEnviron())
-#else
-extern char **environ;
-#endif /* HAVE_CRT_EXTERNS_H */
 
 /*
  * Internal helper function to copy a String in UTF-8 format.
@@ -132,10 +123,11 @@ copy_elem (JNIEnv * env, jobject stringArray, jint i)
 JNIEXPORT void JNICALL
 Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
 				      jobjectArray cmdArray,
-				      jobjectArray envArray, jobject dirFile)
+				      jobjectArray envArray, jobject dirFile,
+				      jboolean redirect)
 {
-  int fds[3];
-  jobject streams[3] = { NULL, NULL, NULL };
+  int fds[CPIO_EXEC_NUM_PIPES];
+  jobject streams[CPIO_EXEC_NUM_PIPES] = { NULL, NULL, NULL };
   jobject dirString = NULL;
   char **newEnviron = NULL;
   jsize cmdArrayLen = 0;
@@ -226,7 +218,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
   method = (*env)->GetMethodID (env, clazz, "<init>", "(II)V");
   if ((*env)->ExceptionOccurred (env))
     goto done;
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < CPIO_EXEC_NUM_PIPES; i++)
     {
       /* Mode is WRITE (2) for in and READ (1) for out and err. */
       const int fd = fds[i];
@@ -238,7 +230,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
       if ((*env)->ExceptionOccurred (env))
 	goto done;
 
-      if (mode == 2)
+      if (mode == gnu_java_nio_channels_FileChannelImpl_WRITE)
 	sclazz = (*env)->FindClass (env, "java/io/FileOutputStream");
       else
 	sclazz = (*env)->FindClass (env, "java/io/FileInputStream");
@@ -266,7 +258,7 @@ Java_java_lang_VMProcess_nativeSpawn (JNIEnv * env, jobject this,
   if ((*env)->ExceptionOccurred (env))
     goto done;
   (*env)->CallVoidMethod (env, this, method,
-			  streams[0], streams[1], streams[2], (jlong) pid);
+			  streams[CPIO_EXEC_STDIN], streams[CPIO_EXEC_STDOUT], streams[CPIO_EXEC_STDERR], (jlong) pid);
   if ((*env)->ExceptionOccurred (env))
     goto done;
 
@@ -282,7 +274,7 @@ done:
    * was created for a file descriptor, we don't close it because it
    * will get closed when the Stream object is finalized.
    */
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < CPIO_EXEC_NUM_PIPES; i++)
     {
       const int fd = fds[i];
 

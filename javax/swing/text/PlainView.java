@@ -164,7 +164,7 @@ public class PlainView extends View implements TabExpander
       {
         Element line = getElement().getElement(lineIndex);
         int startOffset = line.getStartOffset();
-        int endOffset = line.getEndOffset();
+        int endOffset = line.getEndOffset() - 1;
         
         if (selectionStart <= startOffset)
           // Selection starts before the line ...
@@ -198,7 +198,7 @@ public class PlainView extends View implements TabExpander
               // and ends behind the line: First part unselected, second
               // part selected.
               x = drawUnselectedText(g, x, y, startOffset, selectionStart);
-              drawSelectedText(g, x, y, selectionStart, selectionEnd);
+              drawSelectedText(g, x, y, selectionStart, endOffset);
             }
         else
           // Selection is behind this line: Draw completely unselected text.
@@ -325,7 +325,7 @@ public class PlainView extends View implements TabExpander
       {
         Element child = el.getElement(i);
         int start = child.getStartOffset();
-        int end = child.getEndOffset();
+        int end = child.getEndOffset() - 1;
         try
           {
             el.getDocument().getText(start, end - start, seg);
@@ -437,6 +437,11 @@ public class PlainView extends View implements TabExpander
    */
   protected void updateDamage(DocumentEvent changes, Shape a, ViewFactory f)
   {
+    // Return early and do no updates if the allocation area is null
+    // (like the RI).
+    if (a == null)
+      return;
+    
     float oldMaxLineLength = maxLineLength; 
     Rectangle alloc = a.getBounds();
     Element el = getElement();
@@ -518,7 +523,7 @@ public class PlainView extends View implements TabExpander
       {
         Element child = newElements[i];
         int start = child.getStartOffset();
-        int end = child.getEndOffset();
+        int end = child.getEndOffset() - 1;
         try
           {
             el.getDocument().getText(start, end - start, seg);
@@ -637,7 +642,7 @@ public class PlainView extends View implements TabExpander
    * @returna {@link Segment} object, that can be used to fetch text from
    *          the document
    */
-  protected Segment getLineBuffer()
+  protected final Segment getLineBuffer()
   {
     if (lineBuffer == null)
       lineBuffer = new Segment();

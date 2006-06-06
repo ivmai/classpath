@@ -33,6 +33,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.plaf.metal.OceanTheme;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 
 public class Demo
@@ -147,7 +148,15 @@ public class Demo
                                          TabbedPaneDemo.createDemoFactory())));
     examples.add(new JMenuItem(new PopupAction("Tree",
                                                TreeDemo.createDemoFactory())));
+    examples.add(new JMenuItem(new PopupAction("Theme Editor",
+                                       MetalThemeEditor.createDemoFactory())));
 
+    examples.add(new JMenuItem(new PopupAction("DocumentFilter",
+                                     DocumentFilterDemo.createDemoFactory())));
+
+    examples.add(new JMenuItem(new PopupAction("NavigationFilter",
+                                               NavigationFilterDemo.createDemoFactory())));
+    
     final JMenuItem vmMenu;
     
     help.add(new JMenuItem("just play with the widgets"));
@@ -164,7 +173,8 @@ public class Demo
                              + " Version "
                              + System.getProperty("java.vm.version")
                              + " distributed by "
-                             + System.getProperty("java.vm.vendor");
+                             + System.getProperty("java.vm.vendor")
+                             + ".";
                          
             String gnuClasspath = System.getProperty("gnu.classpath.version");
             if(gnuClasspath != null)
@@ -195,17 +205,39 @@ public class Demo
     // Create themes menu.
     themesMenu = new JMenu("Themes");
     ButtonGroup themesGroup = new ButtonGroup();
-    JRadioButtonMenuItem ocean =
-      new JRadioButtonMenuItem(new ChangeThemeAction(new OceanTheme()));
-    ocean.setSelected(MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme);
-    themesMenu.add(ocean);
-    themesGroup.add(ocean);
-    JRadioButtonMenuItem steel =
-      new JRadioButtonMenuItem(new ChangeThemeAction(new DefaultMetalTheme()));
-    ocean.setSelected(MetalLookAndFeel.getCurrentTheme()
-                      instanceof DefaultMetalTheme);
-    themesMenu.add(steel);
-    themesGroup.add(steel);
+
+    // In order to make the demo runable on a 1.4 type VM we have to avoid calling
+    // MetalLookAndFeel.getCurrentTheme(). We simply check whether this method exists
+    // and is public.
+    Method m = null;
+    try
+      {
+        m = MetalLookAndFeel.class.getMethod("getCurrentTheme", null);
+      }
+    catch (NoSuchMethodException nsme)
+      {
+        // Ignore it.
+      }
+    
+    if (m != null)
+      {
+        JRadioButtonMenuItem ocean =
+          new JRadioButtonMenuItem(new ChangeThemeAction(new OceanTheme()));
+        ocean.setSelected(MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme);
+        themesMenu.add(ocean);
+        themesGroup.add(ocean);
+    
+        JRadioButtonMenuItem steel =
+          new JRadioButtonMenuItem(new ChangeThemeAction(new DefaultMetalTheme()));
+        ocean.setSelected(MetalLookAndFeel.getCurrentTheme()
+                          instanceof DefaultMetalTheme);
+        themesMenu.add(steel);
+        themesGroup.add(steel);
+      }
+    else
+      {
+        themesMenu.setEnabled(false);
+      }
     
     bar.add(file);
     bar.add(edit);
@@ -332,7 +364,10 @@ public class Demo
     JPanel main = new JPanel();
     main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
     desktop = createDesktop();
-    main.add(desktop);
+    
+    // Put the desktop in a scrollpane. The scrollbars may show then
+    // up when the them or LaF is changed.
+    main.add(new JScrollPane(desktop));
     main.add(mkButtonBar());
     component.add(main, BorderLayout.CENTER);
     frame.pack();
@@ -507,8 +542,13 @@ public class Demo
                                          TabbedPaneDemo.createDemoFactory())));
     panel.add(new JButton(new PopupAction("Tree",
                                           TreeDemo.createDemoFactory())));
+    panel.add(new JButton(new PopupAction("Theme Editor",
+                                       MetalThemeEditor.createDemoFactory())));
     JButton exitDisposer = mkDisposerButton(frame);
     panel.add(exitDisposer);
+    
+    panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
+                                       panel.getPreferredSize().height));
     exitDisposer.addActionListener(new ActionListener()
       {
 	public void actionPerformed(ActionEvent e)

@@ -42,6 +42,7 @@ exception statement from your version. */
 #define CPIO_EXEC_STDIN 0
 #define CPIO_EXEC_STDOUT 1
 #define CPIO_EXEC_STDERR 2
+#define CPIO_EXEC_NUMPIPES 3
 
 JNIEXPORT int cpproc_forkAndExec (char * const *commandLine, char * const * newEnviron, int *fds, pid_t *pid, const char *wd);
 JNIEXPORT int cpproc_waitpid (pid_t pid, int *status, pid_t *outpid, int options);

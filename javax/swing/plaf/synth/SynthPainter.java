@@ -1100,9 +1100,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param orientation orientation of the scrollbar
    */
   public void paintScrollBarThumbBackground(SynthContext ctx, Graphics g, int x,
-                                   int y, int w, int h)
+                                            int y, int w, int h, int orientation)
   {
     // Nothing to do here.
   }
@@ -1117,9 +1118,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param orientation orientation of the scrollbar
    */
   public void paintScrollBarThumbBorder(SynthContext ctx, Graphics g, int x,
-                               int y, int w, int h)
+                                        int y, int w, int h, int orientation)
   {
     // Nothing to do here.
   }
@@ -1270,9 +1272,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param orientation orientation of the slider
    */
   public void paintSliderThumbBackground(SynthContext ctx, Graphics g, int x,
-                                   int y, int w, int h)
+                                         int y, int w, int h, int orientation)
   {
     // Nothing to do here.
   }
@@ -1287,9 +1290,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param orientation orientation of the slider
    */
   public void paintSliderThumbBorder(SynthContext ctx, Graphics g, int x,
-                               int y, int w, int h)
+                                     int y, int w, int h, int orientation)
   {
     // Nothing to do here.
   }
@@ -1414,23 +1418,6 @@ public abstract class SynthPainter
   }
 
   /**
-   * Paints the border of a split pane's divider.
-   *
-   * @param ctx the synth context identifying the component and region for
-   *        painting
-   * @param g the graphics context to use for painting
-   * @param x the X coordinate of the area to paint
-   * @param y the Y coordinate of the area to paint 
-   * @param w the width of the area to paint
-   * @param h the height of the area to paint
-   */
-  public void paintSplitPaneDividerBorder(SynthContext ctx, Graphics g, int x,
-                               int y, int w, int h)
-  {
-    // Nothing to do here.
-  }
-
-  /**
    * Paints the background of a tabbed pane.
    *
    * @param ctx the synth context identifying the component and region for
@@ -1542,9 +1529,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param index the index of the tab to paint
    */
   public void paintTabbedPaneTabBackground(SynthContext ctx, Graphics g, int x,
-                                   int y, int w, int h)
+                                           int y, int w, int h, int index)
   {
     // Nothing to do here.
   }
@@ -1559,9 +1547,10 @@ public abstract class SynthPainter
    * @param y the Y coordinate of the area to paint 
    * @param w the width of the area to paint
    * @param h the height of the area to paint
+   * @param index the index of the tab to paint
    */
   public void paintTabbedPaneTabBorder(SynthContext ctx, Graphics g, int x,
-                               int y, int w, int h)
+                                       int y, int w, int h, int index)
   {
     // Nothing to do here.
   }

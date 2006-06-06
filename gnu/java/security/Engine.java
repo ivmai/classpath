@@ -166,6 +166,7 @@ public final class Engine
     ClassLoader loader = provider.getClass().getClassLoader();
     Constructor constructor = null;
     String error = algorithm;
+    Throwable cause;
 
     try
       {
@@ -179,29 +180,38 @@ public final class Engine
     catch (ClassNotFoundException cnfe)
       {
         error = "class not found: " + algorithm;
+	cause = cnfe;
       }
     catch (IllegalAccessException iae)
       {
         error = "illegal access: " + iae.getMessage();
+	cause = iae;
       }
     catch (InstantiationException ie)
       {
         error = "instantiation exception: " + ie.getMessage();
+	cause = ie;
       }
     catch (ExceptionInInitializerError eiie)
       {
         error = "exception in initializer: " + eiie.getMessage();
+	cause = eiie;
       }
     catch (SecurityException se)
       {
         error = "security exception: " + se.getMessage();
+	cause = se;
       }
     catch (NoSuchMethodException nsme)
       {
         error = "no appropriate constructor found";
+	cause = nsme;
       }
 
-    throw new NoSuchAlgorithmException(error);
+    NoSuchAlgorithmException nsae = new NoSuchAlgorithmException(error);
+    nsae.initCause(cause);
+
+    throw nsae;
   }
 
   // Own methods.

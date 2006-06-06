@@ -39,6 +39,7 @@ exception statement from your version. */
 package javax.swing.plaf.metal;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 
@@ -79,16 +80,31 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
         int h)
     {
       g.translate(x, y);
-      g.setColor(MetalLookAndFeel.getControlDarkShadow());
-      g.drawLine(0, 0, w - 1, 0);
-      g.drawLine(0, 0, 0, h - 2);
-      g.drawLine(0, h - 2, w - 1, h - 2);
-      g.setColor(MetalLookAndFeel.getControlHighlight());
-      g.drawLine(1, 1, w - 1, 1);
-      g.drawLine(1, 1, 1, h - 1);
-      g.drawLine(1, h - 1, w - 1, h - 1);
-      g.setColor(MetalLookAndFeel.getControl());
-      g.drawLine(1, h - 2, 1, h - 2);
+      if (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme)
+        {
+          g.setColor(MetalLookAndFeel.getControlDarkShadow());
+          g.drawLine(0, 0, w - 1, 0);
+          g.drawLine(0, 0, 0, h - 1);
+          g.drawLine(0, h - 1, w - 1, h - 1);
+          g.setColor(MetalLookAndFeel.getControlShadow());
+          g.drawLine(1, 1, w - 2, 1);
+          g.drawLine(1, 1, 1, h - 2);
+          g.drawLine(1, h - 2, w - 1, h - 2);
+          g.drawLine(w - 1, 1, w - 1, h - 2);
+        }
+      else
+        {
+          g.setColor(MetalLookAndFeel.getControlDarkShadow());
+          g.drawLine(0, 0, w - 1, 0);
+          g.drawLine(0, 0, 0, h - 2);
+          g.drawLine(0, h - 2, w - 1, h - 2);
+          g.setColor(MetalLookAndFeel.getControlHighlight());
+          g.drawLine(1, 1, w - 1, 1);
+          g.drawLine(1, 1, 1, h - 1);
+          g.drawLine(1, h - 1, w - 1, h - 1);
+          g.setColor(MetalLookAndFeel.getControl());
+          g.drawLine(1, h - 2, 1, h - 2);
+        }
       g.translate(-x, -y);
     }
 
@@ -125,7 +141,40 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
       // Nothing to do here.
     }
   }
-  
+
+  /**
+   * A special textfield implementation for the MetalComboBoxEditor.
+   */
+  private class EditorTextField extends JTextField
+  {
+    EditorTextField(String s, int columns)
+    {
+      super(s, columns);
+    }
+
+    /**
+     * Tests seem to show that the textfield in MetalComboBoxEditors have
+     * a height + 4.
+     */
+    public Dimension getPreferredSize()
+    {
+      Dimension size = super.getPreferredSize();
+      size.height += 4;
+      return size;
+    }
+
+    /**
+     * Tests seem to show that the textfield in MetalComboBoxEditors have
+     * a height + 4.
+     */
+    public Dimension getMinimumSize()
+    {
+      Dimension size = super.getMinimumSize();
+      size.height += 4;
+      return size;
+    }
+  }
+
   /** The editor's border insets. */
   protected static Insets editorBorderInsets = new Insets(2, 2, 2, 0);
   
@@ -134,7 +183,7 @@ public class MetalComboBoxEditor extends BasicComboBoxEditor
    */
   public MetalComboBoxEditor()
   {
-    super();
+    editor = new EditorTextField("", 9);
     editor.setBorder(new MetalComboBoxEditorBorder());
   }
   

@@ -10,7 +10,7 @@ libjavalang_la_LIBADD = $(wildcard $(top_builddir)/native/fdlibm/*.lo) \
 			$(top_builddir)/native/jni/classpath/jcl.lo \
 			$(top_builddir)/native/jni/native-lib/libclasspathnative.la
 
-libjavalangreflect_la_SOURCES = java_lang_reflect_Array.c
+libjavalangreflect_la_SOURCES = java_lang_reflect_VMArray.c
 
 AM_LDFLAGS = @CLASSPATH_MODULE@
 AM_CPPFLAGS = @CLASSPATH_INCLUDES@ -I$(top_srcdir)/native/fdlibm

@@ -53,9 +53,15 @@ public class TreePath implements Serializable
   static final long serialVersionUID = 4380036194768077479L;
 
   /**
-   * path
+   * The actual patch. The {@link DefaultTreeSelectionModel#clone()}
+   * assumes that the TreePath is immutable, so it is marked final here.
    */
-  private Object[] path = null;
+  private final Object[] path;
+  
+  /**
+   * The parent path (to be reused).
+   */
+  private transient TreePath parentPath;
 
 
   /**
@@ -293,7 +299,12 @@ public class TreePath implements Serializable
     // is what the JDK does.
     if (path.length <= 1)
       return null;
-
-    return new TreePath(this.getPath(), path.length - 1);
+    
+    // Reuse the parent path, if possible. The parent path is requested
+    // during the tree repainting, so reusing generates a lot less garbage.
+    if (parentPath == null)
+      parentPath = new TreePath(this.getPath(), path.length - 1);
+    
+    return parentPath;
   }
 }

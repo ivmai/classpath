@@ -40,7 +40,8 @@ exception statement from your version. */
 #define _JAVANET_LOADED 
 
 #include <jni.h>
-#include <cpnet.h>
+#include "jcl.h"
+#include "cpnet.h"
 
 /*************************************************************************/
 
@@ -70,19 +71,6 @@ exception statement from your version. */
 
 /* Internal option identifiers. Not needed for JDK compatibility */
 #define SOCKOPT_IP_TTL 7777
-
-/*************************************************************************/
-
-/*
- * Macros
- */
-
-/* Simple debug macro */
-#ifdef DEBUG
-#define DBG(x) fprintf(stderr, (x));
-#else
-#define DBG(x)
-#endif
 
 /*************************************************************************/
 
