@@ -38,17 +38,22 @@
 
 package gnu.classpath.tools.jar;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
+import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class Extractor
     extends Action
 {
+  // This is a set of all the items specified on the command line.
+  private WorkSet allItems;
+
   private void copyFile(InputStream input, File output) throws IOException
   {
     FileOutputStream os = new FileOutputStream(output);
@@ -65,18 +70,38 @@ public class Extractor
 
   public void run(Main parameters) throws IOException
   {
-    ZipFile zip = new ZipFile(parameters.archiveFile);
-    Enumeration e = zip.entries();
-    while (e.hasMoreElements())
+    // Figure out what we want to extract.
+    allItems = new WorkSet(parameters.entries);
+    // Open the input file.
+    ZipInputStream zis;
+    File zfile = parameters.archiveFile;
+    if (zfile == null || "-".equals(zfile.getName())) //$NON-NLS-1$
+      zis = new ZipInputStream(System.in);
+    else
       {
-        ZipEntry entry = (ZipEntry) e.nextElement();
+        InputStream ins = new BufferedInputStream(new FileInputStream(zfile));
+        zis = new ZipInputStream(ins);
+      }
+    // Extract stuff.
+    while (true)
+      {
+        ZipEntry entry = zis.getNextEntry();
+        if (entry == null)
+          break;
+        if (! allItems.contains(entry.getName()))
+          continue;
         File file = new File(entry.getName());
         if (entry.isDirectory())
           {
             if (file.mkdirs())
               {
                 if (parameters.verbose)
-                  System.out.println("  created: " + file);
+                  {
+                    String msg
+                      = MessageFormat.format(Messages.getString("Extractor.Created"), //$NON-NLS-1$
+                                             new Object[] { file });
+                    System.err.println(msg);
+                  }
               }
             continue;
           }
@@ -85,15 +110,17 @@ public class Extractor
         if (parent != null)
           parent.mkdirs();
 
-        InputStream input = zip.getInputStream(entry);
-        copyFile(input, file);
-        input.close();
+        copyFile(zis, file);
 
         if (parameters.verbose)
           {
-            String leader = (entry.getMethod() == ZipEntry.STORED ? " extracted"
-                                                                 : "  inflated");
-            System.out.println(leader + ": " + file);
+            String fmt;
+            if (entry.getMethod() == ZipEntry.STORED)
+              fmt = Messages.getString("Extractor.Extracted"); //$NON-NLS-1$
+            else
+              fmt = Messages.getString("Extractor.Inflated"); //$NON-NLS-1$
+            String msg = MessageFormat.format(fmt, new Object[] { file });
+            System.err.println(msg);
           }
       }
   }

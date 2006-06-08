@@ -39,8 +39,10 @@
 package gnu.classpath.tools.getopt;
 
 import java.io.PrintStream;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * An option group holds a collection of Options. It also has a name. Option
@@ -48,6 +50,9 @@ import java.util.Iterator;
  */
 public class OptionGroup
 {
+  /** An 80-character string of whitespaces to use as a source for padding. */
+  private static final String FILLER = "                                        "
+                                     + "                                        ";
   private String name;
 
   ArrayList options = new ArrayList();
@@ -70,6 +75,85 @@ public class OptionGroup
   }
 
   /**
+   * Print a designated text to a {@link PrintStream}, eventually wrapping the
+   * lines of text so as to ensure that the width of each line does not overflow
+   * {@link Parser#MAX_LINE_LENGTH} columns. The line-wrapping is done with a
+   * {@link BreakIterator} using the default {@link Locale}.
+   * <p>
+   * The text to print may contain <code>\n</code> characters. This method will
+   * force a line-break for each such character.
+   * 
+   * @param out the {@link PrintStream} destination of the formatted text.
+   * @param text the text to print.
+   * @param leftMargin a positive value indicating the column position of the
+   *          start of the first line. Continuation lines, if they exist, are
+   *          printed starting at <code>leftMargin + 2</code> as per GNU
+   *          convention.
+   * @see Parser#MAX_LINE_LENGTH
+   */
+  protected static void formatText(PrintStream out, String text, int leftMargin)
+  {
+    formatText(out, text, leftMargin, Locale.getDefault());
+  }
+
+  /**
+   * Similar to the method with the same name and three arguments, except that
+   * the caller MUST specify a non-null {@link Locale} instance.
+   * <p>
+   * Print a designated text to a {@link PrintStream}, eventually wrapping the
+   * lines of text so as to ensure that the width of each line does not overflow
+   * {@link Parser#MAX_LINE_LENGTH} columns. The line-wrapping is done with a
+   * {@link BreakIterator} using the designated {@link Locale}.
+   * <p>
+   * The text to print may contain <code>\n</code> characters. This method will
+   * force a line-break for each such character.
+   * 
+   * @param out the {@link PrintStream} destination of the formatted text.
+   * @param text the text to print.
+   * @param leftMargin a positive value indicating the column position of the
+   *          start of the first line. Continuation lines, if they exist, are
+   *          printed starting at <code>leftMargin + 2</code> as per GNU
+   *          convention.
+   * @param aLocale the {@link Locale} instance to use when constructing the
+   *          {@link BreakIterator}.
+   * @see Parser#MAX_LINE_LENGTH
+   */
+  protected static void formatText(PrintStream out, String text, int leftMargin,
+                                   Locale aLocale)
+  {
+    BreakIterator bit = BreakIterator.getLineInstance(aLocale);
+    String[] lines = text.split("\n");
+    int length = leftMargin;
+    String leftPadding = FILLER.substring(0, leftMargin + 2);
+    for (int i = 0; i < lines.length; i++)
+      {
+        text = lines[i];
+        bit.setText(text);
+        int start = bit.first();
+        int finish;
+        while ((finish = bit.next()) != BreakIterator.DONE)
+          {
+            String word = text.substring(start, finish);
+            length += word.length();
+            if (length >= Parser.MAX_LINE_LENGTH)
+              {
+                out.println();
+                out.print(leftPadding);
+                length = word.length() + leftMargin + 2;
+              }
+            out.print(word);
+            start = finish;
+          }
+        out.println();
+        if (i != lines.length - 1)
+          {
+            length = leftMargin + 2;
+            out.print(leftPadding);
+          }
+      }
+  }
+
+  /**
    * Add an option to this option group.
    * 
    * @param opt the option to add
@@ -84,12 +168,26 @@ public class OptionGroup
    * 
    * @param out the stream to which to print
    */
-  public void printHelp(PrintStream out)
+  public void printHelp(PrintStream out, boolean longOnly)
   {
     // Compute maximum lengths.
     int maxArgLen = 0;
-    int maxShortLen = 0;
-    Iterator it = options.iterator();
+    boolean shortOptionSeen = false;
+    Iterator it;
+
+    // The first pass only looks to see if we have a short option.
+    it = options.iterator();
+    while (it.hasNext())
+      {
+        Option option = (Option) it.next();
+        if (option.getShortName() != '\0')
+          {
+            shortOptionSeen = true;
+            break;
+          }
+      }
+
+    it = options.iterator();
     while (it.hasNext())
       {
         Option option = (Option) it.next();
@@ -100,21 +198,16 @@ public class OptionGroup
         // a short option if there is also a long name for
         // the option.
         int thisArgLen = 2;
-        if (option.getShortName() != '\0')
-          {
-            // The name of the option plus some padding.
-            thisArgLen += 4;
-          }
-        maxShortLen = Math.max(thisArgLen, maxShortLen);
+        if (shortOptionSeen)
+          thisArgLen += 4;
         if (option.getLongName() != null)
           {
-            // FIXME: different if parsing in 'long option only'
-            // mode.
-            thisArgLen += 2 + option.getLongName().length();
+            // Handle either '-' or '--'.
+            thisArgLen += 1 + option.getLongName().length();
+            if (! longOnly)
+              ++thisArgLen;
           }
-        // We only need to add the argument name in once,
-        // and we don't let it contribute to the width of
-        // the short name.
+        // Add in the width of the argument name.
         if (argName != null)
           thisArgLen += 1 + argName.length();
         maxArgLen = Math.max(maxArgLen, thisArgLen);
@@ -138,9 +231,16 @@ public class OptionGroup
               {
                 if (argName != null)
                   {
-                    out.print(' ');
+                    // This is a silly hack just for '-J'.  We don't
+                    // support joined options in general, but this option
+                    // is filtered out before argument processing can see it.
+                    if (option.getShortName() != 'J')
+                      {
+                        out.print(' ');
+                        ++column;
+                      }
                     out.print(argName);
-                    column += 1 + argName.length();
+                    column += argName.length();
                   }
                 out.print("  ");
               }
@@ -148,24 +248,24 @@ public class OptionGroup
               out.print(", ");
             column += 2;
           }
-        for (; column < maxShortLen; ++column)
+        // Indent the long option past the short options, if one
+        // was seen.
+        for (; column < (shortOptionSeen ? 6 : 2); ++column)
           out.print(' ');
         if (option.getLongName() != null)
           {
-            out.print("--");
+            out.print(longOnly ? "-" : "--");
             out.print(option.getLongName());
-            column += 2 + option.getLongName().length();
+            column += (longOnly ? 1 : 2) + option.getLongName().length();
             if (argName != null)
               {
-                out.print("=" + argName);
+                out.print(" " + argName);
                 column += 1 + argName.length();
               }
           }
-        for (; column < maxArgLen; ++column)
-          out.print(' ');
         // FIXME: should have a better heuristic for padding.
-        out.print("    ");
-        out.println(option.getDescription());
+        out.print(FILLER.substring(0, maxArgLen + 4 - column));
+        formatText(out, option.getDescription(), maxArgLen + 4);
       }
   }
 }

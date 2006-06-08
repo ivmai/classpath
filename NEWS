@@ -1,6 +1,34 @@
-New in release 0.92
+New in release 0.92 (UNRELEASED)
 
-New in release 0.91 (UNRELEASED)
+* libjawtgnu.so has been renamed libjawt.so for binary compatibility.
+  libjawt.so should be installed in a VM-specific directory rather
+  than directly in /usr/lib.  Proprietary VMs put their libjawt.so
+  implementations in VM-specific directories but search /usr/lib first.
+  If GNU Classpath's libjawt.so is installed in /usr/lib it will create
+  problems for people who use a proprietary VM to run AWT Native
+  Interface applications.
+* The GdkGraphics2D backend has been made the default.  There is no
+  longer an explicit dependency on Cairo, the --enable-gtk-cairo
+  configure option is gone, and GTK 2.8 or higher is now required to
+  build the GTK peers.
+* A Mozilla plugin, 'gcjwebplugin', is now included.  It introduces a
+  dependency on the Mozilla plugin support headers and libraries.
+* Several new tools are now included:
+  * appletviewer
+  * jar
+  * native2ascii
+  * serialver
+  A new configure option --enable-tool-wrappers causes wrapper
+  binaries to be built for VMs that support the JNI Invocation API.
+
+Runtime interface changes:
+
+* A new class, VMURLConnection, is used to implement
+  URLConnection.guessContentTypeFromStream.  The reference
+  implementation uses libmagic (and falls back to doing nothing if
+  libmagic is not available).
+
+New in release 0.91 (May 15, 2006)
 
 * Experimental activation (java.rmi.activation) support, including RMI
   activation daemon and persistent naming service tools.
@@ -60,6 +88,9 @@ Runtime interface changes:
 * java.lang.Package now has a new constructor that takes the defining
   ClassLoader as an extra argument. If you use a custom version of
   VMClassLoader, please switch it to use this constructor.
+* The reference implementation of VMClassLoader.getBootPackages() now
+  reads the META-INF/INDEX.LIST resource using the java.boot.class.path
+  system property.
 
 New in release 0.90 (March 6, 2006)
 

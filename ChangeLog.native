@@ -1,3 +1,10 @@
+2006-06-07  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* Merged HEAD as of 2006-06-06.
+
+	* native/jni/native-lib/cpproc.h
+	(CPIO_EXEC_NUM_PIPES): Compilation fix.
+
 2006-06-06  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* Merged HEAD as of 2006-05-08.

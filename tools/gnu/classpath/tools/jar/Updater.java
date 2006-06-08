@@ -38,41 +38,51 @@
 
 package gnu.classpath.tools.jar;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.OutputStream;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class Updater
     extends Creator
 {
+  JarFile inputJar;
+
+  protected Manifest createManifest(Main parameters) throws IOException
+  {
+    Manifest result = inputJar.getManifest();
+    if (result == null)
+      return super.createManifest(parameters);
+    if (parameters.manifestFile != null)
+      result.read(new FileInputStream(parameters.manifestFile));
+    return result;
+  }
+
   public void run(Main parameters) throws IOException
   {
+    // Set this early so that createManifest can use it.
+    inputJar = new JarFile(parameters.archiveFile);
+
     // Write all the new entries to a temporary file.
     File tmpFile = File.createTempFile("jarcopy", null);
-    ArrayList newEntries = writeCommandLineEntries(parameters, tmpFile);
-    HashSet set = new HashSet();
-    Iterator it = newEntries.iterator();
-    while (it.hasNext())
-      {
-        Entry entry = (Entry) it.next();
-        set.add(entry.name);
-      }
+    OutputStream os = new BufferedOutputStream(new FileOutputStream(tmpFile));
+    writeCommandLineEntries(parameters, os);
 
     // Now read the old file and copy extra entries to the new file.
-    ZipFile zip = new ZipFile(parameters.archiveFile);
-    Enumeration e = zip.entries();
+    Enumeration e = inputJar.entries();
     while (e.hasMoreElements())
       {
         ZipEntry entry = (ZipEntry) e.nextElement();
-        if (set.contains(entry.getName()))
+        if (writtenItems.contains(entry.getName()))
           continue;
-        writeFile(entry.isDirectory(), zip.getInputStream(entry),
-                  zip.getName(), parameters.verbose);
+        writeFile(entry.isDirectory(), inputJar.getInputStream(entry),
+                  entry.getName(), parameters.verbose);
       }
 
     close();

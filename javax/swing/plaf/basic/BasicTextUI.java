@@ -38,8 +38,6 @@ exception statement from your version. */
 
 package javax.swing.plaf.basic;
 
-import gnu.classpath.NotImplementedException;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -831,9 +829,9 @@ public abstract class BasicTextUI extends TextUI
    * this UI.
    */
   protected void uninstallKeyboardActions()
-    throws NotImplementedException
   {
-    // FIXME: Uninstall keyboard actions here.
+    SwingUtilities.replaceUIInputMap(textComponent, JComponent.WHEN_FOCUSED, null);
+    SwingUtilities.replaceUIActionMap(textComponent, null);
   }
 
   /**
@@ -1041,7 +1039,12 @@ public abstract class BasicTextUI extends TextUI
 
         Rectangle l1 = modelToView(t, p0, firstBias);
         Rectangle l2 = modelToView(t, p1, secondBias);
-        if (l1.y == l2.y)
+        if (l1 == null || l2 == null)
+          {
+            // Unable to determine the start or end of the selection.
+            t.repaint();
+          }
+        else if (l1.y == l2.y)
           {
             SwingUtilities.computeUnion(l2.x, l2.y, l2.width, l2.height, l1);
             t.repaint(l1);

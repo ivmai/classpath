@@ -38,32 +38,54 @@
 
 package gnu.classpath.tools.jar;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class Lister
     extends Action
 {
-  private void listJar(File jarFile, boolean verbose) throws IOException
+  private WorkSet allItems;
+
+  private long readUntilEnd(InputStream is) throws IOException
   {
-    ZipFile zipFile = new ZipFile(jarFile);
-    Enumeration i = zipFile.entries();
+    byte[] buffer = new byte[5 * 1024];
+    long result = 0;
+    while (true)
+      {
+        int r = is.read(buffer);
+        if (r == -1)
+          break;
+        result += r;
+      }
+    return result;
+  }
+
+  private void listJar(ZipInputStream zis, boolean verbose) throws IOException
+  {
     MessageFormat format = null;
     if (verbose)
       format = new MessageFormat(" {0,date,E M dd HH:mm:ss z yyyy} {1}");
-    while (i.hasMoreElements())
+    while (true)
       {
-        ZipEntry entry = (ZipEntry) i.nextElement();
+        ZipEntry entry = zis.getNextEntry();
+        if (entry == null)
+          break;
+        if (! allItems.contains(entry.getName()))
+          continue;
         if (verbose)
           {
+            // Read the stream; entry.getSize() is unreliable.
+            // (Also, we're just going to read it anyway.)
+            long size = readUntilEnd(zis);
             // No easy way to right-justify the size using
             // MessageFormat -- how odd.
-            long size = entry.getSize();
             String s = "     " + size;
             int index = Math.min(s.length() - 5, 5);
             System.out.print(s.substring(index));
@@ -74,11 +96,17 @@ public class Lister
         else
           System.out.println(entry.getName());
       }
-    zipFile.close();
   }
 
   public void run(Main parameters) throws IOException
   {
-    listJar(parameters.archiveFile, parameters.verbose);
+    allItems = new WorkSet(parameters.entries);
+    File file = parameters.archiveFile;
+    ZipInputStream zis;
+    if (file == null || "-".equals(file.getName()))
+      zis = new ZipInputStream(System.in);
+    else
+      zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
+    listJar(zis, parameters.verbose);
   }
 }

@@ -46,16 +46,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class Creator
     extends Action
 {
-  ZipOutputStream outputStream;
+  JarOutputStream outputStream;
+  HashSet writtenItems = new HashSet();
+  // The manifest to use, or null if we don't want a manifest.
+  Manifest manifest;
 
   private long copyFile(CRC32 crc, InputStream is, OutputStream output)
       throws IOException
@@ -76,8 +83,20 @@ public class Creator
   }
 
   protected void writeFile(boolean isDirectory, InputStream inputFile,
-                           String filename, boolean verbose) throws IOException
+                           String filename, boolean verbose)
+    throws IOException
   {
+    if (writtenItems.contains(filename))
+      {
+        if (verbose)
+          {
+            String msg = MessageFormat.format(Messages.getString("Creator.Ignoring"), //$NON-NLS-1$
+                                              new Object[] { filename });
+            System.err.println(msg);
+          }
+        return;
+      }
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     CRC32 crc = new CRC32();
     long size;
@@ -97,6 +116,7 @@ public class Creator
     outputStream.putNextEntry(entry);
     out.writeTo(outputStream);
     outputStream.closeEntry();
+    writtenItems.add(filename);
 
     if (verbose)
       {
@@ -106,8 +126,15 @@ public class Creator
           perc = 0;
         else
           perc = 100 - (100 * csize) / size;
-        System.out.println("adding: " + filename + " (in=" + size + ") (out="
-                           + entry.getSize() + ") (stored " + perc + "%)");
+        String msg = MessageFormat.format(Messages.getString("Creator.Adding"), //$NON-NLS-1$
+                                          new Object[]
+                                            {
+                                              filename,
+                                              Long.valueOf(size),
+                                              Long.valueOf(entry.getSize()),
+                                              Long.valueOf(perc)
+                                            });
+        System.err.println(msg);
       }
   }
 
@@ -140,7 +167,7 @@ public class Creator
         String[] files = entry.file.list();
         for (int i = 0; i < files.length; ++i)
           addEntries(result, new Entry(new File(entry.file, files[i]),
-                                       entry.name + '/' + files[i]));
+                                       entry.name + files[i]));
       }
     else
       result.add(entry);
@@ -158,35 +185,63 @@ public class Creator
     return allEntries;
   }
 
-  protected ArrayList writeCommandLineEntries(Main parameters, File zipFile)
+  private void writeCommandLineEntries(Main parameters)
       throws IOException
   {
-    outputStream = new ZipOutputStream(
-                                       new BufferedOutputStream(
-                                                                new FileOutputStream(
-                                                                                     zipFile)));
-    outputStream.setMethod(parameters.storageMode);
+    // We've already written the manifest, make sure to mark it.
+    writtenItems.add("META-INF/"); //$NON-NLS-1$
+    writtenItems.add(JarFile.MANIFEST_NAME);
+
     ArrayList allEntries = getAllEntries(parameters);
-    Iterator it = parameters.entries.iterator();
+    Iterator it = allEntries.iterator();
     while (it.hasNext())
       {
         Entry entry = (Entry) it.next();
         writeFile(entry.file, entry.name, parameters.verbose);
       }
-    return allEntries;
+  }
+
+  protected Manifest createManifest(Main parameters)
+    throws IOException
+  {
+    if (! parameters.wantManifest)
+      return null;
+    if (parameters.manifestFile != null)
+      {
+        // User specified a manifest file.
+        InputStream contents = new FileInputStream(parameters.manifestFile);
+        return new Manifest(contents);
+      }
+    return new Manifest();
+  }
+
+  protected void writeCommandLineEntries(Main parameters, OutputStream os)
+    throws IOException
+  {
+    manifest = createManifest(parameters);
+    outputStream = new JarOutputStream(os, manifest);
+    // FIXME: in Classpath this sets the method too late for the
+    // manifest file.
+    outputStream.setMethod(parameters.storageMode);
+    writeCommandLineEntries(parameters);
   }
 
   protected void close() throws IOException
   {
-    // FIXME: handle manifest options here.
-    // FIXME: handle index file here ...?
     outputStream.finish();
     outputStream.close();
   }
 
   public void run(Main parameters) throws IOException
   {
-    writeCommandLineEntries(parameters, parameters.archiveFile);
+    if (parameters.archiveFile == null || parameters.archiveFile.equals("-")) //$NON-NLS-1$
+      writeCommandLineEntries(parameters, System.out);
+    else
+      {
+        OutputStream os
+          = new BufferedOutputStream(new FileOutputStream(parameters.archiveFile));
+        writeCommandLineEntries(parameters, os);
+      }
     close();
   }
 }

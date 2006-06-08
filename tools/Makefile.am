@@ -21,8 +21,46 @@ endif
 endif
 endif
 
-bin_SCRIPTS = jarsigner keytool
-EXTRA_DIST = jarsigner.in keytool.in
+if CREATE_WRAPPERS
+bin_SCRIPTS =
+bin_PROGRAMS = appletviewer jarsigner keytool
+
+if FOUND_GCJ
+LIBJVM = -lgcj
+else
+if FOUND_CACAO
+LIBJVM = -ljvm
+else
+LIBJVM =
+endif
+endif
+
+appletviewer_SOURCES = toolwrapper.c
+appletviewer_CFLAGS = -Wall \
+	-DDATA_DIR="\"$(datadir)\"" \
+	-DPACKAGE="\"$(PACKAGE)\"" \
+	-DTOOLNAME="\"appletviewer\""
+appletviewer_LDFLAGS = -L$(libdir) $(LIBJVM)
+
+jarsigner_SOURCES = toolwrapper.c
+jarsigner_CFLAGS = -Wall \
+	-DDATA_DIR="\"$(datadir)\"" \
+	-DPACKAGE="\"$(PACKAGE)\"" \
+	-DTOOLNAME="\"jarsigner\""
+jarsigner_LDFLAGS = -L$(libdir) $(LIBJVM)
+
+keytool_SOURCES = toolwrapper.c
+keytool_CFLAGS = -Wall \
+	-DDATA_DIR="\"$(datadir)\"" \
+	-DPACKAGE="\"$(PACKAGE)\"" \
+	-DTOOLNAME="\"keytool\""
+keytool_LDFLAGS = -L$(libdir) $(LIBJVM)
+
+else
+bin_SCRIPTS = appletviewer jarsigner keytool
+bin_PROGRAMS =
+endif
+EXTRA_DIST = toolwrapper.c appletviewer.in jarsigner.in keytool.in
 
 # All our example java source files
 TOOLS_JAVA_FILES = $(srcdir)/gnu/classpath/tools/*.java $(srcdir)/gnu/classpath/tools/*/*.java $(srcdir)/gnu/classpath/tools/*/*/*.java
@@ -43,10 +81,8 @@ TOOLS_TEMPLATES = $(GRMIC_TEMPLATES) $(RMIC_TEMPLATES)
 # This covers the built-in help texts, both for giop and rmic subpackages.
 GIOP_HELPS = $(srcdir)/gnu/classpath/tools/giop/*.txt
 RMI_HELPS = $(srcdir)/gnu/classpath/tools/rmi/*.txt
-JARSIGNER_HELPS = $(srcdir)/gnu/classpath/tools/jarsigner/*.txt
-KEYTOOL_HELPS = $(srcdir)/gnu/classpath/tools/keytool/*.txt
 
-TOOLS_HELPS = $(GIOP_HELPS) $(RMI_HELPS) $(JARSIGNER_HELPS) $(KEYTOOL_HELPS)
+TOOLS_HELPS = $(GIOP_HELPS) $(RMI_HELPS)
 
 # The tool specific README files.
 READMES = $(srcdir)/gnu/classpath/tools/giop/README
@@ -81,14 +117,13 @@ dist-hook:
 $(TOOLS_ZIP): $(TOOLS_JAVA_FILES)
 	mkdir -p classes/gnu/classpath/tools/giop/grmic/templates
 	mkdir -p classes/gnu/classpath/tools/rmi/rmic/templates
+	mkdir -p classes/gnu/classpath/tools/appletviewer
 	mkdir -p classes/gnu/classpath/tools/jarsigner
 	mkdir -p classes/gnu/classpath/tools/keytool
 	cp $(RMIC_TEMPLATES) classes/gnu/classpath/tools/rmi/rmic/templates
 	cp $(GRMIC_TEMPLATES) classes/gnu/classpath/tools/giop/grmic/templates
 	cp $(RMI_HELPS) classes/gnu/classpath/tools/rmi/
 	cp $(GIOP_HELPS) classes/gnu/classpath/tools/giop/
-	cp $(JARSIGNER_HELPS) classes/gnu/classpath/tools/jarsigner/
-	cp $(KEYTOOL_HELPS) classes/gnu/classpath/tools/keytool/
 	$(JCOMPILER) -d classes $(TOOLS_JAVA_FILES)
 	(cd classes; \
 	if test "$(ZIP)" != ""; then $(ZIP) -r ../$(TOOLS_ZIP) .; fi; \
@@ -99,3 +134,7 @@ $(TOOLS_ZIP): $(TOOLS_JAVA_FILES)
 # Zip file be gone! (and make sure the classes are gone too)
 clean-local:
 	rm -rf $(TOOLS_ZIP) classes
+
+# FIXME: remove this when GNU Classpath includes a bootstrap VM.
+installcheck-binSCRIPTS:
+	:
