@@ -1,5 +1,5 @@
 /* GdkTextLayout.java
-   Copyright (C) 2003, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2006  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -70,20 +70,26 @@ public class GdkTextLayout
   // native side, plumbing, etc.
   static 
   {
-    if (Configuration.INIT_LOAD_LIBRARY)
-      {
-        System.loadLibrary("gtkpeer");
-      }
+    System.loadLibrary("gtkpeer");
+
     initStaticState ();
   }
   private native void setText(String str);
+  private native void setFont(GdkFontPeer font);
   private native void getExtents(double[] inkExtents,
                                  double[] logExtents);
   private native void indexToPos(int idx, double[] pos);
+
   private native void initState ();
+
   private native void dispose ();
+
+  private native void cairoDrawGdkTextLayout(long cg2d, float x, float y);
+
   static native void initStaticState();
+
   private final int native_state = GtkGenericPeer.getUniqueInteger ();
+
   protected void finalize ()
   {
     dispose ();
@@ -99,6 +105,15 @@ public class GdkTextLayout
     initState();
     attributedString = str;
     fontRenderContext = frc;
+    AttributedCharacterIterator aci = str.getIterator();
+    char[] chars = new char[aci.getEndIndex() - aci.getBeginIndex()];
+    for(int i = aci.getBeginIndex(); i < aci.getEndIndex(); i++)
+      chars[i] = aci.setIndex(i);    
+    setText(new String(chars));
+
+    Object fnt = aci.getAttribute(TextAttribute.FONT);
+    if (fnt != null && fnt instanceof Font) 	 
+      setFont( (GdkFontPeer) ((Font)fnt).getPeer() );
   }
 
   protected class CharacterIteratorProxy 
@@ -201,9 +216,7 @@ public class GdkTextLayout
 
   public void draw (Graphics2D g2, float x, float y)
   {
-    // we share pango structures directly with GdkGraphics2D 
-    GdkGraphics2D gg2 = (GdkGraphics2D) g2;
-    gg2.drawGdkTextLayout(this, x, y);
+    cairoDrawGdkTextLayout(((CairoGraphics2D) g2).nativePointer, x, y);
   }
 
   public TextHitInfo getStrongCaret (TextHitInfo hit1, 

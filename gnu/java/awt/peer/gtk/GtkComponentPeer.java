@@ -207,13 +207,7 @@ public class GtkComponentPeer extends GtkGenericPeer
 
   public Image createImage (int width, int height)
   {
-    Image image;
-    image = new BufferedImage (width, height, BufferedImage.TYPE_INT_RGB);
-
-    Graphics g = image.getGraphics();
-    g.setColor(getBackground());
-    g.fillRect(0, 0, width, height);
-    return image;
+    return CairoSurface.getBufferedImage(width, height);
   }
 
   public void disable () 
@@ -240,7 +234,7 @@ public class GtkComponentPeer extends GtkGenericPeer
   // never return null.
   public Graphics getGraphics ()
   {
-    return new GdkGraphics2D (this);
+    return ComponentGraphics.getComponentGraphics(this);
   }
 
   public Point getLocationOnScreen () 
@@ -703,7 +697,7 @@ public class GtkComponentPeer extends GtkGenericPeer
   // on which this component is displayed.
   public VolatileImage createVolatileImage (int width, int height)
   {
-    return new GtkVolatileImage (width, height);
+    return new GtkVolatileImage (this, width, height, null);
   }
 
   // Creates buffers used in a buffering strategy.
@@ -713,7 +707,7 @@ public class GtkComponentPeer extends GtkGenericPeer
     // numBuffers == 2 implies double-buffering, meaning one back
     // buffer and one front buffer.
     if (numBuffers == 2)
-      backBuffer = new GtkVolatileImage(awtComponent.getWidth(),
+      backBuffer = new GtkVolatileImage(this, awtComponent.getWidth(),
 					awtComponent.getHeight(),
 					caps.getBackBufferCapabilities());
     else

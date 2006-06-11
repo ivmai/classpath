@@ -834,11 +834,11 @@ public class LogManager
       }
     catch (ClassNotFoundException e)
       {
-        warn(property, className, "class not found");
+        warn(property, className, "class not found", e);
       }
     catch (IllegalAccessException e)
       {
-        warn(property, className, "illegal access");
+        warn(property, className, "illegal access", e);
       }
     catch (InstantiationException e)
       {
@@ -846,7 +846,7 @@ public class LogManager
       }
     catch (java.lang.LinkageError e)
       {
-        warn(property, className, "linkage error");
+        warn(property, className, "linkage error", e);
       }
 
     return null;

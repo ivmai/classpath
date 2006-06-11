@@ -701,7 +701,7 @@ public class Collections
 	boolean forward = true;
         while (low <= hi)
           {
-            pos = (low + hi) >> 1;
+            pos = (low + hi) >>> 1;
             if (i < pos)
 	      {
 		if (!forward)
@@ -730,7 +730,7 @@ public class Collections
       {
 	while (low <= hi)
 	  {
-	    pos = (low + hi) >> 1;
+	    pos = (low + hi) >>> 1;
 	    final int d = compare(((List<T>) l).get(pos), key, c);
 	    if (d == 0)
               return pos;

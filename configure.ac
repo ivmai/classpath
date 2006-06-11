@@ -321,6 +321,7 @@ if test "x${COMPILE_JNI}" = xyes; then
 		  strerror_r \
                   fcntl \
 		  mmap munmap mincore msync madvise getpagesize sysconf \
+		  lstat readlink \
 		  ])
 
   LIBMAGIC=
@@ -400,12 +401,27 @@ if test "x${COMPILE_JNI}" = xyes; then
         AC_MSG_ERROR([GTK+ peers requested but no X library available])
     fi
     dnl We explicitly want the XTest Extension for Robot support.
-    AC_CHECK_LIB([Xtst], [XTestQueryExtension], [true],
-       	  [AC_MSG_ERROR([libXtst NOT found, required for GdkRobot])],
-       	  [${X_LIBS}])
+    AC_CHECK_LIB([Xtst], [XTestQueryExtension],
+    		 [XTEST_LIBS="$XTEST_LIBS -lX11 -lXtst"],
+		 [AC_MSG_ERROR([libXtst NOT found, required for GdkRobot])],
+		 [${X_LIBS}])
+
     PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.8 gthread-2.0 >= 2.2 gdk-pixbuf-2.0)
     PKG_CHECK_MODULES(FREETYPE2, freetype2)
     PKG_CHECK_MODULES(PANGOFT2, pangoft2)
+    dnl Check if we can link against the XRender library and set
+    dnl HAVE_XRENDER accordingly.
+    AC_CHECK_LIB([Xrender], [XRenderQueryExtension],
+		 [AC_DEFINE(HAVE_XRENDER, 1, [Define to 1 if you have libXrender.])[X_EXTRA_LIBS="$X_EXTRA_LIBS -lXrender"]],
+		 [true],
+		 [${X_LIBS}])
+
+    dnl Check if we can link against the XRandR library and set
+    dnl HAVE_XRANDR accordingly.
+    AC_CHECK_LIB([Xrandr], [XRRQueryExtension],
+                 [AC_DEFINE(HAVE_XRANDR, 1, [Define to 1 if you have libXrandr.])[X_EXTRA_LIBS="$X_EXTRA_LIBS -lXrandr"]],
+                 [true],
+                 [${X_LIBS}])
 
     AC_SUBST(GTK_CFLAGS)
     AC_SUBST(GTK_LIBS)
@@ -413,6 +429,7 @@ if test "x${COMPILE_JNI}" = xyes; then
     AC_SUBST(FREETYPE2_CFLAGS)
     AC_SUBST(PANGOFT2_LIBS)
     AC_SUBST(PANGOFT2_CFLAGS)
+    AC_SUBST(XTEST_LIBS)
   fi
 
   dnl Check for AWT related Qt4
@@ -466,7 +483,13 @@ if test "x${COMPILE_JNI}" = xyes; then
 
   dnl Check for plugin support headers and libraries.
   if test "x${COMPILE_PLUGIN}" = xyes; then
-    PKG_CHECK_MODULES(MOZILLA, mozilla-plugin)
+    PKG_CHECK_MODULES(MOZILLA, mozilla-plugin, [MOZILLA_FOUND=yes], [MOZILLA_FOUND=no])
+    if test "x${MOZILLA_FOUND}" = xno; then
+      PKG_CHECK_MODULES(MOZILLA, firefox-plugin, [MOZILLA_FOUND=yes], [MOZILLA_FOUND=no])
+    fi
+    if test "x${MOZILLA_FOUND}" = xno; then
+      PKG_CHECK_MODULES(MOZILLA, xulrunner-plugin, [MOZILLA_FOUND=yes], [MOZILLA_FOUND=no])
+    fi
     PKG_CHECK_MODULES(GLIB, glib-2.0)
 
     AC_SUBST(MOZILLA_CFLAGS)

@@ -1,5 +1,5 @@
 /* File.java -- Class representing a file on disk
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -82,7 +82,7 @@ public class File implements Serializable, Comparable<File>
   
   /**
    * This is the string that is used to separate the host name from the
-   * path name in paths than include the host name.  It is the value of
+   * path name in paths that include the host name.  It is the value of
    * the <code>path.separator</code> system property.
    */
   public static final String pathSeparator
@@ -484,9 +484,9 @@ public class File implements Serializable, Comparable<File>
   /**
    * This method returns a canonical representation of the pathname of
    * this file.  The actual form of the canonical representation is
-   * different.  On the GNU system, the canonical form differs from the
-   * absolute form in that all relative file references to "." and ".."
-   * are resolved and removed.
+   * system-dependent.  On the GNU system, conversion to canonical
+   * form involves the removal of redundant separators, references to
+   * "." and "..", and symbolic links.
    * <p>
    * Note that this method, unlike the other methods which return path
    * names, can throw an IOException.  This is because native method 

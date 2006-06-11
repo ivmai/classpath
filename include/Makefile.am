@@ -37,11 +37,16 @@ $(top_srcdir)/include/gnu_xml_libxmlj_transform_GnomeTransformer.h \
 $(top_srcdir)/include/gnu_xml_libxmlj_transform_GnomeTransformerFactory.h
 
 GTKPEER_H_FILES = \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_CairoSurface.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_CairoGraphics2D.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_ComponentGraphics.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_ComponentGraphicsCopy.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_FreetypeGlyphVector.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkFontPeer.h \
-$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphics2D.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkPixbufDecoder.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkRobotPeer.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkScreenGraphicsDevice.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GdkTextLayout.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkButtonPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkCanvasPeer.h \
@@ -71,6 +76,7 @@ $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkTextAreaPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkTextFieldPeer.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkToolkit.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkWindowPeer.h \
+$(top_srcdir)/include/gnu_java_awt_peer_gtk_GtkVolatileImage.h \
 $(top_srcdir)/include/gnu_java_awt_peer_gtk_GThreadNativeMethodRunner.h
 
 QTPEER_H_FILES = \
@@ -119,6 +125,7 @@ $(QTPEER_H_FILES) \
 $(top_srcdir)/include/gnu_java_net_VMPlainDatagramSocketImpl.h \
 $(top_srcdir)/include/gnu_java_net_VMPlainSocketImpl.h \
 $(top_srcdir)/include/gnu_java_net_local_LocalSocketImpl.h \
+$(top_srcdir)/include/gnu_java_nio_VMChannel.h \
 $(top_srcdir)/include/gnu_java_nio_VMPipe.h \
 $(top_srcdir)/include/gnu_java_nio_VMSelector.h \
 $(top_srcdir)/include/gnu_java_nio_channels_FileChannelImpl.h \
@@ -171,6 +178,8 @@ $(top_srcdir)/include/gnu_java_net_VMPlainSocketImpl.h: $(top_srcdir)/vm/referen
 	$(JAVAH) -o $@ gnu.java.net.VMPlainSocketImpl
 $(top_srcdir)/include/gnu_java_net_local_LocalSocketImpl.h: $(top_srcdir)/gnu/java/net/local/LocalSocketImpl.java
 	$(JAVAH) -o $@ gnu.java.net.local.LocalSocketImpl
+$(top_srcdir)/include/gnu_java_nio_VMChannel.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMChannel.java
+	$(JAVAH) -o $@ gnu.java.nio.VMChannel
 $(top_srcdir)/include/gnu_java_nio_VMPipe.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMPipe.java
 	$(JAVAH) -o $@ gnu.java.nio.VMPipe
 $(top_srcdir)/include/gnu_java_nio_VMSelector.h: $(top_srcdir)/vm/reference/gnu/java/nio/VMSelector.java

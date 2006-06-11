@@ -21,7 +21,7 @@ bin_PROGRAMS = appletviewer jarsigner keytool
 #LIBJVM = -lgcj
 #else
 if FOUND_CACAO
-LIBJVM = -lcacaovm
+LIBJVM = -ljvm
 else
 LIBJVM =
 endif
@@ -32,21 +32,21 @@ appletviewer_CFLAGS = -Wall \
 	-DDATA_DIR="\"$(datadir)\"" \
 	-DPACKAGE="\"$(PACKAGE)\"" \
 	-DTOOLNAME="\"appletviewer\""
-appletviewer_LDFLAGS = $(LIBJVM)
+appletviewer_LDFLAGS = -L$(libdir) $(LIBJVM)
 
 jarsigner_SOURCES = toolwrapper.c
 jarsigner_CFLAGS = -Wall \
 	-DDATA_DIR="\"$(datadir)\"" \
 	-DPACKAGE="\"$(PACKAGE)\"" \
 	-DTOOLNAME="\"jarsigner\""
-jarsigner_LDFLAGS = $(LIBJVM)
+jarsigner_LDFLAGS = -L$(libdir) $(LIBJVM)
 
 keytool_SOURCES = toolwrapper.c
 keytool_CFLAGS = -Wall \
 	-DDATA_DIR="\"$(datadir)\"" \
 	-DPACKAGE="\"$(PACKAGE)\"" \
 	-DTOOLNAME="\"keytool\""
-keytool_LDFLAGS = $(LIBJVM)
+keytool_LDFLAGS = -L$(libdir) $(LIBJVM)
 
 else
 bin_SCRIPTS = appletviewer jarsigner keytool
