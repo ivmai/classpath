@@ -44,7 +44,7 @@ class testExtensionList
       System.out.println ("PASS: get(0).type()");
     else
       System.out.println ("FAIL: get(0).type()");
-    if (Arrays.equals (e.value(), new byte[] { 1 }))
+    if (Arrays.equals (e.valueBytes(), new byte[] { 1 }))
       System.out.println ("PASS: get(0).value()");
     else
       System.out.println ("FAIL: get(0).value()");
@@ -54,7 +54,7 @@ class testExtensionList
       System.out.println ("PASS: get(1).type()");
     else
       System.out.println ("FAIL: get(1).type()");
-    if (Arrays.equals(e.value(), new byte[3]))
+    if (Arrays.equals(e.valueBytes(), new byte[3]))
       System.out.println ("PASS: get(1).value()");
     else
       System.out.println ("FAIL: get(1).value()");
