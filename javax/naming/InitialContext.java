@@ -424,25 +424,25 @@ public class InitialContext implements Context
   }
 
   /** @inheritDoc */  
-  public NamingEnumeration list (Name name) throws NamingException
+  public NamingEnumeration<NameClassPair> list (Name name) throws NamingException
   {
     return getURLOrDefaultInitCtx (name).list (name);
   }
 
   /** @inheritDoc */  
-  public NamingEnumeration list (String name) throws NamingException
+  public NamingEnumeration<NameClassPair> list (String name) throws NamingException
   {
     return getURLOrDefaultInitCtx (name).list (name);
   }
 
   /** @inheritDoc */  
-  public NamingEnumeration listBindings (Name name) throws NamingException
+  public NamingEnumeration<Binding> listBindings (Name name) throws NamingException
   {
     return getURLOrDefaultInitCtx (name).listBindings (name);
   }
 
   /** @inheritDoc */  
-  public NamingEnumeration listBindings (String name) throws NamingException
+  public NamingEnumeration<Binding> listBindings (String name) throws NamingException
   {
     return getURLOrDefaultInitCtx (name).listBindings (name);
   }
