@@ -1,3 +1,10 @@
+2006-06-16  Tom Tromey  <tromey@redhat.com>
+
+	* vm/reference/sun/reflect/Reflection.java (verifyMemberAccess):
+	Removed.
+	(getCallerClass): Now static.
+	* vm/reference/sun/reflect/misc/ReflectUtil.java: New file.
+
 2006-06-15  Tom Tromey  <tromey@redhat.com>
 
 	* scripts/sanitize-jsr166: New file.

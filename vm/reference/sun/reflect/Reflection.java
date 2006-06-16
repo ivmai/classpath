@@ -39,60 +39,13 @@ package sun.reflect;
 
 import gnu.classpath.VMStackWalker;
 
-import java.lang.reflect.Modifier;
-
 public class Reflection
 {
   /**
    * A stack-walking wrapper method used by the JSR 166 RI. 
    */
-  public Class getCallerClass(int depth)
+  public static Class getCallerClass(int depth)
   {
     return VMStackWalker.getClassContext()[depth];
-  }
-  
-  // We use this inaccessible inner class as an argument type
-  // in verifyMemberAccess.  All current users of this method
-  // in the JSR 166 RI pass 'null' for this argument, and
-  // consequently we don't know what it means.  Using a funny
-  // type like this for the argument means that if the RI changes,
-  // we will see a compilation error.
-  private static class MustBeNull
-  {
-  }
-
-  /**
-   * Perform access checks on a member of a class.  This API is
-   * derived from the public domain code in the JSR 166 reference
-   * implementation.
-   * @param caller the class requesting access to the member
-   * @param declarer the declaring class of the member
-   * @param ignored unknown parameter; always null
-   * @param modifiers the modifiers on the member
-   * @return true if access is granted, false otherwise
-   */
-  public static boolean verifyMemberAccess(Class caller,
-                                           Class declarer,
-                                           MustBeNull ignored,
-                                           int modifiers)
-  {
-    // Same class, always ok.
-    if (caller == declarer)
-      return true;
-    // Public access is ok.
-    if ((modifiers & Modifier.PUBLIC) != 0)
-      return true;
-    // Protected access and request comes from
-    // a subclass of the declarer -- ok.
-    if ((modifiers & Modifier.PROTECTED) != 0
-        && declarer.isAssignableFrom(caller))
-      return true;
-    // Package-private access, or protected access,
-    // and the packages are the same --ok.
-    if ((modifiers & Modifier.PRIVATE) == 0
-        && caller.getPackage() == declarer.getPackage())
-      return true;
-    // Otherwise, no.
-    return false;
   }
 }
