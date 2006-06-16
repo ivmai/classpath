@@ -1,5 +1,9 @@
 2006-06-16  Tom Tromey  <tromey@redhat.com>
 
+	* NEWS: Updated for JSR 166.
+
+2006-06-16  Tom Tromey  <tromey@redhat.com>
+
 	* lib/Makefile.am (compile_classpath): Added jsr166.
 	* configure.ac: Added external/jsr166/Makefile.
 	* external/Makefile.am (SUBDIRS): Added jsr166.
