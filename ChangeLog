@@ -1,3 +1,25 @@
+2006-06-16  Keith Seitz  <keiths@redhat.com>
+
+	* gnu/classpath/jdwp/event/EventManager.java (getDefault): Redo
+	instantiation so that EventManager is created when getDefault
+	is first called.
+	* gnu/classpath/jdwp/Jdwp.java (Thread): Force creation
+	of EventManager.
+
+2006-06-16  Keith Seitz  <keiths@redhat.com>
+
+	* gnu/classpath/jdwp/Jdwp.java (_initLock): New field.
+	(_initCount): New field.
+	(Jdwp): Don't set isDebugging until fully initialized.
+	(subcomponentInitialized): New method.
+	(run): Wait for PacketProcessor and JdwpConnection to
+	startup, then set isDebugging, and then let this thread
+	die.
+	* gnu/classpath/jdwp/transport/JdwpConnection.java
+	(run): Add synchronization notification.
+	* gnu/classpath/jdwp/processor/PacketProcessor.java
+	(run): Likewise.
+
 2006-06-16  Tom Tromey  <tromey@redhat.com>
 
 	* NEWS: Updated for JSR 166.
@@ -9,6 +31,17 @@
 	* external/Makefile.am (SUBDIRS): Added jsr166.
 	* external/jsr166/Makefile.am: New file.
 	* lib/gen-classlist.sh.in: Look in external/jsr166.
+
+2006-06-16  Kyle Galloway  <kgallowa@redhat.com>
+
+	* gnu/classpath/jdwp/event/ExceptionEvent:
+	Added Object instance to javadoc in constructor
+	* gnu/classpath/jdwp/event/MethodEntryEvent:
+	Ditto.
+	* gnu/classpath/jdwp/event/MethodExitEvent:
+	Ditto,
+	* gnu/classpath/jdwp/event/SingleStepEvent:
+	Ditto. 
 
 2006-06-16  Tom Tromey  <tromey@redhat.com>
 
@@ -29,6 +62,92 @@
 	(getCallerClass): Now static.
 	* vm/reference/sun/reflect/misc/ReflectUtil.java: New file.
 
+2006-06-16  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/FileDialog.java
+	(FileDialog): Added @since tag to API docs.
+	(FileDialog): Likewise.
+	(FileDialog): Likewise.
+	* java/awt/Font.java:
+	Added @since tag to TYPE1_FONT field docs.
+	* javax/swing/plaf/basic/BasicScrollBarUI.java:
+	(isThumbRollover): Likewise.
+	(setThumbRollover): Likewise.
+	(getSupportsAbsolutePositioning): Likewise.
+	* javax/swing/plaf/basic/BasicSliderUI.java:
+	(isDragging): Likewise.
+
+2006-06-16  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/FileDialog.java
+	(FileDialog): Implemented.
+	(FileDialog): Implemented.
+	(FileDialog): Implemented.
+	* java/awt/Font.java:
+	Added TYPE1_FONT constant field.
+
+2006-06-16  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/font/TextLayout.java:
+	Removed unneeded imports.
+	* javax/swing/plaf/basic/BasicScrollBarUI.java:
+	Added new thumbRollover field.
+	(mouseMoved): Added code to set thumbRollover field.
+	(isThumbRollover): New function.
+	(setThumbRollover): New function.
+	(getSupportsAbsolutePositioning): Implemented. This
+	needs to be changed once the feature has been 
+	implemented.
+	* javax/swing/plaf/basic/BasicSliderUI.java:
+	Added new dragging field.
+	(mouseDragged): Initialized dragging field.
+	(isDragging): New function.
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java
+	(focusGained): Marked as not implemented.
+	(focusLost): Likewise.
+
+2006-06-16  Kyle Galloway  <kgallowa@redhat.com>
+
+	* gnu/classpath/jdwp/event/filters/ThreadOnlyFilter.java:
+	Added check for null ThreadId to avoid null pointer
+	exception.
+
+2006-06-16  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/DefaultComboBoxModel.java
+	(removeElementAt): Set new selected item by calling setSelectedItem().
+
+2006-06-16  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/DefaultButtonModel.java
+	(setSelected): Use 'this', not null, for the item in the ItemEvent.
+
+2006-06-16  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/event/ListDataEvent.java: updated API docs, plus
+	(ListDataEvent): Handle case where index0 > index1,
+	(toString): Implemented.
+
+2006-06-16  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/metal/MetalMenuBarUI.java:
+	(update): Added subexpression to if-statement.
+
+2006-06-16  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/basic/BasicRadioButtonUI.java:
+	(installDefaults): Removed unneccessary code.
+	(paint): Removed complex if-cascade, revert to default icon if
+	icon property is not set.
+	(getPreferredSize): New method.
+
+2006-06-16  Roman Kennke  <kennke@aicas.com>
+
+	PR 28027
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(drawImage): Don't use setClip() but instead clipRect() to
+	intersect the current clip with a new one.
+
 2006-06-15  Tom Tromey  <tromey@redhat.com>
 
 	* scripts/sanitize-jsr166: New file.
@@ -37,6 +156,137 @@
 	* vm/reference/gnu/classpath/Unsafe.java: Moved...
 	* vm/reference/sun/misc/Unsafe.java: ...here.
 
+2006-06-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.ac: Rename appletviewer to gappletviewer, jarsigner to
+	gjarsigner and keytool to gkeytool.
+	* doc/tools.texinfo: Add note about tool exectable names.
+	* tools/Makefile.am: Rename appletviewer to gappletviewer,
+	jarsigner to gjarsigner and keytool to gkeytool.
+	* tools/appletviewer.in: Rename ...
+	* tools/gappletviewer.in: New file.
+	* tools/jarsigner.in: Rename ...
+	* tools/gjarsigner.in: New file.
+	* tools/keytool.in: Rename ...
+	* tools/gkeytool.in: New file.
+	* tools/toolwrapper.c: Simplify TOOLS_ZIP macro.
+
+2006-06-15  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/AttributeList.java:
+	Add serialization UID.
+	* javax/management/DynamicMBean.java:
+	New file.
+	* javax/management/JMRuntimeException.java:
+	Add serialization UID and correct name
+	of serialized field.
+	* javax/management/MBeanInfo.java: New file.
+	
+2006-06-15  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/AttributeList.java,
+	* javax/management/JMRuntimeException.java,
+	* javax/management/RuntimeOperationsException.java:
+	New files.
+	
+2006-06-15  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/font/TextLayout.java:
+	DEFAULT_CARET_POLICY changed to be public static final.
+
+2006-06-15  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/plaf/metal/MetalScrollButton.java
+	(MetalScrollButton): Should set 'focusable' to false.
+
+2006-06-15  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/plaf/basic/BasicArrowButton.java
+	(BasicArrowButton): Should set 'focusable' to false.
+	(BasicArrowButton): Should set 'focusable' to false.
+
+2006-06-15  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java
+	(getGraphicsConfiguration): Return default screen device.
+	* gnu/java/awt/peer/gtk/GtkVolatileImage.java (component):
+	New field.
+	(GtkVolatileImage): Record initiating component.
+	* gnu/java/awt/peer/gtk/VolatileImageGraphics.java
+	(getDeviceConfiguration): Return configuration of image component.
+
+2006-06-15  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/geom/GeneralPath.java (closePath): Return if path already
+	closed.
+
+2006-06-15  Mark Wielaard  <mark@klomp.org>
+
+	* java/awt/BasicStroke.java (createStrokedShape): Call getPathIterator
+	with null argument.
+
+2006-06-15  Kyle Galloway  <kgallowa@redhat.com>
+
+	* gnu/classpath/jdwp/event/filters/ExceptionOnlyFilter.java
+	(matches): Added explicit brackets to return statement.
+
+2006-06-15  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/JRadioButtonMenuItem.java
+	(JRadioButtonMenuItem): Should set 'focusable' to false.
+
+2006-06-15  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/JCheckBoxMenuItem.java
+	(JCheckBoxMenuItem): Should set 'focusable' to false.
+
+2006-06-15  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/AbstractButton.java:
+	(AbstractButton): 'Focusable' should be set to true and not false.
+
+2006-06-15  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/ManagementFactory.java:
+	Add private constructor to prevent instance creation.
+	* java/lang/management/ManagementPermission.java:
+	Make final.
+	
+2006-06-15  Francis Kung  <fkung@redhat.com>
+
+	* javax/swing/plaf/basic/BasicArrowButton.java:
+	(BasicArrowButton): move client property for not triggering out 
+	of consturctor
+	* javax/swing/plaf/basic/BasicComboBoxUI.java:
+	(configureArrowButton): set client property for not triggering
+	(installUI): set client property for not triggering
+	* javax/swing/plaf/basic/BasicLookAndFeel.java:
+	(PopupHelper.mousePressed): check client property for triggering
+
+2006-06-15  Roman Kennke  <kennke@aicas.com>
+
+	PR 28037
+	* javax/swing/RepaintManager.java
+	(blitBuffer): Substract coordinates the other way around.
+
+2006-06-15  Roman Kennke  <kennke@aicas.com>
+
+	PR 28027
+	* javax/swing/JComponent.java
+	(paintImmediately2): Only paint component without double buffering
+	when all of it's parents have also double buffering disabled.
+	(isPaintingDoubleBuffered): New helper method.
+
+2006-06-15  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(draw(Shape)): Pass null transform to getPathIterator(),
+	(getClip): Likewise,
+	* gnu/java/print/PostscriptGraphics2D.java
+	(drawStringShape): Pass null transform to getPathIterator(),
+	(writeShape): Likewise,
+	* java/awt/Shape.java: Small updates to API docs.
+
 2006-06-14  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* javax/naming/InitialContext.java:
@@ -44,6 +294,476 @@
 	(list(String)): Likewise.
 	(listBindings(javax.naming.Name)): Likewise.
 	(listBindings(String)): Likewise.
+	
+2006-06-14  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicComboBoxUI.java
+	(getAccessibleChildrenCount): Implemented.
+	(getAccessibleChild): Implemented.
+	(isNavigationKey): Implemented.
+	(KeyHandler.keyPressed): Implemented.
+
+2006-06-14  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/ManagementPermission.java:
+	Added serialization UID.
+	* javax/management/Attribute.java: Likewise.
+	* javax/management/MBeanException.java,
+	* javax/management/ReflectionException.java:
+	Added serialization UID and changed to extend
+	javax.management.JMException.
+	
+2006-06-14  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/Component.java
+	(ignoreOldMouseEvents): Made static.
+	(translateEvent): Made static.
+	* java/awt/TextComponent.java
+	(ignoreOldMouseEvents): Made static.
+
+2006-06-14  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/ComponentGraphics.java (drawLine): Lock and
+	call super.
+	(drawRect): Likewise.
+	(fillRect): Likewise.
+
+2006-06-14  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/Component.java
+	(ignoreOldMouseEvents): New helper function.
+	(translateEvent): Changed to be non-static and use new helper.
+	* java/awt/TextComponent.java
+	(ignoreOldMouseEvents): New helper function.
+
+2006-06-14  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/RepaintManager.java
+	(MERGE_REGIONS): New constant flag.
+	(commitBuffer): Exclude the merging of regions by default. This
+	was causing painting artifacts in some applications, especially
+	when different areas of the GUI are updated synchronously.
+
+2006-06-14  Roman Kennke  <kennke@aicas.com>
+
+	* examples/gnu/classpath/examples/awt/AicasGraphicsBenchmark.java:
+	New file. This is a benchmark for AWT 1.1 style graphics operations.
+	* examples/gnu/classpath/examples/awt/palme.gif: New file.
+	* examples/gnu/classpath/examples/awt/aicas.gif: New file.
+
+2006-06-14  Tom Tromey  <tromey@redhat.com>
+
+	* java/io/File.java (getParent): Javadoc fix.
+
+2006-06-14  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/net/loader/JarURLLoader.java (initialize): Skip our own
+	jar.
+	* gnu/java/net/IndexListParser.java (IndexListParser): Call clearAll
+	when index entry does not exist.
+
+2006-06-14  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/AbstractButton.java
+	(AbstractButton): Set focusable to false, not true.
+
+2006-06-14  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/JMenuItem.java
+	(init): Changed horizontalAlignment from JButton.LEFT to JButton.LEADING.
+
+2006-06-14  Tania Bento  <tbento@redhat.com>
+
+	* javax/swing/JCheckBoxMenuItem.java
+	(JCheckBoxMenuItem): Added check to set the selected state.
+
+2006-06-14  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(cairoDrawLine): New native method.
+	(cairoDrawRect): New native method.
+	(cairoFillRect): New native method.
+	(drawLine): Use special native method.
+	(drawRect): Use special native method.
+	(fillRect): Use special native method.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoGraphics2D.c
+	(cairoDrawLine): New native method.
+	(cairoDrawRect): New native method.
+	(cairoFillRect): New native method.
+	* include/gnu_java_awt_peer_gtk_CairoGraphics2D.h: Regenerated.
+
+2006-06-14  Mark Wielaard  <mark@klomp.org>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImage.c
+	(Java_gnu_java_awt_peer_gtk_GtkImage_getPixels): Return when array
+	cannot be allocated.
+
+2006-06-14  Tom Tromey  <tromey@redhat.com>
+
+	PR java/28024:
+	* m4/acinclude.m4 (REGEN_WITH_JAY): Use backquote, not $(...).
+	* configure.ac (QT_INCLUDE_DIR): Use backquote, not $(...).
+
+2006-06-14  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(isRepainting): New flag.
+	(paintImmediately2): Set isRepainting flag.
+	(getRoot): Removed obsolete method.
+	(paintDoubleBuffered): Differenciate between paint calls from
+	RepaintManager and from AWT refresh. Call
+	RepaintManager.commitBuffer with this and local coordinates.
+	(findOpaqueParent): Stop searching at heavyweight component. These
+	are always opaque.
+	(paintChildrenOptimized): Don't paint heavyweight children. These
+	should care for themselves.
+	(paintChildrenWithOverlap): Don't paint heavyweight children. These
+	should care for themselves.
+	* javax/swing/RepaintManager.java
+	(getOffscreenBuffer): Associate offscreen buffer with toplevel
+	windows only.
+	(getVolatileOffscreenBuffer): Associate offscreen buffer with
+	toplevel windows only.
+	(getRoot): Removed obsolete method.
+	(commitBuffer): Blit buffer on nearest heavyweight.
+	(blitBuffer): New helper method.
+	(getHeavyweightParent): New helper method.
+	(commitRemainingBuffers): Call blitBuffer instead of commitBuffer.
+	* javax/swing/SwingUtilities.java
+	(convertRectangleToAncestor): New helper method.
+
+2006-06-14  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/security/auth/login/ConfigFileTokenizer.java: Fixed a typo.
+	Condition all trace/debug code based on Configuration.DEBUG.
+	Use logger instead of STDOUT and ot STDERR.
+
+2006-06-13  Lillian Angel  <langel@redhat.com>
+
+	* native/plugin/gcjwebplugin.cc
+	(NP_Initialize): Removed code to create whitelist file.
+	(GCJ_New): Added code to create whitelist file.
+	(plugin_user_trusts_documentbase): Fixed error message.
+
+2006-06-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/metal/MetalIconFactory.java
+	(HorizontalSliderThumbIcon.gradientMask): Modified by 1 pixel to 
+	prevent overwriting border,
+	(VerticalSliderThumbIcon.gradientMask): Likewise.
+
+2006-06-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/AttributeNotFoundException.java,
+	* javax/management/InvalidAttributeValueException.java,
+	* javax/management/JMException.java,
+	* javax/management/MBeanException.java,
+	* javax/management/OperationsException.java,
+	* javax/management/ReflectionException.java:
+	New files.
+	
+2006-06-13  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(dispatchEvent): Handle events even when consumed (this might be
+	picked up later in the dispatching chain).
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	(PopupHelper.mousePressed): Don't consume event. Only close popup
+	when target component isn't flagged as DONT_CANCEL_POPUP.
+	(DONT_CANCEL_POPUP): New package private constant for flagging
+	special components that don't trigger popup closing.
+	* javax/swing/plaf/basic/BasicArrowButton.java
+	(BasicArrowButton): Set client property for not triggering closing
+	of popups.
+
+2006-06-13  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/image/PixelGrabber.java
+	(PixelGrabber): Added to API documentation.
+
+2006-06-13  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/filters/ExceptionOnlyFilter.java
+	(ExceptionOnlyFilter): Allow null refId.
+
+	* gnu/classpath/jdwp/event/BreakpointEvent.java: Added _instance for
+	compatibility with filters.
+	(getParameter): Modified to allow access to above. 
+
+2006-06-13  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/CairoSurface.java
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoSurface.c
+	(create): Use stride in ints.
+
+2006-06-13  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/ClassUnloadEvent.java: New file.
+
+2006-06-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/basic/BasicSliderUI.java
+	(calculateThumbSize): Removed unnecessary code,
+	(calculateThumbLocation): Shift position by one,
+	(calculateTickRect): Shift position by one when ticks are displayed,
+	(calculateLabelRect): Calculate rect differently according to whether
+	or not the labels are visible,
+	(paintTrack): Shift track down one pixel.
+
+2006-06-13  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/image/PixelGrabber.java
+	(PixelGrabber): Removed check to throw exception. JDK does
+	not do this.
+	(startGrabbing): Removed line to print stacktrace. 
+
+2006-06-13  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java (drawImage): Don't
+	allocate unused AffineTransform. Add comment about conversion to
+	BufferedImage.
+	* gnu/java/awt/peer/gtk/ComponentGraphics.java (drawImage):
+	Recognize identity transform as "easy". Always convert to
+	BufferedImage before calling super.
+
+2006-06-13  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(getGraphics): Translate child graphics correctly.
+	(dispatchEvent): Only dispatch event if it hasn't been consumed
+	yet by the global dispatcher.
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	Added some API docs.
+	(PopupHelper.mousePressed): Consume the event after closing
+	opened menus.
+
+2006-06-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/basic/BasicCheckBoxUI.java: Source code formatting 
+	changes only,
+	* javax/swing/plaf/basic/BasicComboBoxUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicComboPopup.java: Likewise,
+	* javax/swing/plaf/basic/BasicFileChooserUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicLookAndFeel.java: Likewise,
+	* javax/swing/plaf/basic/BasicMenuItemUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicOptionPaneUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicProgressBarUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicRadioButtonUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicScrollBarUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicSliderUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicTableHeaderUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicTableUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicTextUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicToolBarUI.java: Likewise,
+	* javax/swing/plaf/basic/BasicTreeUI.java: Likewise.
+
+2006-06-12  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/font/LineBreakMeasurer.java): Implement.
+
+2006-06-12  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/SingleStepEvent.java: New file.
+
+2006-06-12  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/MethodEntryEvent.java: New file.
+
+	* gnu/classpath/jdwp/event/MethodExitEvent.java: New file.
+
+2006-06-12  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(paintDoubleBuffered): Correctly translate and clip the Graphics
+	instance.
+	(clipAndTranslateGraphics): New helper method.
+
+2006-06-12  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(copy): Use getClip() to copy the clip. Make copied transform
+	null when original transform is null. Set clip here.
+	(setTransform): Correctly update the clip.
+	(setTransformImpl): New method. Updates the actual transform for
+	Cairo.
+	(transform): Correctly update the clip.
+	(translate): Correctly update the clip.
+	(clip): Handle null clip and argument correctly.
+	(clipRect): Avoid creating new Rectangle objects.
+	(getClip): Get the correct copy of the clip.
+	(setClip): Correctly handle null argument.
+	* gnu/java/awt/peer/gtk/CairoSurfaceGraphics.java
+	(CairoSurfaceGraphics): Don't set the clip here. The clip can either
+	be null or whatever has been set in copy().
+	* gnu/java/awt/peer/gtk/ComponentGraphics.java
+	(drawImage): Add translation to the image coordinates.
+	* gnu/java/awt/peer/gtk/VolatileImageGraphics.java
+	(VolatileImageGraphics): Don't set clip here. The clip can either
+	be null or whatever has been set in copy().
+
+2006-06-12  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/filters/ExceptionOnlyFilter.java
+	(forCaught): Removed unused/unnecessary method.
+	(forUncaught): Likewise.
+	(matches): Implement.
+
+2006-06-12  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/ExceptionEvent.java: New file.
+
+2006-06-12  Keith Seitz  <keiths@redhat.com>
+
+	From Kyle Galloway  <kgallowa@redhat.com>:
+	* gnu/classpath/jdwp/event/Event.java: Added constants for
+	type.
+	(getParameter): Changed parameter type from Class to int.
+	* gnu/classpath/jdwp/event/BreakpointEvent.java (getParameter):
+	Changed from Class type to constants.
+	* gnu/classpath/jdwp/event/ClassPrepareEventEvent.java (getParameter):
+	Likewise.
+	* gnu/classpath/jdwp/event/ThreadEndEvent.java (getParameter):
+	Likewise.
+	* gnu/classpath/jdwp/event/ThreadStartEvent.java (getParameter):
+	Likewise.
+	* gnu/classpath/jdwp/event/VmDeathEvent.java (getParameter):
+	Likewise.
+	* gnu/classpath/jdwp/event/VmInitEvent.java (getParameter):
+	Likewise.
+	* gnu/classpath/jdwp/event/ClassMatchFilter.java (matches):
+	Likewise.
+	* gnu/classpath/jdwp/event/ClassOnlyFilter.java (matches):
+	Likewise.
+	* gnu/classpath/jdwp/event/InstanceOnlyFilter.java (matches):
+	Likewise.
+	* gnu/classpath/jdwp/event/ThreadOnlyFilter.java (matches):
+	Likewise.
+
+2006-06-12  Lillian Angel  <langel@redhat.com>
+
+	* tools/gnu/classpath/tools/appletviewer/StandaloneAppletWindow.java
+	(StandaloneAppletWindow): Changed title of standalone window.
+
+2006-06-12  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java
+	(layoutContainer): Added missing selectedComponent assignment.
+
+2006-06-12  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/plaf/basic/BasicTabbedPaneUI.java
+	(layoutContainer): Added check to prevent exception.
+
+2006-06-12  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/Thread.java (uncaughtException): Javadoc fix.
+
+2006-06-12  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/ComponentGraphics.java (hasLock):
+	New static field.
+	(ONE): Likewise.
+	(lock): New method.
+	(unlock): Likewise.
+	(draw): Use lock() and unlock().
+	(fill): Likewise.
+	(drawRenderedImage): Likewise.
+	(drawImage): Likewise.
+	(drawGlyphVector): Likewise.
+
+2006-06-12  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(drawPixels): Include alpha in parameter list.
+	(cairoFill): Include alpha in parameter list.
+	(setComposite): Don't modify the color.
+	(draw(Shape))): Use fill when the current composite has an alpha
+	of != 1.0, so that the stroked shaped will be composited.
+	(fill(Shape)): Call cairoFill() with alpha.
+	(drawImage): Call drawPixels or drawSurface with alpha.
+	(drawGlyphVector): When composite alpha is != 1.0, render the
+	outline using fill() to enable compositing for text.
+	(drawRaster): Call drawPixels with alpha.
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(nativeDrawSurface): Include alpha in parameter list.
+	(drawSurface): Include alpha in parameter list. Pass it to
+	nativeDrawSurface().
+	* include/gnu_java_awt_peer_gtk_CairoGraphics2D.h
+	* include/gnu_java_awt_peer_gtk_CairoSurface.h:
+	Regenerated.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoGraphics2D.c
+	(drawPixels): Handle possible alpha for compositing.
+	(cairoFill): Likewise.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoSurface.c
+	(nativeDrawSurface): Handle possible alpha for compositing.
+
+2006-06-12  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java (streamImage):
+	Notify data when completely done. Wait for worker thread to finish.
+	Rethrow any pending exceptions.
+	(exception): New field.
+	(run): Store pending exception.
+
+2006-06-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/ManagementPermission.java:
+	New file.
+	
+2006-06-12  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* doc/tools.texinfo: Replaced original author with "The GNU Classpath Team".
+
+2006-06-12  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/security/auth/login/ConfigFileParser.java (validateClassName):
+	Use String.charAt().
+
+2006-06-11  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* doc/tools.texinfo
+	(Applet Tools): New chapter.
+	(appletviewer Tool): New section.
+	(gcjwebplugin): New section.
+
+2006-06-11  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java (streamImage):
+	Takes GdkPixbufWriter.
+	(GdkPixbufWriter): Implements Runnable.
+	(write(IIOMetadata,IIOImage,ImageWriteParam)): Start Thread for
+	data processing.
+	(DATADONE): New static final field.
+	(data): New field.
+	(write(byte[])): New method.
+	(run): Likewise.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkPixbufDecoder.c
+	(Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_initStaticState):
+	Get dataOutputWriteID from writeClass.
+	(stream_save_request): Change stream field to writer.
+	(save_to_stream): Remove FIXME, call writer.
+	(Java_gnu_java_awt_peer_gtk_GdkPixbufDecoder_streamImage):
+	Store writer.
+
+2006-06-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS:
+	Mention new VM interface and use of properties.
+	* doc/vmintegration.texinfo:
+	Update with new gnu.java.lang.management section.
+	* gnu/java/lang/management/RuntimeMXBeanImpl.java:
+	New file.
+	* java/lang/management/ManagementFactory.java:
+	(getRuntimeMXBean()): Implemented.
+	* vm/reference/gnu/java/lang/management/RuntimeMXBeanImpl.java:
+	New VM interface file.
 	
 2006-06-11  Raif S. Naffah  <raif@swiftdsl.com.au>
 

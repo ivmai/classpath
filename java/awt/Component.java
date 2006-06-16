@@ -1739,9 +1739,8 @@ public abstract class Component
         if (gfx == null && parent != null)
           {
             gfx = parent.getGraphics();
-            Rectangle bounds = getBounds();
-            gfx.setClip(bounds);
-            gfx.translate(bounds.x, bounds.y);
+            gfx.clipRect(getX(), getY(), getWidth(), getHeight());
+            gfx.translate(getX(), getY());
             return gfx;
           }
         gfx.setFont(font);
@@ -2318,6 +2317,17 @@ public abstract class Component
     dispatchEventImpl(e);
   }
 
+  /**
+   * By default, no old mouse events should be ignored.
+   * This can be overridden by subclasses.
+   * 
+   * @return false, no mouse events are ignored.
+   */
+  static boolean ignoreOldMouseEvents()
+  {
+    return false;
+  }
+  
   /**
    * AWT 1.0 event handler.
    *
@@ -4866,7 +4876,7 @@ p   * <li>the set of backward traversal keys
         if ((mods & InputEvent.ALT_DOWN_MASK) != 0)
           oldMods |= Event.ALT_MASK;
 
-        if (e instanceof MouseEvent)
+        if (e instanceof MouseEvent && !ignoreOldMouseEvents())
           {
             if (id == MouseEvent.MOUSE_PRESSED)
               oldID = Event.MOUSE_DOWN;

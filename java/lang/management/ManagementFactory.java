@@ -38,6 +38,7 @@ exception statement from your version. */
 package java.lang.management;
 
 import gnu.java.lang.management.OperatingSystemMXBeanImpl;
+import gnu.java.lang.management.RuntimeMXBeanImpl;
 
 /**
  * <p>
@@ -65,6 +66,16 @@ public class ManagementFactory
   private static OperatingSystemMXBean osBean;
 
   /**
+   * The runtime management bean.
+   */
+  private static RuntimeMXBean runtimeBean;
+
+  /**
+   * Private constructor to prevent instance creation.
+   */
+  private ManagementFactory() {}
+
+  /**
    * Returns the operating system management bean for the
    * operating system on which the virtual machine is running.
    *
@@ -76,6 +87,20 @@ public class ManagementFactory
     if (osBean == null)
       osBean = new OperatingSystemMXBeanImpl();
     return osBean;
+  }
+
+  /**
+   * Returns the runtime management bean for the
+   * running virtual machine.
+   *
+   * @return an instance of {@link RuntimeMXBean} for
+   *         this virtual machine.
+   */
+  public static RuntimeMXBean getRuntimeMXBean()
+  {
+    if (runtimeBean == null)
+      runtimeBean = new RuntimeMXBeanImpl();
+    return runtimeBean;
   }
 
 }

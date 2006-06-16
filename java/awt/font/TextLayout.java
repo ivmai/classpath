@@ -43,13 +43,11 @@ import gnu.classpath.NotImplementedException;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
 import java.text.Bidi;
 import java.util.Map;
 
@@ -85,7 +83,7 @@ public final class TextLayout implements Cloneable
   /**
    * The default caret policy.
    */
-  static TextLayout.CaretPolicy DEFAULT_CARET_POLICY = new CaretPolicy();
+  public static final TextLayout.CaretPolicy DEFAULT_CARET_POLICY = new CaretPolicy();
 
   /**
    * Constructs a TextLayout.

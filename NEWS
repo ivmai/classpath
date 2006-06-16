@@ -31,6 +31,12 @@ Runtime interface changes:
 * The method gnu.java.io.PlatformHelper.toCanonicalForm() has been
   replaced with a JNI implementation of VMFile.toCanonicalForm() for
   GNU/Posix systems.
+* An new class, VMRuntimeMXBeanImpl, is used to implement
+  the low-level support of the runtime management bean.
+  VMs should use it to supply the input arguments and start
+  time of the VM.  In addition, one of sun.boot.class.path
+  or java.boot.class.path should be defined by the VM to
+  support the optional boot class path access functionality.
 * The Unsafe class was moved back to the place expected by the JSR 166
   reference implementation.  We've also added a couple other new VM
   classes to support the JSR 166 code -- sun.reflect.Reflection and

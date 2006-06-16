@@ -671,6 +671,12 @@ public abstract class JComponent extends Container implements Serializable
   static boolean isPaintingDoubleBuffered = false;
 
   /**
+   * Indicates whether we are calling paintDoubleBuffered() from
+   * paintImmadiately (RepaintManager) or from paint() (AWT refresh).
+   */
+  static private boolean isRepainting = false;
+
+  /**
    * Listeners for events other than {@link PropertyChangeEvent} are
    * handled by this listener list. PropertyChangeEvents are handled in
    * {@link #changeSupport}.
@@ -1855,7 +1861,7 @@ public abstract class JComponent extends Container implements Serializable
       index < children.length; index++)
       {
         Component comp = children[index];
-        if (! comp.isVisible())
+        if (! comp.isVisible() || ! comp.isLightweight())
           continue;
 
         Rectangle compBounds = comp.getBounds();
@@ -2027,7 +2033,7 @@ public abstract class JComponent extends Container implements Serializable
         if (i == children.length - 1)
           paintingTile = false;
 
-        if (!children[i].isVisible())
+        if (!children[i].isVisible() || ! children[i].isLightweight())
           continue;
 
         Rectangle bounds = children[i].getBounds(rectCache);
@@ -2131,40 +2137,35 @@ public abstract class JComponent extends Container implements Serializable
    */
   void paintImmediately2(Rectangle r)
   {
+    isRepainting = true;
     RepaintManager rm = RepaintManager.currentManager(this);
-    if (rm.isDoubleBufferingEnabled() && isDoubleBuffered())
+    if (rm.isDoubleBufferingEnabled() && isPaintingDoubleBuffered())
       paintDoubleBuffered(r);
     else
       paintSimple(r);
+    isRepainting = false;
   }
 
   /**
-   * Gets the root of the component given. If a parent of the 
-   * component is an instance of Applet, then the applet is 
-   * returned. The applet is considered the root for painting
-   * and adding/removing components. Otherwise, the root Window
-   * is returned if it exists.
-   * 
-   * @param comp - The component to get the root for.
-   * @return the parent root. An applet if it is a parent,
-   * or the root window. If neither exist, null is returned.
+   * Returns true if we must paint double buffered, that is, when this
+   * component or any of it's ancestors are double buffered.
+   *
+   * @return true if we must paint double buffered, that is, when this
+   *         component or any of it's ancestors are double buffered
    */
-  private Component getRoot(Component comp)
+  private boolean isPaintingDoubleBuffered()
   {
-      Applet app = null;
-      
-      while (comp != null)
-        {
-          if (app == null && comp instanceof Window)
-            return comp;
-          else if (comp instanceof Applet)
-            app = (Applet) comp;
-          comp = comp.getParent();
-        }
-      
-      return app;
+    boolean doubleBuffered = isDoubleBuffered();
+    Component parent = getParent();
+    while (! doubleBuffered && parent != null)
+      {
+        doubleBuffered = parent instanceof JComponent
+                         && ((JComponent) parent).isDoubleBuffered();
+        parent = parent.getParent();
+      }
+    return doubleBuffered;
   }
-  
+
   /**
    * Performs double buffered repainting.
    */
@@ -2173,24 +2174,31 @@ public abstract class JComponent extends Container implements Serializable
     RepaintManager rm = RepaintManager.currentManager(this);
 
     // Paint on the offscreen buffer.
-    Component root = getRoot(this);
+    Component root = SwingUtilities.getRoot(this);
     Image buffer = rm.getVolatileOffscreenBuffer(this, root.getWidth(),
                                                  root.getHeight());
+
     // The volatile offscreen buffer may be null when that's not supported
     // by the AWT backend. Fall back to normal backbuffer in this case.
     if (buffer == null)
       buffer = rm.getOffscreenBuffer(this, root.getWidth(), root.getHeight());
 
     //Rectangle targetClip = SwingUtilities.convertRectangle(this, r, root);
-    Point translation = SwingUtilities.convertPoint(this, 0, 0, root);
     Graphics g2 = buffer.getGraphics();
-    g2.translate(translation.x, translation.y);
-    g2.setClip(r.x, r.y, r.width, r.height);
+    clipAndTranslateGraphics(root, this, g2);
+    g2.clipRect(r.x, r.y, r.width, r.height);
     g2 = getComponentGraphics(g2);
     isPaintingDoubleBuffered = true;
     try
       {
-        paint(g2);
+        if (isRepainting) // Called from paintImmediately, go through paint().
+          paint(g2);
+        else // Called from paint() (AWT refresh), don't call it again.
+          {
+            paintComponent(g2);
+            paintBorder(g2);
+            paintChildren(g2);
+          }
       }
     finally
       {
@@ -2199,9 +2207,27 @@ public abstract class JComponent extends Container implements Serializable
       }
 
     // Paint the buffer contents on screen.
-    rm.commitBuffer(root, new Rectangle(translation.x + r.x,
-                                        translation.y + r.y, r.width,
-                                        r.height));
+    rm.commitBuffer(this, r);
+  }
+
+  /**
+   * Clips and translates the Graphics instance for painting on the double
+   * buffer. This has to be done, so that it reflects the component clip of the
+   * target component.
+   *
+   * @param root the root component (top-level container usually)
+   * @param target the component to be painted
+   * @param g the Graphics instance
+   */
+  private void clipAndTranslateGraphics(Component root, Component target,
+                                        Graphics g)
+  {
+    Component parent = target.getParent();
+    if (parent != root)
+      clipAndTranslateGraphics(root, parent, g);
+
+    g.translate(target.getX(), target.getY());
+    g.clipRect(0, 0, target.getWidth(), target.getHeight());
   }
 
   /**
@@ -3633,7 +3659,7 @@ public abstract class JComponent extends Container implements Serializable
       {
         if ((found instanceof JComponent) && ((JComponent) found).isOpaque())
           break;
-        else if (!(found instanceof JComponent))
+        else if (!(found instanceof JComponent) && !found.isLightweight())
           break;
         Container p = found.getParent();
         if (p == null)

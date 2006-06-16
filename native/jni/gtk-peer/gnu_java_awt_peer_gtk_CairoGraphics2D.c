@@ -188,7 +188,7 @@ JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_CairoGraphics2D_drawPixels 
 (JNIEnv *env __attribute__((unused)), jobject obj __attribute__((unused)),
  jlong pointer, jintArray java_pixels, 
- jint w, jint h, jint stride, jdoubleArray java_matrix)
+ jint w, jint h, jint stride, jdoubleArray java_matrix, jdouble alpha)
 {
   jint *native_pixels = NULL;
   jdouble *native_matrix = NULL;
@@ -218,7 +218,11 @@ Java_gnu_java_awt_peer_gtk_CairoGraphics2D_drawPixels
    if (gr->pattern)
      cairo_pattern_set_filter (p, cairo_pattern_get_filter (gr->pattern));
    cairo_set_source (gr->cr, p);
-   cairo_paint (gr->cr);
+   if (alpha == 1.)
+     cairo_paint (gr->cr);
+   else
+     cairo_paint_with_alpha(gr->cr, alpha);
+
    cairo_pattern_destroy (p);
    cairo_surface_destroy (surf);
  }
@@ -581,12 +585,20 @@ Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoStroke
 JNIEXPORT void JNICALL
 Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoFill 
 (JNIEnv *env __attribute__((unused)), jobject obj __attribute__((unused)),
- jlong pointer)
+ jlong pointer, jdouble alpha)
 {
   struct cairographics2d *gr = JLONG_TO_PTR(struct cairographics2d, pointer);
   g_assert (gr != NULL);
 
-  cairo_fill (gr->cr);
+  if (alpha == 1.0)
+    cairo_fill (gr->cr);
+  else
+    {
+      cairo_save(gr->cr);
+      cairo_clip(gr->cr);
+      cairo_paint_with_alpha(gr->cr, alpha);
+      cairo_restore(gr->cr);
+    }
 }
 
 JNIEXPORT void JNICALL
@@ -653,6 +665,47 @@ Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoSurfaceSetFilter
     }
 }
 
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoDrawLine
+(JNIEnv *env __attribute__ ((unused)), jobject obj __attribute__ ((unused)),
+ jlong pointer, jdouble x1, jdouble y1, jdouble x2, jdouble y2)
+{
+  struct cairographics2d *gr = JLONG_TO_PTR(struct cairographics2d, pointer);
+  g_assert (gr != NULL);
+
+  cairo_new_path(gr->cr);
+  cairo_move_to(gr->cr, x1, y1);
+  cairo_line_to(gr->cr, x2, y2);
+  cairo_stroke(gr->cr);
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoDrawRect
+(JNIEnv *env __attribute__ ((unused)), jobject obj __attribute__ ((unused)),
+ jlong pointer, jdouble x, jdouble y, jdouble w, jdouble h)
+{
+  struct cairographics2d *gr = JLONG_TO_PTR(struct cairographics2d, pointer);
+  g_assert (gr != NULL);
+
+  cairo_new_path(gr->cr);
+  cairo_rectangle(gr->cr, x, y, w, h);
+  cairo_stroke(gr->cr);
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoFillRect
+(JNIEnv *env __attribute__ ((unused)), jobject obj __attribute__ ((unused)),
+ jlong pointer, jdouble x, jdouble y, jdouble w, jdouble h)
+{
+  struct cairographics2d *gr = JLONG_TO_PTR(struct cairographics2d, pointer);
+  g_assert (gr != NULL);
+
+  cairo_new_path(gr->cr);
+  cairo_rectangle(gr->cr, x, y, w, h);
+  cairo_fill(gr->cr);
+}
+
+
 /************************** FONT STUFF ****************************/
 static void
 install_font_peer(cairo_t *cr,
@@ -702,5 +755,4 @@ update_pattern_transform (struct cairographics2d *gr)
   cairo_get_matrix (gr->cr, &mat);
   cairo_pattern_set_matrix (gr->pattern, &mat);
 }
-
 
