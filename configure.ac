@@ -706,6 +706,7 @@ external/Makefile
 external/sax/Makefile
 external/w3c_dom/Makefile
 external/relaxngDatatype/Makefile
+external/jsr166/Makefile
 gnu/classpath/Configuration.java
 include/Makefile
 native/Makefile

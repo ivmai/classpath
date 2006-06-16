@@ -1,5 +1,13 @@
 2006-06-16  Tom Tromey  <tromey@redhat.com>
 
+	* lib/Makefile.am (compile_classpath): Added jsr166.
+	* configure.ac: Added external/jsr166/Makefile.
+	* external/Makefile.am (SUBDIRS): Added jsr166.
+	* external/jsr166/Makefile.am: New file.
+	* lib/gen-classlist.sh.in: Look in external/jsr166.
+
+2006-06-16  Tom Tromey  <tromey@redhat.com>
+
 	Imported JSR 166 reference implementation:
 	* .classpath: Added external/jsr166.
 	* java/util/concurrent/CopyOnWriteArrayList.java: New file.
