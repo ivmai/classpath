@@ -1,5 +1,17 @@
 2006-06-16  Tom Tromey  <tromey@redhat.com>
 
+	Imported JSR 166 reference implementation:
+	* .classpath: Added external/jsr166.
+	* java/util/concurrent/CopyOnWriteArrayList.java: New file.
+	* java/util/AbstractQueue.java: Removed.
+	* java/util/Queue.java: Removed.
+	* external/jsr166/java/util/concurrent/ScheduledThreadPoolExecutor.java
+	(runPeriodic): Added explicit cast.
+	* external/jsr166/java/util/ArrayDeque.java (clone): Use
+	elements.clone.
+
+2006-06-16  Tom Tromey  <tromey@redhat.com>
+
 	* vm/reference/sun/reflect/Reflection.java (verifyMemberAccess):
 	Removed.
 	(getCallerClass): Now static.
