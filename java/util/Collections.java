@@ -6619,7 +6619,7 @@ public class Collections
       if (entries == null)
 	{
 	  Class<Map.Entry<K,V>> klass =
-	    (Class<Map.Entry<K,V>>) Map.Entry.class;
+	    (Class<Map.Entry<K,V>>) (Class) Map.Entry.class;
 	  entries = new CheckedEntrySet<Map.Entry<K,V>,K,V>(m.entrySet(),
 							    klass,
 							    keyType,
