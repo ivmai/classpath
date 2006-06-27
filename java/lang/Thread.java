@@ -1254,4 +1254,19 @@ public class Thread implements Runnable
     private static final long serialVersionUID = 605505746047245783L;
   }
 
+
+  /**
+   * Returns the current state of the thread.  This
+   * is designed for monitoring thread behaviour, rather
+   * than for synchronization control.
+   *
+   * @return the current thread state.
+   */
+  public State getState()
+  {
+    VMThread t = vmThread;
+    return t == null ? null : State.valueOf(t.getState());
+  }
+
+
 }

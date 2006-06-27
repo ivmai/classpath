@@ -698,6 +698,14 @@ public abstract class Toolkit
   public PrintJob getPrintJob(Frame frame, String title,
                               JobAttributes jobAttr, PageAttributes pageAttr)
   {
+    // FIXME: it is possible this check may be removed
+    // if this method, when written, always delegates to
+    // getPrintJob(Frame, String, Properties).
+    SecurityManager sm;
+    sm = System.getSecurityManager();
+    if (sm != null)
+      sm.checkPrintJobAccess();
+
     return null;
   }
 

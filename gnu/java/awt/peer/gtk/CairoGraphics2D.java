@@ -41,6 +41,7 @@ package gnu.java.awt.peer.gtk;
 import gnu.java.awt.ClasspathToolkit;
 
 import java.awt.AlphaComposite;
+import java.awt.AWTPermission;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
@@ -886,6 +887,12 @@ public abstract class CairoGraphics2D extends Graphics2D
       }
     else
       {
+        // FIXME: this check is only required "if this Graphics2D
+        // context is drawing to a Component on the display screen".
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null)
+          sm.checkPermission(new AWTPermission("readDisplayPixels"));
+
         // FIXME: implement general Composite support
         throw new java.lang.UnsupportedOperationException();
       }
@@ -1201,6 +1208,7 @@ public abstract class CairoGraphics2D extends Graphics2D
     // Note - this can get us in trouble when the gdk lock is re-acquired.
     // for example by VolatileImage. See ComponentGraphics for how we work
     // around this.
+    
     if( !(img instanceof BufferedImage) )
       {
 	ImageProducer source = img.getSource();
@@ -1217,6 +1225,7 @@ public abstract class CairoGraphics2D extends Graphics2D
 
     // If this BufferedImage has a BufferedImageGraphics object, 
     // use the cached CairoSurface that BIG is drawing onto
+    
     if( BufferedImageGraphics.bufferedImages.get( b ) != null )
       db = (DataBuffer)BufferedImageGraphics.bufferedImages.get( b );
     else
@@ -1231,6 +1240,7 @@ public abstract class CairoGraphics2D extends Graphics2D
     if(db instanceof CairoSurface)
       {
 	((CairoSurface)db).drawSurface(nativePointer, i2u, alpha);
+        updateColor();
 	return true;
       }
 	    
@@ -1247,24 +1257,7 @@ public abstract class CairoGraphics2D extends Graphics2D
 	setPaint( oldPaint );
       }
 
-    int[] pixels;
-
-    // Shortcut for easy color models.
-    if( b.getColorModel().equals(rgb32) )
-      {
-	pixels = ((DataBufferInt)db).getData();
-	for(int i = 0; i < pixels.length; i++)
-	  pixels[i] |= 0xFF000000;
-      }
-    else if( b.getColorModel().equals(argb32) )
-      {
-	pixels = ((DataBufferInt)db).getData();
-      }
-    else
-      {
-	pixels = b.getRGB(0, 0, width, height,
-			  null, 0, width);
-      }
+    int[] pixels = b.getRGB(0, 0, width, height, null, 0, width);
 
     drawPixels(nativePointer, pixels, width, height, width, i2u, alpha);
 

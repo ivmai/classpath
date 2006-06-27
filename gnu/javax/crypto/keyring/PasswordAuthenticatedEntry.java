@@ -38,7 +38,7 @@ exception statement from your version.  */
 
 package gnu.javax.crypto.keyring;
 
-import gnu.classpath.Configuration;
+import gnu.java.security.Configuration;
 import gnu.java.security.Registry;
 import gnu.java.security.prng.IRandom;
 import gnu.java.security.prng.LimitReachedException;
@@ -309,7 +309,7 @@ public final class PasswordAuthenticatedEntry extends MaskableEnvelopeEntry
 
     HashMap macAttr = new HashMap();
     macAttr.put(IMac.MAC_KEY_MATERIAL, dk);
-    macAttr.put(IMac.TRUNCATED_SIZE, new Integer(maclen));
+    macAttr.put(IMac.TRUNCATED_SIZE, Integer.valueOf(maclen));
     try
       {
         mac.init(macAttr);

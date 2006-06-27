@@ -38,7 +38,7 @@ exception statement from your version.  */
 
 package gnu.javax.crypto.keyring;
 
-import gnu.classpath.Configuration;
+import gnu.java.security.Configuration;
 import gnu.java.security.Registry;
 import gnu.java.security.prng.IRandom;
 import gnu.java.security.prng.LimitReachedException;
@@ -313,7 +313,7 @@ public class PasswordEncryptedEntry extends MaskableEnvelopeEntry implements
       }
     HashMap modeAttr = new HashMap();
     modeAttr.put(IMode.KEY_MATERIAL, dk);
-    modeAttr.put(IMode.STATE, new Integer(state));
+    modeAttr.put(IMode.STATE, Integer.valueOf(state));
     modeAttr.put(IMode.IV, iv);
     try
       {
