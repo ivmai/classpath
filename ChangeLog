@@ -1,9 +1,615 @@
+2006-07-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS:
+	Updated to include VMCompilationMXBeanImpl.
+	* doc/vmintegration.texinfo:
+	Likewise, along with update to VMMemoryMXBeanImpl
+	as below.
+	* examples/gnu/classpath/examples/management/TestCompilation.java,
+	* gnu/java/lang/management/CompilationMXBeanImpl.java,
+	* java/lang/management/CompilationMXBeanImpl.java:
+	New files.
+	* java/lang/management/ManagementFactory.java:
+	(getCompilationMXBean()): Implemented.
+	* vm/reference/gnu/java/lang/management/VMCompilationMXBeanImpl.java:
+	New file.
+	* vm/reference/gnu/java/lang/management/VMMemoryMXBeanImpl.java:
+	(getHeapMemoryUsage()): Added default implementation.	
+	
+2006-07-02  Anthony Green  <green@redhat.com>
+
+	* NEWS: Mention MIDI file reader/writer providers.
+
+2006-07-02  Anthony Green  <green@redhat.com>
+
+	* resource/META-INF/services/javax.sound.midi.spi.MidiFileWriter,
+	gnu/javax/sound/midi/file/MidiFileWriter.java,
+	gnu/javax/sound/midi/file/MidiDataOutputStream.java: New files.
+
+2006-07-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS:
+	Updated to include VMMemoryMXBeanImpl.
+	* doc/vmintegration.texinfo: Likewise.
+	* examples/gnu/classpath/examples/management/TestMemory.java:
+	New file.
+	* gnu/java/lang/management/ClassLoadingMXBeanImpl.java:
+	Remove redundant import.
+	* gnu/java/lang/management/MemoryMXBeanImpl.java:
+	New file.
+	* gnu/java/lang/management/ThreadMXBeanImpl.java:
+	Remove redundant import.
+	* java/lang/management/ManagementFactory.java:
+	(getMemoryMXBean()): Implemented.
+	* java/lang/management/MemoryMXBean.java,
+	* java/lang/management/MemoryUsage.java:
+	New files.
+	* java/lang/management/ThreadInfo.java:
+	(toString()): Updated documentation.
+	* vm/reference/gnu/java/lang/management/VMMemoryMXBeanImpl.java:
+	New file.
+	
+2006-07-01  Anthony Green  <green@redhat.com>
+
+	* resource/META-INF/services/javax.sound.midi.spi.MidiFileReader,
+	gnu/javax/sound/midi/file/MidiFileReader.java,
+	gnu/javax/sound/midi/file/ExtendedMidiFileFormat.java,
+	gnu/javax/sound/midi/file/MidiDataInputStream.java: New files.
+
+2006-07-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/prng/ARCFour.java: Source formatting.
+	* gnu/javax/crypto/prng/CSPRNG.java: Likewise.
+	* gnu/javax/crypto/prng/Fortuna.java: Likewise.
+	* gnu/javax/crypto/prng/ICMGenerator.java: Likewise.
+	* gnu/javax/crypto/prng/PBKDF2.java: Likewise.
+	* gnu/javax/crypto/prng/PRNGFactory.java: Likewise.
+	* gnu/javax/crypto/prng/UMacGenerator.java: Likewise.
+
+2006-07-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/pad/BasePad.java: Source formatting.
+	* gnu/javax/crypto/pad/IPad.java: Likewise.
+	* gnu/javax/crypto/pad/PadFactory.java: Likewise.
+	* gnu/javax/crypto/pad/PKCS1_V1_5.java: Likewise.
+	* gnu/javax/crypto/pad/PKCS7.java: Likewise.
+	* gnu/javax/crypto/pad/SSL3.java: Likewise.
+	* gnu/javax/crypto/pad/TBC.java: Likewise.
+	* gnu/javax/crypto/pad/TLS1.java: Likewise.
+	* gnu/javax/crypto/pad/WrongPaddingException.java: Likewise.
+
+2006-07-01  Anthony Green  <green@redhat.com>
+
+	* javax/sound/midi/SysexMessage.java (setMessage): Fix sysex
+	status byte test.
+	(setMessage): Fix it again, in a different setMessage method.
+
+2006-07-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/mode/BaseMode.java: Source formatting.
+	* gnu/javax/crypto/mode/CBC.java: Likewise.
+	* gnu/javax/crypto/mode/CFB.java: Likewise.
+	* gnu/javax/crypto/mode/CTR.java: Likewise.
+	* gnu/javax/crypto/mode/EAX.java: Likewise.
+	* gnu/javax/crypto/mode/ECB.java: Likewise.
+	* gnu/javax/crypto/mode/IAuthenticatedMode.java: Likewise.
+	* gnu/javax/crypto/mode/ICM.java: Likewise.
+	* gnu/javax/crypto/mode/IMode.java: Likewise.
+	* gnu/javax/crypto/mode/ModeFactory.java: Likewise.
+	* gnu/javax/crypto/mode/OFB.java: Likewise.
+
+2006-07-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/mac/BaseMac.java: Source formatting.
+	* gnu/javax/crypto/mac/HMac.java: Likewise.
+	* gnu/javax/crypto/mac/HMacFactory.java: Likewise.
+	* gnu/javax/crypto/mac/IMac.java: Likewise.
+	* gnu/javax/crypto/mac/MacFactory.java: Likewise.
+	* gnu/javax/crypto/mac/MacInputStream.java: Likewise.
+	* gnu/javax/crypto/mac/MacOutputStream.java: Likewise.
+	* gnu/javax/crypto/mac/OMAC.java: Likewise.
+	* gnu/javax/crypto/mac/TMMH16.java: Likewise.
+	* gnu/javax/crypto/mac/UHash32.java: Likewise.
+	* gnu/javax/crypto/mac/UMac32.java: Likewise.
+
+2006-07-01  Anthony Green  <green@redhat.com>
+
+	* javax/sound/midi/Track.java (vector, eventSet): Initialize. 
+
+2006-07-02  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/keyring/AuthenticatedEntry.java: Source formatting.
+	* gnu/javax/crypto/keyring/BaseKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/BinaryDataEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/CertificateEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/CertPathEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/CompressedEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/EncryptedEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/Entry.java: Likewise.
+	* gnu/javax/crypto/keyring/EnvelopeEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/GnuPrivateKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/GnuPublicKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/IKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/IPrivateKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/IPublicKeyring.java: Likewise.
+	* gnu/javax/crypto/keyring/MalformedKeyringException.java: Likewise.
+	* gnu/javax/crypto/keyring/MaskableEnvelopeEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/MeteredInputStream.java: Likewise.
+	* gnu/javax/crypto/keyring/PasswordAuthenticatedEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/PasswordEncryptedEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/PasswordProtectedEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/PrimitiveEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/PrivateKeyEntry.java: Likewise.
+	* gnu/javax/crypto/keyring/Properties.java: Likewise.
+	* gnu/javax/crypto/keyring/PublicKeyEntry.java: Likewise.
+
+2006-07-01  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractCellEditor.java: Source code formatting,
+	* javax/swing/AbstractSpinnerModel.java: Likewise,
+	* javax/swing/Box.java: Likewise,
+	* javax/swing/BoxLayout.java: Likewise,
+	* javax/swing/DefaultListModel.java: Likewise,
+	* javax/swing/GrayFilter.java: Likewise,
+	* javax/swing/LookAndFeel.java: Likewise,
+	* javax/swing/ProgressMonitor.java: Likewise,
+	* javax/swing/ProgressMonitorInputStream.java: Likewise,
+	* javax/swing/ScrollPaneLayout.java: Likewise,
+	* javax/swing/SpringLayout.java: Likewise,
+	* javax/swing/event/EventListenerList.java: Likewise,
+	* javax/swing/event/MenuEvent.java: Likewise,
+	* javax/swing/event/TreeExpansionListener.java: Likewise.
+
+2006-07-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS:
+	Mention threading bean and getState().
+	* doc/vmintegration.texinfo:
+	Update documentation for threading bean and new
+	method of VMThread.
+	
+2006-07-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+        
+	* examples/gnu/classpath/examples/management/TestClassLoading.java,
+	* examples/gnu/classpath/examples/management/TestOS.java,
+	* examples/gnu/classpath/examples/management/TestRuntime.java,
+	* examples/gnu/classpath/examples/management/TestThread.java:
+	New files.
+	
+2006-07-01  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/lang/ThreadGroup.java
+	(getThreadFromId, getThreadFromIdImpl): New methods.
+
+2006-07-01  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/lang/Thread.java:
+	Make thread IDs start from 1 in a more efficient way.
+
+2006-07-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Thread.java:
+	Make thread IDs start from 1.
+	
+2006-07-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/lang/management/BeanImpl.java:
+	New superclass for all bean implementations.
+	* gnu/java/lang/management/ClassLoadingMXBeanImpl.java:
+	Extend BeanImpl and call permission code there.
+	* gnu/java/lang/management/OperatingSystemMXBeanImpl.java:
+	Extend BeanImpl.
+	* gnu/java/lang/management/RuntimeMXBeanImpl.java:
+	Extend BeanImpl and call permission code there.
+	* gnu/java/lang/management/ThreadMXBeanImpl.java:
+	New file.
+	* java/lang/management/ManagementFactory.java:
+	(getThreadMXBean()): Implemented.
+	* java/lang/management/ThreadInfo.java:
+	(ThreadInfo(Thread,int)): Replaced...
+	(ThreadInfo(Thread,long,long,Object,Thread,long,long,
+	boolean, boolean, StackTraceElement[])): with this.
+	(getBlockedCount()): Refactored to use local variables.
+	(getBlockedTime()): Likewise.
+	(getLockName()): Likewise.
+	(getLockOwnerId()): Likewise.
+	(getLockOwnerName()): Likewise.
+	(getStackTrace()): Likewise.
+	(getWaitedCount()): Likewise.
+	(getWaitedTime()): Likewise.
+	(isInNative()): Likewise.
+	(isSuspended()): Likewise.
+	(toString()): Changed to use new local variables.
+	* java/lang/management/ThreadMXBean.java:
+	(getThreadInfo(long, int)): Corrected documentation.
+	(getThreadInfo(long[], int)): Likewise.
+	* vm/reference/gnu/java/lang/management/VMThreadMXBeanImpl.java:
+	New file.
+	* vm/reference/java/lang/management/VMThreadInfo.java:
+	Removed.
+
+2006-07-01  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/key/dh/DHKeyPairRawCodec.java: Source formatting.
+	* gnu/javax/crypto/key/dh/DiffieHellmanKeyAgreement.java: Likewise.
+	* gnu/javax/crypto/key/dh/DiffieHellmanReceiver.java: Likewise.
+	* gnu/javax/crypto/key/dh/DiffieHellmanSender.java: Likewise.
+	* gnu/javax/crypto/key/dh/ElGamalKeyAgreement.java: Likewise.
+	* gnu/javax/crypto/key/dh/ElGamalReceiver.java: Likewise.
+	* gnu/javax/crypto/key/dh/ElGamalSender.java: Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHKey.java: Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHKeyPairGenerator.java: Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHPrivateKey.java: Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHPublicKey.java: Likewise.
+	* gnu/javax/crypto/key/dh/RFC2631.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6Host.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6KeyAgreement.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6SaslClient.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6SaslServer.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6TLSClient.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6TLSServer.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRP6User.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPAlgorithm.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPKey.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPKeyPairGenerator.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPKeyPairRawCodec.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPPrivateKey.java: Likewise.
+	* gnu/javax/crypto/key/srp6/SRPPublicKey.java: Likewise.
+	* gnu/javax/crypto/key/BaseKeyAgreementParty.java: Likewise.
+	* gnu/javax/crypto/key/GnuSecretKey.java: Likewise.
+	* gnu/javax/crypto/key/IKeyAgreementParty.java: Likewise.
+	* gnu/javax/crypto/key/IncomingMessage.java: Likewise.
+	* gnu/javax/crypto/key/KeyAgreementException.java: Likewise.
+	* gnu/javax/crypto/key/KeyAgreementFactory.java: Likewise.
+	* gnu/javax/crypto/key/OutgoingMessage.java: Likewise.
+
+2006-07-01  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/java2d/AbstractGraphics2D.java
+	(transform): Make field protected.
+	(getDestinationRaster): Provide default implementation for
+	previously abstract method.
+
+2006-06-30  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/TextArea.java
+	(TextArea(String, int, int, int)): No longer throws
+	IllegalArgumentException if rows, columns, or scrollbarVisibility 
+	values are invalid.  
+	(TextArea(String, int, int, int)): If rows or columns are < 0, 
+	they get set to 0.  If scrollbarVisibility is < 0 or > 4, it 
+	gets set to the default value of 0 (SCROLLBARS_BOTH).
+	 (appendText): Added case when peer = null.
+	(insertText): Added case when peer == null.
+	(replaceText): Added case when peer == null.
+	* java/awt/TextComponent.java
+	(TextComponent(String)): If text == null, set it to "".
+
+2006-06-30  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkCheckboxPeer.java
+	(create): Added synchronized block around groupMap.get calls.
+	(setCheckboxGroup): Likewise.
+
+2006-06-30  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkCheckboxPeer.java
+	(create): Changed to be non-synchronized.
+	(setLabel): Likewise.
+	(setCheckboxGroup): Likewise.
+	(addToGroupMap): Likewise. Added synchronized block around
+	code.
+	(dispose): Changed to be non-synchronized.
+
+2006-06-30  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkCheckboxPeer.java:
+	Changed all return values of native functions to void.
+	(create): Changed function to be synchronized. Removed
+	call to put value in groupMap, this is now done from 
+	the native code.
+	(setState): Changed function to be synchronized.
+	(setLabel): Changed function to be synchronized.
+	(setCheckboxGroup): Changed function to be synchronized. Removed
+	call to put value in groupMap, this is now done from
+	the native code.
+	(postItemEvent): Changed function to be synchronized.
+	(addToGroupMap): New function. Called by native code to add
+	new value to the group.
+	(dispose): Changed function to be synchronized.
+	* include/gnu_java_awt_peer_gtk_GtkCheckboxPeer.h: Updated
+	all functions.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkCheckboxPeer.c
+	(cp_gtk_checkbox_init_jni): Added code to link to 
+	java function.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_createRadioButton): 
+	Changed return value to void. Added call
+	to java function to set pointer in groupMap.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_addtoGroup): Likewise. Also,
+	changed check to an assert. Also, removed call to set/del pointer.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_removeFromGroup): 
+	Likewise. Also, added check to determine if native_group should be 
+	set to NULL.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_switchToGroup): Likewise.
+
+2006-06-30  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/ClasspathToolkit.java,
+	* gnu/java/awt/peer/x/XToolkit.java,
+	* gnu/java/awt/peer/qt/QtToolkit.java,
+	* gnu/java/awt/peer/gtk/GtkToolkit.java,
+	Remove ClasspathTextLayoutPeer.
+	* gnu/java/awt/peer/gtk/GdkTextLayout.java,
+	* gnu/java/awt/peer/ClasspathTextLayoutPeer:
+	Files removed.
+	
+2006-06-30  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java:
+	(drawGlyphVector): Don't draw empty vectors.
+
+2006-06-30  Lillian Angel  <langel@redhat.com>
+	    Tom Fitzsimmons <fitzsim@redhat.com>
+
+	* gnu/java/awt/peer/gtk/GtkCheckboxGroupPeer.java: Removed class.
+	* gnu/java/awt/peer/gtk/GtkCheckboxPeer.java:
+	Added current_group, groupMap fields. Added definitions for
+	new native functions.
+	(create): Removed FIXME. Added code to create the check button or
+	radio button when appropriate. Updated groupMap to contain
+	pointer to the newly created group.
+	(setCheckboxGroup): Added code to handle all cases. Removing
+	a button from a group, adding a button to a group, or changing the
+	group of a button.
+	(dispose): Changed to call super.
+	* include/Makefile.am: Removed reference to 
+	gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.h.
+	* include/gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.h: Removed file.
+	* include/gnu_java_awt_peer_gtk_GtkCheckboxPeer.h: Added definitions
+	for new functions.
+	* native/jni/gtk-peer/Makefile.am: Removed reference to 
+	gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.c.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.c:
+	Removed file.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkCheckboxPeer.c
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_combobox_get_widget): 
+	Renamed to checkbox_get_widget.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_connectSignals): 
+	Changed to use checkbox_get_widget.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_nativeSetCheckboxGroup): 
+	Removed.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkWidgetModifyFont):
+	Changed to use checkbox_get_widget.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_gtkButtonSetLabel):
+	Likewise.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_createCheckButton):
+	New function. Creates checkbutton without a group.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_createRadioButton):
+	Creates a radio button in a group, using groupPointer. If groupPointer
+	is 0, then a new group is created.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_addToGroup): Adds the
+	check button to a group, using groupPointer. A radio button is created
+	in its place. If groupPointer is 0, then a new group is created.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_removeFromGroup): The
+	radio button is removed from the group. A check button is created in 
+	its place.
+	(Java_gnu_java_awt_peer_gtk_GtkCheckboxPeer_switchToGroup): The
+	radio button is moved to a new group.
+
+2006-06-30  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Move standard.omit creation after dirs are created.
+	Cat standard.omit.in from srcdir. Make exclude regex more explicit.
+	* lib/Makefile.am (EXTRA_DIST): Add standard.omit.in.
+	(clean-local): Remove standard.omit.
+	* lib/gen-classlist.sh.in: Use omit file in build dir.
+	* lib/standard.omit.in: Make exclude regex more explicit.
+
+2006-06-30  Roman Kennke  <kennke@aicas.com>
+
+	* lib/Makefile.am: Added Escher dir/jar to classpath when
+	requested.
+	* configure.ac: Moved handling of standard.omit to a place
+	where it actually gets executed.
+
+2006-06-30  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/TextComponent.java: Reformatted source code,
+	* java/awt/TextField.java: Likewise.
+
+2006-06-29  Jeroen Frijters <jeroen@sumatra.nl>
+
+	* java/lang/Thread.java:
+	(getState()): Handle case of no VMThread
+	correctly.
+
+2006-06-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Thread.java,
+	* java/lang/VMThread.java:
+	Reverted patch from 2006-06-28.
+	
+2006-06-29  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/GLGraphics.java,
+	* gnu/java/awt/peer/x/ImageConverter.java,
+	* gnu/java/awt/peer/x/KeyboardMapping.java,
+	* gnu/java/awt/peer/x/XEventPump.java,
+	* gnu/java/awt/peer/x/XFontPeer.java,
+	* gnu/java/awt/peer/x/XFontPeer2.java,
+	* gnu/java/awt/peer/x/XFramePeer.java,
+	* gnu/java/awt/peer/x/XGraphics.java,
+	* gnu/java/awt/peer/x/XGraphics2D.java,
+	* gnu/java/awt/peer/x/XGraphicsConfiguration.java,
+	* gnu/java/awt/peer/x/XGraphicsDevice.java,
+	* gnu/java/awt/peer/x/XGraphicsEnvironment.java,
+	* gnu/java/awt/peer/x/XImage.java,
+	* gnu/java/awt/peer/x/XLightweightPeer.java,
+	* gnu/java/awt/peer/x/XToolkit.java,
+	* gnu/java/awt/peer/x/XWindowPeer.java,
+	* gnu/java/awt/peer/x/fonts.properties: New files.
+	* lib/standard.omit: Removed.
+	* lib/standard.omit.in: Added.
+	* configure.ac: Added configure option --with-escher. Added some
+	configury for omitting gnu.java.awt.peer.x package when
+	this option is not specified.
+
+2006-06-29  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JComponent.java
+	(JComponent()): Initialize the locale here, not the default locale,
+	(getDefaultLocale): If null, return Locale.getDefault(),
+	(setDefaultLocale): Added API docs.
+
+2006-06-29  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/Container.java
+	(applyComponentOrientation): Implemented method.
+
+2006-06-29  Gary Benson  <gbenson@redhat.com>
+
+	* java/io/File.java (listRoots): Merge security checks from libgcj.
+
+2006-06-29  Gary Benson  <gbenson@redhat.com>
+
+	* java/io/FilePermission.java (implies): Work when path is "/".
+
+2006-06-28  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Thread.java:
+	(Thread(ThreadGroup,Runnable,String,long)): Update
+	state.
+	(Thread(VMThread,String,int,boolean)): Likewise.
+	(join(long,int)): Likewise.
+	(resume()): Likewise.
+	(sleep(long,int)): Likewise.
+	(start()): Likewise.
+	(stop()): Likewise.
+	(suspend()): Likewise.
+	(die()): Likewise.
+	(getState()): Return either state or use VMThread.
+	* java/lang/VMThread.java:
+	(getState()): Added default implementation to return
+	thread.state
+	
+2006-06-28  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* gnu/java/awt/peer/gtk/CairoSurface.java: Swap the data from the
+	GdkPixbuf correctly on big endian systems. Fix a typo in the little
+	endian swapping code.
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkImage.c
+	(Java_gnu_java_awt_peer_gtk_GtkImage_getPixels): Swap the pixeldata
+	without alpha information correctly on big endian systems.
+
+2006-06-28  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/net/local/LocalSocket.java
+	(setSoTimeout): Don't throw exception and ignore request.
+	(getSoTimeout): Don't throw exception and always return 0.
+
+2006-06-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JComponent.java
+	(getRegisteredKeyStrokes): Implemented.
+
+2006-06-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JComponent.java
+	(verifyInputWhenFocusTarget): Initialise to true.
+
+2006-06-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/beans/VetoableChangeSupport.java
+	(addVetoableChangeListener(VetoableChangeListener)): Do nothing for
+	null listener,
+	(addVetoableChangeListener(String, VetoableChangeListener)): Do nothing
+	for null property name and/or listener,
+	* javax/swing/JComponent.java
+	(getListeners): Handle VetoableChangeListener.class as a special case,
+	(getVetoableChangeListeners): Fetch these from the 
+	vetoableChangeSupport object.
+
+2006-06-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JComponent.java
+	(componentPopupMenu): New field,
+	(inheritsPopupMenu): New field,
+	(getInheritsPopupMenu): Implemented,
+	(setInheritsPopupMenu): Likewise,
+	(getComponentPopupMenu): Likewise,
+	(setComponentPopupMenu): Likewise,
+	* javax/swing/JLabel.java
+	(JLabel(String, Icon, int)): Set inheritsPopupMenu to true.
+
+2006-06-28  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/key/dh/GnuDHPublicKey.java (str): New field.
+	(toString): New method.
+	* gnu/javax/crypto/key/dh/GnuDHPrivateKey.java (str): New field.
+	(toString): New method.
+	* gnu/javax/crypto/key/dh/GnuDHKey.java (str): New field.
+	(toString): New method.
+	* gnu/javax/crypto/key/dh/DHKeyPairPKCS8Codec.java (encodePrivateKey):
+	Handle case when Q is null.
+	(decodePrivateKey): Likewise.
+	* gnu/javax/crypto/key/dh/DHKeyPairX509Codec.java (encodePublicKey):
+	Likewise.
+	(decodePublicKey): Likewise.
+	* gnu/javax/crypto/jce/GnuCrypto.java (run): Added AlgorithmParameters
+	aliases for all block ciphers.
+	* gnu/javax/crypto/jce/DiffieHellmanImpl.java (result): Changed to byte[].
+	(engineDoPhase): Compute fully the shared secret.
+	(checkState): New method.
+	(reset): Likewise.
+	(engineGenerateSecret()): Reset key-agreement before returning.
+	(engineGenerateSecret(byte[],int)): Check for short-buffer.
+	Reset key-agreement before returning.
+	(engineGenerateSecret(String)): Reset key-agreement before returning.
+	(engineInit(Key,SecureRandom)): Call reset() before returning.
+	* gnu/javax/crypto/jce/params/BlockCipherParameters.java (log): New field.
+	(engineInit): Replace printing to System.out with conditional logging.
+	* gnu/javax/crypto/jce/cipher/CipherAdapter.java (engineInitHandler):
+	When the key-size is not specified, attempt best effort to find a suitable
+	value among those advertised by the cipher before setting it to the length
+	of provided key material.
+
+2006-06-28  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/table/DefaultTableColumnModel.java
+	(changeEvent): Don't initialize yet, removed FIXME,
+	(fireColumnModelChanged): Initialize changeEvent if necessary.
+
+2006-06-27  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/Thread.java:
+	(getAllStackTraces()): Implemented.
+	(getStackTrace()): Likewise.
+	
+2006-06-27  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/Component.java
+	(setComponentOrientation): NPE should not be thrown.
+
+2006-06-27  Tom Tromey  <tromey@redhat.com>
+
+	* configure.ac: Create gjar, gnative2ascii, gserialver.
+	* tools/gappletviewer.in: Quote $@.
+	* tools/gkeytool.in: Likewise.
+	* tools/gjarsigner.in: Likewise.
+	* tools/gjar.in: New file.
+	* tools/gnative2ascii.in: Likewise.
+	* tools/gserialver.in: Likewise.
+	* tools/Makefile.am (bin_PROGRAMS): Added gjar, gnative2ascii,
+	gserialver.
+	(bin_SCRIPTS): Likewise.
+
 2006-06-27  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/management/ThreadMXBean.java:
 	(getThreadInfo(long[])): Corrected return type.
 	(getThreadInfo(long[], int)): Likewise.
-	
+
 2006-06-27  Mark Wielaard  <mark@klomp.org>
 
 	* java/awt/datatransfer/Clipboard.java (addFlavorListener): Do

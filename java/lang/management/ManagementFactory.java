@@ -37,11 +37,14 @@ exception statement from your version. */
 
 package java.lang.management;
 
-import gnu.classpath.NotImplementedException;
+import gnu.classpath.SystemProperties;
 
 import gnu.java.lang.management.ClassLoadingMXBeanImpl;
+import gnu.java.lang.management.CompilationMXBeanImpl;
 import gnu.java.lang.management.OperatingSystemMXBeanImpl;
+import gnu.java.lang.management.MemoryMXBeanImpl;
 import gnu.java.lang.management.RuntimeMXBeanImpl;
+import gnu.java.lang.management.ThreadMXBeanImpl;
 
 /**
  * <p>
@@ -77,6 +80,21 @@ public class ManagementFactory
    * The class loading management bean.
    */
   private static ClassLoadingMXBean classLoadingBean;
+
+  /**
+   * The thread bean.
+   */
+  private static ThreadMXBean threadBean;
+
+  /**
+   * The memory bean.
+   */
+  private static MemoryMXBean memoryBean;
+
+  /**
+   * The compilation bean (may remain null).
+   */
+  private static CompilationMXBean compilationBean;
 
   /**
    * Private constructor to prevent instance creation.
@@ -133,9 +151,42 @@ public class ManagementFactory
    *         this virtual machine.
    */
   public static ThreadMXBean getThreadMXBean()
-    throws NotImplementedException
   {
-    return null;
+    if (threadBean == null)
+      threadBean = new ThreadMXBeanImpl();
+    return threadBean;
+  }
+
+  /**
+   * Returns the memory management bean for the running
+   * virtual machine.
+   *
+   * @return an instance of {@link MemoryMXBean} for
+   *         this virtual machine.
+   */
+  public static MemoryMXBean getMemoryMXBean()
+  {
+    if (memoryBean == null)
+      memoryBean = new MemoryMXBeanImpl();
+    return memoryBean;
+  }
+
+  /**
+   * Returns the compilation bean for the running
+   * virtual machine, if supported.  Otherwise,
+   * it returns <code>null</code>.
+   *
+   * @return an instance of {@link CompilationMXBean} for
+   *         this virtual machine, or <code>null</code>
+   *         if the virtual machine doesn't include
+   *         a Just-In-Time (JIT) compiler.
+   */
+  public static CompilationMXBean getCompilationMXBean()
+  {
+    if (compilationBean == null &&
+	SystemProperties.getProperty("gnu.java.compiler.name") != null)
+      compilationBean = new CompilationMXBeanImpl();
+    return compilationBean;
   }
 
 }

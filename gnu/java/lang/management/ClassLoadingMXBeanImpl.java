@@ -38,7 +38,6 @@ exception statement from your version. */
 package gnu.java.lang.management;
 
 import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.ManagementPermission;
 
 /**
  * Provides access to information about the class loading 
@@ -50,6 +49,7 @@ import java.lang.management.ManagementPermission;
  * @since 1.5
  */
 public final class ClassLoadingMXBeanImpl
+  extends BeanImpl
   implements ClassLoadingMXBean
 {
 
@@ -75,9 +75,7 @@ public final class ClassLoadingMXBeanImpl
 
   public void setVerbose(boolean verbose)
   {
-    SecurityManager sm = System.getSecurityManager();
-    if (sm != null)
-      sm.checkPermission(new ManagementPermission("control"));
+    checkControlPermissions();
     VMClassLoadingMXBeanImpl.setVerbose(verbose);
   }
 

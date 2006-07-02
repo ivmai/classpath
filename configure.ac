@@ -697,6 +697,30 @@ esac;
 AM_CONDITIONAL(USE_PREBUILT_GLIBJ_ZIP, test x$use_glibj_zip = xtrue)
 AC_SUBST(PATH_TO_GLIBJ_ZIP)
 
+dnl -----------------------------------------------------------
+dnl Build with Escher based X peers.
+dnl -----------------------------------------------------------
+AC_ARG_WITH([escher],
+	 AS_HELP_STRING([--with-escher=ABS.PATH],
+	                [specify path to escher dir or JAR for X peers]))
+case "$with_escher" in
+"")
+        use_escher=false
+        ;;
+"no")
+        use_escher=false
+        ;;
+"yes")
+        AC_MSG_ERROR([Please suply an absolute path to Escher library])
+        ;;
+*)
+        use_escher=true
+        PATH_TO_ESCHER=$with_escher
+        ;;
+esac;
+
+AM_CONDITIONAL(USE_ESCHER, test x$use_escher = xtrue)
+AC_SUBST(PATH_TO_ESCHER)
 
 dnl -----------------------------------------------------------
 dnl Check if local socket support should be included.
@@ -770,12 +794,25 @@ if test "x${COMPILE_WRAPPERS}" = xno
 then
 AC_CONFIG_FILES([tools/gappletviewer
 tools/gjarsigner
-tools/gkeytool])
+tools/gkeytool
+tools/gjar
+tools/gnative2ascii
+tools/gserialver])
 AC_CONFIG_COMMANDS([gappletviewer],[chmod 755 tools/gappletviewer])
 AC_CONFIG_COMMANDS([gjarsigner],[chmod 755 tools/gjarsigner])
 AC_CONFIG_COMMANDS([gkeytool],[chmod 755 tools/gkeytool])
+AC_CONFIG_COMMANDS([gjar],[chmod 755 tools/gjar])
+AC_CONFIG_COMMANDS([gnative2ascii],[chmod 755 tools/gnative2ascii])
+AC_CONFIG_COMMANDS([gserialver],[chmod 755 tools/gserialver])
 fi
 
 AC_CONFIG_COMMANDS([gen-classlist],[chmod 755 lib/gen-classlist.sh])
 AC_CONFIG_COMMANDS([copy-vmresources],[chmod 755 lib/copy-vmresources.sh])
 AC_OUTPUT
+
+# Create standard.omit based on decisions we just made.
+cat ${srcdir}/lib/standard.omit.in > lib/standard.omit
+if test x$use_escher != xtrue; then
+   echo gnu/java/awt/peer/x/.*java$ >> lib/standard.omit
+fi
+

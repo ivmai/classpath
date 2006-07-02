@@ -29,6 +29,8 @@ New in release 0.92 (UNRELEASED)
   A new configure option --enable-tool-wrappers causes wrapper
   binaries to be built for VMs that support the JNI Invocation API.
 * We've imported the JSR 166 (concurrency) reference implementation.
+* javax.sound.midi providers have been added to read and
+  write standard MIDI files.
 
 Runtime interface changes:
 
@@ -55,6 +57,19 @@ Runtime interface changes:
   are currently loaded, how many have been unloaded and whether
   verbose class loading output is on or off.  Provision should also
   be made for the latter to be toggled at runtime.
+* VMThreadMXBeanImpl is used to implement the low-level support
+  of the thread management bean.  Providing this interface requires
+  providing a fair amount of information about threads, including
+  optional time and contention monitoring, and instances of the
+  new ThreadInfo class in java.lang.management.  getState() has also
+  been added to the VMThread interface; this is required by the bean
+  as well as java.lang.Thread.
+* VMMemoryMXBeanImpl is used to implement the low-level support
+  of the memory management bean.  Providing this interface requires
+  providing information about the levels of heap and non-heap memory,
+  and the number of objects eligible for garbage collection.
+* VMCompilationMXBeanImpl is used to allow for optional compilation
+  time support for Just-In-Time compilers.
 
 New in release 0.91 (May 15, 2006)
 

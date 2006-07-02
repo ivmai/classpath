@@ -572,6 +572,21 @@ public abstract class JComponent extends Container implements Serializable
    */
    String toolTipText;
 
+  /**
+   * The popup menu for the component.
+   * 
+   * @see #getComponentPopupMenu()
+   * @see #setComponentPopupMenu(JPopupMenu)
+   */
+  JPopupMenu componentPopupMenu;
+   
+  /**
+   * A flag that controls whether the {@link #getComponentPopupMenu()} method
+   * looks to the component's parent when the <code>componentPopupMenu</code>
+   * field is <code>null</code>.
+   */
+  boolean inheritsPopupMenu;
+  
   /** 
    * <p>Whether to double buffer this component when painting. This flag
    * should generally be <code>true</code>, to ensure good painting
@@ -702,7 +717,7 @@ public abstract class JComponent extends Container implements Serializable
   private ComponentInputMap inputMap_whenInFocusedWindow;
   private ActionMap actionMap;
   /** @since 1.3 */
-  private boolean verifyInputWhenFocusTarget;
+  private boolean verifyInputWhenFocusTarget = true;
   private InputVerifier inputVerifier;
 
   private TransferHandler transferHandler;
@@ -796,7 +811,7 @@ public abstract class JComponent extends Container implements Serializable
   {
     super();
     setDropTarget(new DropTarget());
-    defaultLocale = Locale.getDefault();
+    setLocale(getDefaultLocale());
     debugGraphicsOptions = DebugGraphics.NONE_OPTION;
     setRequestFocusEnabled(true);
   }
@@ -935,6 +950,8 @@ public abstract class JComponent extends Container implements Serializable
   {
     if (listenerType == PropertyChangeListener.class)
       return (T[]) getPropertyChangeListeners();
+    else if (listenerType == VetoableChangeListener.class)
+      return (T[]) getVetoableChangeListeners();
     else
       return listenerList.getListeners(listenerType);
   }
@@ -953,12 +970,16 @@ public abstract class JComponent extends Container implements Serializable
   /**
    * Return all registered <code>VetoableChangeListener</code> objects.
    *
-   * @return The set of <code>VetoableChangeListener</code> objects in {@link
-   * #listenerList}
+   * @return An array of the <code>VetoableChangeListener</code> objects 
+   *     registered with this component (possibly empty but never 
+   *     <code>null</code>).
+   * 
+   * @since 1.4
    */
   public VetoableChangeListener[] getVetoableChangeListeners()
-  {
-    return (VetoableChangeListener[]) getListeners(VetoableChangeListener.class);
+  {    
+    return vetoableChangeSupport == null ? new VetoableChangeListener[0]
+        : vetoableChangeSupport.getVetoableChangeListeners();
   }
 
   /**
@@ -1402,11 +1423,32 @@ public abstract class JComponent extends Container implements Serializable
    * Return the set of {@link KeyStroke} objects which are registered
    * to initiate actions on this component.
    *
-   * @return An array of the registered keystrokes
+   * @return An array of the registered keystrokes (possibly empty but never
+   *     <code>null</code>).
    */
   public KeyStroke[] getRegisteredKeyStrokes()
   {
-    return null;
+    KeyStroke[] ks0;
+    KeyStroke[] ks1;
+    KeyStroke[] ks2;
+    if (inputMap_whenFocused != null)
+      ks0 = inputMap_whenFocused.keys();
+    else 
+      ks0 = new KeyStroke[0];
+    if (inputMap_whenAncestorOfFocused != null)
+      ks1 = inputMap_whenAncestorOfFocused.keys();
+    else 
+      ks1 = new KeyStroke[0];
+    if (inputMap_whenInFocusedWindow != null)
+      ks2 = inputMap_whenInFocusedWindow.keys();
+    else
+      ks2 = new KeyStroke[0];
+    int count = ks0.length + ks1.length + ks2.length;
+    KeyStroke[] result = new KeyStroke[count];
+    System.arraycopy(ks0, 0, result, 0, ks0.length);
+    System.arraycopy(ks1, 0, result, ks0.length, ks1.length);
+    System.arraycopy(ks2, 0, result, ks0.length + ks1.length, ks2.length);
+    return result;
   }
 
   /**
@@ -1524,7 +1566,89 @@ public abstract class JComponent extends Container implements Serializable
   {
     return getToolTipText();
   }
+  
+  /**
+   * Returns the flag that controls whether or not the component inherits its
+   * parent's popup menu when no popup menu is specified for this component.
+   * 
+   * @return A boolean.
+   * 
+   * @since 1.5
+   * 
+   * @see #setInheritsPopupMenu(boolean)
+   */
+  public boolean getInheritsPopupMenu()
+  {
+    return inheritsPopupMenu; 
+  }
+  
+  /**
+   * Sets the flag that controls whether or not the component inherits its
+   * parent's popup menu when no popup menu is specified for this component.
+   * This is a bound property with the property name 'inheritsPopupMenu'.
+   * 
+   * @param inherit  the new flag value.
+   * 
+   * @since 1.5
+   * 
+   * @see #getInheritsPopupMenu()
+   */
+  public void setInheritsPopupMenu(boolean inherit)
+  {
+    if (inheritsPopupMenu != inherit)
+      {
+        inheritsPopupMenu = inherit;
+        this.firePropertyChange("inheritsPopupMenu", ! inherit, inherit);
+      }
+  }
+  
+  /**
+   * Returns the popup menu for this component.  If the popup menu is 
+   * <code>null</code> AND the {@link #getInheritsPopupMenu()} method returns
+   * <code>true</code>, this method will return the parent's popup menu (if it
+   * has one).
+   * 
+   * @return The popup menu (possibly <code>null</code>.
+   * 
+   * @since 1.5
+   * 
+   * @see #setComponentPopupMenu(JPopupMenu)
+   * @see #getInheritsPopupMenu()
+   */
+  public JPopupMenu getComponentPopupMenu()
+  {
+    if (componentPopupMenu == null && getInheritsPopupMenu())
+      {
+        Container parent = getParent(); 
+        if (parent instanceof JComponent)
+          return ((JComponent) parent).getComponentPopupMenu();
+        else
+          return null;
+      }
+    else
+      return componentPopupMenu;
+  }
 
+  /**
+   * Sets the popup menu for this component (this is a bound property with 
+   * the property name 'componentPopupMenu').
+   * 
+   * @param popup  the popup menu (<code>null</code> permitted).
+   *
+   * @since 1.5
+   * 
+   * @see #getComponentPopupMenu()
+   */
+  public void setComponentPopupMenu(JPopupMenu popup)
+  {
+    if (componentPopupMenu != popup)
+      {
+        JPopupMenu old = componentPopupMenu;
+        componentPopupMenu = popup;
+        firePropertyChange("componentPopupMenu", old, popup);
+      }
+  }
+  
   /**
    * Return the top level ancestral container (usually a {@link
    * java.awt.Window} or {@link java.applet.Applet}) which this component is
@@ -2259,7 +2383,13 @@ public abstract class JComponent extends Container implements Serializable
   /**
    * A variant of {@link
    * #registerKeyboardAction(ActionListener,String,KeyStroke,int)} which
-   * provides <code>null</code> for the command name.   
+   * provides <code>null</code> for the command name.
+   * 
+   * @param act  the action listener to notify when the keystroke occurs.
+   * @param stroke  the key stroke.
+   * @param cond  the condition (one of {@link #WHEN_FOCUSED}, 
+   *     {@link #WHEN_IN_FOCUSED_WINDOW} and 
+   *     {@link #WHEN_ANCESTOR_OF_FOCUSED_COMPONENT}).
    */
   public void registerKeyboardAction(ActionListener act,
                                      KeyStroke stroke, 
@@ -2336,9 +2466,22 @@ public abstract class JComponent extends Container implements Serializable
                                      KeyStroke stroke, 
                                      int cond)
   {
-    getInputMap(cond).put(stroke, new ActionListenerProxy(act, cmd));
+    ActionListenerProxy proxy = new ActionListenerProxy(act, cmd);
+    getInputMap(cond).put(stroke, proxy);
+    getActionMap().put(proxy, proxy);
   }
 
+  /**
+   * Sets the input map for the given condition.
+   * 
+   * @param condition  the condition (one of {@link #WHEN_FOCUSED}, 
+   *     {@link #WHEN_IN_FOCUSED_WINDOW} and 
+   *     {@link #WHEN_ANCESTOR_OF_FOCUSED_COMPONENT}).
+   * @param map  the map.
+   * 
+   * @throws IllegalArgumentException if <code>condition</code> is not one of
+   *     the specified values.
+   */
   public final void setInputMap(int condition, InputMap map)
   {
     enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -2474,13 +2617,17 @@ public abstract class JComponent extends Container implements Serializable
    */
   public ActionListener getActionForKeyStroke(KeyStroke ks)
   {
-    Object cmd = getInputMap().get(ks);
-    if (cmd != null)
+    Object key = getInputMap(JComponent.WHEN_FOCUSED).get(ks);
+    if (key == null)
+      key = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(ks);
+    if (key == null)
+      key = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(ks);
+    if (key != null)
       {
-        if (cmd instanceof ActionListenerProxy)
-          return (ActionListenerProxy) cmd;
-        else if (cmd instanceof String)
-          return getActionMap().get(cmd);
+        if (key instanceof ActionListenerProxy)
+          return ((ActionListenerProxy) key).target;
+        else
+          return getActionMap().get(key);
       }
     return null;
   }
@@ -3082,11 +3229,29 @@ public abstract class JComponent extends Container implements Serializable
     // Nothing to do here.
   }
 
+  /**
+   * Returns the locale used as the default for all new components.  The 
+   * default value is {@link Locale#getDefault()} (that is, the platform
+   * default locale).
+   * 
+   * @return The locale (never <code>null</code>).
+   * 
+   * @see #setDefaultLocale(Locale)
+   */
   public static Locale getDefaultLocale()
   {
+    if (defaultLocale == null)
+      defaultLocale = Locale.getDefault();
     return defaultLocale;
   }
   
+  /**
+   * Sets the locale to be used as the default for all new components.  If this
+   * is set to <code>null</code>, the {@link #getDefaultLocale()} method will
+   * return the platform default locale.
+   * 
+   * @param l  the locale (<code>null</code> permitted).
+   */
   public static void setDefaultLocale(Locale l)
   {
     defaultLocale = l;
