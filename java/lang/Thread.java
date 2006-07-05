@@ -1312,7 +1312,7 @@ public class Thread implements Runnable
    * @since 1.5
    * @see #getStackTrace()
    */
-  public static Map getAllStackTraces()
+  public static Map<Thread, StackTraceElement[]> getAllStackTraces()
   {
     ThreadGroup group = currentThread().group;
     while (group.getParent() != null)
