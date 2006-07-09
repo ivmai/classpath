@@ -746,7 +746,9 @@ public abstract class Component
    */
   public boolean isValid()
   {
-    return valid;
+    // Tests show that components are invalid as long as they are not showing, even after validate()
+    // has been called on them.
+    return peer != null && valid;
   }
 
   /**
@@ -931,7 +933,6 @@ public abstract class Component
         ComponentPeer currentPeer=peer;
         if (currentPeer != null)
             currentPeer.show();
-
         // The JDK repaints the component before invalidating the parent.
         // So do we.
         if (isShowing() && isLightweight())
@@ -1116,16 +1117,13 @@ public abstract class Component
    */
   public void setFont(Font newFont)
   {
-    if((newFont != null && (font == null || !font.equals(newFont)))
-       || newFont == null)
-      {
-        Font oldFont = font;
-        font = newFont;
-        if (peer != null)
-          peer.setFont(font);
-        firePropertyChange("font", oldFont, newFont);
-        invalidate();
-      }
+    Font oldFont = font;
+    font = newFont;
+    if (peer != null)
+      peer.setFont(font);
+    firePropertyChange("font", oldFont, newFont);
+    if (valid)
+      invalidate();
   }
 
   /**

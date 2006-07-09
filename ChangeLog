@@ -1,9 +1,665 @@
+2006-07-09  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/Timer.java
+	(setDelay): Throw IllegalArgumentException for negative delay,
+	(setInitialDelay): Likewise,
+	* javax/swing/ToolTipManager.java
+	(setInitialDelay): Document IllegalArgumentException,
+	(setDismissDelay): Likewise,
+	(setReshowDelay): Likewise.
+
+2006-07-09  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/MemoryUsage.java:
+	(from(javax.management.openmbean.CompositeData)):
+	Implemented.
+	* java/lang/management/ThreadInfo.java:
+	Changed to use open types throughout for the state.
+	(ThreadInfo(long,String,String,long,long,String,
+	long,String,long,long,boolean,StackTraceElement[])):
+	New constructor.
+	(checkAttribute(javax.management.openmbean.CompositeType,
+	String, javax.management.openmbean.OpenType)): New method.
+	(from(javax.management.openmbean.CompositeData)):
+	Implemented.
+	(getLockName()): Fixed to use new variable.
+	(getLockOwnerId()): Likewise.
+	(getLockOwnerName()): Likewise.
+	(getThreadId()): Likewise.
+	(getThreadName()): Likewise.
+	(getThreadState()): Likewise.
+	(toString()): Refactored to use new variables.
+	* javax/management/openmbean/ArrayType.java:
+	New file.
+	* javax/management/openmbean/CompositeType.java:
+	Variables should be transient, not volatile.
+	* javax/management/openmbean/OpenDataException.java:
+	(serialVersionUID): Added.
+	* javax/management/openmbean/SimpleType.java:
+	New file.
+	* javax/management/openmbean/TabularType.java
+	Variables should be transient, not volatile.
+
+2006-07-09  Tom Tromey  <tromey@redhat.com>
+
+	* tools/.cvsignore: Updated for new tools.
+
+2006-07-09  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/openmbean/CompositeData.java,
+	* javax/management/openmbean/CompositeType.java,
+	* javax/management/openmbean/OpenDataException.java,
+	* javax/management/openmbean/OpenType.java,
+	* javax/management/openmbean/TabularData.java,
+	* javax/management/openmbean/TabularType.java,
+	* javax/management/openmbean/package.html:
+	New files.
+
+2006-07-09  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/javax/print/ipp/IppRequest.java: Remove double assignment.
+	* gnu/java/rmi/server/UnicastServerRef.java: Likewise.
+	* gnu/java/rmi/server/ActivatableServerRef.java: Likewise.
+
+2006-07-08  Anthony Green  <green@redhat.com>
+
+	* gnu/javax/sound/sampled/WAV/WAVReader.java,
+	resource/META-INF/services/javax.sound.sampled.spi.AudioFileReader: 
+	New files.
+
+2006-07-09  Mario Torre  <neugens@limasoftware.net>
+
+	* native/jni/gconf-peer/GConfNativePeer.c:
+	Fixed indentation to be more compliant to the GNU coding
+	guidelines.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1unset):
+	Added explicit test for errors in the GConf backend.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1get_1string):
+	Added explicit test for errors in the GConf backend.
+	Fixed Segmentation Fault when non valid key names are given as input.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1set_1string):
+	likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1dir_1exists):
+	Added explicit test for errors in the GConf backend.
+	* gnu/java/util/prefs/gconf/GConfNativePeer.java:
+	Added javadoc comments for all native methods.
+	(nodeExist): removed test to check for valid absolute path name
+	for nodes.
+	(startWatchingNode): likewise.
+	(stopWatchingNode): likewise.
+	(setString): likewise, plus fixed javadoc comments.
+	(unset): likekwise.
+	(getKey): likewise.
+	(getKeys): likewise, also fixed javadoc comments.
+	(getChildrenNodes): likewise.
+	* gnu/java/util/prefs/GConfBasedPreferences.java:
+	changed DEFAULT_USER_ROOT to /apps/classpath.
+	(constructor): Test to check for a valid absolute path for nodes
+	is now in the contructor for that node, instead of being on
+	each method of the backend.
+	(getGConfKey): removed empty new line.
+
+2006-07-08  Mark Wielaard  <mark@klomp.org>
+
+	* .classpath: Add gnu/java/awt/peer/x/ to excludes.
+
+2006-07-08  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/FlowView.java (FlowStrategy.layoutRow):
+	Handle the forced break in the same way as exceeding the
+	available row space.
+	* javax/swing/text/html/HRuleView.java: Rewritten.
+	* javax/swing/text/html/HTMLDocument.java 
+	(HTMLReader.addSpecialElement):Reserve two characters for
+	the special elements.
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java
+	(text): Extended the HTML example to parse.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractButton.java
+	(setHorizontalAlignment): Check for illegal argument,
+	(setVerticalAlignment): Likewise.
+
+2006-07-07  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/html/TableView.java
+	(getStyleSheet): New method. (RowView.getStyleSheet):
+	New method.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractButton.java
+	(setRolloverIcon): Call setRolloverEnabled(true),
+	(setRolloverSelectedIcon): Likewise.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/border/TitledBorder.java
+	(setTitlePosition): Added message to exception,
+	(setTitleJustification): Likewise.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/metal/MetalLookAndFeel.java
+	(createDefaultTheme): Corrected API docs,
+	(initComponentDefaults): Added entry for 'TitledBorder.border',
+	(getCurrentTheme): Initialise theme if it is null.
+
+2006-07-07  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(isValid): Return false when component has no peer,
+	don't query the showing state.
+
+2006-07-07  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/FlowView.java (FlowStrategy.layoutRow):
+	Advance the offset also in the case of the enforced break.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/basic/BasicArrowButton.java
+	(MAXIMUM_SIZE): Removed field,
+	(MINIMUM_SIZE): Likewise,
+	(PREFERRED_SIZE): Likewise,
+	(getMaximumSize): Return new instance every time,
+	(getMinimumSize): Likewise,
+	(getPreferredSize): Likewise.
+
+2006-07-07  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/LightweightDispatcher.java
+	(findTarget):  Avoid array copying in
+	Container.getComponents().
+
+2006-07-07  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(paintChildrenWithOverlap): Avoid array copying in
+	Container.getComponents().
+	(paintChildrenOptimized): Avoid array copying in
+	Container.getComponents().
+	(fireAncestorEvent):  Avoid array copying in
+	Container.getComponents().
+	(findOverlapFreeParent): Avoid array copying in
+	Container.getComponents().
+
+2006-07-07  Matt Wringe <mwringe@redhat.com>
+
+	* javax/crypto/spec/PBEKeySpec.java: Updated copyright year.
+	(passwordValid): New field.
+	(setPassword): New method.
+	(setSalt): Likewise.
+	(setIterationCount): Likewise.
+	(setKeyLength): Likewise.
+	(PBEKeySpec(char[])): Use new setter methods.
+	(PBEKeySpec(char[], byte[], int)): Likewise.
+	(PBEKeySpec(char[], byte[], int, int)): Likewise.
+	(clearPassword): Set passwordValid to false.
+	(getPassword): Check that clearPassword() was not called earlier.
+	Return a clone of the password.
+	(getSalt): Return a clone of the salt if it was not null.
+
+2006-07-07  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(isValid): Always return false when component is
+	not showing.
+	(setFont): Always set font, even when setting
+	the same or equal font again.
+
+2006-07-07  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/plaf/metal/MetalIconFactory.java
+	(CheckBoxMenuItemIcon): Implement UIResource,
+	(FileChooserDetailViewIcon): Likewise,
+	(FileChooserHomeFolderIcon): Likewise,
+	(FileChooserListViewIcon): Likewise,
+	(FileChooserNewFolderIcon): Likewise,
+	(FileChooserUpFolderIcon): Removed redundant 'implements',
+	(RadioButtonMenuItemIcon): Implement UIResource,
+	(HorizontalSliderThumbIcon): Likewise,
+	(InternalFrameCloseIcon): Likewise,
+	(InternalFrameDefaultMenuIcon): Likewise,
+	(InternalFrameAltMaximizeIcon): Likewise,
+	(InternalFrameMaximizeIcon): Likewise,
+	(InternalFrameMinimizeIcon): Likewise,
+	(VerticalSliderThumbIcon): Likewise,
+	(TreeHardDriveIcon): Likewise,
+	(TreeFloppyDriveIcon): Likewise,
+	(TreeComputerIcon): Likewise,
+	(horizontalSliderThumbIcon): New field,
+	(verticalSliderThumbIcon): New field,
+	(getHorizontalSliderThumbIcon): Cache icon,
+	(getVerticalSliderThumbIcon): Likewise.
+
+2006-07-06  Mark Wielaard  <mark@klomp.org>
+
+	* lib/Makefile.am (CLEANFILES): Add Makefile.deps.
+	(DISTCLEANFILES): Add standard.omit.
+	(clean-local): Remove Makefile.deps, only remove dirs.
+
+2006-07-06  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(setFont): Only invalidate when component is valid.
+	* java/awt/Container.java
+	(setLayout): Only invalidate when component is valid.
+
+2006-07-06  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/dnd/GtkMouseDragGestureRecognizer.java:
+	New class not fully implemented.
+	* gnu/java/awt/dnd/peer/gtk/GtkDragSourceContextPeer.java:
+	New class not fully implemented.
+	* gnu/java/awt/dnd/peer/gtk/GtkDropTargetPeer.java:
+	New class not fully implemented.
+	* gnu/java/awt/dnd/peer/gtk/GtkDropTargetContextPeer.java:
+	New class not fully implemented.
+	* nu/java/awt/peer/gtk/GtkToolkit.java:
+	Fixed Imports.
+	(createDragSourceContextPeer): Implemented.
+	(createDragGestureRecognizer): New function to override
+	java.awt.Toolkit.createDragGestureRecognizer.
+	* java/awt/dnd/DragSource.java
+	(NoDragGestureRecognizer): Removed inner class.
+	(createDragGestureRecognizer): Re-Implemented to 
+	call Toolkit's createDragGestureRecognizer.
+	(createDefaultDragGestureRecognizer): Re-Implemented to
+	call Toolkit's createDragGestureRecognizer.
+	* java/awt/dnd/DropTarget.java
+	(addNotify): Added check to determine type of peer and call
+	addDropTarget.
+	(removeNotify): Added call to removeDropTarget.
+
+2006-07-06  Tom Tromey  <tromey@redhat.com>
+
+	* gnu/java/util/prefs/EventDispatcher.java (dispatch): Notify
+	'queue'.
+	(run): Wait on queue, not 'this'.
+
+2006-07-06  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/dnd/DragSource.java
+	(startDrag): Implemented. Added comments describing
+	what the function should do. Removed FIXME.
+
+2006-07-06  Tania Bento  <tbento@redhat.com>
+	
+	* gnu/java/awt/Canvas.java
+	Added new private variable 'next_canvas_number'.
+	(generateName): Added.
+	(getUniqueLong): Added.
+
+2006-07-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* gnu/javax/swing/text/html/CharacterAttributeTranslator.java
+	(getColor): Made public.
+	* javax/swing/text/html/StyleSheet.java (stringToColor):
+	Use CharacterAttributeTranslator.getColor(String)
+
+2006-07-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/html/HTMLEditorKit.java:
+	(HTMLFactory.createElement): Update reference to the html table view.
+	* javax/swing/text/html/HTMLTableView.java: Removed (renamed).
+	* javax/swing/text/html/TableView.java: New file.
+
+2006-07-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/html/HTMLEditorKit.java: 
+	(HTMLFactory.createElement): Uncomment
+	code for BRView and HRuleView.
+	* javax/swing/text/html/BRView.java,
+	javax/swing/text/html/HRuleView.java: New files.
+
 2006-07-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/Thread.java:
 	(getAllStackTraces(Map<Thread,StackTraceElement[]>)):
 	Added generic type signature.
 
+2006-07-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS: Updated.
+	* doc/vmintegration.texinfo: Likewise.
+	* examples/gnu/classpath/examples/management/TestGarbageCollector.java,
+	* examples/gnu/classpath/examples/management/TestMemoryManager.java,
+	* gnu/java/lang/management/GarbageCollectorMXBeanImpl.java,
+	* gnu/java/lang/management/MemoryManagerMXBeanImpl.java,
+	* java/lang/management/GarbageCollectorMXBean.java:
+	New files.
+	* java/lang/management/ManagementFactory.java:
+	(getGarbageCollectorMXBeans()): Implemented.
+	(getMemoryManagerMXBeans()): Likewise.
+	* vm/reference/gnu/java/lang/management/VMGarbageCollectorMXBeanImpl.java,
+	* vm/reference/gnu/java/lang/management/VMMemoryManagerMXBeanImpl.java:
+	New files.
+	* vm/reference/java/lang/management/VMManagementFactory.java:
+	(getMemoryManagerNames()): Added.
+	(getGarbageCollectorNames()): Added.
+	
+2006-07-05  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* native/plugin/Makefile.am (nativeexeclib_LTLIBRARIES): Rename
+	from lib_LTLIBRARIES.
+	(install-plugin): Depend on nativeexeclib_LTLIBRARIES.
+
+2006-07-05  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/dnd/DragGestureEvent.java:
+	Added new fields.
+	(DragGestureEvent): Initialized new fields, added to check and 
+	added documentation.
+	(getSourceAsDragGestureRecognizer): Added documentation and 
+	changed to use getSource.
+	(getComponent): Added documentation and fixed to return the proper
+	value.
+	(getDragSource): Likewise.
+	(getDragOrigin): Added documentation.
+	(iterator): Implemented and added documentation.
+	(toArray): Likewise.
+	(toArray): Likewise.
+	(getDragAction): Likewise.
+	(getTriggerEvent): Likewise.
+	(startDrag): Likewise.
+	* java/awt/dnd/DragGestureRecognizer.java
+	(resetRecognizer): Added FIXME.
+	* java/awt/dnd/DragSource.java:
+	Added new field.
+	(DragSource): Set ds to be null if headless.
+	(getDefaultDragSource): Added documentation and implemented.
+	(isDragImageSupported): Marked as unimplemented.
+	(startDrag): Likewise.
+	(createDragSourceContext): Implemented.
+	(NoDragGestureRecognizer): Formatted inner class.
+	* java/awt/dnd/DropTarget.java
+	(stop): Marked as unimplemented.
+	(actionPerformed): Likewise.
+	(addDropTargetListener): Added code to throw exception.
+	(removeDropTargetListener): Added check, removed FIXME.
+	(dragEnter): Implemented.
+	(dragOver): Implemented.
+	(dropActionChanged): Implemented.
+	(dragExit): Implemented.
+	(drop): Implemented.
+	(addNotify): Implemented.
+	(removeNotify): Implemented.
+	(createDropTargetContext): Implemented.
+	(createDropTargetAutoScroller): Implemented.
+	(initializeAutoscrolling): Implemented.
+	(updateAutoscroll): Implemented.
+	(clearAutoscroll): Implemented.
+	* java/awt/dnd/DropTargetContext.java
+	(dropComplete): Implemented.
+	(acceptDrag): Implemented.
+	(rejectDrag): Implemented.
+	(acceptDrop): Implemented.
+	(rejectDrop): Implemented.
+	(getCurrentDataFlavors): Implemented.
+	(getTransferable): Partially implemented.
+	* java/awt/dnd/DropTargetDragEvent.java
+	(getDropAction): Uncommented correct code.
+	* java/awt/dnd/DropTargetDropEvent.java
+	(dropComplete) :Implemented.
+	* java/awt/dnd/InvalidDnDOperationException.java
+	(InvalidDnDOperationException): Added call to super.
+
+2006-07-05  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/basic/BasicArrowButton.java:
+	(paint): Removed getBounds() call, changed center point
+	calculation.
+
+2006-07-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/InputMap.java
+	(inputMap): Don't initialize yet,
+	(InputMap): Removed TODO,
+	(get): Check for null inputMap,
+	(put): Return immediately for null keyStroke, check for null inputMap
+	and initialize if necessary,
+	(remove): Check for null inputMap,
+	(size): Likewise,
+	(clear): Likewise,
+	(keys): Likewise,
+	(allKeys): Likewise,
+	(writeObject): Removed,
+	(readObject): Removed.
+
+2006-07-05  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* gnu/classpath/examples/swing/TabbedPaneDemo.java
+	(createContent): Use different labels for buttons.
+
+2006-07-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* NEWS:	Updated.
+	* doc/vmintegration.texinfo: Likewise.
+	* examples/gnu/classpath/examples/management/TestMemoryPool.java,
+	* gnu/java/lang/management/MemoryPoolMXBeanImpl.java:
+	New files.
+	* java/lang/management/ManagementFactory.java:
+	(getMemoryPoolMXBeans()): Implemented.
+	* vm/reference/gnu/java/lang/management/VMMemoryPoolMXBeanImpl.java,
+	* vm/reference/java/lang/management/VMManagementFactory.java:
+	New files.
+	
+2006-07-04  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/dnd/DragSourceContext.java:
+	Removed FIXMEs from fields.
+	(DragSourceContext): Added code to initialize cursor and sourceActions.
+	(getDragSource): Added documentation.
+	(getComponent): Likewise.
+	(getTrigger): Likewise.
+	(getSourceActions): Added documentation and implemented.
+	(setCursor): Implemented. Added documentation.
+	(getCursor): Implemented. Added documentation.
+	(dragEnter): Added code to notify DragSource's listeners.
+	(dragOver): Likewise.
+	(dragExit): Likewise.
+	(dropActionChanged): Likewise.
+	(dragDropEnd): Likewise.
+	(dragMouseMoved): Implemented.
+	(getTransferable): Added API documentation.
+	(updateCurrentCursor): Added API documentation and partially implemented.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/plaf/basic/BasicTreeUI.java (KeyHandler): Implemented.
+
+2006-07-04  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/dnd/DragSourceContext.java
+	(DragSourceContext): Implemented fully. Fixed API docs.
+	(transferablesFlavorsChanged): Implemented.
+	(dragEnter): Implemented.
+	(dragOver): Implemented.
+	(dragExit): Implemented.
+	(dropActionChanged): Implemented.
+	(dragDropEnd): Implemented.
+
+2006-07-04  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/plaf/basic/BasicOptionPaneUI.java:
+	Fixed name of constant.
+	(getIconWidth): Changed name of constant returned.
+	(getIconHeight): Likewise.
+	(paint): Likewise.
+	(createSeparator): Marked as unimplemented.
+	* javax/swing/plaf/basic/BasicTableUI.java
+	(focusGained): Marked as unimplemented.
+	(focusLost): Marked as unimplemented.
+	(mouseEntered): Likewise.
+	(mouseMoved): Likewise.
+	(uninstallDefaults): Likewise.
+	* javax/swing/plaf/basic/BasicToolBarUI.java
+	(mouseClicked): Changed comment.
+	(mouseEntered): Likewise.
+	(mouseExited): Likewise.
+	(mouseMoved): Likewise.
+	(setOrientation): Implemented.
+	(ToolBarFocusListener): Marked as unimplemented.
+	(focusGained): Marked as unimplemented.
+	(focusLost): Marked as unimplemented.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28061
+	* javax/swing/plaf/basic/BasicTreeUI.java (isLocationInExpandControl):
+	Mind the effect of the root visibility on the position of the control.
+	Quess icon width 18. (paintVerticalPartOfLeg): Do no paint the 
+	vertical line over first level nodes.
+
+2006-07-04  Lillian Angel  <langel@redhat.com>
+
+	* javax/swing/plaf/basic/BasicMenuUI.java
+	(installKeyboardActions): Implemented to call super. Nothing else
+	needs to be done here.
+	(setupPostTimer): Marked as unimplemented.
+	(uninstallKeyboardActions): Implemented to call super. Nothing else
+	needs to be done here.
+	(mouseMoved): Removed TODO. Nothing to be done here.
+	(ChangeHandler): Implemented.
+	(menuDragMouseExited): Removed TODO. Nothing to be done here.
+	(menuDragMouseReleased): Removed TODO. Nothing to be done here.
+	(menuKeyReleased): Removed TODO. Nothing to be done here.
+	(menuKeyTyped): Marked as unimplemented.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28061
+	* gnu/javax/swing/plaf/gnu/GNULookAndFeel.java
+	(getDefaults): Set hash color to black.
+	* javax/swing/plaf/basic/BasicLookAndFeel.java
+	(initComponentDefaults): Set hash color to grey blue.
+	* javax/swing/plaf/basic/BasicTreeUI.java
+	(instellDefaults): Set hash color.
+	* javax/swing/plaf/metal/MetalIconFactory.java
+	(TreeControlIcon.paint): Rewritten.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28061
+	* javax/swing/plaf/basic/BasicTreeUI.java (MouseHandler.mousePressed):
+	Always cancel the current editing session before doing anything else,
+	return immediately if this fails.
+	(TreeHomeAction): Ensure that the lead selection path is visible after
+	the action is performed. TreeIncrementAction: Likewise. TreeToggleAction:
+	Likewise. TreeTraverseAction: Likewise.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28061
+	* javax/swing/plaf/basic/BasicTreeUI.java (MouseHandler.mousePressed):
+	Returned back the code to handle the start of the click-pause-click
+	editing initiation, explained about this code. 
+	(TreeStartEditingAction): New inner class.
+	(stopEditingInCompleteEditing): Explained about this field.
+	(completeEditing(boolean, boolean, boolean): Only return early
+	if there is no current editing session.
+	(createDefaultActions): Install TreeStartEditingAction and
+	TreeCancelEditingAction.
+
+2006-07-04  Mario Torre  <neugens@limasoftware.net>
+
+	* configure.ac: Added new option --enable-default-preferences-peer
+	to pass user specified default preference backend.
+	If the GConf peer is built, GConf become the default backend.
+	* resource/META-INF/services/java.util.prefs.PreferencesFactory.in:
+	new file. 
+	* lib/Makefile.am: excludes files terminating in 'in' from
+	the metafiles list.
+	* lib/copy-vmresources.sh.in: excludes files terminating in 'in'
+	from copy into META-INF.
+	* java/util/prefs/Preferences.java: added two new import
+	classes gnu.classpath.ServiceFactory and java.util.Iterator.
+	(getFactory): Now try to check for
+	a system defined default preference backend before to fall back on
+	FileBasedPreference.
+
+2006-07-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28061
+	* javax/swing/JTree.java (COLLAPSED): Initialise to Boolean.FALSE.
+	(EXPANDED): Initialise to Boolean.TRUE.
+	* javax/swing/plaf/basic/BasicTreeUI.java (completeUIInstall):
+	First configure layout cache and then set the assigned value 
+	as row mapper. Set the root visibility property.
+	(toggleExpandState): Obtains expansion state from the layout cache.
+
+2006-07-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/MemoryPoolMXBean.java:
+	New file.
+	
+2006-07-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/RSACipherImpl.java: Source formatting.
+
+2006-07-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/sasl/anonymous/AnonymousClient.java: Source formatting.
+	* gnu/javax/crypto/sasl/anonymous/AnonymousServer.java: Likewise.
+	* gnu/javax/crypto/sasl/anonymous/AnonymousUtil.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/CramMD5AuthInfoProvider.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/CramMD5Client.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/CramMD5Registry.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/CramMD5Server.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/CramMD5Util.java: Likewise.
+	* gnu/javax/crypto/sasl/crammd5/PasswordFile.java: Likewise.
+	* gnu/javax/crypto/sasl/plain/PasswordFile.java: Likewise.
+	* gnu/javax/crypto/sasl/plain/PlainAuthInfoProvider.java: Likewise.
+	* gnu/javax/crypto/sasl/plain/PlainClient.java: Likewise.
+	* gnu/javax/crypto/sasl/plain/PlainRegistry.java: Likewise.
+	* gnu/javax/crypto/sasl/plain/PlainServer.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/CALG.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/ClientStore.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/IALG.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/KDF.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/PasswordFile.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SecurityContext.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/ServerStore.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SRP.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SRPAuthInfoProvider.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SRPClient.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SRPRegistry.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/SRPServer.java: Likewise.
+	* gnu/javax/crypto/sasl/srp/StoreEntry.java: Likewise.
+	* gnu/javax/crypto/sasl/AuthInfo.java: Likewise.
+	* gnu/javax/crypto/sasl/AuthInfoProviderFactory.java: Likewise.
+	* gnu/javax/crypto/sasl/ClientFactory.java: Likewise.
+	* gnu/javax/crypto/sasl/ClientMechanism.java: Likewise.
+	* gnu/javax/crypto/sasl/ConfidentialityException.java: Likewise.
+	* gnu/javax/crypto/sasl/IAuthInfoProvider.java: Likewise.
+	* gnu/javax/crypto/sasl/IAuthInfoProviderFactory.java: Likewise.
+	* gnu/javax/crypto/sasl/IllegalMechanismStateException.java: Likewise.
+	* gnu/javax/crypto/sasl/InputBuffer.java: Likewise.
+	* gnu/javax/crypto/sasl/IntegrityException.java: Likewise.
+	* gnu/javax/crypto/sasl/NoSuchMechanismException.java: Likewise.
+	* gnu/javax/crypto/sasl/NoSuchUserException.java: Likewise.
+	* gnu/javax/crypto/sasl/OutputBuffer.java: Likewise.
+	* gnu/javax/crypto/sasl/SaslEncodingException.java: Likewise.
+	* gnu/javax/crypto/sasl/SaslInputStream.java: Likewise.
+	* gnu/javax/crypto/sasl/SaslOutputStream.java: Likewise.
+	* gnu/javax/crypto/sasl/SaslUtil.java: Likewise.
+	* gnu/javax/crypto/sasl/ServerFactory.java: Likewise.
+	* gnu/javax/crypto/sasl/ServerMechanism.java: Likewise.
+	* gnu/javax/crypto/sasl/UserAlreadyExistsException.java: Likewise.
+
+2006-07-02  Anthony Green  <green@redhat.com>
+
+	* gnu/javax/sound/midi/file/MidiFileWriter.java (writeTrack): Make
+	sure that every track written ends with an End Of Track meta
+	message.
+
+2006-07-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/MemoryUsage.java:
+	(toString()): Fix missing MB for maximum memory usage.
+	
 2006-07-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* NEWS:

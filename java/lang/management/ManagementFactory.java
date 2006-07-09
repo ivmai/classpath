@@ -41,10 +41,16 @@ import gnu.classpath.SystemProperties;
 
 import gnu.java.lang.management.ClassLoadingMXBeanImpl;
 import gnu.java.lang.management.CompilationMXBeanImpl;
+import gnu.java.lang.management.GarbageCollectorMXBeanImpl;
 import gnu.java.lang.management.OperatingSystemMXBeanImpl;
 import gnu.java.lang.management.MemoryMXBeanImpl;
+import gnu.java.lang.management.MemoryManagerMXBeanImpl;
+import gnu.java.lang.management.MemoryPoolMXBeanImpl;
 import gnu.java.lang.management.RuntimeMXBeanImpl;
 import gnu.java.lang.management.ThreadMXBeanImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -187,6 +193,55 @@ public class ManagementFactory
 	SystemProperties.getProperty("gnu.java.compiler.name") != null)
       compilationBean = new CompilationMXBeanImpl();
     return compilationBean;
+  }
+
+  /**
+   * Returns the memory pool beans for the running
+   * virtual machine.  These may change during the course
+   * of execution.
+   *
+   * @return a list of memory pool beans, one for each pool.
+   */
+  public static List getMemoryPoolMXBeans()
+  {
+    List poolBeans = new ArrayList();
+    String[] names = VMManagementFactory.getMemoryPoolNames();
+    for (int a = 0; a < names.length; ++a)
+      poolBeans.add(new MemoryPoolMXBeanImpl(names[a]));
+    return poolBeans;
+  }
+
+  /**
+   * Returns the memory manager beans for the running
+   * virtual machine.  These may change during the course
+   * of execution.
+   *
+   * @return a list of memory manager beans, one for each manager.
+   */
+  public static List getMemoryManagerMXBeans()
+  {
+    List managerBeans = new ArrayList();
+    String[] names = VMManagementFactory.getMemoryManagerNames();
+    for (int a = 0; a < names.length; ++a)
+      managerBeans.add(new MemoryManagerMXBeanImpl(names[a]));
+    managerBeans.add(getGarbageCollectorMXBeans());
+    return managerBeans;
+  }
+
+  /**
+   * Returns the garbage collector beans for the running
+   * virtual machine.  These may change during the course
+   * of execution.
+   *
+   * @return a list of garbage collector beans, one for each pool.
+   */
+  public static List getGarbageCollectorMXBeans()
+  {
+    List gcBeans = new ArrayList();
+    String[] names = VMManagementFactory.getGarbageCollectorNames();
+    for (int a = 0; a < names.length; ++a)
+      gcBeans.add(new GarbageCollectorMXBeanImpl(names[a]));
+    return gcBeans;
   }
 
 }
