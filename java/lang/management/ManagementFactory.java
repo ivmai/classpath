@@ -202,7 +202,7 @@ public class ManagementFactory
    *
    * @return a list of memory pool beans, one for each pool.
    */
-  public static List getMemoryPoolMXBeans()
+  public static List<MemoryPoolMXBean> getMemoryPoolMXBeans()
   {
     List poolBeans = new ArrayList();
     String[] names = VMManagementFactory.getMemoryPoolNames();
@@ -218,7 +218,7 @@ public class ManagementFactory
    *
    * @return a list of memory manager beans, one for each manager.
    */
-  public static List getMemoryManagerMXBeans()
+  public static List<MemoryManagerMXBean> getMemoryManagerMXBeans()
   {
     List managerBeans = new ArrayList();
     String[] names = VMManagementFactory.getMemoryManagerNames();
@@ -235,7 +235,7 @@ public class ManagementFactory
    *
    * @return a list of garbage collector beans, one for each pool.
    */
-  public static List getGarbageCollectorMXBeans()
+  public static List<GarbageCollectorMXBean> getGarbageCollectorMXBeans()
   {
     List gcBeans = new ArrayList();
     String[] names = VMManagementFactory.getGarbageCollectorNames();
