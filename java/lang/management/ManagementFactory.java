@@ -204,7 +204,8 @@ public class ManagementFactory
    */
   public static List<MemoryPoolMXBean> getMemoryPoolMXBeans()
   {
-    List poolBeans = new ArrayList();
+    List<MemoryPoolMXBean> poolBeans =
+      new ArrayList<MemoryPoolMXBean>();
     String[] names = VMManagementFactory.getMemoryPoolNames();
     for (int a = 0; a < names.length; ++a)
       poolBeans.add(new MemoryPoolMXBeanImpl(names[a]));
@@ -220,11 +221,12 @@ public class ManagementFactory
    */
   public static List<MemoryManagerMXBean> getMemoryManagerMXBeans()
   {
-    List managerBeans = new ArrayList();
+    List<MemoryManagerMXBean> managerBeans =
+      new ArrayList<MemoryManagerMXBean>();
     String[] names = VMManagementFactory.getMemoryManagerNames();
     for (int a = 0; a < names.length; ++a)
       managerBeans.add(new MemoryManagerMXBeanImpl(names[a]));
-    managerBeans.add(getGarbageCollectorMXBeans());
+    managerBeans.addAll(getGarbageCollectorMXBeans());
     return managerBeans;
   }
 
@@ -237,7 +239,8 @@ public class ManagementFactory
    */
   public static List<GarbageCollectorMXBean> getGarbageCollectorMXBeans()
   {
-    List gcBeans = new ArrayList();
+    List<GarbageCollectorMXBean> gcBeans =
+      new ArrayList<GarbageCollectorMXBean>();
     String[] names = VMManagementFactory.getGarbageCollectorNames();
     for (int a = 0; a < names.length; ++a)
       gcBeans.add(new GarbageCollectorMXBeanImpl(names[a]));
