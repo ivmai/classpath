@@ -1,3 +1,754 @@
+2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/MBeanInfo.java:
+	(getNotifications()): Implemented.
+	* javax/management/NotificationBroadcaster.java:
+	(removeNotificationListener(NotificationListener)):
+	Renamed from removeListener.
+	* javax/management/NotificationEmitter.java:
+	(removeNotificationListener(NotificationListener,
+	NotificationFilter, Object)): Likewise.
+	* javax/management/NotificationFilter.java:
+	Implement Serializable.
+	* javax/management/NotificationListener.java:
+	Implement java.util.EventListener.
+	* javax/rmi/ssl/SslRMIClientSocketFactory.java:
+	Implement Serializable.
+
+2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/MemoryNotificationInfo.java:
+	New file.
+	
+2006-07-16  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28392
+	* gnu/javax/swing/text/html/parser/htmlValidator.java 
+	(tagIsValidForContext):	If it is not possible to insert any tag, but 
+	is possible to insert a P, insert a P.
+	* gnu/javax/swing/text/html/parser/HTML_401Swing.java
+	(newInstance): Removed print statement. (getBodyElements):
+	Removed ABBR, ACRONYM, BDO, Q, S, SUB, SUP and ADDRESS from the
+	valid body level tags (will be enclosed into P's).
+
+2006-07-17  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/gnu/classpath/tools/keytool/Command.java (setKeystoreURLParam):
+	Condition the creation of .keystore (a default keystore) based on the
+	createIfNotFound argument as well.
+
+2006-07-16  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 28392
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	Removed heading p tag from the parsing example.
+	* gnu/javax/swing/text/html/parser/HTML_401F.java:
+	(createHtmlContentModel): Explained.
+	(defineElements): Call getBodyElements to get the body
+	elements. (getBodyElements): New method. (model):
+	Made protected from private.
+	* gnu/javax/swing/text/html/parser/htmlValidator.java
+	(openTag): Mind that current content model may be null.
+	(tagIsValidForContext): If the tag is PCDATA, and it is not
+	valid for context, but the paragraph (P) is valid for context,
+	suggest to insert the P tag here.
+	* javax/swing/text/html/HTMLDocument.java (HTMLReader.addContent,
+	HTMLReader.blockOpen, HTMLReader.blockClose): Do not handle
+	implied P tags here.
+	* javax/swing/text/html/HTMLEditorKit.java (getParser):
+	Get the custom parser, using HTML_401Swing.java DTD.
+	* javax/swing/text/html/parser/ParserDelegator.java:
+	Removed the obsolete note that HTMLEditorKit does not exist.
+	* gnu/javax/swing/text/html/parser/GnuParserDelegator.java,
+	gnu/javax/swing/text/html/parser/HTML_401Swing.java: New files.
+
+2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/ListenerNotFoundException.java:
+	New file.
+	* javax/management/MBeanFeatureInfo.java:
+	(hashCode()): Use summation instead of multiplication
+	for consistency with other classes.
+	* javax/management/MBeanNotificationInfo.java,
+	* javax/management/Notification.java,
+	* javax/management/NotificationBroadcaster.java,
+	* javax/management/NotificationEmitter.java,
+	* javax/management/NotificationFilter.java,
+	* javax/management/NotificationListener.java:
+	New files.
+	* javax/management/OperationsException.java:
+	(serialVersionUID): Added.
+	
+2006-07-16  Thomas Minor  <1nocentrabidlamb@sexMagnet.com>
+	    Mark Wielaard  <mark@klomp.org>
+
+	* java/io/PrintStream.java: Added four constructors, for File and
+	String describing a filename with or without explicit encoding.
+
+2006-07-16  Sven de Marothy  <sven@physto.se>
+
+	* javax/rmi/ssl/SslRMIServerSocketFactory.java,
+	* javax/rmi/ssl/SslRMIClientSocketFactory.java:
+	New files.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	PR Classpath/28391
+	* tools/gnu/classpath/tools/keytool/Command.java (setKeyStoreParams(5)): 
+	New method.
+	(setKeyStoreParams(4)): Call the above method with false as its 1st arg.
+	(setProviderClassNameParam): Made private.
+	(setKeystoreTypeParam): Likewise.
+	(setKeyPasswordParam): Likewise
+	(setKeystorePasswordParam): Likewise.
+	(setKeystoreURLParam): Now accepts 2 more arguments; the first a boolean to
+	create or not the keystore if it's not there, and the second is the store's
+	password to process before loading the keystore. Amended the code
+	accordingly.
+	* tools/gnu/classpath/tools/keytool/GenKeyCmd.java (setup): Call super's
+	setKeyStoreParams(5) with true as its first argument.
+	* tools/gnu/classpath/tools/keytool/IdentityDBCmd.java (setup): Likewise.
+	* tools/gnu/classpath/tools/keytool/ImportCmd.java (setup): Likewise.
+
+2006-07-16  Sven de Marothy  <sven@physto.se>
+
+	* java/util/UUID.java: New file.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/jce/cipher/KeyWrappingAlgorithmAdapter.java: New file.
+	* gnu/javax/crypto/jce/cipher/AESKeyWrapSpi.java: New file.
+	* gnu/javax/crypto/jce/cipher/AES128KeyWrapSpi.java: Likewise.
+	* gnu/javax/crypto/jce/cipher/AES192KeyWrapSpi.java: Likewise.
+	* gnu/javax/crypto/jce/cipher/AES256KeyWrapSpi.java: Likewise.
+	* gnu/javax/crypto/jce/cipher/TripleDESKeyWrapSpi.java: Likewise.
+	* gnu/javax/crypto/jce/GnuCrypto.java (.run): Added mappings for newly
+	added Key Wrapping Algorithm SPIs.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* javax/crypto/Cipher.java (getOutputSize): Allow SPIs initialised for key
+	wrapping/unwrapping to invoke their engineGetOutputSize.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/kwa/TripleDESKeyWrap.java (rnd): New field.
+	(engineInit): If a SecureRandom was specified then use it.
+	(nextRandomBytes): New method.
+	(engineWrap): Use above method.
+	* gnu/javax/crypto/kwa/BaseKeyWrappingAlgorithm.java (prng): New field.
+	(getDefaultPRNG): New method.
+	* gnu/javax/crypto/kwa/AESKeyWrap.java (engineInit): Reset underlying AES.
+	* gnu/javax/crypto/kwa/IKeyWrappingAlgorithm.java (SOURCE_OF_RANDOMNESS):
+	New constant.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/jce/params/BlockCipherParameters.java
+	(engineGetParameterSpec): Should be able to return an IvParameterSpec.
+
+2006-07-16  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/cipher/DES.java (adjustParity): Index limit now takes
+	offset into consideration.
+
+2006-07-16  Mario Torre  <neugens@limasoftware.net>
+
+	* native/jni/gconf-peer/GConfNativePeer.c (init_gconf_client):
+	Fixed comment. This functions now requires to be called
+	with gdk lock held, the comment states that.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_init_1id_1cache):
+	Introduces gdk locks around critical regions of code.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1gconf_1client_1all_1keys):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1gconf_1client_1all_1nodes):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1suggest_1sync):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1unset):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1get_1string):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1set_1string):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1remove_1dir):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1add_1dir):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1dir_1exists):
+	Likewise.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_finalize_1class):
+	* native/jni/gconf-peer/Makefile.am: The GConf peer now depends on GTK.
+
+2006-07-15  Sven de Marothy  <sven@physto.se>
+
+        * javax/swing/JFileChooser.java
+        Change default selection mode to FILES_ONLY.
+        * javax/swing/plaf/basic/BasicDirectoryModel.java
+        Document, fix selection mode filtering.
+        (renameFile): Implement
+        * javax/swing/plaf/basic/BasicFileChooserUI.java
+        (selectedDir): New field to handle selected directories,
+        disallow selecting of directories in FILES_ONLY mode.
+        * javax/swing/plaf/metal/MetalFileChooserUI.java:
+        (EditingActionListener.actionPerformed):
+        Stop editing on all actions (e.g. return-key press)
+
+2006-07-15  Mark Wielaard  <mark@klomp.org>
+
+	* doc/vmintegration.texinfo (gnu.java.lang.management): Change xref
+	to code.
+	(JNI Implementation): Mark JVMTI Implementation as next.
+	(JVMTI Implementation): Mark JNI Implementation as prev.
+
+2006-07-15  Mark Wielaard  <mark@klomp.org>
+
+	* include/Makefile.am: Remove
+	include/gnu_java_awt_peer_gtk_GdkTextLayout.h.
+	* include/gnu_java_awt_peer_gtk_GdkTextLayout.h: Removed.
+	* native/jni/gtk-peer/Makefile.am: Remove
+	gnu_java_awt_peer_gtk_GdkTextLayout.c
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkTextLayout.c:
+	Removed.
+
+	* include/gnu_java_awt_peer_gtk_GtkWindowPeer.h: Regenerated.
+
+2006-07-15  Mark Wielaard  <mark@klomp.org>
+
+	* autogen.sh: Recognize autoconf 2.60.
+
+2006-07-15  Keith Seitz  <keiths@redhat.com>
+
+	* NEWS: Update for JVMTI and jvmti.h.
+	* doc/vmintegration.texinfo: Likewise.
+	* include/jvmti.h: New file.
+
+2006-07-15  Mark Wielaard  <mark@klomp.org>
+
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c:
+	Removed C++ style comment.
+
+2006-07-15  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GtkMouseInfoPeer.java,
+	* java/awt/MouseInfo.java,
+	* java/awt/PointerInfo.java,
+	* java/awt/peer/MouseInfoPeer.java:
+	New files.
+
+	* java/awt/Image.java
+	(accelerationPriority): New field.
+	(setAccelerationPriority, getAccelerationPriority): New methods..
+
+	* include/gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkGraphicsEnvironment.c,
+	* gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java:
+	(getMouseCoordinates): New method.
+
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java
+	(updateAlwaysOnTop): Remove stub overload.
+
+	* gnu/java/awt/ClasspathToolkit.java,
+	* gnu/java/awt/peer/gtk/GtkToolkit.java,
+	* include/gnu_java_awt_peer_gtk_GtkToolkit.h,
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c:
+	(getMouseInfoPeer): New method.
+	(getMouseNumberOfButtons): New method.
+	
+	* gnu/java/awt/peer/gtk/GtkWindowPeer.java
+	* include/gnu_java_awt_peer_gtk_GtkWindowPeer.h
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkWindowPeer.c
+	(gtkWindowSetAlwaysOnTop): New method.
+	(updateAlwaysOnTop): Implement.
+
+	* java/awt/Toolkit.java,
+	(getMouseInfoPeer): New method.
+
+	* java/awt/Window.java
+	(alwaysOnTop): New field.
+	(isAlwaysOnTop, setAlwaysOnTop): New methods.
+
+	* java/awt/peer/WindowPeer.java: Doc fix.
+
+2006-07-14  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/font/TextLayout.java:
+	(hitTestChar): Stub method.
+	* java/awt/font/TextMeasurer.java:
+	(getLayout): Throw exception on invalid argument.
+	
+2006-07-14  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/image/DataBuffer.java
+	(DataBuffer): Call constructors in the correct order,
+	
+2006-07-14  Mark Wielaard  <mark@klomp.org>
+
+	Revert to previous implementation.
+	* java/awt/GridBagLayout.java (AdjustForGravity): Only adjust for
+	constraints insets.
+
+2006-07-14  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XToolkit.java
+	(XToolkit): Install properties to SystemProperties
+	rather than System, to avoid SecurityManager.
+	(getImage(String)): Return error image when string is invalid.
+	(createImage(URL)): Moved image loading to helper method.
+	(createImage(ImageProducer)): Implemented.
+	(createImage(byte[],int,int)): Implemented.
+	(createImage(InputStream)): New helper method.
+
+2006-07-14  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/FlowLayout.java
+	(setHgap): No Excpetion should be thrown if hgap has
+	a negative value.
+	(setVgap): No Exception should be thrown if vgap has
+	a negative value.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java: 
+	Added API docs all over.
+
+2006-07-14  Matt Wringe  <mwringe@redhat.com>
+
+	* gnu/javax/crypto/jce/cipher/CipherAdapter.java 
+	(engineInit): Throw InvalidAlgorithmParameterException
+	for invalid IVParameterSpec IV length.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(createDataBuffer): Include dataBitOffset in calculating the size for
+	the data buffer.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(getSampleSize()): Return a copy of the array,
+	(getTransferType()): New method override.
+
+2006-07-14  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/CardLayout.java
+	(show): Validate parent to make sure that the layout is
+	valid.
+
+2006-07-14  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(enable): Added tree locking.
+	(disable): Added tree locking.
+	(show): Added tree locking.
+	(hide): Added tree locking.
+	(getLocationOnScreen): Added tree locking.
+	(reshape): Added tree locking.
+	(addHierarchyListener): Added tree locking.
+	(removeHierarchyListener): Added tree locking.
+	(addHierarchyBoundsListener): Added tree locking.
+	(removeHierarchyBoundsListener): Added tree locking.
+	(addNotify): Added tree locking.
+	(removeNotify): Added tree locking.
+	* java/awt/Container.java
+	(invalidateTree): Added tree locking.
+	(getAlignmentX): Added tree locking.
+	(getAlignmentY): Added tree locking.
+	(addNotify): Added tree locking.
+	(setComponentZOrder): Added tree locking.
+	(getComponentZOrder): Added tree locking.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(createSubsetSampleModel): Restored argument check, but let null
+	through.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(createSubsetSampleModel): Removed argument check.
+
+2006-07-14  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(numHierarchyListeners): New field.
+	(numHierarchyBoundsListeners): New field.
+	(show): Fire hierarchy events here. Only fire component event
+	if there is actually a listener for it.
+	(hide): Fire hierarchy events here. Only fire component event
+	if there is actually a listener for it.
+	(reshape): Fire hierarchy events here. Only fire component event
+	if there is actually a listener for it.
+	(addHierarchyListeners): Update listener counters.
+	(removeHierarchyListeners): Update listener counters.
+	(addHierarchyBoundsListeners): Update listener counters.
+	(removeHierarchyBoundsListeners): Update listener counters.
+	(fireHierarchyEvent): New helper method for firing hierarchy
+	events.
+	* java/awt/Container.java
+	(addImpl): Update listener counters. Fire hierarchy event.
+	(remove): Update listener counters. Fire hierarchy event.
+	(fireHierarchyEvent): New helper method for firing hierarchy
+	events.
+	(updateHierarchyListenerCount): New helper method for
+	updating the listener counters.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(equals): New method override,
+	(hashCode): Likewise.
+
+2006-07-14  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(MultiPixelPackedSampleModel(int, int, int, int, int, int)): 
+	Corrected scanlineStride calculation.
+
+2006-07-14  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/java/security/Registry.java (KWA_PREFIX): New constant.
+	(AES_KWA): Likewise.
+	(AES128_KWA): Likewise.
+	(AES192_KWA): Likewise.
+	(AES256_KWA): Likewise.
+	(RIJNDAEL_KWA): Likewise.
+	(TRIPLEDES_KWA): Likewise.
+	(DESEDE_KWA): Likewise.
+	* gnu/javax/crypto/kwa/AESKeyWrap.java: New file
+	* gnu/javax/crypto/kwa/BaseKeyWrappingAlgorithm.java: Likewise.
+	* gnu/javax/crypto/kwa/IKeyWrappingAlgorithm.java: Likewise.
+	* gnu/javax/crypto/kwa/KeyUnwrappingException.java: Likewise.
+	* gnu/javax/crypto/kwa/KeyWrappingAlgorithmFactory.java: Likewise.
+	* gnu/javax/crypto/kwa/TripleDESKeyWrap.java: Likewise.
+
+2006-07-14  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/javax/crypto/pad/IPad.java: Updated class documentation.
+	(PADDING_BLOCK_SIZE): New constant.
+	(init(Map attributes)): New method.
+	* gnu/javax/crypto/pad/BasePad.java (init): New method.
+
+2006-07-14  Mario Torre  <neugens@limasoftware.net>
+
+	* gnu/java/security/OID.java (OID): Private Constructor removed as
+	it is not needed anymore.
+	(clone): Fixed. Now uses super.clone instead of the private
+	constructor as per specification of clone method.
+	(serialVersionUID): added new field to allow serialization.
+
+2006-07-13  Sven de Marothy  <sven@physto.se>
+
+	* gnu/javax/imageio/gif/GIFImageReader.java
+	(read): Remove old debugging trace.
+
+2006-07-13  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	PR awt/28369:
+	* gnu/java/awt/peer/gtk/CairoSurface.java (ColorModel): Swap red and
+	blue mask.
+
+2006-07-13  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/Component.java
+	(DEFAULT_MAX_SIZE): New static constant.
+	(preferredSize): Return copy of the actual value computed
+	by new helper method.
+	(preferredSizeImpl): New helper method. Adds locking and
+	correct handling of cached value.
+	(minimumSize): Return copy of the actual value computed
+	by new helper method.
+	(minimumSizeImpl): New helper method. Adds locking and
+	correct handling of cached value.
+	(getMaximumSize):  Return copy of the actual value computed
+	by new helper method.
+	(maximumSizeImpl): New helper method. Adds locking and
+	correct handling of cached value.
+	(invalidate): Correct handling of cached layout information.
+	Added locking.
+	* java/awt/Container.java
+	(preferredSize): Minimized locking. Corrected handling of cached
+	values. Return copy of real value.
+	(minimumSize): Minimized locking. Corrected handling of cached
+	values. Return copy of real value.
+	(getMaximumSize): Minimized locking. Corrected handling of cached
+	values. Return copy of real value.
+	
+2006-07-13  Tania Bento  <tbento@redhat.com>
+
+	* gnu/java/awt/peer/ClasspathFontPeer.java
+	(isLogicalFontName): Return true if name == default.
+	(logicalFontNameToFaceName): Check if name == default,
+	and if so, return "Dialog.plain".
+	(setStandardAttributes(String, Map)): If name == null, 
+	it should be set to "Default", not "SansSerif".
+	* java/awt/Canvas.java
+	(generateName): Fixed documentation.
+	* java/awt/CheckboxMenuItem.java
+	Added static variable "next_chkmenuitem_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/Choice.java
+	Added static variable "next_choice_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/Cursor.java
+	(Cursor(int)): Set name depending on the type passed.
+	* java/awt/List.java
+	Added static variable "next_list_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/Menu.java
+	Added static variable "next_menu_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/MenuBar.java
+	Added static variable "next_menubar_number".
+	(generateName): Added and implemented method.	
+	(getUniqueLong): Likewise.
+	* java/awt/MenuComponent.java
+	(getName): Before returning name, check if name == null
+	and name is not explicity set.  If this is the case,    
+	name will be generated.
+	(generateName): Added and implemented method.	
+	* java/awt/MenuItem.java
+	Added static variable "next_menuitem_number".
+	(generateName): Added and implemented method.   
+	(getUniqueLong): Likewise.
+	* java/awt/PopupMenu.java
+	Added static variable "next_popup_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/ScrollPane.java
+	Added static variable "next_scrollpane_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+	* java/awt/TextField.java
+	Added static variable "next_textfield_number".
+	(generateName): Added and implemented method.
+	(getUniqueLong): Likewise.
+
+
+2006-07-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/SinglePixelPackedSampleModel.java
+	(SinglePixelPackageSampleModel(int, int, int, int, int[])): Convert
+	mask correctly as an unsigned integer,
+	(equals): New method override.
+
+2006-07-13  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/html/HTMLDocument.java (insertAfterEnd,
+	insertAfterStart, insertBeforeEnd):  Removed stub markings.
+
+2006-07-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/BandedSampleModel.java: API doc updates and source 
+	code reformatting,
+	* java/awt/image/SinglePixelPackageSampleModel.java: Likewise.
+
+2006-07-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/BandedSampleModel.java: API doc updates.
+
+2006-07-13  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* javax/swing/text/html/HTMLDocument.java (HTMLReader.parseStack): 
+	Made package private. (HTMLReader.charAttr, HTMLReader.charAttrStack,
+	HTMLReader.insertTag, HTMLReader.insertTagEncountered, 
+	HTMLReader.pushDepth, HTMLReader.popDepth): Documented. 
+	(HRMLReader.blockClose): Mind that parser stack may be empty. 
+	(HTMLReader.handeComment, HTMLReader.handleStartTag,
+	HTMLReader.handleEndTag, HTMLReader.handleSimpleTag): Rewritten. 
+	(HTMLReader.shouldInsert): New method. (getElement(String)): 
+	Pass HTML.Atrribute.ID. (insertAfterEnd, insertBeforeEnd, 
+	insertAfterStart, insertBeforeStart, setInnerHTML, setOuterHTML):
+	Implemented. (getInsertingReader): New method. 
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	Added buttons to demonstrate the work of the insert actions.
+
+2006-07-13  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/SampleModel.java: API doc updates and additions,
+	* java/awt/image/SinglePixelPackedSampleModel.java: Likewise.
+
+2006-07-12  Sven de Marothy  <sven@physto.se>
+
+	* javax/swing/JFileChooser.java:
+	(createDialog): Close operation should cause a cancel.
+
+2006-07-12  Francis Kung  <fkung@redhat.com>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java: Organized imports.
+	(cairoArc): New native method.
+	(cairoRestore): New native method.
+	(cairoSave): New native method.
+	(cairoScale): New native method.
+	(createPath): New method to centralize code from draw and fill.
+	(draw): Modified to use createPath method.
+	(fill): Modified to use createPath method.
+	* include/gnu_java_awt_peer_gtk_CairoGraphics2D.h: Added 
+	function declarations.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoGraphics2D.c
+	(Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoScale): New 
+	method.
+	(Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoSave): New 
+	method.
+	(Java_gnu_java_awt_peer_gtk_CairoGraphics2D_cairoArc): New 
+	method.
+	
+2006-07-12  Tom Tromey  <tromey@redhat.com>
+
+	PR libgcj/27271:
+	* java/util/zip/ZipFile.java (getInputStream): Call addDummyByte
+	on PartialInputStream.
+	(PartialInputStream.dummyByteCount): New field.
+	(PartialInputStream.fillBuffer): Handle dummy byte.
+	(PartialInputStream.read): Likewise.
+	(PartialInputStream.addDummyByte): New method.
+
+2006-07-12  Mario Torre  <neugens@limasoftware.net>
+
+	* native/jni/gconf-peer/GConfNativePeer.c
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1get_1string):
+	Fixed C++ style comment.
+
+2006-07-12  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/util/Arrays.java
+	(asList): Updated API docs.
+
+2006-07-11  Robert Schuster  <robertschuster@fsfe.org>
+
+	Fixes PR28350.
+	* native/jni/gconf-peer/GConfNativePeer.c:
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1set_1string):
+	Changed if-expression.
+	(Java_gnu_java_util_prefs_gconf_GConfNativePeer_gconf_1client_1get_1string):
+	Added check for _value not being NULL.
+	
+2006-07-11  Roman Kennke  <kennke@aicas.com>
+
+	* native/jni/java-net/gnu_java_net_local_LocalSocketImpl.c
+	(read): Use fd when local sockets are disabled to make the
+	compiler quite.
+	(write): Likewise.
+
+2006-07-11  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(MultiPixelPackedSampleModel): Substract -1 so that the integer
+	division gets rounded up.
+
+2006-07-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/lang/management/ManageFactory.java:
+	(getMemoryManagerMXBeans()): Use addAll, not add.
+	
+2006-07-11  Vivek Lakshmanan  <vivekl@redhat.com>
+
+	PR 27649:
+	* gnu/classpath/ByteArray.java: Removed (moved).
+	* gnu/java/security/util/ByteArray.java: New File.
+	* gnu/javax/crypto/RSACipherImpl.java: Reference 
+	gnu.java.security.util.ByteArray instead of gnu.classpath.ByteArray.
+
+2006-07-11  Roman Kennke  <kennke@aicas.com>
+
+	* native/jni/java-net/gnu_java_net_local_LocalSocketImpl.c
+	(available): Pass fd as argument and avoid JNI class/field
+	lookup.
+	(read): Likewise.
+	(write): Likewise.
+	* include/gnu_java_net_local_LocalSocketImpl.h:
+	Regenerated.
+	* gnu/java/net/local/LocalSocketImpl.h
+	(available): Pass fd as argument and avoid JNI class/field
+	lookup.
+	(read): Likewise.
+	(write): Likewise.	
+
+2006-07-11  Sven de Marothy  <sven@physto.se>
+
+	* gnu/javax/sound/sampled/AU/AUReader.java:
+	Correct file extension from .as to .au.
+
+2006-07-11  Sven de Marothy  <sven@physto.se>
+
+	* gnu/javax/sound/sampled/AU/AUReader.java:
+	New file.
+	* resource/META-INF/services/javax.sound.sampled.spi.AudioFileReader: 
+	Added new provider.
+
+2006-07-11  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/JTable.java
+	(setRowSelectionAllowed): Fire required PropertyChangeEvent,
+	(setColumnSelectionAllowed): Likewise.
+
+2006-07-10  Vivek Lakshmanan  <vivekl@redhat.com>
+
+	PR 27649:
+	* gnu/classpath/debug/Simple1LineFormatter.java: Use
+	AccessController.doPrivileged instead of SystemProperties.getProperty.
+	* gnu/classpath/debug/SystemLogger.java: Likewise.
+	* gnu/java/security/PolicyFile.java: Likewise and cut unnecessary
+	repeated getProperty calls for "file.seperator".
+	(refresh): Since already in privileged block, call System.getProperty
+	instead of SystemProperties.getProperty.
+	* gnu/java/security/key/dss/DSSKey.java
+	(toString): Use AccessController.doPrivileged instead of
+	SystemProperties.getProperty.
+	* gnu/java/security/key/dss/DSSPrivateKey.java
+	(toString): Likewise.
+	* gnu/java/security/key/dss/DSSPublicKey.java
+	(toString): Likewise.
+	* gnu/java/security/key/rsa/GnuRSAKey.java
+	(toString): Likewise.
+	* gnu/java/security/key/rsa/GnuRSAPrivateKey.java
+	(toString): Likewise.
+	* gnu/java/security/key/rsa/GnuRSAPublicKey.java
+	(toString): Likewise.
+	* gnu/javax/crypto/sasl/plain/PasswordFile.java: Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHKey.java 
+	(toString): Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHPrivateKey.java 
+	(toString): Likewise.
+	* gnu/javax/crypto/key/dh/GnuDHPublicKey.java 
+	(toString): Likewise.
+
+2006-07-11  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractButton.java
+	(disabledIcon): Fixed name (was 'disabeldIcon'),
+	(getDisabledIcon): Updated for corrected field name,
+	(setDisabledIcon): Fire a PropertyChangeEvent.
+
+2006-07-11  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/DefaultBoundedRangeModel.java
+	(readObject): New private method,
+	(writeObject): Likewise.
+
+2006-07-11  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/ButtonGroup.java
+	(add): Ignore null argument,
+	(remove): Ignore null argument.  If removing selected button, clear the
+	sel field,
+	(findButton): Changed case for method name, and documented,
+	(setSelected): Updated for modification to findButton() method name,
+	(isSelected): Updated API docs.
+
+2006-07-11  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/BufferedImage.java
+	(BufferedImage(int, int, int)): Use correct color space for 
+	TYPE_BYTE_GRAY and TYPE_USHORT_GRAY, and throw an 
+	IllegalArgumentException for an unrecognised type.
+
 2006-07-10  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/lang/management/ManagementFactory.java:
@@ -12,9 +763,148 @@
 	(getMemoryManagerMXBeans): Likewise.
 	(getGarbageCollectorMXBeans): Likewise.
 
+2006-07-10  Mario Torre  <neugens@limasoftware.net>
+
+        * java/awt/BasicStroke.java: Removed unused import.
+        * gnu/java/awt/java2d/CubicSegment.java (clone): Fixed. 
+        * gnu/java/awt/java2d/LineSegment.java (clone): Fixed. 
+        * gnu/java/awt/java2d/QuadSegment.java (clone): Fixed.
+
+2006-07-10  Matt Wringe  <mwringe@redhat.com>
+
+	PR classpath/28212:
+	* javax/crypto/spec/SecretKeySpec.java 
+	(equals): Check object type. 
+
+2006-07-10  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/StructureToPassHelper.java,
+	examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/StructureToReturnHelper.java,
+	examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/TreeNodeHelper.java,
+	examples/gnu/classpath/examples/CORBA/SimpleCommunication/
+	communication/WeThrowThisExceptionHelper.java,
+	gnu/CORBA/ForwardRequestHelper.java,
+	org/omg/CORBA/CompletionStatusHelper.java,
+	org/omg/CORBA/CurrentHelper.java,
+	org/omg/CORBA/DefinitionKindHelper.java,
+	org/omg/CORBA/IDLTypeHelper.java,
+	org/omg/CORBA/NameValuePairHelper.java,
+	org/omg/CORBA/ObjectHelper.java,
+	org/omg/CORBA/ParameterModeHelper.java,
+	org/omg/CORBA/PolicyErrorCodeHelper.java,
+	org/omg/CORBA/PolicyErrorHelper.java,
+	org/omg/CORBA/PolicyHelper.java,
+	org/omg/CORBA/PolicyListHelper.java,
+	org/omg/CORBA/PolicyTypeHelper.java,
+	org/omg/CORBA/ServiceDetailHelper.java,
+	org/omg/CORBA/ServiceInformationHelper.java,
+	org/omg/CORBA/SetOverrideTypeHelper.java,
+	org/omg/CORBA/StringValueHelper.java,
+	org/omg/CORBA/UnionMemberHelper.java,
+	org/omg/CORBA/UnknownUserExceptionHelper.java,
+	org/omg/CORBA/VisibilityHelper.java,
+	org/omg/CORBA/WStringValueHelper.java,
+	org/omg/CORBA/WrongTransactionHelper.java,
+	org/omg/CosNaming/BindingHelper.java,
+	org/omg/CosNaming/BindingIteratorHelper.java,
+	org/omg/CosNaming/BindingListHelper.java,
+	org/omg/CosNaming/BindingTypeHelper.java,
+	org/omg/CosNaming/NameComponentHelper.java,
+	org/omg/CosNaming/NameHelper.java,
+	org/omg/CosNaming/NamingContextExtHelper.java,
+	org/omg/CosNaming/NamingContextExtPackage/AddressHelper.java,
+	org/omg/CosNaming/NamingContextExtPackage/InvalidAddressHelper.java,
+	org/omg/CosNaming/NamingContextExtPackage/StringNameHelper.java,
+	org/omg/CosNaming/NamingContextExtPackage/URLStringHelper.java,
+	org/omg/CosNaming/NamingContextHelper.java,
+	org/omg/CosNaming/NamingContextPackage/AlreadyBoundHelper.java,
+	org/omg/CosNaming/NamingContextPackage/CannotProceedHelper.java,
+	org/omg/CosNaming/NamingContextPackage/InvalidNameHelper.java,
+	org/omg/CosNaming/NamingContextPackage/NotEmptyHelper.java,
+	org/omg/CosNaming/NamingContextPackage/NotFoundHelper.java,
+	org/omg/CosNaming/NamingContextPackage/NotFoundReasonHelper.java,
+	org/omg/DynamicAny/AnySeqHelper.java,
+	org/omg/DynamicAny/DynAnyFactoryHelper.java,
+	org/omg/DynamicAny/DynAnyFactoryPackage/InconsistentTypeCodeHelper.java,
+	org/omg/DynamicAny/DynAnyHelper.java,
+	org/omg/DynamicAny/DynAnyPackage/InvalidValueHelper.java,
+	org/omg/DynamicAny/DynAnyPackage/TypeMismatchHelper.java,
+	org/omg/DynamicAny/DynAnySeqHelper.java,
+	org/omg/DynamicAny/DynArrayHelper.java,
+	org/omg/DynamicAny/DynEnumHelper.java,
+	org/omg/DynamicAny/DynFixedHelper.java,
+	org/omg/DynamicAny/DynSequenceHelper.java,
+	org/omg/DynamicAny/DynStructHelper.java,
+	org/omg/DynamicAny/DynUnionHelper.java,
+	org/omg/DynamicAny/DynValueHelper.java,
+	org/omg/DynamicAny/NameDynAnyPairHelper.java,
+	org/omg/DynamicAny/NameDynAnyPairSeqHelper.java,
+	org/omg/DynamicAny/NameValuePairHelper.java,
+	org/omg/DynamicAny/NameValuePairSeqHelper.java,
+	org/omg/IOP/CodecFactoryHelper.java,
+	org/omg/IOP/CodecFactoryPackage/UnknownEncodingHelper.java,
+	org/omg/IOP/CodecPackage/FormatMismatchHelper.java,
+	org/omg/IOP/CodecPackage/InvalidTypeForEncodingHelper.java,
+	org/omg/IOP/CodecPackage/TypeMismatchHelper.java,
+	org/omg/IOP/ComponentIdHelper.java,
+	org/omg/IOP/IORHelper.java,
+	org/omg/IOP/MultipleComponentProfileHelper.java,
+	org/omg/IOP/ProfileIdHelper.java,
+	org/omg/IOP/ServiceContextHelper.java,
+	org/omg/IOP/ServiceContextListHelper.java,
+	org/omg/IOP/ServiceIdHelper.java,
+	org/omg/IOP/TaggedComponentHelper.java,
+	org/omg/IOP/TaggedProfileHelper.java,
+	org/omg/PortableInterceptor/AdapterManagerIdHelper.java,
+	org/omg/PortableInterceptor/AdapterNameHelper.java,
+	org/omg/PortableInterceptor/AdapterStateHelper.java,
+	org/omg/PortableInterceptor/CurrentHelper.java,
+	org/omg/PortableInterceptor/ForwardRequestHelper.java,
+	org/omg/PortableInterceptor/IORInterceptor_3_0Helper.java,
+	org/omg/PortableInterceptor/InvalidSlotHelper.java,
+	org/omg/PortableInterceptor/ORBInitInfoPackage/DuplicateNameHelper.java,
+	org/omg/PortableInterceptor/ORBInitInfoPackage/InvalidNameHelper.java,
+	org/omg/PortableInterceptor/ObjectReferenceFactoryHelper.java,
+	org/omg/PortableInterceptor/ObjectReferenceTemplateHelper.java,
+	org/omg/PortableInterceptor/ObjectReferenceTemplateSeqHelper.java,
+	org/omg/PortableServer/CurrentHelper.java,
+	org/omg/PortableServer/CurrentPackage/NoContextHelper.java,
+	org/omg/PortableServer/ForwardRequestHelper.java,
+	org/omg/PortableServer/POAHelper.java,
+	org/omg/PortableServer/POAManagerPackage/AdapterInactiveHelper.java,
+	org/omg/PortableServer/POAPackage/AdapterAlreadyExistsHelper.java,
+	org/omg/PortableServer/POAPackage/AdapterNonExistentHelper.java,
+	org/omg/PortableServer/POAPackage/InvalidPolicyHelper.java,
+	org/omg/PortableServer/POAPackage/NoServantHelper.java,
+	org/omg/PortableServer/POAPackage/ObjectAlreadyActiveHelper.java,
+	org/omg/PortableServer/POAPackage/ObjectNotActiveHelper.java,
+	org/omg/PortableServer/POAPackage/ServantAlreadyActiveHelper.java,
+	org/omg/PortableServer/POAPackage/ServantNotActiveHelper.java,
+	org/omg/PortableServer/POAPackage/WrongAdapterHelper.java,
+	org/omg/PortableServer/POAPackage/WrongPolicyHelper.java,
+	org/omg/PortableServer/ServantActivatorHelper.java,
+	org/omg/PortableServer/ServantLocatorHelper.java: Remove the 
+	typecode caching and always use OrbRestricted.Singleton.
+
 2006-07-09  Tom Tromey  <tromey@redhat.com>
 
 	* java/util/logging/LoggingMXBean.java (getLoggerNames): Genericized.
+
+2006-07-09  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/ComponentGraphics.java (hasXRenderExtension):
+	New static final boolean field.
+	(getComponentGraphics): Use hasXRenderExtension.
+	(setClip): Override method for locking.
+
+2006-07-09  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* javax/swing/AbstractButton.java
+	(setHorizontalTextPosition): Added check for illegal argument,
+	(setVerticalTextPosition): Likewise.
 
 2006-07-09  David Gilbert  <david.gilbert@object-refinery.com>
 

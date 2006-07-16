@@ -214,6 +214,12 @@ public abstract class Component
    */
   static final Object treeLock = new String("AWT_TREE_LOCK");
 
+  /**
+   * The default maximum size.
+   */
+  private static final Dimension DEFAULT_MAX_SIZE 
+                             = new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
+
   // Serialized fields from the serialization spec.
 
   /**
@@ -588,6 +594,17 @@ public abstract class Component
   transient BufferStrategy bufferStrategy;
 
   /**
+   * The number of hierarchy listeners of this container plus all of its
+   * children. This is needed for efficient handling of HierarchyEvents.
+   * These must be propagated to all child components with HierarchyListeners
+   * attached. To avoid traversal of the whole subtree, we keep track of
+   * the number of HierarchyListeners here and only walk the paths that
+   * actually have listeners.
+   */
+  int numHierarchyListeners;
+  int numHierarchyBoundsListeners;
+
+  /**
    * true if requestFocus was called on this component when its
    * top-level ancestor was not focusable.
    */
@@ -834,9 +851,17 @@ public abstract class Component
    */
   public void enable()
   {
-    this.enabled = true;
-    if (peer != null)
-      peer.setEnabled (true);
+    if (! enabled)
+      {
+        // Need to lock the tree here, because the peers are involved.
+        synchronized (getTreeLock())
+          {
+            enabled = true;
+            ComponentPeer p = peer;
+            if (p != null)
+              p.enable();
+          }
+      }
   }
 
   /**
@@ -861,9 +886,17 @@ public abstract class Component
    */
   public void disable()
   {
-    this.enabled = false;
-    if (peer != null)
-      peer.setEnabled (false);
+    if (enabled)
+      {
+        // Need to lock the tree here, because the peers are involved.
+        synchronized (getTreeLock())
+          {
+            enabled = false;
+            ComponentPeer p = peer;
+            if (p != null)
+              p.disable();
+          }
+      }
   }
 
   /**
@@ -928,15 +961,38 @@ public abstract class Component
     // and its children.
     if(!isVisible())
       {
-        this.visible = true;
-        // Avoid NullPointerExceptions by creating a local reference.
-        ComponentPeer currentPeer=peer;
-        if (currentPeer != null)
-            currentPeer.show();
-        // The JDK repaints the component before invalidating the parent.
-        // So do we.
-        if (isShowing() && isLightweight())
-          repaint();
+        // Need to lock the tree here to avoid races and inconsistencies.
+        synchronized (getTreeLock())
+          {
+            visible = true;
+            // Avoid NullPointerExceptions by creating a local reference.
+            ComponentPeer currentPeer=peer;
+            if (currentPeer != null)
+              {
+                currentPeer.show();
+
+                // Fire HierarchyEvent.
+                fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED,
+                                   this, parent,
+                                   HierarchyEvent.SHOWING_CHANGED);
+
+                // The JDK repaints the component before invalidating the parent.
+                // So do we.
+                if (isLightweight())
+                  repaint();
+              }
+
+            // Only post an event if this component actually has a listener
+            // or has this event explicitly enabled.
+            if (componentListener != null
+                || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+              {
+                ComponentEvent ce =
+                  new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+          }
+
         // Invalidate the parent if we have one. The component itself must
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
@@ -944,9 +1000,6 @@ public abstract class Component
         if (currentParent != null)
           currentParent.invalidate();
 
-        ComponentEvent ce =
-          new ComponentEvent(this,ComponentEvent.COMPONENT_SHOWN);
-        getToolkit().getSystemEventQueue().postEvent(ce);
       }
   }
 
@@ -974,27 +1027,45 @@ public abstract class Component
   {
     if (isVisible())
       {
-        // Avoid NullPointerExceptions by creating a local reference.
-        ComponentPeer currentPeer=peer;
-        if (currentPeer != null)
-            currentPeer.setVisible(false);
-        boolean wasShowing = isShowing();
-        this.visible = false;
+        // Need to lock the tree here to avoid races and inconsistencies.
+        synchronized (getTreeLock())
+          {
+            visible = false;
 
-        // The JDK repaints the component before invalidating the parent.
-        // So do we.
-        if (wasShowing)
-          repaint();
-        // Invalidate the parent if we have one. The component itself must
+            // Avoid NullPointerExceptions by creating a local reference.
+            ComponentPeer currentPeer=peer;
+            if (currentPeer != null)
+              {
+                currentPeer.hide();
+
+                // Fire hierarchy event.
+                fireHierarchyEvent(HierarchyEvent.HIERARCHY_CHANGED,
+                                   this, parent,
+                                   HierarchyEvent.SHOWING_CHANGED);
+                // The JDK repaints the component before invalidating the
+                // parent. So do we. This only applies for lightweights.
+                if (peer instanceof LightweightPeer)
+                  repaint();
+              }
+
+            // Only post an event if this component actually has a listener
+            // or has this event explicitly enabled.
+            if (componentListener != null
+                || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+              {
+                ComponentEvent ce =
+                  new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+          }
+
+        // Invalidate the parent if we have one. The component itself need
         // not be invalidated. We also avoid NullPointerException with
         // a local reference here.
         Container currentParent = parent;
         if (currentParent != null)
           currentParent.invalidate();
 
-        ComponentEvent ce =
-          new ComponentEvent(this,ComponentEvent.COMPONENT_HIDDEN);
-        getToolkit().getSystemEventQueue().postEvent(ce);
       }
   }
 
@@ -1215,8 +1286,15 @@ public abstract class Component
       throw new IllegalComponentStateException("component "
                                                + getClass().getName()
                                                + " not showing");
-    // We know peer != null here.
-    return peer.getLocationOnScreen();
+
+    // Need to lock the tree here. We get crazy races and explosions when
+    // the tree changes while we are trying to find the location of this
+    // component.
+    synchronized (getTreeLock())
+      {
+        // We know peer != null here.
+        return peer.getLocationOnScreen();
+      }
   }
 
   /**
@@ -1410,53 +1488,91 @@ public abstract class Component
    */
   public void reshape(int x, int y, int width, int height)
   {
-    int oldx = this.x;
-    int oldy = this.y;
-    int oldwidth = this.width;
-    int oldheight = this.height;
-    
-    if (this.x == x && this.y == y && this.width == width
-        && this.height == height)
-      return;
-
-    invalidate();
-    
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    if (peer != null)
-      peer.setBounds (x, y, width, height);
-    
-    // Erase old bounds and repaint new bounds for lightweights.
-    if (isLightweight() && isShowing())
+    // We need to lock the tree here, otherwise we risk races and
+    // inconsistencies.
+    synchronized (getTreeLock())
       {
-        if (parent != null)
+        int oldx = this.x;
+        int oldy = this.y;
+        int oldwidth = this.width;
+        int oldheight = this.height;
+    
+        if (this.x == x && this.y == y && this.width == width
+            && this.height == height)
+          return;
+
+        invalidate();
+    
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        if (peer != null)
+          peer.setBounds (x, y, width, height);
+    
+        // Erase old bounds and repaint new bounds for lightweights.
+        if (isLightweight() && isShowing())
           {
-            Rectangle oldBounds = new Rectangle(oldx, oldy, oldwidth,
-                                                oldheight);
-            Rectangle newBounds = new Rectangle(x, y, width, height);
-            Rectangle destroyed = oldBounds.union(newBounds);
-            if (!destroyed.isEmpty())
-              parent.repaint(0, destroyed.x, destroyed.y, destroyed.width,
-                             destroyed.height);
+            if (parent != null)
+              {
+                Rectangle oldBounds = new Rectangle(oldx, oldy, oldwidth,
+                                                    oldheight);
+                Rectangle newBounds = new Rectangle(x, y, width, height);
+                Rectangle destroyed = oldBounds.union(newBounds);
+                if (!destroyed.isEmpty())
+                  parent.repaint(0, destroyed.x, destroyed.y, destroyed.width,
+                                 destroyed.height);
+              }
           }
-      }
 
-    // Only post event if this component is visible and has changed size.
-    if (isShowing ()
-        && (oldx != x || oldy != y))
-      {
-        ComponentEvent ce = new ComponentEvent(this,
+        boolean resized = oldwidth != width || oldheight != height;
+        boolean moved = oldx != x || oldy != y;
+        // Only post an event if this component actually has a listener
+        // or has this event explicitly enabled.
+        if (componentListener != null
+            || (eventMask & AWTEvent.COMPONENT_EVENT_MASK) != 0)
+          {
+            // Fire component event on this component.
+            if (moved)
+              {
+                ComponentEvent ce = new ComponentEvent(this,
                                                ComponentEvent.COMPONENT_MOVED);
-        getToolkit().getSystemEventQueue().postEvent(ce);
-      }
-    if (isShowing ()
-        && (oldwidth != width || oldheight != height))
-      {
-        ComponentEvent ce = new ComponentEvent(this,
-                                               ComponentEvent.COMPONENT_RESIZED);
-        getToolkit().getSystemEventQueue().postEvent(ce);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+            if (resized)
+              {
+                ComponentEvent ce = new ComponentEvent(this,
+                                             ComponentEvent.COMPONENT_RESIZED);
+                getToolkit().getSystemEventQueue().postEvent(ce);
+              }
+          }
+        else
+          {
+            // Otherwise we might need to notify child components when this is
+            // a Container.
+            if (this instanceof Container)
+              {
+                Container cont = (Container) this;
+                if (resized)
+                  {
+                    for (int i = 0; i < cont.getComponentCount(); i++)
+                      {
+                        Component child = cont.getComponent(i);
+                        child.fireHierarchyEvent(HierarchyEvent.ANCESTOR_RESIZED,
+                                                 this, parent, 0);
+                      }
+                  }
+                if (moved)
+                  {
+                    for (int i = 0; i < cont.getComponentCount(); i++)
+                      {
+                        Component child = cont.getComponent(i);
+                        child.fireHierarchyEvent(HierarchyEvent.ANCESTOR_MOVED,
+                                                 this, parent, 0);
+                      }
+                  }
+              }
+          }
       }
   }
 
@@ -1660,14 +1776,36 @@ public abstract class Component
    */
   public Dimension preferredSize()
   {
-    if (!prefSizeSet)
+    // Create a new Dimension object, so that the application doesn't mess
+    // with the actual values.
+    return new Dimension(preferredSizeImpl());
+  }
+
+  /**
+   * The actual calculation is pulled out of preferredSize() so that
+   * we can call it from Container.preferredSize() and avoid creating a
+   * new intermediate Dimension object.
+   * 
+   * @return the preferredSize of the component
+   */
+  Dimension preferredSizeImpl()
+  {
+    Dimension size = prefSize;
+    // Try to use a cached value.
+    if (size == null || !(valid || prefSizeSet))
       {
-        if (peer == null)
-          prefSize = minimumSize();
-        else
-          prefSize = peer.getPreferredSize();
+        // We need to lock here, because the calculation depends on the
+        // component structure not changing.
+        synchronized (getTreeLock())
+          {
+            ComponentPeer p = peer;
+            if (p != null)
+              size = peer.preferredSize();
+            else
+              size = minimumSizeImpl();
+          }
       }
-    return prefSize;
+    return size;
   }
 
   /**
@@ -1724,10 +1862,36 @@ public abstract class Component
    */
   public Dimension minimumSize()
   {
-    if (minSize == null)
-      minSize = (peer != null ? peer.getMinimumSize()
-                 : new Dimension(width, height));
-    return minSize;
+    // Create a new Dimension object, so that the application doesn't mess
+    // with the actual values.
+    return new Dimension(minimumSizeImpl());
+  }
+
+  /**
+   * The actual calculation is pulled out of minimumSize() so that
+   * we can call it from Container.preferredSize() and
+   * Component.preferredSizeImpl and avoid creating a
+   * new intermediate Dimension object.
+   * 
+   * @return the minimum size of the component
+   */
+  Dimension minimumSizeImpl()
+  {
+    Dimension size = minSize;
+    if (size == null || !(valid || minSizeSet))
+      {
+        // We need to lock here, because the calculation depends on the
+        // component structure not changing.
+        synchronized (getTreeLock())
+          {
+            ComponentPeer p = peer;
+            if (p != null)
+              size = peer.minimumSize();
+            else
+              size = size();
+          }
+      }
+    return size;
   }
 
   /**
@@ -1741,10 +1905,24 @@ public abstract class Component
    */
   public Dimension getMaximumSize()
   {
+    return new Dimension(maximumSizeImpl());
+  }
+
+  /**
+   * This is pulled out from getMaximumSize(), so that we can access it
+   * from Container.getMaximumSize() without creating an additional
+   * intermediate Dimension object.
+   *
+   * @return the maximum size of the component
+   */
+  Dimension maximumSizeImpl()
+  {
+    Dimension size;
     if (maxSizeSet)
-      return maxSize;
+      size = maxSize;
     else
-      return new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
+      size = DEFAULT_MAX_SIZE;
+    return size;
   }
 
   /**
@@ -1848,11 +2026,25 @@ public abstract class Component
    */
   public void invalidate()
   {
-    valid = false;
-    prefSize = null;
-    minSize = null;
-    if (parent != null && parent.isValid())
-      parent.invalidate();
+    // Need to lock here, to avoid races and other ugly stuff when doing
+    // layout or structure changes in other threads.
+    synchronized (getTreeLock())
+      {
+        // Invalidate.
+        valid = false;
+
+        // Throw away cached layout information.
+        if (! minSizeSet)
+          minSize = null;
+        if (! prefSizeSet)
+          prefSize = null;
+        if (! maxSizeSet)
+          maxSize = null;
+
+        // Also invalidate the parent, if it hasn't already been invalidated.
+        if (parent != null && parent.isValid())
+          parent.invalidate();
+      }
   }
 
   /**
@@ -2592,6 +2784,14 @@ public abstract class Component
     hierarchyListener = AWTEventMulticaster.add(hierarchyListener, listener);
     if (hierarchyListener != null)
       enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyListeners++;
+        if (parent != null)
+          parent.updateHierarchyListenerCount(AWTEvent.HIERARCHY_EVENT_MASK, 1);
+      }
   }
 
   /**
@@ -2607,6 +2807,15 @@ public abstract class Component
   public synchronized void removeHierarchyListener(HierarchyListener listener)
   {
     hierarchyListener = AWTEventMulticaster.remove(hierarchyListener, listener);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyListeners--;
+        if (parent != null)
+          parent.updateHierarchyListenerCount(AWTEvent.HIERARCHY_EVENT_MASK,
+                                              -1);
+      }
   }
 
   /**
@@ -2642,6 +2851,16 @@ public abstract class Component
       AWTEventMulticaster.add(hierarchyBoundsListener, listener);
     if (hierarchyBoundsListener != null)
       enableEvents(AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyBoundsListeners++;
+        if (parent != null)
+          parent.updateHierarchyListenerCount
+                                        (AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK,
+                                         1);
+      }
   }
 
   /**
@@ -2659,6 +2878,16 @@ public abstract class Component
   {
     hierarchyBoundsListener =
       AWTEventMulticaster.remove(hierarchyBoundsListener, listener);
+
+    // Need to lock the tree, otherwise we might end up inconsistent.
+    synchronized (getTreeLock())
+      {
+        numHierarchyBoundsListeners--;
+        if (parent != null)
+          parent.updateHierarchyListenerCount
+                                         (AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK,
+                                          -1);
+      }
   }
 
   /**
@@ -2674,6 +2903,40 @@ public abstract class Component
     return (HierarchyBoundsListener[])
       AWTEventMulticaster.getListeners(hierarchyBoundsListener,
                                        HierarchyBoundsListener.class);
+  }
+
+  /**
+   * Fires a HierarchyEvent or HierarchyChangeEvent on this component.
+   *
+   * @param id the event id
+   * @param changed the changed component
+   * @param parent the parent
+   * @param flags the event flags
+   */
+  void fireHierarchyEvent(int id, Component changed, Container parent,
+                          long flags)
+  {
+    boolean enabled = false;
+    switch (id)
+    {
+      case HierarchyEvent.HIERARCHY_CHANGED:
+        enabled = hierarchyListener != null
+                  || (eventMask & AWTEvent.HIERARCHY_EVENT_MASK) != 0;
+        break;
+      case HierarchyEvent.ANCESTOR_MOVED:
+      case HierarchyEvent.ANCESTOR_RESIZED:
+        enabled = hierarchyBoundsListener != null
+                  || (eventMask & AWTEvent.HIERARCHY_BOUNDS_EVENT_MASK) != 0;
+          break;
+      default:
+        assert false : "Should not reach here";
+    }
+    if (enabled)
+      {
+        HierarchyEvent ev = new HierarchyEvent(this, id, changed, parent,
+                                               flags);
+        dispatchEvent(ev);
+      }
   }
 
   /**
@@ -3578,18 +3841,22 @@ public abstract class Component
    */
   public void addNotify()
   {
-    if (peer == null)
-      peer = getToolkit().createComponent(this);
-    else if (parent != null && parent.isLightweight())
-      new HeavyweightInLightweightListener(parent);
-    /* Now that all the children has gotten their peers, we should
+    // We need to lock the tree here to avoid races and inconsistencies.
+    synchronized (getTreeLock())
+      {
+        if (peer == null)
+          peer = getToolkit().createComponent(this);
+        else if (parent != null && parent.isLightweight())
+          new HeavyweightInLightweightListener(parent);
+        /* Now that all the children has gotten their peers, we should
        have the event mask needed for this component and its
        lightweight subcomponents. */
-    peer.setEventMask(eventMask);
-    /* We do not invalidate here, but rather leave that job up to
+        peer.setEventMask(eventMask);
+        /* We do not invalidate here, but rather leave that job up to
        the peer. For efficiency, the peer can choose not to
        invalidate if it is happy with the current dimensions,
        etc. */
+      }
   }
 
   /**
@@ -3603,17 +3870,21 @@ public abstract class Component
    */
   public void removeNotify()
   {
-    // We null our peer field before disposing of it, such that if we're
-    // not the event dispatch thread and the dispatch thread is awoken by
-    // the dispose call, there will be no race checking the peer's null
-    // status.
-
-    ComponentPeer tmp = peer;
-    peer = null;
-    if (tmp != null)
+    // We need to lock the tree here to avoid races and inconsistencies.
+    synchronized (getTreeLock())
       {
-        tmp.hide();
-        tmp.dispose();
+        // We null our peer field before disposing of it, such that if we're
+        // not the event dispatch thread and the dispatch thread is awoken by
+        // the dispose call, there will be no race checking the peer's null
+        // status.
+
+        ComponentPeer tmp = peer;
+        peer = null;
+        if (tmp != null)
+          {
+            tmp.hide();
+            tmp.dispose();
+          }
       }
   }
 
