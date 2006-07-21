@@ -133,6 +133,25 @@ public class CopyOnWriteArrayList<E> extends AbstractList<E> implements
   }
 
   /**
+   * Return the lowest index greater equal <code>index</code> at which
+   * <code>e</code> appears in this List, or -1 if it does not
+   * appear.
+   *
+   * @param e the element whose inclusion in the list is being tested
+   * @param index the index at which the search begins
+   * @return the index where <code>e</code> was found
+   */
+  public int indexOf(E e, int index)
+  {
+    E[] data = this.data;
+
+    for (int i = index; i < data.length; i++)
+      if (equals(e, data[i]))
+	return i;
+    return -1;
+  }
+
+  /**
    * Returns the highest index at which element appears in this List, or -1 if
    * it does not appear.
    * 
@@ -146,6 +165,25 @@ public class CopyOnWriteArrayList<E> extends AbstractList<E> implements
     for (int i = data.length - 1; i >= 0; i--)
       if (equals(e, data[i]))
         return i;
+    return -1;
+  }
+
+  /**
+   * Returns the highest index lesser equal <code>index</code> at
+   * which <code>e</code> appears in this List, or -1 if it does not
+   * appear.
+   *
+   * @param e the element whose inclusion in the list is being tested
+   * @param index the index at which the search begins
+   * @return the index where <code>e</code> was found
+   */
+  public int lastIndexOf(E e, int index)
+  {
+    E[] data = this.data;
+
+    for (int i = index; i >= 0; i--)
+      if (equals(e, data[i]))
+	return i;
     return -1;
   }
 
@@ -255,7 +293,7 @@ public class CopyOnWriteArrayList<E> extends AbstractList<E> implements
   public synchronized boolean add(E e)
   {
     E[] data = this.data;
-    E[] newData = (E[]) new Object[data.length];
+    E[] newData = (E[]) new Object[data.length + 1];
     System.arraycopy(data, 0, newData, 0, data.length);
     newData[data.length] = e;
     this.data = newData;
@@ -277,7 +315,7 @@ public class CopyOnWriteArrayList<E> extends AbstractList<E> implements
   public synchronized void add(int index, E e)
   {
     E[] data = this.data;
-    E[] newData = (E[]) new Object[data.length];
+    E[] newData = (E[]) new Object[data.length + 1];
     System.arraycopy(data, 0, newData, 0, index);
     newData[index] = e;
     System.arraycopy(data, index, newData, index + 1, data.length - index);

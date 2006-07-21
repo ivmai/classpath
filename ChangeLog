@@ -1,3 +1,10 @@
+2006-07-21  Carsten Neumann  <cn-develop@gmx.net>
+
+	* java/util/CopyOnWriteArrayList.java (indexOf(E, int)): New method.
+	(lastIndexOf(E, int)): Likewise.
+	(add(E)): Increase the size of newData array by one.
+	(add(int, E)): Likewise.
+
 2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* javax/management/MBeanInfo.java:
