@@ -43,9 +43,9 @@ import gnu.x11.Pixmap;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
+import java.util.Hashtable;
 
 public class XImage
   extends Image
@@ -53,10 +53,12 @@ public class XImage
 
   Pixmap pixmap;
 
+  private Hashtable properties;
+
   XImage(int w, int h)
   {
-    XToolkit tk = (XToolkit) Toolkit.getDefaultToolkit();
-    GraphicsEnvironment env = tk.getLocalGraphicsEnvironment();
+    GraphicsEnvironment env =
+      GraphicsEnvironment.getLocalGraphicsEnvironment();
     XGraphicsDevice dev = (XGraphicsDevice) env.getDefaultScreenDevice();
     pixmap = new Pixmap(dev.getDisplay(), w, h);
   }
@@ -90,8 +92,10 @@ public class XImage
 
   public Object getProperty(String name, ImageObserver observer)
   {
-    // TODO: Implement this.
-    throw new UnsupportedOperationException("Not yet implemented.");
+    Object val = null;
+    if (properties != null)
+      val = properties.get(val);
+    return val;
   }
 
   public void flush()

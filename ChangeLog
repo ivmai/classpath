@@ -1,9 +1,573 @@
+2006-07-23  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Check for moc and moc-qt4.
+
+2006-07-23  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/Kernel.java: API doc updates.
+
+2006-07-22  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* gnu/java/awt/peer/gtk/CairoSurface.java: Optimize pixel swap code a
+	bit more.
+
+2006-07-22  Mark Wielaard  <mark@klomp.org>
+
+	* java/lang/Iterable.java: Import all of java.util.
+	* lib/mkcollections.pl.in (javautilclasses): Add Iterable.
+	* lib/Makefile.am: Only search for .java files in COLLECTIONS_PREFIX.
+
+2006-07-22  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* doc/vmintegration.texinfo:
+	Document getType(String).
+	* gnu/java/lang/management/MemoryPoolMXBeanImpl.java,
+	* java/lang/management/MemoryPoolMXBean.java:
+	(getType()): Implemented.
+	* vm/reference/gnu/java/lang/management/VMMemoryPoolMXBeanImpl.java
+	(getType(String)): Implemented.
+	
+2006-07-22  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* doc/vmintegration.texinfo:
+	Move end of itemization block.
+
+2006-07-22  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/metal/MetalLookAndFeel.java:
+	(initComponentDefaults): Added new properties, added comments.
+	
+2006-07-22  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* doc/vmintegration.texinfo:
+	Mention callback methods.
+	* gnu/java/lang/management/MemoryMXBeanImpl.java:
+	(fireNotification(String,String,long,long,long,long,long)):
+	Made package-private.
+	(fireThresholdExceededNotification(String,long,long,long,
+	long,long)): Likewise.
+	(fireCollectionThresholdExceededNotification(String,long,
+	long,long,long,long)): Likewise.
+	* java/lang/management/MemoryMXBean.java:
+	Document notifications.
+
+2006-07-22  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/lang/management/MemoryMXBeanImpl.java:
+	(fireNotification(String,String,long,long,long,long,long)):
+	Implemented.
+	(fireThresholdExceededNotification(String,long,long,long,
+	long,long)): Likewise.
+	(fireCollectionThresholdExceededNotification(String,long,
+	long,long,long,long)): Likewise.
+	* java/lang/management/MemoryNotificationInfo.java:
+	Use composite type from MemoryMXBeanImpl.
+	* javax/management/openmbean/CompositeData.java:
+	Correct documentation.
+	* javax/management/openmbean/CompositeDataSupport.java,
+	* javax/management/openmbean/InvalidKeyException.java:
+	New files.
+
+2006-07-22  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* gnu/java/security/util/IntegerUtil.java: New file.
+
+2006-07-22  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	PR Classpath/28100
+	* gnu/javax/crypto/cipher/TripleDES.java: Updated documentation.
+	(KEY_SIZE): Likewise.
+	(adjustParity(int,byte[],int): New method.
+	(adjustParity(byte[],int): Call above method with 3 as 1st argument.
+	(isParityAdjusted(int,byte[],int)): New method.
+	(isParityAdjusted): Call above method with 3 as 1st argument.
+	(keySizes): Add 8 and 16 as other valid key sizes.
+	(makeKey): Amended to cater for 1, 2 and 3 independent DES keys.
+
+2006-07-22  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* gnu/java/awt/peer/gtk/CairoSurface.java (CairoSurface): Rearrange
+	code for the pixel swap routine to be more efficient.
+
 2006-07-21  Carsten Neumann  <cn-develop@gmx.net>
 
 	* java/util/CopyOnWriteArrayList.java (indexOf(E, int)): New method.
 	(lastIndexOf(E, int)): Likewise.
 	(add(E)): Increase the size of newData array by one.
 	(add(int, E)): Likewise.
+
+2006-07-20  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/dnd/GtkMouseDragGestureRecognizer.java:
+	Removed unused fields.
+	(GtkMouseDragGestureRecognizer): Removed initializations.
+
+2006-07-20  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/dnd/GtkMouseDragGestureRecognizer.java
+	(GtkMouseDragGestureRecognizer): New constructor.
+	(GtkMouseDragGestureRecognizer): New constructor.
+	(GtkMouseDragGestureRecognizer): New constructor.
+	(mouseClicked): Removed FIXME.
+	(mousePressed): Implemented.
+	(mouseReleased): Implemented.
+	(mouseEntered): Implemented.
+	(mouseDragged): Implemented to check mouse point and trigger origin.
+	(mouseMoved): Removed FIXME.
+	(getDropActionFromEvent): New helper function used to convert mouse event
+	modifiers to a drop action.
+	* java/awt/dnd/DragSource.java
+	(getDragThreshold): Changed to return some arbitrary value for testing
+	purposes.
+
+2006-07-20  Roman Kennke  <kennke@aicas.com>
+
+	* java/awt/LightweightDispatcher.java
+	(findTarget): Also consider components that have their eventMask
+	set, for compatibility with stonage AWT. Optimized check
+	for MouseListener.
+	(handleMouseEvent): Likewise.
+
+2006-07-20  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JTable.java
+	(tableChanged): Split out handling of the event into multiple
+	subroutines.
+	(handleCompleteChange): New method. Clear the selection and
+	check the lead/anchor indices.
+	(handleInsert): New method. Check the lead/anchor indices.
+	Optimized repainting.
+	(handleDelete): New method. Check the lead/anchor indices.
+	Optimized repainting.
+	(handleUpdate): New method. Optimized repainting.
+	(checkSelection): New helper method.
+	(setSelectionModel): Update lead/anchor indices.
+
+2006-07-20  Lillian Angel  <langel@redhat.com>
+
+	PR 28440
+	* gnu/java/awt/peer/gtk/GtkCheckboxPeer.java
+	(dispose): Reset all fields.
+
+2006-07-20  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XToolkit.java
+	(createImage(InputStream)): Only copy image to Pixmap if
+	it's actually opaque. Transparent images are left as
+	BufferedImage and composited later onto the screen.
+	* gnu/java/awt/peer/x/XGraphics.java
+	(XGraphics): Fetch some parameters for image rendering.
+	(drawImage): Added special handling of transparent images.
+	(getRGB): New helper method.
+	(setRGB): New helper method.
+
+2006-07-20  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/javax/imageio/IIOInputStream.java: New class. Wraps
+	ImageInputStreams as normal InputStreams.
+	* gnu/javax/imageio/gif/GIFStream.java:
+	Moved to gnu/javax/imageio/IIOInputStream.java.
+	* gnu/javax/imageio/gif/GIFImageReader.java
+	(readImage): Use IIOInputStream.
+	* gnu/javax/imageio/gif/GIFImageReaderSpi.java
+	(canDecodeInput): Use IIOInputStream.
+	* gnu/javax/imageio/png/PNGException.java: Make subclass
+	of IOException.
+	* gnu/javax/imageio/png/PNGImageReader.java: New class.
+	Implements the ImageIO ImageReader for PNG.
+	* gnu/javax/imageio/png/PNGImageReaderSpi.java: New class.
+	Implements the ImageIO ImageReaderSpi for PNG.
+	* javax/imageio/spi/IIORegistry.java:
+	(IIORegistry): Add PNGImageReaderSpi.
+
+2006-07-20  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/ComponentSampleModel.java
+	(getPixel): Added argument check,
+	(getSample): Modified exception message.
+
+2006-07-20  David Gilbert  <david.gilbert@object-refinery.com>
+
+	PR Classpath/28422
+	* java/awt/image/ConvolveOp.java
+	(filter(Raster, WritableRaster)): Reimplemented,
+	(fillEdge): New private method.
+
+2006-07-19  Keith Seitz  <keiths@redhat.com>
+
+	* include/jvmti.h (JVMTI_VERSION_1_0): Define.
+	(JVMTI_VERSION): Define.
+
+2006-07-19  Roman Kennke  <kennke@aicas.com>
+
+	* resource/gnu/regexp/MessagesBundle.properties,
+	* resource/gnu/regexp/MessagesBundle_fr.properties,
+	* resource/gnu/regexp/MessagesBundle_it.properties:
+	Moved to resource/gnu/java/util/regex.
+	* resource/gnu/java/util/regex/MessagesBundle.properties,
+	* resource/gnu/java/util/regex/MessagesBundle_fr.properties,
+	* resource/gnu/java/util/regex/MessagesBundle_it.properties:
+	New files.
+	* gnu/java/util/regex/RE.java
+	Use new resource bundle location.
+
+2006-07-19  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/JComponent.java
+	(paintChildren): Refactored. The paintChildrenOptimized method
+	has been moved back in here. Added locking of the tree and
+	only check for completely obscured child components
+	when not optimized drawing enabled. Use Graphics.create() to
+	protect from irreversible changes.
+	(isCompletelyObscured): New helper method.
+	(paintComponent): Also use Graphics.create() for Graphics2D,
+	to protect from irreverible changes.
+	(clipAndTranslateGraphics): Refactored to use more efficient
+	iterative (vs recursive) approach.
+	* javax/swing/RepaintManager.java
+	(getOffscreenBuffer): Create image from root component.
+	
+2006-07-19  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XGraphics.java
+	(translate): Don't set the clip on the X server.
+	(clipRect): Use setXClip() to set the clip on the X server.
+	(hitClip): More efficient and correct implementation.
+	(setClip): Use setXClip() to set the clip on the X server.
+	(setClip(Shape)): Use setXClip() to set the clip on the X server.
+	(copyArea): Translate and clip the source rectangle correctly.
+	(dispose): Only flush when object is not yet disposed.
+	(clone): Use setXClip() to set the clip on the X server.
+
+2006-07-19  Sven de Marothy  <sven@physto.se>
+
+	* gnu/javax/imageio/png/PNGChunk.java,
+	* gnu/javax/imageio/png/PNGData.java,
+	* gnu/javax/imageio/png/PNGDecoder.java,
+	* gnu/javax/imageio/png/PNGEncoder.java,
+	* gnu/javax/imageio/png/PNGException.java,
+	* gnu/javax/imageio/png/PNGFile.java,
+	* gnu/javax/imageio/png/PNGFilter.java,
+	* gnu/javax/imageio/png/PNGGamma.java,
+	* gnu/javax/imageio/png/PNGHeader.java,
+	* gnu/javax/imageio/png/PNGICCProfile.java,
+	* gnu/javax/imageio/png/PNGPalette.java,
+	* gnu/javax/imageio/png/PNGPhys.java,
+	* gnu/javax/imageio/png/PNGTime.java:
+	New files.
+
+2006-07-19  Sven de Marothy  <sven@physto.se>
+
+	* java/net/Inet6Address.java:
+	(getScopedId, getScopedInterface): New methods.
+	
+2006-07-19  Lillian Angel  <langel@redhat.com>
+
+	* examples/gnu/classpath/examples/awt/Demo.java
+	(DragDropWindow): Fixed typo in Label text.
+	* gnu/java/awt/dnd/peer/gtk/GtkDragSourceContextPeer.java
+	(GtkDragSourceContextPeer): Removed unneeded initialization for field.
+	(startDrag): Initialized context field.
+	(transferablesFlavorsChanged): Removed FIXME. Nothing is done in this
+	function.
+	(dragEnter): New function.
+	(dragExit): Likewise.
+	(dragDropEnd): Likewise.
+	(dragMouseMoved): Likewise.
+	(dragOver): Likewise.
+	(dragActionChanged): Likewise.
+
+2006-07-19  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	PR Classpath/26302
+	* resource/java/security/classpath.security: Updated copyright year.
+	(auth.login.defaultCallbackHandler): New property; set to our default
+	callback handler. This is needed by the LoginContext when no callback
+	handler was specified.
+	* javax/security/auth/login/LoginContext.java: Updated copyright year.
+	(LoginContext(4)): Assign passed parameters to local fields before invoking
+	lookup method.
+
+2006-07-19  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XGraphics.java
+	(drawImage(Image,int,int,int,int,int,int,int,int,ImageObserver)):
+	Fixed ordering of parameters.
+
+2006-07-18  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/lang/management/MemoryMXBeanImpl.java:
+	(MemoryMXBeanImpl()): Implemented.
+	(ListenerData): New private class.
+	(addNotificationListener(NotificationListener,
+	NotificationFilter, Object)): Implemented.
+	(getNotificationInfo()): Likewise.
+	(removeNotificationListener(NotificationListener)):
+	Likewise.
+	(removeNotificationListener(NotificationListener,
+	NotificationFilter, Object)): Likewise.
+	
+2006-07-18  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XFontPeer.java
+	(encodeFont): Be more flexible with font sizes.
+	(validSize): New helper method.
+	* gnu/java/awt/peer/x/XGraphics.java
+	(drawImage(Image,int,int,int,int,int,int,int,int,ImageObserver)):
+	Implemented.
+	(drawImage(Image,int,int,int,int,int,int,int,int,Color,ImageObserver)):
+	Implemented.
+	* gnu/java/awt/peer/x/XImage.java
+	(properties): New field.
+	(getProperty): Implemented.
+	* resource/gnu/java/awt/peer/x/fonts.properties:
+	Added copyright header. Fixed font size field.
+
+2006-07-18  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/BandedSampleModel.java
+	(createDataBuffer): New method override,
+	* java/awt/image/ByteLookupTable.java
+	(ByteLookupTable(int, byte[][])): Create new array to hold references,
+	(ByteLookuptable(int, byte[])): Check for null array,
+	* java/awt/image/ComponentSampleModel.java
+	(createDataBuffer): Removed unnecessary braces,
+	(getSample): Check (x, y) is within bounds,
+	* java/awt/image/ShortLookupTable.java
+	(ShortLookupTable(int, short[][])): Create new array to hold references,
+	(ShortLookupTable(int, short[])): Check for null array,
+	(getTable): Added API docs,
+	(lookupPixel): Source reformatting.
+
+2006-07-18  Tania Bento  <tbento@redhat.com>
+	
+	* java/awt/GridLayout.java
+	(setHgap): Illegal Argument Exception should not be thrown if 
+	hgap < 0.
+	(setVgap): Illegal Argument Exception should not be thrown if 
+	vgap < 0.
+	(toString): Opening square braket ([) should appear before hgap
+	value, not the name of the class.
+
+2006-07-18  Roman Kennke  <kennke@aicas.com>
+
+	* lib/copy-vmresources.sh.in: Reverted.
+	* gnu/java/awt/peer/x/fonts.properties: Moved to resource/
+	* resource/gnu/java/awt/peer/x/fonts.properties: New file.
+
+2006-07-18  Roman Kennke  <kennke@aicas.com>
+
+	* lib/copy-vmresources.sh.in: Include properties from X peers.
+
+2006-07-18  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	PR Classpath/27205
+	* tools/gnu/classpath/tools/jarsigner/SFHelper.java (writeDSA): Check
+	certificate validity.
+	(getIssuerName): New method.
+	(getSubjectName): Likewise.
+	(getNotAfterDate): Likewise.
+	(getNotBeforeDate): Likewise.
+	* resource/gnu/classpath/tools/jarsigner/messages.properties: Added
+	messages for newly added messages in SFHelper.
+
+2006-07-18  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XDialogPeer.java: New class.
+	* gnu/java/awt/peer/x/XEventPump.java
+	(handleEvent): Cast to XWindowPeer rather than XFramePeer.
+	* gnu/java/awt/peer/x/XFramePeer.java
+	Made a subclass of XWindowPeer, rather than SwingFramePeer.
+	* gnu/java/awt/peer/x/XGraphics.java
+	Made subclass of Graphics rather than Graphics2D. Removed
+	all Graphics2D specific method stubs.
+	(setColor): Map colors using the X color map that is
+	stored in XToolkit.
+	* gnu/java/awt/peer/x/XToolkit.java
+	(colorMap): New field.
+	(getLocalGraphicsEnvironment): Return new XGraphicsEnvironment
+	instance.
+	(createDialog): Implemented.
+	(createImage(ImageProducer)): Implemented.
+	(createImage(InputStream)): Use createImage(ImageProducer)
+	to convert the BufferedImage to an XImage.
+	* gnu/java/awt/peer/x/XWindowPeer.java
+	(XWindowPeer): Removed debug output.
+
+2006-07-18  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/BufferedImageOp.java: API docs added,
+	* java/awt/image/RasterOp.java: Likewise.
+
+2006-07-18  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/Graphics2D.java: API docs updated.
+
+2006-07-18  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/WritableRaster.java: Added API docs and reformatted 
+	source code.
+
+2006-07-18  Sven de Marothy  <sven@physto.se>
+
+	* java/net/Inet6Address.java:
+	Add 1.5 serialized fields.
+	(getByAddress): New methods.
+	(readObject, writeObject): New methods. 
+	(equals): Reimplement.
+
+2006-07-18  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/Raster.java: Added API docs and reformatted source
+	code.
+
+2006-07-18  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* gnu/java/awt/peer/gtk/BufferedImageGraphics.java: Remove unneeded
+	imports.
+	* gnu/java/awt/peer/gtk/CairoSurface.java: Likewise.
+	* gnu/java/awt/peer/gtk/CairoSurfaceGraphics.java: Likewise.
+	* gnu/java/awt/peer/gtk/ComponentGraphicsCopy.java: Likewise.
+	* gnu/java/awt/peer/gtk/GdkFontPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GdkPixbufDecoder.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkButtonPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkClipboardNotifier.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkContainerPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkDialogPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkFramePeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkImage.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkImageConsumer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkMenuBarPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkMenuItemPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkMouseInfoPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkPanelPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkPopupMenuPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkScrollbarPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/GtkWindowPeer.java: Likewise.
+	* gnu/java/awt/peer/gtk/VolatileImageGraphics.java: Likewise.
+
+2006-07-17  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* javax/swing/text/html/HTMLEditorKit.java: Rearrange import statements
+	to make it compile again under jikes. Note added.
+
+2006-07-17  Lillian Angel  <langel@redhat.com>
+
+	* examples/gnu/classpath/examples/awt/Demo.java
+	(Demo): Added new window for DnD demo.
+	(DragDropWindow): New class.
+	* gnu/java/awt/dnd/peer/gtk/GtkDragSourceContextPeer.java:
+	Added new fields and declarations for native functions.
+	(GtkDragSourceContextPeer): Implemented.
+	(getComponentPeer): New function.
+	(startDrag): Partially implemented.
+	(getCursor): Implemented.
+	(setCursor): Implemented.
+	* include/GtkDragSourceContextPeer.h: New file.
+	* include/Makefile.am: Added new header file.
+	* java/awt/Component.java
+	(addNotify): Added call to the dropTarget's addNotify.
+	* java/awt/dnd/DragSource.java
+	(startDrag): Fixed code to use shared instances of peer and
+	context.
+	(getDragThreshold): Added stub.
+	* java/awt/dnd/DropTarget.java
+	(DropTarget): Implemented fully.
+	(addNotify): Added code to get the peer of the parent that is
+	not lightweight.
+	* java/awt/dnd/DropTargetDragEvent.java
+	(getTransferable): Added stub.
+	* native/jni/gtk-peer/GtkDragSourceContextPeer.c: New file.
+	* native/jni/gtk-peer/Makefile.am: Added new c file.
+	* gnu/java/awt/dnd/peer/gtk/GtkDropTargetContextPeer.java:
+	Changed to extend GtkGenericPeer.
+	(GtkDropTargetContextPeer): New constructor.
+	* gnu/java/awt/dnd/peer/gtk/GtkDropTargetPeer.java:
+	Changed to extend GtkGenericPeer.
+	(GtkDropTargetContextPeer): New constructor.
+
+2006-07-17  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/SinglePixelPackedSampleModel.java
+	(createSubsetSampleModel): Added argument check and API docs.
+
+2006-07-17  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XGraphics.java
+	(copyArea): Implemented.
+
+2006-07-17  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/SinglePixelPackedSampleModel.java
+	(getSampleSize): Return copy of array,
+	(getOffset): Added API docs,
+	(getScanlineStride): Likewise,
+	(hashCode): Implemented.
+
+2006-07-17  David Gilbert  <david.gilbert@object-refinery.com>
+
+	* java/awt/image/MultiPixelPackedSampleModel.java
+	(getOffset): Updated API docs and source reformatting,
+	(getBitOffset): Source reformatting only,
+	(getDataElements): Likewise,
+	(getPixel): Likewise,
+	(getPixels): Removed method override,
+	(setDataElements): Reimplemented.
+
+2006-07-17  Gary Benson  <gbenson@redhat.com>
+
+	* resource/META-INF/services/.cvsignore: New file.
+	* lib/.cvsignore: Updated.	
+
+2006-07-17  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicButtonListener.java
+	(propertyChange): Only do the text layout caching as long
+	as the noGraphics2D property isn't set.
+	* javax/swing/plaf/basic/BasicMenuItemUI.java
+	(PropertyChangeHandler.propertyChange): Only do the text layout
+	caching as long	as the noGraphics2D property isn't set.
+
+2006-07-17  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/java/awt/peer/x/XGraphicsEnvironment.java
+	(XGraphicsEnvironment): Make constructor public so that it
+	can be called via Class.forName().newInstance().
+	* gnu/java/awt/peer/x/XImage.java
+	(XImage): Fetch GraphicsEnvironment via
+	GraphicsEnvironment.getLocalGraphicsEnvironment() rather
+	than the XToolkit method, to avoid double instantiation
+	of the XGraphicsEnvironment.
+	* gnu/java/awt/peer/x/XToolkit.java
+	(env): Removed field.
+	(getLocalGraphicsEnvironment): Removed impl. This method
+	should not be called since we set the graphicsenv property
+	in the constructor.
+
+2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/UUID.java:
+	(compareTo(Object)): Call compareTo(UUID).
+	(compareTo(UUID)): Implemented.
+	
+2006-07-16  Tom Tromey  <tromey@redhat.com>
+
+	* java/lang/StrictMath.java (cbrt): Added '@since'.
+
+2006-07-16  Carsten Neumann  <cn-develop@gmx.net>
+
+	* java/lang/StrictMath.java (cbrt): New method.
+	(getLowDWord): New helper method.
+	(getHighDWord): Likewise.
+	(buildDouble): Likewise.
+	(CBRT_B1): New field.
+	(CBRT_B2): Likewise.
+	(CBRT_C): Likewise.
+	(CBRT_D): Likewise.
+	(CBRT_E): Likewise.
+	(CBRT_F): Likewise.
+	(CBRT_G): Likewise.
 
 2006-07-16  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
