@@ -1,4 +1,4 @@
-/* LineSegment.java -- Line segment used for BasicStroke
+/* NotCompliantMBeanException.java -- Thrown due to a non-compliant bean.
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,84 +35,44 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
+package javax.management;
 
-package gnu.java.awt.java2d;
-
-
-import java.awt.geom.Point2D;
-
-public class LineSegment extends Segment
+/**
+ * Thrown when a management bean is passed to a method
+ * (e.g. to an MBean server to be registered) and it
+ * fails to comply with the specifications for such
+ * a bean.
+ *
+ * @author Andrew John Hughes (gnu_andrew@member.fsf.org)
+ * @since 1.5
+ */
+public class NotCompliantMBeanException
+  extends OperationsException
 {
-  public LineSegment(double x1, double y1, double x2, double y2)
-  {
-    super();
-    P1 = new Point2D.Double(x1, y1);
-    P2 = new Point2D.Double(x2, y2);
-  }
 
-  public LineSegment(Point2D p1, Point2D p2)
+  /**
+   * Compatible with JDK 1.5
+   */
+  private static final long serialVersionUID = 5175579583207963577L;
+
+  /**
+   * Constructs a new <code>NotCompliantMBeanException</code>.
+   */
+  public NotCompliantMBeanException()
   {
     super();
-    P1 = (Point2D) p1.clone();
-    P2 = (Point2D) p2.clone();
   }
 
   /**
-   * Clones this segment
+   * Constructs a new <code>NotCompliantMBeanException</code>
+   * with the specified message.
+   *
+   * @param message the error message to give to the user.
    */
-  public Object clone()
+  public NotCompliantMBeanException(String message)
   {
-    LineSegment segment = null;
-    
-    try
-      {
-        segment = (LineSegment) super.clone();
-        segment.P1 = (Point2D) P1.clone();
-        segment.P2 = (Point2D) P2.clone();
-      }
-    catch (CloneNotSupportedException cnse)
-      {
-        InternalError ie = new InternalError();
-        ie.initCause(cnse);
-        throw ie;
-      }
-    
-    return segment;
+    super(message);
   }
 
-  /**
-   * Get the "top" and "bottom" segments of this segment.
-   * First array element is p0 + normal, second is p0 - normal.
-   */
-  public Segment[] getDisplacedSegments(double radius)
-  {
-    this.radius = radius;
-    double x0 = P1.getX();
-    double y0 = P1.getY();
-    double x1 = P2.getX();
-    double y1 = P2.getY();
-    double[] p = normal(x0, y0, x1, y1);
-    Segment s1 = (new LineSegment(x0 + p[0], y0 + p[1],
-                                  x1 + p[0], y1 + p[1] ));
-    Segment s2 = (new LineSegment(x0 - p[0], y0 - p[1],
-                                  x1 - p[0], y1 - p[1] ));
-    return new Segment[]{s1, s2};
-  }
+}
 
-  public void reverse()
-  {
-    Point2D p = P1;
-    P1 = P2;
-    P2 = p;
-  }
-
-  public double[] cp1()
-  {
-    return new double[]{P2.getX(), P2.getY()}; 
-  }
-
-  public double[] cp2()
-  {
-    return new double[]{P1.getX(), P1.getY()}; 
-  }
-} // class LineSegment
