@@ -1,3 +1,13 @@
+2006-07-29  Mark Wielaard  <mark@klomp.org>
+
+	* gnu/java/awt/peer/gtk/GdkTextLayout.java: Removed.
+	* gnu/java/awt/peer/gtk/GtkCheckboxGroupPeer.java: Removed.
+	* include/gnu_java_awt_peer_gtk_GdkTextLayout.h: Removed.
+	* include/gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.h: Removed.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkTextLayout.c: Removed.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkCheckboxGroupPeer.c:
+	Removed.
+
 2006-07-29  Sven de Marothy  <sven@physto.se>
 
 	* java/math/BigDecimal.java
