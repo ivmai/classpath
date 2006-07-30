@@ -1,5 +1,10 @@
 2006-07-30  Mark Wielaard  <mark@klomp.org>
 
+	* javax/swing/JComponent.java (getListeners): Revert
+	un-genericization.
+
+2006-07-30  Mark Wielaard  <mark@klomp.org>
+
 	* resource/java/security/classpath.security: Add /dev/urandom as
 	default securerandom.source.
 
