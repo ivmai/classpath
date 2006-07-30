@@ -1,5 +1,10 @@
 2006-07-30  Mark Wielaard  <mark@klomp.org>
 
+	* resource/java/security/classpath.security: Add /dev/urandom as
+	default securerandom.source.
+
+2006-07-30  Mark Wielaard  <mark@klomp.org>
+
 	* java/util/GregorianCalendar.java (maximums): Months can have up to
 	6 weeks.
 	(nonLeniencyCheck): weeks is either 5 or 6.
