@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.93-pre],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.92-pre],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -120,9 +120,9 @@ AC_ARG_ENABLE([Werror],
               [case "${enableval}" in
                 yes) ENABLE_WERROR=yes ;;
                 no) ENABLE_WERROR=no ;;
-                *) ENABLE_WERROR=default ;;
+                *) ENABLE_WERROR=no ;;
               esac],
-              [ENABLE_WERROR=default])
+              [ENABLE_WERROR=no])
 
 dnl -----------------------------------------------------------
 dnl Default AWT toolkit
@@ -305,17 +305,6 @@ dnl AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-# Handle -Werror default case.
-if test "$ENABLE_WERROR" = default; then
-  case "$host_os" in
-    *linux*)
-      if test "$GCC" = yes; then
-        ENABLE_WERROR=yes
-      fi
-      ;;
-  esac
-fi
-
 if test "x${COMPILE_COLLECTIONS}" = xyes; then
   AC_PATH_PROG(PERL, [perl])
   AC_SUBST(PERL)
@@ -478,6 +467,10 @@ if test "x${COMPILE_JNI}" = xyes; then
     PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.11.2)
     AC_SUBST(GCONF_CFLAGS)
     AC_SUBST(GCONF_LIBS)
+    dnl we also need gdk for locking
+    PKG_CHECK_MODULES(GDK, gdk-2.0 >= 2.8)
+    AC_SUBST(GDK_CFLAGS)
+    AC_SUBST(GDK_LIBS)
     dnl check if the config value was given form the command line,
     dnl if not, overwrite the default if we have the gconf backend
     dnl compiled in
@@ -741,41 +734,16 @@ case "$with_escher" in
         use_escher=false
         ;;
 "yes")
-        AC_MSG_ERROR([Please supply an absolute path to Escher library])
+        AC_MSG_ERROR([Please suply an absolute path to Escher library])
         ;;
 *)
         use_escher=true
         PATH_TO_ESCHER=$with_escher
         ;;
-esac
+esac;
 
 AM_CONDITIONAL(USE_ESCHER, test x$use_escher = xtrue)
 AC_SUBST(PATH_TO_ESCHER)
-
-dnl -----------------------------------------------------------
-dnl Build javah using ASM library
-dnl -----------------------------------------------------------
-AC_ARG_WITH([asm],
-	 AS_HELP_STRING([--with-asm=ABS.PATH],
-	                [specify path to ASM jar for javah]))
-case "$with_asm" in
-"")
-        use_asm=false
-        ;;
-"no")
-        use_asm=false
-        ;;
-"yes")
-        AC_MSG_ERROR([Please supply an absolute path to ASM jar])
-        ;;
-*)
-        use_asm=true
-        PATH_TO_ASM=$with_asm
-        ;;
-esac
-
-AM_CONDITIONAL(USE_ASM, test x$use_asm = xtrue)
-AC_SUBST(PATH_TO_ASM)
 
 dnl -----------------------------------------------------------
 dnl Check if local socket support should be included.
@@ -864,11 +832,6 @@ AC_CONFIG_COMMANDS([gkeytool],[chmod 755 tools/gkeytool])
 AC_CONFIG_COMMANDS([gjar],[chmod 755 tools/gjar])
 AC_CONFIG_COMMANDS([gnative2ascii],[chmod 755 tools/gnative2ascii])
 AC_CONFIG_COMMANDS([gserialver],[chmod 755 tools/gserialver])
-
-  if test "$use_asm" = true; then
-    AC_CONFIG_FILES([tools/gjavah])
-    AC_CONFIG_COMMANDS([gjavah], [chmod 755 tools/gjavah])
-  fi
 fi
 
 AC_CONFIG_COMMANDS([gen-classlist],[chmod 755 lib/gen-classlist.sh])
@@ -880,3 +843,4 @@ cat ${srcdir}/lib/standard.omit.in > lib/standard.omit
 if test x$use_escher != xtrue; then
    echo gnu/java/awt/peer/x/.*java$ >> lib/standard.omit
 fi
+

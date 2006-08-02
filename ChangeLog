@@ -1,3 +1,11 @@
+2006-08-02  Mark Wielaard  <mark@klomp.org>
+
+	PR 28535
+	* configure.ac (gconf-peer): Check for gdk-2.0.
+	* native/jni/gconf-peer/Makefile.am
+	(AM_LDFLAGS): Use GDK_LIBS.
+	(AM_CFLAGS): Use GDK_CFLAGS.
+
 2006-07-31  Raif S. Naffah  <raif@swiftdsl.com.au>
 
 	* java/security/Provider.java: Updated copyright year.
