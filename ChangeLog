@@ -1,5 +1,63 @@
 2006-08-03  Roman Kennke  <kennke@aicas.com>
 
+	PR 27606
+	* javax/swing/plaf/basic/BasicListUI.java
+	(paintCell): Pass row index to cell renderer.
+	* javax/swing/plaf/basic/MetalFileChooserUI.java
+	(DirectoryComboBoxRenderer.indentIcon): New field.
+	(DirectoryComboBoxRenderer.DirectoryComboBoxRenderer):
+	Initialize indentIcon.
+	(DirectoryComboBoxRenderer.getListCellRendererComponent):
+	Fall back to super and removed standard functionality.
+	Handle indentation.
+	(IndentIcon): New class. Wraps and indents another icon.
+
+2006-08-03  Roman Kennke  <kennke@aicas.com>
+
+	PR 27605
+	* javax/swing/JComboBox.java
+	(setSelectedItem): Fire ActionEvent here.
+	* javax/swing/plaf/basic/BasicDirectoryModel.java
+	(directories): Changed to type Vector.
+	(files): New field.
+	(loadThread): New field.
+	(DirectoryLoadThread): New inner class. This loads the contents
+	of directories asynchronously.
+	(getDirectories): Return cached Vector.
+	(getFiles): Return cached Vector.
+	(getSize): Return plain size of contents Vector.
+	(propertyChange): Reread directory also for DIRECTORY_CHANGED,
+	FILE_FILTER_CHANGED, FILE_HIDING_CHANGED and FILE_VIEW_CHANGED.
+	(sort): Don't store sorted list in contents. This must be done
+	asynchronously from the EventThread.
+	(validateFileCache): Rewritten for asynchronous reading
+	of directory contents.
+	* javax/swing/plaf/basic/BasicFileChooserUI.java
+	(installListeners): Install model as PropertyChangeListener.
+	(uninstallListeners): Uninstall model as PropertyChangeListener.
+	(createPropertyChangeListener): Return null just like the
+	RI.
+
+2006-08-03  Roman Kennke  <kennke@aicas.com>
+
+	PR 27604
+	* javax/swing/plaf/basic/BasicChooserUI.java
+	(BasicFileView.getName): Fetch the real name from the
+	file chooser's FileSystemView.
+	* javax/swing/plaf/metal/MetalChooserUI.java
+	(DirectoryComboBoxRenderer.getListCellRendererComponent):
+	Set the text fetched from the JFileChooser.getName().
+	* javax/swing/FileSystemView.java
+	(createFileObject): When file is a filesystem root,
+	create a filesystem root object first.
+	(getSystemDisplayName): Return the filename. Added specnote
+	about ShellFolder class that is mentioned in the spec.
+	* javax/swing/UnixFileSystemView.java
+	(getSystemDisplayName): Implemented to return the real name
+	of a file, special handling files like '.' or '..'.
+
+2006-08-03  Roman Kennke  <kennke@aicas.com>
+
 	PR 28562
 	* javax/swing/plaf/basic/BasicOptionPaneUI.java
 	(PropertyChangeHandler.propertyChange): Cleanly reinstall
