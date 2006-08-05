@@ -1,5 +1,40 @@
 2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* examples/gnu/classpath/examples/swing/FillRect.java,
+	* gnu/CORBA/Focused_ORB.java,
+	* gnu/CORBA/interfaces/gnuSocketFactory.java,
+	* gnu/classpath/ByteArray.java,
+	* gnu/classpath/ObjectPool.java,
+	* gnu/java/awt/peer/ClasspathTextLayoutPeer.java,
+	* gnu/java/awt/peer/x/fonts.properties,
+	* gnu/java/security/util/Prime2.java,
+	* gnu/javax/imageio/gif/GIFStream.java,
+	* javax/swing/text/html/HTMLTableView.java,
+	* native/cni/Makefile.am,
+	* org/omg/CORBA/SendingContext/RunTimeOperations.java,
+	* org/omg/CORBA/SendingContext/Runtime.java,
+	* resource/gnu/regexp/MessagesBundle.properties,
+	* resource/gnu/regexp/MessagesBundle_fr.properties,
+	* resource/gnu/regexp/MessagesBundle_it.properties,
+	* tools/appletviewer.in,
+	* tools/jarsigner.in,
+	* tools/keytool.in,
+	* vm/reference/java/lang/management/VMThreadInfo.java:
+	Removed.
+	* examples/gnu/classpath/examples/awt/aicas.png,
+	* examples/gnu/classpath/examples/awt/palme.gif,
+	* examples/gnu/classpath/examples/java2d/aicas.png,
+	* examples/gnu/classpath/examples/java2d/palme.gif,
+	* gnu/java/awt/font/opentype/truetype/doc-files/ZonePathIterator-1.dia,
+	* gnu/java/awt/font/opentype/truetype/doc-files/ZonePathIterator-1.png,
+	* java/awt/doc-files/capjoin.png,
+	* java/awt/geom/doc-files/Area-1.png,
+	* java/awt/geom/doc-files/Ellipse-1.png,
+	* java/awt/geom/doc-files/GeneralPath-1.png:
+	Added.
+	
+2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* configdiag.jnlp:
 	Removed.
 	
