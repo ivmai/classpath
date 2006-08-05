@@ -1,3 +1,10 @@
+2006-08-04  Robert Schuster  <robertschuster@fsfe.org>
+
+	Reported by Henrik Gulbrandsen <henrik@gulbra.net>
+	Fixes PR27864.
+	* gnu/xml/dom/DomIterator.java:
+	(successor): Added if-statement.
+
 2006-08-03  Roman Kennke  <kennke@aicas.com>
 
 	PR 27606
