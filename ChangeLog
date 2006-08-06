@@ -1,3 +1,7 @@
+2006-08-06  Thomas Minor  <1nocentrabidlamb@sexMagnet.com>
+
+	* java/net/URL.java (getContent(Class[])): Implement.
+
 2006-08-06  Mark Wielaard  <mark@klomp.org>
 
 	PR 28555
