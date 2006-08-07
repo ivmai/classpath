@@ -1,4 +1,13 @@
-2006-08-07          Sven de Marothy  <sven@physto.se>
+2006-08-07  C. Scott Marshall  <csm@gnu.org>
+
+	Fixes PR 28608.
+	* java/nio/DirectByteBufferImpl.java (duplicate): only reset if
+	the mark has been set.
+	* native/jni/java-nio/java_nio_VMDirectByteBuffer.c
+	(Java_java_nio_VMDirectByteBuffer_allocate): zero out the
+	allocated data.
+
+2006-08-07  Sven de Marothy  <sven@physto.se>
 
 	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
 	(drawGlyphVector): Synchronize against font object when drawing.
