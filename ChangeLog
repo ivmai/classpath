@@ -1,5 +1,33 @@
 2006-08-08  Roman Kennke  <kennke@aicas.com>
 
+	PR 28650
+	* javax/swing/plaf/basic/BasicMenuBarUI.java
+	(getActionMap): Store ActionMap in MenuBar.actionMap, rather
+	than Tree.actionMap.
+	* javax/swing/plaf/basic/BasicTreeUI.java
+	(action): Removed obsolete field.
+	(uninstallKeyboardActions): Removed action field handling.
+	(installKeyboardActions): Removed action field handling.
+	(createDefaultActions): Don't install removed TreeAction.
+	(TreeAction): Removed obsolete inner class.
+	(ActionListenerProxy): Removed obsolete inner class.
+	(MouseHandler.mousePressed): Request focus on JTree component
+	on mouse press.
+
+2006-08-08  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicListUI.java
+	(MouseInputHandler.mousePressed): Request focus on list
+	component.
+
+2006-08-08  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicTableUI.java
+	(MouseInputHandler.mousePressed): Request focus on list
+	component.
+
+2006-08-08  Roman Kennke  <kennke@aicas.com>
+
 	* javax/swing/plaf/basic/BasicTextUI.java
 	(damageRange(JTextComponent,int,int)): Call damageRange() with
 	correct biases, rather than null.
