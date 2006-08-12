@@ -134,6 +134,11 @@ public abstract class Toolkit
   AWTEventListenerProxy[] awtEventListeners;
 
   /**
+   * The shared peer for all lightweight components.
+   */
+  private GLightweightPeer lightweightPeer;
+
+  /**
    * Default constructor for subclasses.
    */
   public Toolkit()
@@ -382,7 +387,9 @@ public abstract class Toolkit
    */
   protected LightweightPeer createComponent(Component target)
   {
-    return new GLightweightPeer(target);
+    if (lightweightPeer == null)
+      lightweightPeer = new GLightweightPeer();
+    return lightweightPeer;
   }
 
   /**

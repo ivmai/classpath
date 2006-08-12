@@ -1,9 +1,332 @@
+2006-08-11  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* vm/reference/gnu/java/lang/management/VMMemoryMXBeanImpl.java:
+	Fix documentation typos.
+
+2006-08-11  David Daney  <ddaney@avtrex.com>
+
+	PR classpath/28580
+	* gnu/java/net/protocol/http/Request.java (readResponse):  Call
+	createResponseBodyStream in more cases and with new parameter.
+	(createResponseBodyStream):  Added new parameter mayHaveBody.  Handle
+	HEAD and !mayHaveBody responses specially.
+	
+2006-08-11  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/GlyphView.java
+	(DefaultGlyphPainter.modelToView): Fixed model->view mapping.
+	* javax/swing/text/LabelView.java
+	(valid): New flag indicating if the text attributes are valid.
+	(LabelView): Initialize valid field with false.
+	(setPropertiesFromAttributes): Call setter methods instead
+	of setting properties directly. Set valid to true.
+	(changedUpdate): Invalidate attributes. Call super.
+	(getBackground): Sync attributes if necessary.
+	(getForeground): Sync attributes if necessary.
+	(getFont): Sync attributes if necessary.
+	(isUnderline): Sync attributes if necessary.
+	(isSuperscript): Sync attributes if necessary.
+	(isStrikeThrough): Sync attributes if necessary.
+	(getFontMetrics): Sync attributes if necessary. Fetch font metrics
+	from toolkit if Container is not available yet.
+
+2006-08-11  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/PlainView.java
+	(tabBase): New field.
+	(tabSize): New field.
+	(updateMetrics): Update tabSize.
+	(lineToRect): Only allocate when really necessary.
+	(modelToView): Use tabBase for offset calculations.
+	(paint): Only allocate when really necessary. Update tabBase.
+	(nextTabStop): Fixed tab calculation.
+	(viewToModel): Correctly handle multiline text and locations
+	outside the view's bounds. Set bias.
+	(getLineLength): Use tabBase.
+	* javax/swing/text/Utilities.java
+	(drawTabbedText): Don't special case newlines. The views
+	must take care of this.
+
+2006-08-11  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/GapContent.java
+	(UndoPosRef): New inner class. Used for resetting positions
+	after undo/redo operations.
+	(InsertUndo.positions): New field.
+	(InsertUndo.undo): Store positions in removed range.
+	(InsertUndo.redo): Restore positions in re-inserted range.
+	(UndoRemove.positions): New field.
+	(UndoRemove.UndoRemove): Store positions in removed range.
+	(UndoRemove.undo): Restore positions in re-inserted range.
+	(UndoRemove.redo): Store positions in removed range.
+	(insertString): Create InsertUndo instance before actually
+	inserting the string.
+	(remove): Create UndoRemove instance before actually
+	removing.
+	(getPositionsInRange): Don't clear the Vector. Return Vector
+	of UndoPosRefs.
+	(updateUndoPositions): Implemented to reset all UndoPosRefs
+	in the vector.
+
+2006-08-11  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/io/ObjectInputStream.java (readClassDescriptor):
+	Use class's class loader to resolve field types.
+	* java/io/ObjectStreamField.java
+	(ObjectStreamField(String,String,ClassLoader)): Removed.
+	(ObjectStreamField(String,String)): Don't try to resolve typename.
+	(resolveType): New method.
+
+2006-08-10  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/BoxView.java
+	(calculateMajorAxisRequirements): Sum up the preferred and
+	maximum sizes.
+	(isAfter): Also add in the rectangle's with/height.
+	(childAllocation): Don't trigger layout here.
+	(layoutMinorAxis): Removed debug output.
+	(getWidth): Consider the insets.
+	(getHeight): Consider the insets.
+	(setSize): Consider the insets.
+	(updateRequirements): Check axis and throw
+	IllegalArgumentException.
+
+2006-08-10  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/AbstractDocument.java
+	(BidiRootName): New constant field, denotes the element name
+	for bidi root elements.
+	(AsyncLoadPriority): New constant field, denotes the property
+	to store the asynchronousLoadPriority.
+	(I18N): New constant field, denotes the property for
+	I18N support.
+	(bidiRoot): Made field type BidiRootElement.
+	(AbstractDocument): Build initial element structure for
+	bidi.
+	(getAsynchronousLoadPriority): Implemented. Returns the
+	value stored in the document properties.
+	(setAsynchronousLoadPriority): Implemented. Sets the
+	value stored in the document properties.
+	(getEndPosition): Implemented to use a Position from the
+	content.
+	(getStartPosition): Implemented to use a Position from the
+	content.
+	(insertStringImpl): Update the I18N setting if necessary.
+	(insertUpdate): Update the bidi structure if necessary.
+	(postRemoveUpdate): Update the bidi structure if necessary.
+	(putProperty): Update the I18N setting and bidi structure
+	if necessary.
+	(updateBidi): New helper method for updating the bidi
+	structure.
+	(getBidis): New helper method. Fetches the Bidi analysers
+	for the paragraphs of the range to check.
+	(dump): Also dump the bidi structure.
+	(AbstractElement.dump): Indent the '>' correctly.
+	(AbstractElement.children): Check numChildren rather then
+	children.length.
+	(BidiRootElement): New inner class.
+	(BidiElement): New inner class.
+
+2006-08-10  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/GapContent.java
+	(getChars): Optimized to only copy array when really necessary.
+	Respect the partialReturn property.
+
+2006-08-10  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/dnd/peer/gtk/GtkDragSourceContextPeer.java
+	(getComponentPeer): Added check to prevent NPE.
+
+2006-08-10  Gary Benson  <gbenson@redhat.com>
+
+	* java/security/AccessControlContext.java (<init>):
+	Avoid a duplicated AccessController.getContext() call.
+
 2006-08-09  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac (VERSION): Set to 0.92-generics.
 	* NEWS: Add updates for 0.92 release.
 
-2006-08-08  Roman Kennke  <kennke@aicas.com>
+2006-08-09  Tom Tromey  <tromey@redhat.com>
+
+	PR classpath/28658:
+	* java/text/SimpleDateFormat.java (parse): Let an unquoted space in
+	the pattern match any number of spaces in the text.
+
+2006-08-09  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/image/BufferedImage.java
+	(BufferedImage): Reimplement predefined-type constructor.
+	(observers/tileObservers): Field renamed to tileObservers.
+	(createDefaultIndexedColorModel): New method.
+
+2006-08-09  Tom Tromey  <tromey@redhat.com>
+
+	PR classpath/28666:
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GdkScreenGraphicsDevice.c
+	(Java_gnu_java_awt_peer_gtk_GdkScreenGraphicsDevice_nativeGetDisplayModes):
+	Create a 'short' array.
+
+2006-08-09  Tom Tromey  <tromey@redhat.com>
+
+	* tools/gnu/classpath/tools/javah/JniHelper.java (getName): Properly
+	handle arrays.
+	* tools/gnu/classpath/tools/javah/JniIncludePrinter.java
+	(writeFields): Print "L" after int constant.  Don't mangle the field
+	name.  Only print int/long fields.
+
+2006-08-09  Tom Tromey  <tromey@redhat.com>
+
+	* tools/gnu/classpath/tools/javah/Main.java (getParser): Name program
+	"javah".
+
+2006-08-09  Sven de Marothy  <sven@physto.se>
+
+	* javax/swing/JTree.java
+	(JTree): Default SelectionModel should be DefaultTreeSelectionModel.
+	(setSelectionModel): Null parameter should create an EmptySelectionM.
+
+2006-08-09  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/AbstractDocument.java
+	(insertString): Perform modifications inside a write lock.
+	(insertStringImpl): Don't lock here. This is already done
+	in insertString().
+	(replace): Perform modifications inside a write lock.
+	(AbstractElement.AbstractElement): Call addAttributes() to
+	add the attributes.
+	(AbstractElement.getName): Fetch name from the ElementNameAttibute.
+	(BranchElement.lastIndex): New field. Optimizes getElementIndex().
+	(BranchElement.BranchElement): Set lastIndex to -1.
+	(BranchElement.getElementIndex): Implemented more efficient
+	search.
+
+2006-08-09  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/DefaultStyledDocument.java
+	(Edit): Moved this inner class into ElementBuffer where it
+	is actually needed.
+	(edits): Moved this field into ElementBuffer.
+	(getEditForParagraphAndIndex): Removed obsolete method.
+	(insertUpdate): Added some optimizations and fixes. Split
+	out handling insertion after newlines.
+	(insertAfterNewline): New helper method. Handles insertions
+	after a newline.
+	(ElementBuffer.Edit): New inner class. Moved here from
+	DefaultStyledDocument.
+	(ElementBuffer.createdFracture): New field.
+	(ElementBuffer.documentEvent): Made private.
+	(ElementBuffer.edits): New field. Moved here from
+	DefaultStyledDocument.
+	(ElementBuffer.fracNotCreated): Replaced by createdFracture.
+	(ElementBuffer.fracturedChild): New field.
+	(ElementBuffer.fracturedParent): New field.
+	(ElementBuffer.insertPath): New field.
+	(ElementBuffer.lastFractured): Removed. Replaced by fracturedChild and
+	fracturedParent.
+	(ElementBuffer.offsetLastIndex): New field.
+	(ElementBuffer.offsetLastIndexReplace): New field.
+	(ElementBuffer.recreateLeafs): New field.
+	(ElementBuffer.ElementBuffer): Don't initialize stack here.
+	(ElementBuffer.canJoin): New helper method.
+	(ElementBuffer.changeUpdate): Changed to use elementStack with
+	Edits rather than Elements. Let the split method do the work.
+	(ElementBuffer.cloneAsNecessary): New helper method.
+	(ElementBuffer.createFracture): Changed to fracture the bottommost
+	child in the stack.
+	(ElementBuffer.finishEdit): New helper method. Moved out
+	from insertUpdate to perform the actual changes and update
+	the event.
+	(fracture): New helper method.
+	(insertContentTag): Fixed some bugs and changed to use Edit
+	instances in the stack, rather then Elements.
+	(insertElement): New helper method. Moved out from insertUpdate()
+	to process the ElementSpecs.
+	(insertFirstContentTag): Fixed some problems and changed to use Edit
+	instances in the stack, rather then Elements.
+	(insertFracture): Removed. Basically moved into createFracture()
+	and fracture().
+	(insertParagraph): Removed.
+	(insertUpdate): Split out the ElementSpec processing into
+	insertElement(). Use Edit instances in the stack. Fixed some
+	problems.
+	(insert): Split out the preparation and finishing code into
+	prepareEdit() and finishEdit().
+	(join): New helper method.
+	(pop): New helper method.
+	(prepareEdit): New helper method.
+	(recreateFracturedElement): New helper method.
+	(recreateLeaves): Removed.
+	(recreate): New helper method.
+	(removeElements): New helper method. Split out from removeUpdate().
+	(removeUpdate): Split out the actual removal. Use the
+	Edit stack to perform removal and perform the remove actions
+	and event updates afterwards, just like in insertImpl().
+	(remove): Use prepareEdit() and finishEdit().
+	(split): Replaced with more flexible impl.
+
+2006-08-09  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/CairoSurface.java
+	Change class to extend WritableRaster and not DataBuffer.
+	(CairoDataBuffer): New inner class.
+	* gnu/java/awt/peer/gtk/BufferedImageGraphics.java
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	* gnu/java/awt/peer/gtk/GdkGraphicsEnvironment.java
+	Accomodate the above change.
+
+2006-08-09  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/GtkMainThread.java
+	New file.
+	* gnu/java/awt/peer/gtk/GtkChoicePeer.java
+	* gnu/java/awt/peer/gtk/GtkComponentPeer.java
+	Replace GtkToolkit.mainThread with GtkMainThread.mainThread.
+	* gnu/java/awt/peer/gtk/GtkToolkit.java
+	Minor style fixes; removed unused fields, 
+	set fields to private where possible.
+	(createDialog, createFrame, createWindow, createEmbeddedWindow): 
+	Call GtkMainThread.createWindow().
+	* gnu/java/awt/peer/gtk/GtkWindowPeer.java
+	(dispose): New method.
+	* include/gnu_java_awt_peer_gtk_GtkToolkit.h
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkToolkit.c
+	(gtkQuit): New native method.
+
+2006-08-08  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/Component.java
+	(setDropTarget): Added check.
+
+2006-08-08  Lillian Angel  <langel@redhat.com>
+
+	* gnu/java/awt/dnd/peer/gtk/GtkDragSourceContextPeer.java
+	(GtkDragSourceContextPeer): Added FIXME. Changed call
+	to setTarget. 
+	* gnu/java/awt/dnd/peer/gtk/GtkDropTargetContextPeer.java
+	(GtkDropTargetContextPeer): Removed target initialization.
+	* java/awt/Component.java
+	(setTarget): Removed commented out code.
+
+2006-08-08  Mark Wielaard  <mark@klomp.org>
+
+	* javax/swing/text/DefaultHighlighter.java: Qualify
+	Highlighter.HighlightPainter class name for gcj.
+
+2006-08-05  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicTableUI.java
+	(MouseInputHandler.mousePressed): Request focus on list
+	component.
+
+2006-08-05  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/plaf/basic/BasicListUI.java
+	(MouseInputHandler.mousePressed): Request focus on list
+	component.
+
+2006-08-05  Roman Kennke  <kennke@aicas.com>
 
 	PR 28650
 	* javax/swing/plaf/basic/BasicMenuBarUI.java
@@ -167,7 +490,7 @@
 	(getMinimumSize): Added specnote about this method never
 	beeing called in the RI.
 
-2006-08-06  Sven de Marothy  <sven@physto.se>
+2006-08-03  Sven de Marothy  <sven@physto.se>
 
 	* gnu/java/awt/peer/gtk/ComponentGraphics.java
 	(grab, nativeGrab): New methods.
@@ -215,6 +538,138 @@
 	g_type_init earlier in function to correctly initialize the
 	type system used by the backend.
 
+2006-08-05  Roman Kennke  <kennke@aicas.com>
+  
+	* javax/swing/text/DefaultHighlight.java
+	(DefaultHighlightPainter.paintHighlight): Removed method.
+	(DefaultHighlightPainter.paintLayer): Implemented.
+	(DefaultHighlightPainter.paint): Implemented more efficient
+	painting for multiline-highlights.
+	(HighlightEntry.p0): Changed to be a Position.
+	(HighlightEntry.p1): Changed to be a Position.
+	(HighlightEntry.HighlightEntry): Changed to take Position
+	arfuments.
+	(HighlightEntry.getStartOffset): Changed to return p0.getOffset();
+	(HighlightEntry.getEndOffset): Changed to return p1.getOffset();
+	(LayerHighlightEntry): New inner class. Extends HighlightEntry
+	and tracks the painted rectangle for efficient repainting.
+	(addHighlight): Handle layered highlight.
+	(changeHighlight): Handle layered highlight.
+	(paintLayeredHighlights): Implemented.
+	(paint): Paint only non-layered highlights here.
+	(removeAllHighlights): Trigger correct repaint.
+	(removeHighlight): Handle layered highlight here for
+	more efficient repainting.
+	* javax/swing/text/GlyphView.java
+	(paint): Handle layered highlights.
+	* javax/swing/text/PlainView.java
+	(paint): Handle layered highlights.
+	* javax/swing/text/WrappedPlainView.java
+	(WrappedLine.paint): Handle layered highlights.
+
+2006-08-07  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+  
+	PR 26972
+	* NEWS: As suggested by Paul Jennier, added note about the fix of
+	the InitialContext.
+
+2006-08-07  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	* NEWS: Added entry about the context factories for JNDI.
+
+2006-08-07  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 27383
+	* gnu/CORBA/Connected_objects.java (size): New method.
+	* gnu/CORBA/OrbFunctional.java (countConnectedObjects):
+	New method.
+	* javax/naming/spi/NamingManager.java (getURLContext):
+	Also search for the URL context factories in 
+	gnu/javax/naming/jndi/url.
+	* gnu/javax/naming/giop/ContextContinuation.java,
+	gnu/javax/naming/giop/CorbalocParser.java,
+	gnu/javax/naming/giop/GiopNamingEnumeration.java,
+	gnu/javax/naming/giop/GiopNamingServiceFactory.java,
+	gnu/javax/naming/giop/GiopNamingServiceURLContext.java,
+	gnu/javax/naming/giop/ListBindingsEnumeration.java,
+	gnu/javax/naming/giop/ListEnumeration.java,
+	gnu/javax/naming/jndi/url/corbaname/corbanameURLContextFactory.java,
+	gnu/javax/naming/jndi/url/rmi/ContextContinuation.java,
+	gnu/javax/naming/jndi/url/rmi/ListBindingsEnumeration.java,
+	gnu/javax/naming/jndi/url/rmi/ListEnumeration.java,
+	gnu/javax/naming/jndi/url/rmi/RmiContinuation.java,
+	gnu/javax/naming/jndi/url/rmi/RmiNamingEnumeration.java,
+	gnu/javax/naming/jndi/url/rmi/rmiURLContext.java,
+	gnu/javax/naming/jndi/url/rmi/rmiURLContextFactory.java: New files.
+
+2006-08-06  Sven de Marothy  <sven@physto.se>
+
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(drawGlyphVector): Synchronize against font object when drawing.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_CairoGraphics2D.c
+	(nativeDrawGlyphVector): Use pango locking when drawing.
+	(install_font_peer): Use pango locking when creating the cairo face.
+
+2006-08-06  C. Scott Marshall  <csm@gnu.org>
+
+	Fixes PR 28608.
+	* java/nio/DirectByteBufferImpl.java (duplicate): only reset if
+	the mark has been set.
+	* native/jni/java-nio/java_nio_VMDirectByteBuffer.c
+	(Java_java_nio_VMDirectByteBuffer_allocate): zero out the
+	allocated data.
+
+2006-08-06  Mark Wielaard  <mark@klomp.org>
+
+	PR 28555
+	Suggested by Matthew Burgess <matthew@linuxfromscratch.org>
+	* gnu/xml/transform/ApplyTemplatesNode.java (clone): Check whether
+	withParams is null.
+	* gnu/xml/transform/ForEachNode.java (clone): Check whether
+	sortKeys is null.
+
+2006-08-06  Raif S. Naffah  <raif@swiftdsl.com.au>
+	    Paul Jenner  <psj@harker.dyndns.org>
+
+	* README: Update bug, patches and cvs instructions plus new URLs of
+	various external projects.
+  
+2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/lang/management/BeanImpl.java:
+	(cacheMBeanInfo(MBeanInfo)): Override given MBeanInfo
+	with open variant.
+	(getCachedMBeanInfo()): Return open variant.
+	(getMBeanInfo()): Likewise.
+	(getTypeFromClass(Class)): Implemented.
+	(translateSignature(MBeanParameterInfo)): Likewise.
+	(translate(String)): Likewise.
+	* javax/management/StandardMBean.java:
+	(getMBeanInfo()): Return attribute names with capital letters,
+	as in docs for java.lang.management.ManagementFactory, and
+	ensure descriptions are not "".
+	* javax/management/openmbean/OpenMBeanConstructorInfoSupport.java,
+	* javax/management/openmbean/OpenMBeanInfoSupport.java,
+	* javax/management/openmbean/OpenMBeanOperationInfoSupport.java:
+	(toString()): Use Arrays.toString().
+	* javax/management/openmbean/OpenMBeanParameterInfoSupport.java:
+	(OpenMBeanParameterInfoSupport(String, String, OpenType)):
+	Set open type here rather than in other constructors.
+
+2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/MBeanFeatureInfo.java:
+	Make string variable package-private.
+	* javax/management/StandardMBean.java:
+	(getMBeanInterface()): Made final.
+	* javax/management/openmbean/SimpleType.java:
+	Made final.
+
+2006-08-05  Jeroen Frijters  <jeroen@frijters.net>
+
+	* java/awt/Component.java (setDropTarget): Commented out GTK specific
+	code.
+  
 2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* examples/gnu/classpath/examples/swing/FillRect.java,
@@ -255,13 +710,175 @@
 	* configdiag.jnlp:
 	Removed.
 	
+2006-08-05  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/lang/management/BeanImpl.java:
+	(getAttribute(String)): Implemented.
+
+2006-08-05  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/JTextComponent.java
+	(AccessibleJTextComponent.dot): Renamed field into caretDot.
+	(AccessibleJTextComponent.textComp): Removed field
+	and replace with JTextComponent.this construct.
+	(AccessibleJTextComponent.AccessibleJTextComponent):
+	Fetch caret position.
+	(caretUpdate): Implemented. Fires property change events and
+	updates the caretDot field.
+	(changedUpdate): Implemented. Fires property change events.
+	(insertUpdate): Implemented. Fires property change events.
+	(removeUpdate): Implemented. Fires property change events.
+	(cut): Replaced textComp with JTextComponent.this construct.
+	(paste): Replaced textComp with JTextComponent.this construct.
+	(replaceText): Replaced textComp with JTextComponent.this construct.
+	(selectText): Replaced textComp with JTextComponent.this construct.
+	(getCaretPosition): Replaced textComp with JTextComponent.this
+	construct.
+	(getCharCount): Replaced textComp with JTextComponent.this construct.
+	(getSelectedText): Replaced textComp with JTextComponent.this
+	construct.
+	(getSelectionEnd): Replaced textComp with JTextComponent.this
+	construct.
+	(getSelectionStart): Replaced textComp with JTextComponent.this
+	construct.
+	(getTextRange): Replaced textComp with JTextComponent.this
+	construct.
+	(doAccessibleAction): Implemented.
+	(getAccessibleActionCount): Implemented.
+	(getAccessibleActionDescription): Implemented.
+	(getAccessibleStateSet): Implemented.
+	(getAfterIndex): Implemented.
+	(getBeforeIndex): Implemented.
+	(getAtIndex): Implemented.
+	(getAtIndexImpl): New helper method.
+	(getCharacterAttribute): Implemented.
+	(getCharacterBounds): Implemented.
+	(getIndexAtPoint): Implemented.	
+	(insertTextAtIndex): Implemented.
+	(setAttributes): Implemented.
+	(setTextContents): Implemented.
+
+2006-08-05  Raif S. Naffah  <raif@swiftdsl.com.au>
+  
+	* configure.ac: Better handling of default-preferences-peer option.
+
+2006-08-04  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* java/awt/BasicStroke.java (dashedStroke): Cast coords.clone to
+	double[].
+
+2006-08-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/openmbean/TabularData.java:
+	Documentation corrections.
+	* javax/management/openmbean/TabularDataSupport.java:
+	New file.
+
+2006-08-04  Francis Kung  <fkung@redhat.com>
+
+	* java/awt/BasicStroke.java
+	(dashedStroke): Implemented.
+
+2006-08-04  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/BadAttributeValueExpException.java,
+	* javax/management/BadStringOperationException.java,
+	* javax/management/InstanceAlreadyExistsException.java,
+	* javax/management/InstanceNotFoundException.java,
+	* javax/management/InvalidApplicationException.java,
+	* javax/management/MBeanRegistrationException.java,
+	* javax/management/MalformedObjectNameException.java,
+	* javax/management/RuntimeErrorException.java,
+	* javax/management/RuntimeMBeanException.java,
+	* javax/management/ServiceNotFoundException.java:
+	New files.
+	
+2006-08-04  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/SwingUtilities.java
+	(layoutCompoundLabel(JComponent,FontMetrics,String,Icon,int,int,int,
+	 int,Rectangle,Rectangle,Rectangle,int)): Delegate to new
+	layoutCompoundLabelImpl().
+	(layoutCompoundLabel(FontMetrics,String,Icon,int,int,int,int,
+	 Rectangle,Rectangle,Rectangle,int)): Delegate to new
+	layoutCompoundLabelImpl().
+	(layoutCompoundLabelImpl): New helper method. Moved impl from
+	layoutCompoundLabel() to here and added handling of HTML.
+	* javax/swing/plaf/basic/BasicButtonUI.java
+	(installUI): Update HTML view if appropriate.
+	(uninstallUI): New method. Do the usual uninstallUI things
+	and uninstall HTML view.
+	(getMinimumSize): New method. Adjusts the minimum size
+	by the HTML view minimum size.
+	(getMaximumSize): New method. Adjusts the maximum size
+	by the HTML view maximum size.
+	(getPreferredSize): Pass the button's iconTextGap to the
+	BasicGraphicsUtils method.
+	(paint): Let HTML view paint the text, if present.
+	* javax/swing/plaf/basic/BasicButtonListener.java
+	(propertyChange): Update the HTML view when the button's
+	text is changed.
+	
+2006-08-04  Mario Torre  <neugens@limasoftware.net>
+
+	Reported by Raif S. Naffah <raif@swiftdsl.com.au>
+	* native/jni/gconf-peer/GConfNativePeer.c (init_gconf_client):
+	g_type_init earlier in function to correctly initialize the
+	type system used by the backend.
+
+2006-08-04  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
+	PR 26972
+	* javax/naming/Name.java (addAll, getPrefix, getSuffix):
+	Documented.
+	* gnu/javax/naming/ictxImpl/trans/GnuName.java: New file.
+
 2006-08-04  Robert Schuster  <robertschuster@fsfe.org>
 
 	Reported by Henrik Gulbrandsen <henrik@gulbra.net>
-	Fixes PR27864.
-	* gnu/xml/dom/DomIterator.java:
-	(successor): Added if-statement.
+        Fixes PR27864.
+        * gnu/xml/dom/DomIterator.java:
+        (successor): Added if-statement.
 
+2006-08-04  Mark Wielaard  <mark@klomp.org>
+
+	* scripts/Makefile.am (EXTRA_DIST): Add import-cacerts.sh.
+
+2006-08-04  Robert Schuster  <robertschuster@fsfe.org>
+
+	* javax/swing/plaf/metal/MetalMenuBarUI.java:
+	(update): Check size and paint smaller gradient.
+	* javax/swing/plaf/metal/MetalBorders.java:
+	(MenuBarBorder): Removed borderColor field.
+	(MenuBarBorder.paintBorder): Added note, fetch color from UIManager or
+	MetalLookAndFeel.
+
+2006-08-03  Roman Kennke  <kennke@aicas.com>
+
+	PR 27637
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java
+	(ComponentHandler.componentResized): Reimplemented to handle
+	arbitrary parents.
+	(InternalFramePropertyChangeHandler.propertyChange): (Un)install
+	component listener on changed ancestor.
+	(installListeners): Install componentListener.
+	(uninstallListeners): Uninstall componentListener.
+
+2006-08-03  Carsten Neumann  <cn-develop@gmx.net>
+
+	* StrictMath.java (cbrt): Return argument if it is a NaN.
+	(cosh): Likewise.
+	(expm1): Likewise.
+	(sinh): Likewise.
+  
+2006-08-03  Carsten Neumann  <cn-develop@gmx.net>
+  
+	* java/lang/StrictMath.java (tanh): New method.
+  
+2006-08-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+  
+	* scripts/import-cacerts.sh: Batch CA certificates import script.
+  
 2006-08-03  Roman Kennke  <kennke@aicas.com>
 
 	PR 27606
@@ -276,7 +893,63 @@
 	Handle indentation.
 	(IndentIcon): New class. Wraps and indents another icon.
 
-2006-08-03  Roman Kennke  <kennke@aicas.com>
+2006-08-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/MBeanConstructorInfo.java:
+	(MBeanConstructorInfo(String,String,MBeanParameterInfo[]):
+	Copy array rather than directly assigning.
+	* javax/management/MBeanInfo.java:
+	(MBeanInfo(String,String,MBeanAttributeInfo[],
+	MBeanConstructorInfo[], MBeanOperationInfo[],
+	MBeanNotificationInfo[])): Likewise.
+	* javax/management/MBeanOperationInfo.java:
+	(MBeanOperationInfo(String,String,MBeanParameterInfo[],String,int)):
+	Likewise.
+	* javax/management/openmbean/OpenMBeanAttributeInfoSupport.java,
+	* javax/management/openmbean/OpenMBeanConstructorInfoSupport.java:
+	New files.
+	* javax/management/openmbean/OpenMBeanInfo.java:
+	Corrected documentation.
+	* javax/management/openmbean/OpenMBeanInfoSupport.java:
+	New file.
+	* javax/management/openmbean/OpenMBeanOperationInfo.java:
+	Corrected documentation.
+	* javax/management/openmbean/OpenMBeanOperationInfoSupport.java:
+	New file.
+	* javax/management/openmbean/OpenMBeanParameterInfoSupport.java:
+	(MBeanParameterInfo(String,String,OpenType,Object,Object[])):
+	Call other constructor rather than reimplementing.
+
+2006-08-02  Lillian Angel  <langel@redhat.com>
+
+	* java/awt/dnd/DragSource.java
+	(isDragImageSupported): Implemented.
+	(getDragThreshold): Changed default value.
+	* java/awt/dnd/DropTarget.java
+	(DropTarget): Default action is changed to ACTION_COPY_OR_MOVE.
+	(DropTarget): Likewise.
+	(DropTarget): If FlavorMap passed in is null, we should use the system default.
+	(addDropTargetListener): Added check to determine if new DropTargetListener
+	is this class. If so, an IllegalArgumentException is thrown. If the 
+	new listener is null, nothing happens.
+
+2006-08-02  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.ac (MOZILLA_FOUND): Fall back to
+	mozilla-firefox-plugin.
+
+2006-08-02  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/geom/AffineTransform.java
+	(hashCode): Tweak impl. 
+	* java/awt/font/FontRenderContext.java
+	(hashCode): Implement. 
+
+2006-08-02  Carsten Neumann  <cn-develop@gmx.net>
+
+	* java/lang/StrictMath.java (sinh): New method.
+
+2006-08-02  Roman Kennke  <kennke@aicas.com>
 
 	PR 27605
 	* javax/swing/JComboBox.java
@@ -302,7 +975,70 @@
 	(createPropertyChangeListener): Return null just like the
 	RI.
 
-2006-08-03  Roman Kennke  <kennke@aicas.com>
+2006-08-02  Sven de Marothy  <sven@physto.se>
+  
+	* gnu/java/awt/peer/gtk/GtkChoicePeer.java
+	(remove): Force event on removing item 0 when it's selected.
+	(handleEvent): Always call Choice.selected().
+	* java/awt/Choice.java:
+	(remove): Simplify and correct.
+  
+2006-08-02  Mark Wielaard  <mark@klomp.org>
+  
+	PR 28535
+	* configure.ac (gconf-peer): Check for gdk-2.0.
+	* native/jni/gconf-peer/Makefile.am
+	(AM_LDFLAGS): Use GDK_LIBS.
+	(AM_CFLAGS): Use GDK_CFLAGS.
+  
+2006-08-02  Thomas Minor  <1nocentrabidlamb@sexMagnet.com>
+  
+	* java/net/URL.java (getContent(Class[])): Implement.
+  
+2006-08-02  Roman Kennke  <kennke@aicas.com>
+  
+	PR 27624
+	* javax/swing/JMenu.java
+	(JMenu()): Removed setting of delay.
+	(JMenu(String)): Removed setting of delay.
+	(JMenu(Action)): Removed setting of delay.
+	(JMenu(String,boolean)): Removed setting of delay.
+	(setSelectedHelper): Removed unneeded method.
+	(setSelected): Simply set the model state.
+	(setPopupMenuVisible): Recognize the popup location
+	determined by getPopupMenuOrigin().
+	(getPopupMenuOrigin): Recognize the UI properties for
+	X and Y offset.
+	(menuSelectionChanged): Call setSelected() directly.
+	* javax/swing/JPopupMenu.java
+	(menuSelectionChanged): If invoker is a JMenu, then delegate
+	to that to get the position right.
+	* javax/swing/Popup.java
+	(LightweightPopup.show): Insert the popup as first component
+	in the layer, so that it overlaps it's caller.
+	* javax/swing/plaf/basic/BasicMenuItemUI.java
+	(getPath): Don't include the popup.
+	* javax/swing/plaf/basic/BasicMenuUI.java
+	(SelectMenuAction): New class. This invokes the popup when
+	a menu is selected.
+	(installDefaults): Install delay of 200 ms.
+	(setupPostTimer): Implemented.
+	(MouseInputHandler.mouseClicked): Do nothing here.
+	(MouseInputHandler.mouseEntered): Use MenuSelectionManager
+	magic to handle the selection. Open the menu via a timer.
+	(MouseInputHandler.mousePressed): Use MenuSelectionManager
+	magic to handle the selection. Open the menu via a timer.
+	(MenuDragMouseHandler.menuMouseDragged): Probably use
+	timer.
+	(menuDragMouseEntered): Do nothing here.
+  
+2006-08-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+	
+	* javax/management/openmbean/InvalidOpenTypeException.java,
+	* javax/management/openmbean/KeyAlreadyExistsException.java:
+	New files.
+
+2006-08-02  Roman Kennke  <kennke@aicas.com>
 
 	PR 27604
 	* javax/swing/plaf/basic/BasicChooserUI.java
@@ -351,72 +1087,102 @@
 	Set renderer to a default handler when the current renderer
 	in the JTree is null.
 
-2006-08-03  Mark Wielaard  <mark@klomp.org>
-
-	* scripts/Makefile.am (EXTRA_DIST): Add import-cacerts.sh.
-
-2006-08-03  Raif S. Naffah  <raif@swiftdsl.com.au>
-
-	* scripts/import-cacerts.sh: Batch CA certificates import script.
-
-2006-08-03  Raif S. Naffah  <raif@swiftdsl.com.au>
-
-	PR Classpath/28556
-	* gnu/java/security/key/rsa/RSAKeyPairPKCS8Codec.java
-	(encodePrivateKey): Updated documentation to clarify that RFC-2459
-	states that the parameters field of the AlgorithmIdentifier element
-	MUST be NULL if present. Amended the code to reflect the specs.
-	(decodePrivateKey): Handle case of NULL AlgorithmIdentifier.parameters.
-
-2006-08-03  Raif S. Naffah  <raif@swiftdsl.com.au>
+2006-08-02  Raif S. Naffah  <raif@swiftdsl.com.au>
 
 	PR Classpath/23899
 	* java/security/SecureRandom.java (next): Call nextBytes as per specs.
 
-2006-08-03  Thomas Fitzsimmons  <fitzsim@redhat.com>
+2006-08-02  Raif S. Naffah  <raif@swiftdsl.com.au>
 
-	* native/jawt/Makefile.am (libjawt_la_LDFLAGS): Add
-	-avoid-version.
-	* native/jni/gtk-peer/Makefile.am (libgtkpeer_la_LDFLAGS):
-	Likewise.
-	* native/jni/midi-alsa/Makefile.am (libgjsmalsa_la_LDFLAGS):
-	Likewise.
-	* native/jni/midi-dssi/Makefile.am (libgjsmdssi_la_LDFLAGS):
-	Likewise.
+	PR Classpath/28556
+	* gnu/java/security/key/rsa/RSAKeyPairPKCS8Codec.java (encodePrivateKey):
+	Updated documentation to clarify that RFC-2459 states that the parameters
+	field of the AlgorithmIdentifier element MUST be NULL if present.
+	Amended the code to reflect the specs.
+	(decodePrivateKey): Handle case of NULL AlgorithmIdentifier.parameters.
 
-2006-08-03  Thomas Fitzsimmons  <fitzsim@redhat.com>
+2006-08-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/openmbean/OpenMBeanParameterInfoSupport.java:
+	Call parameter 'defaultValue' not 'defValue'.
+
+2006-08-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/openmbean/OpenMBeanParameterInfoSupport.java:
+	New file.
+
+2006-08-01  Roman Kennke  <kennke@aicas.com>
+  
+  	PR 28562
+  	* javax/swing/plaf/basic/BasicOptionPaneUI.java
+  	(PropertyChangeHandler.propertyChange): Cleanly reinstall
+	components when visual property chanegs.
+  
+2006-08-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* javax/management/openmbean/OpenMBeanAttributeInfo.java:
+	(toString()): Corrected documentation.
+	* javax/management/openmbean/OpenMBeanConstructorInfo.java,
+	* javax/management/openmbean/OpenMBeanInfo.java,
+	* javax/management/openmbean/OpenMBeanOperationInfo.java:
+	New files.
+	* javax/management/openmbean/OpenMBeanParameterInfo.java:
+	(toString()): Corrected documentation.
+	
+2006-08-01  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/Choice.java
+	(remove(int)): Added documentation.
+
+2006-08-01  Tania Bento  <tbento@redhat.com>
+	
+	* java/awt/Choice.java
+	(remove(int)): An IllegalArgumentException should not be thrown
+	if int is invalid.  Update selectedIndex and peer selection.
+
+2006-08-01  Tania Bento  <tbento@redhat.com>
+
+	* java/awt/CardLayout.java
+	(toString): Changed format of string outputted.
+	(goToComponent): Changed the order of the if-clause.
+
+2006-07-31  Tom Tromey  <tromey@redhat.com>
+
+	* INSTALL: Updated for ASM.
+
+2006-07-31  Tom Tromey  <tromey@redhat.com>
+
+	PR libgcj/23682:
+	* java/nio/channels/SelectionKey.java (attach): Now synchronized.
+	(attachment): Likewise.
+	* java/nio/channels/spi/AbstractSelectionKey.java (cancel): Now
+	synchronized.
+	(isValid): Likewise.
+	* gnu/java/nio/SelectionKeyImpl.java (impl): Now final
+	(ch): Likewise.
+	(interestOps): Synchronize.
+	(readyOps): Likewise.
+	* gnu/java/nio/SelectorImpl.java (register): Synchronize around
+	interestOps call.
+
+2006-07-31  Roman Kennke  <kennke@aicas.com>
+
+	* NEWS: Added note about the X peers.
+	* INSTALL: Added install notes about the X peers.
+
+2006-07-31  Carsten Neumann  <cn-develop@gmx.net>
+
+	* StrictMath.java (getLowDWord): Return long instead of int.
+	(getHighDWord): Likewise.
+	(buildDouble): Take two long arguments.
+	(cbrt): Adapted to int -> long change.
+	(expm1): Likewise.
+	(cosh): Likewise.
+
+2006-07-31  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* native/jni/qt-peer/Makefile.am (libqtpeer_la_LDFLAGS): Add
 	-avoid-version.
-
-2006-08-03  Andrew John Hughes  <gnu_andrew@member.fsf.org>
-
-	* examples/gnu/classpath/examples/management/TestBeans.java:
-	New file.
-	* javax/management/MBeanAttributeInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanConstructorInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanFeatureInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanNotificationInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanOperationInfo.java:
-	(toString()): Implemented.
-	* javax/management/MBeanParameterInfo.java:
-	(toString()): Implemented.
-	* javax/management/StandardMBean.java:
-	(getMBeanInfo()): Fix attribute naming.
-
-2006-08-02  Mark Wielaard  <mark@klomp.org>
-
-	PR 28535
-	* configure.ac (gconf-peer): Check for gdk-2.0.
-	* native/jni/gconf-peer/Makefile.am
-	(AM_LDFLAGS): Use GDK_LIBS.
-	(AM_CFLAGS): Use GDK_CFLAGS.
 
 2006-07-31  Raif S. Naffah  <raif@swiftdsl.com.au>
 
@@ -455,11 +1221,65 @@
 	6 weeks.
 	(nonLeniencyCheck): weeks is either 5 or 6.
 
+2006-07-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+	
+	* javax/management/openmbean/OpenMBeanAttributeInfo.java,
+	* javax/management/openmbean/OpenMBeanParameterInfo.java:
+	New files.
+
+2006-07-30  Matt Wringe  <mwringe@redhat.com>
+
+	* gnu/java/security/Engine.java 
+	(getInstance): Ignore self referencing aliases.
+
+2006-07-30  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/Choice.java:
+	(accessibleAction): Call select() directly.
+	(add, insert, remove): Reimplement.
+	(dispatchEventImpl): Always call super.
+	(processItemEvent): Does not set the index.
+	* include/gnu_java_awt_peer_gtk_GtkChoicePeer.h
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkChoicePeer.c
+	(append): removed.
+	(nativeAdd): Name changed to add.
+	(selection_changed_cb): Simplify callback.
+	* gnu/java/awt/peer/gtk/GtkChoicePeer.java
+	(selected): New field.
+	(add): Replaced with native impl.
+	(handleEvent): New method.	
+	
+2006-07-30  Sven de Marothy  <sven@physto.se>
+
+	* java/awt/Choice.java:
+	Reformat, fix copyright year.
+
 2006-07-29  Mark Wielaard  <mark@klomp.org>
 
 	* javax/swing/JComponent.java (paintingDoubleBuffered): Renamed
 	static field isPaintingDoubleBuffered to not have the same name
 	as a method.
+
+2006-07-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+  
+	* examples/gnu/classpath/examples/management/TestBeans.java:
+	New file.
+	* javax/management/MBeanAttributeInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanConstructorInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanFeatureInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanNotificationInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanOperationInfo.java:
+	(toString()): Implemented.
+	* javax/management/MBeanParameterInfo.java:
+	(toString()): Implemented.
+	* javax/management/StandardMBean.java:
+	(getMBeanInfo()): Fix attribute naming.
 
 2006-07-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
@@ -559,6 +1379,51 @@
 	(joinOuterSegments): New method.
 	(joinSegments): Refactored some code into joinOuterSegments.
 	(solidStroke): Connect segments together properly.
+
+2006-07-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* native/jawt/Makefile.am (libjawt_la_LDFLAGS): Add
+	-avoid-version.
+	* native/jni/gtk-peer/Makefile.am (libgtkpeer_la_LDFLAGS):
+	Likewise.
+	* native/jni/midi-alsa/Makefile.am (libgjsmalsa_la_LDFLAGS):
+	Likewise.
+	* native/jni/midi-dssi/Makefile.am (libgjsmdssi_la_LDFLAGS):
+	Likewise.
+
+2006-07-28  Tom Tromey  <tromey@redhat.com>
+
+	* configure.ac: Enable -Werror by default on Linux-with-gcc.
+
+2006-07-28  Lillian Angel  <langel@redhat.com>
+
+	* native/jni/gtk-peer/GtkDragSourceContextPeer.c:
+	Removed function declarations.
+	(connect_signals_for_widget): Removed implementation because
+	stub functions have been removed.
+	(drag_begin_cb): Removed function.
+	(drag_motion_cb): Likewise.
+	(drag_data_get_cb): Likewise.
+	(drag_data_delete_cb): Likewise.
+	(drag_drop_cb): Likewise.
+	(drag_end_cb): Likewise.
+	(drag_data_received_cb): Likewise.	
+
+2006-07-28  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Set version to 0.93-pre.
+
+2006-07-29  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/Makefile.am: Added source 1.4 compliance option when ECJ is used.
+
+2006-07-29  Raif S. Naffah  <raif@swiftdsl.com.au>
+
+	* tools/gnu/classpath/tools/keytool/Command.java: Removed unused import.
+	(getCallbackHandler): Fully qualify linked class in javadoc.
+	* tools/gnu/classpath/tools/keytool/GenKeyCmd.java (cmdOptionsParser): Removed.
+	* tools/gnu/classpath/tools/keytool/ImportCmd.java (imported): Likewise.
+	* tools/gnu/classpath/tools/keytool/Main.java (printHelp): Likewise.
 
 2006-07-27  Tom Tromey  <tromey@redhat.com>
 
@@ -2659,10 +3524,10 @@
 
 2006-07-10  Mario Torre  <neugens@limasoftware.net>
 
-        * java/awt/BasicStroke.java: Removed unused import.
-        * gnu/java/awt/java2d/CubicSegment.java (clone): Fixed. 
-        * gnu/java/awt/java2d/LineSegment.java (clone): Fixed. 
-        * gnu/java/awt/java2d/QuadSegment.java (clone): Fixed.
+	* java/awt/BasicStroke.java: Removed unused import.
+	* gnu/java/awt/java2d/CubicSegment.java (clone): Fixed. 
+	* gnu/java/awt/java2d/LineSegment.java (clone): Fixed. 
+	* gnu/java/awt/java2d/QuadSegment.java (clone): Fixed.
 
 2006-07-10  Matt Wringe  <mwringe@redhat.com>
 
