@@ -1,0 +1,642 @@
+2006-07-18  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/ClientHandshake.java
+	(implHandleInput, implHandleOutput): fix PSK exchange handling.
+	(ClientDHGen.full): new field.
+	(ClientDHGen.implRun): run full key exchange if `full' is true.
+	(ClientDHGen.serverKey): new method.
+	(RSAGen.full): new field.
+	(RSAGen.implRun): run full key exchange if `full' is true.
+	* gnu/javax/net/ssl/provider/ClientDHE_PSKParameters.java
+	(params): slice the buffer.
+	* gnu/javax/net/ssl/provider/ServerDHE_PSKParameters.java
+	(<init>): use `dhParams,' not `buffer.'
+	(params): slice the buffer.
+	* gnu/javax/net/ssl/provider/ServerKeyExchange.java (length):
+	handle case where parameters or signature are null.
+	* gnu/javax/net/ssl/provider/ClientRSA_PSKParameters.java
+	(version): removed.
+	(<init>): don't take version argument.
+	(<init>): don't take version argument; take buffer argument.
+	(secret): pass TLS_1 to EncryptedPreMasterSecret constructor.
+	* gnu/javax/net/ssl/provider/CipherSuite.java (isResolved): new
+	field.
+	(<init>, <init>): set `isResolved.'
+	(resolve): add PSK cipher suite detection.
+	(isResolved): new method.
+	* gnu/javax/net/ssl/provider/ServerHandshake.java (serverKey): new
+	field.
+	(chooseSuites): choose NONE key exchanges, too; omit unresolved
+	cipher suites.
+	(implHandleInput, implHandleOutput): fix PSK handling.
+	(checkKeyExchange): update for NONE and PSK exchanges.
+	(CertLoader.implRun): grab our private key here.
+	(RSAKeyExchange.implRun): initialize RSA cipher with our private
+	key.
+	(RSA_PSKExchange.implRun): likewise.
+	* gnu/javax/net/ssl/provider/ExchangeKeys.java (<init>): duplicate
+	and order the buffer; handle null argument.
+	* gnu/javax/net/ssl/provider/ClientKeyExchange.java
+	(exchangeKeys): handle NONE exchange.
+	* gnu/javax/net/ssl/provider/SSLContextImpl.java (engineInit):
+	handle PSK key managers properly.
+	* gnu/javax/net/ssl/provider/SSLEngineImpl.java (<init>): remove
+	debug logging.
+	* gnu/javax/net/ssl/provider/ServerDHParams.java (<init>):
+	duplicate and order the buffer.
+	* gnu/javax/crypto/RSACipherImpl.java (doFinal): allow short
+	input.
+	(rsaDecrypt): ensure there's a leading zero.
+	* gnu/javax/net/ssl/provider/EmptyExchangeKeys.java: new file.
+
+2006-07-14  Casey Marshall  <csm@gnu.org>
+
+	* gnu/java/net/protocol/http/HTTPConnection.java (getSocket):
+	enable TLSv1.1.
+	* gnu/java/security/action/GetPropertyAction.java: implement
+	PrivilegedAction<String>.
+	(run): return String.
+
+2006-07-14  Casey Marshall  <csm@gnu.org>
+
+	* gnu/classpath/debug/Component.java (SSL_DELEGATED_TASK): new
+	constant.
+	* gnu/classpath/debug/SystemLogger.java (getSystemLogger): new
+	class method.
+	* gnu/javax/crypto/RSACipherImpl.java (logger): make instance of
+	SystemLogger.
+	(doFinal): use `EME_PKCS1_V1_5' to pad/unpad.
+	* gnu/javax/net/ssl/AbstractSessionContext.java (getSession): new
+	method.
+	* gnu/javax/net/ssl/PreSharedKeyManager.java: new file.
+	* gnu/javax/net/ssl/PreSharedKeyManagerParameters.java: new file.
+	* gnu/javax/net/ssl/provider/AbstractHandshake.java: move
+	delegated task classes to the end.
+	(handleInput): don't stop processing current input if tasks are
+	scheduled.
+	(DHE_PSKGen): new class.
+	* gnu/javax/net/ssl/provider/CertificateStatusRequest.java
+	(buffer): make non-final.
+	(<init>): new "builder" constructor.
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/CertificateURL.java (buffer): make
+	non-final.
+	(<init>): new "builder" constructor.
+	(buffer): new method.
+	(URLAndOptionalHash): implement Builder.
+	(URLAndOptionalHash.<init>): set buffer order to BIG_ENDIAN.
+	(URLAndOptionalHash.<init>, URLAndOptionalHash.<init>): new
+	"builder" constructors.
+	(URLAndOptionalHash.buffer): new method.
+	* gnu/javax/net/ssl/provider/CipherSuite.java: replace
+	DIFFIE_HELLMAN with qualified algorithm.
+	(TLS_PSK_WITH_RC4_128_SHA, TLS_PSK_WITH_3DES_EDE_CBC_SHA,
+	TLS_PSK_WITH_AES_128_CBC_SHA, TLS_PSK_WITH_AES_256_CBC_SHA,
+	TLS_DHE_PSK_WITH_RC4_128_SHA, TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA,
+	TLS_DHE_PSK_WITH_AES_128_CBC_SHA,
+	TLS_DHE_PSK_WITH_AES_256_CBC_SHA,
+	TLS_RSA_PSK_WITH_RC4_128_SHA, TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA,
+	TLS_RSA_PSK_WITH_AES_128_CBC_SHA,
+	TLS_RSA_PSK_WITH_AES_256_CBC_SHA): new constants.
+	* gnu/javax/net/ssl/provider/ClientDHE_PSKParameters.java: new
+	file.
+	* gnu/javax/net/ssl/provider/ClientHandshake.java
+	(maxFragmentLengthSent, truncatedHMacSent, sentVersion): new
+	fields.
+	(implHandleInput): handle hello extensions; handle PSK key
+	exchange.
+	(implHandleOutput): send extensions if configured; handle PSK key
+	exchange.
+	(enableExtensions, maxFragmentLength, truncatedHMac,
+	getPSKIdentity): new methods.
+	(RSAGen.implRun): use the protocol version we sent in the
+	generated secret, not the agreed version.
+	* gnu/javax/net/ssl/provider/ClientHello.java: remove unused
+	imports.
+	(disableExtensions): new field.
+	(length): use `disableExtensions' field.
+	(extensions): fix telling if there are extensions.
+	* gnu/javax/net/ssl/provider/ClientHelloBuilder.java
+	(setExtensions): fix.
+	(setDisableExtensions): new method.
+	* gnu/javax/net/ssl/provider/ClientKeyExchange.java
+	(exchangeKeys): handle PSK exchange.
+	* gnu/javax/net/ssl/provider/ClientPSKParameters.java: new file.
+	* gnu/javax/net/ssl/provider/ClientRSA_PSKParameters.java: new
+	file.
+	* gnu/javax/net/ssl/provider/EncryptedPreMasterSecret.java
+	(toString): include hexdump output.
+	* gnu/javax/net/ssl/provider/Extension.java: implement Builder.
+	(buffer): mark non-final.
+	(<init>): make public.
+	(<init>): new "builder" constructor.
+	(length): include length of the extension type.
+	(buffer): new method.
+	(Value): implement Builder.
+	* gnu/javax/net/ssl/provider/ExtensionList.java: implement
+	Builder.
+	(<init>): new "builder" constructor.
+	(get): fix.
+	(length): return total length, including length field.
+	* gnu/javax/net/ssl/provider/InputSecurityParameters.java
+	(decrypt): handle stream ciphers (with no padding) properly.
+	* gnu/javax/net/ssl/provider/Jessie.java (<init>): add JessiePSK
+	key manager factory.
+	* gnu/javax/net/ssl/provider/KeyExchangeAlgorithm.java
+	(DIFFIE_HELLMAN): removed.
+	(DH_DSS, DH_RSA, DH_anon, DHE_DSS, DHE_RSA, PSK, DHE_PSK,
+	RSA_PSK): new enum constants.
+	* gnu/javax/net/ssl/provider/MaxFragmentLength.java (buffer): new
+	method.
+	* gnu/javax/net/ssl/provider/OutputSecurityParameters.java
+	(encrypt): don't use `doFinal.'
+	* gnu/javax/net/ssl/provider/PreSharedKeyManagerFactoryImpl.java:
+	new file.
+	* gnu/javax/net/ssl/provider/SSLContextImpl.java (pskManager): new
+	field.
+	(engineInit): initialize PSK manager, if specified.
+	* gnu/javax/net/ssl/provider/SSLEngineImpl.java (unwrap): debug
+	logging; don't log warnings on closure alerts.
+	* gnu/javax/net/ssl/provider/SSLSocketImpl.java
+	(SocketOutputStream.write): throw an exception if the handshake
+	threw one in another thread; clear the output buffer after writing
+	the record.
+	(doHandshake): fix this; capture exceptions thrown here, for other
+	threads.
+	* gnu/javax/net/ssl/provider/ServerDHE_PSKParameters.java: new
+	file.
+	* gnu/javax/net/ssl/provider/ServerDHParams.java (algorithm): mark
+	deprecated (it's difficult to support this properly).
+	* gnu/javax/net/ssl/provider/ServerHandshake.java
+	(chooseSuites): select suites based on key exchange algorithm.
+	(implHandleInput): handle key exchange better; handle PSK
+	exchange.
+	(implHandleOutput): likewise.
+	(CertLoader.implRun): just use key exchange name directly.
+	(RSA_PSKExchange): new class.
+	* gnu/javax/net/ssl/provider/ServerKeyExchange.java (params):
+	handle PSK exchange algorithms.
+	(signature): likewise.
+	* gnu/javax/net/ssl/provider/ServerNameList.java
+	(buffer): make non-final.
+	(<init>): new "builder" constructor.
+	(buffer): new method.
+	(ServerName.buffer): make non-final.
+	(ServerName.<init>): new "builder" constructor.
+	(ServerName.length): return total length, including type and
+	length fields.
+	(ServerName.buffer): new method.
+	* gnu/javax/net/ssl/provider/ServerPSKParameters.java: new file.
+	* gnu/javax/net/ssl/provider/ServerRSA_PSKParameters.java: new
+	file.
+	* gnu/javax/net/ssl/provider/TruncatedHMAC.java (buffer): new
+	method.
+	* gnu/javax/net/ssl/provider/TrustedAuthorities.java (<init>): set
+	buffer order to BIG_ENDIAN.
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/UnresolvedExtensionValue.java
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/Util.java (wrapBuffer, wrapBuffer):
+	new methods.
+	(WrappedBuffer): new class.
+	* gnu/javax/net/ssl/provider/X509KeyManagerFactory.java
+	(getAliases): add RSA_PSK.
+
+2006-07-12  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/security/auth/callback/CertificateCallback.java: new
+	file.
+
+2006-07-12  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/AbstractHandshake.java
+	(engine, inParams, outParams, tasks, serverRandom, clientRandom,
+	compression): new fields.
+	(<init>): take an SSLEngineImpl parameter; init `tasks.'
+	(handleInput): return NEED_TASK if we have tasks.
+	(getInputParams, getOutputParams): implement here; mark final.
+	(getTask): new method.
+	(checkKeyExchange): new method.
+	(reallocateBuffer): use `compact.'
+	(diffieHellmanPhase1, diffieHellmanPhase2): removed.
+	(DHPhase, CertVerifier): new classes.
+	(generateMasterSecret): add asserts.
+	(setupSecurityParameters): new method.
+	* gnu/javax/net/ssl/provider/Certificate.java (certificates): fix
+	reading multiple certificates.
+	* gnu/javax/net/ssl/provider/ClientCertificateTypeList.java:
+	implement Iterable<ClientCertificateType>.
+	(iterator): new method.
+	* gnu/javax/net/ssl/provider/ClientDiffieHellmanPublic.java: make
+	public; implement Builder.
+	(<init>): make public.
+	(<init>): new constructor.
+	(wrap): new method.
+	(buffer): new method.
+	(publicValue): make public; use `rewind.'
+	(setPublicValue): use `Util.trim;' use `rewind.'
+	(length): return proper length.
+	* gnu/javax/net/ssl/provider/ClientHandshake.java: new file.
+	* gnu/javax/net/ssl/provider/ClientKeyExchange.java: remove unused
+	imports; make public, non-final.
+	(buffer): make protected, non-final.
+	(suite, version): make protected.
+	(<init>): make public.
+	(length): return 0 for NONE key exchange algorithm.
+	* gnu/javax/net/ssl/provider/ClientKeyExchangeBuilder.java: new
+	file.
+	* gnu/javax/net/ssl/provider/DelegatedTask.java: new file.
+	* gnu/javax/net/ssl/provider/DiffieHellman.java (getParams): use
+	AccessController instead of Util.
+	* gnu/javax/net/ssl/provider/EncryptedPreMasterSecret.java: make
+	public; implement Builder.
+	(<init>): make public.
+	(<init>): new constructor.
+	(buffer): new method.
+	(encryptedSecret): make public; fix SSLv3 handling.
+	(setEncryptedSecret): make public; rewind the buffer after putting
+	the value.
+	(length): fix length computation.
+	* gnu/javax/net/ssl/provider/ExchangeKeys.java: make public.
+	(buffer): make protected, non-final.
+	(<init>): made public; don't check null.
+	* gnu/javax/net/ssl/provider/Jessie.java (<init>): add "SSL" alias.
+	* gnu/javax/net/ssl/provider/ServerHandshake.java: clean up unused
+	imports.
+	(engine, compression, clientRandom, serverRandom, clientSessionID,
+	inParams, outParams, keyAgreement): moved to superclass.
+	(genDH, certVerifier, certLoader, keyExchangeTask): new fields.
+	(<init>): pass engine to superclass constructor.
+	(implHandleInput): throw `AlertException' when it makes sense; run
+	long-running tasks as delegated tasks; return NEED_TASK if we
+	scheduled a delegated task.
+	(implHandleOutput): generate keys for continued sessions; run
+	long-running tasks as delegated tasks; return NEED_TASK if we
+	scheduled a delegated task.
+	(status): also return NEED_TASK as appropriate.
+	(getInputParams, getOutputParams): removed.
+	(checkKeyExchange): new method.
+	(genDiffieHellman): removed.
+	(signParams): throw exceptions.
+	(CertLoader, GenDH, RSAKeyExchange): new classes.
+	* gnu/javax/net/ssl/provider/SSLContextImpl.java
+	(engineGetServerSocketFactory): implement.
+	(engineGetSocketFactory): implement.
+	(defaultRandom): use AccessController instead of Util.
+	* gnu/javax/net/ssl/provider/SSLEngineImpl.java (<init>): use
+	`defaultSuites.'
+	(defaultSuites): new method.
+	(startHandshake): start client handshake in client mode.
+	(getDelegatedTask): implement.
+	(unwrap, wrap): send alert if we catch an AlertException during
+	handshaking.
+	* gnu/javax/net/ssl/provider/SSLServerSocketFactoryImpl.java: new
+	file.
+	* gnu/javax/net/ssl/provider/SSLServerSocketImpl.java: new file.
+	* gnu/javax/net/ssl/provider/SSLSocketFactoryImpl.java: new file.
+	* gnu/javax/net/ssl/provider/SSLSocketImpl.java: new file.
+	* gnu/javax/net/ssl/provider/X509TrustManagerFactory.java
+	(sep, JSSE_CERTS, CA_CERTS, engineInit): use AccessController, not
+	Util.
+	(checkTrusted): don't require revocation checking.
+	* java/util/Collections.java (CheckedMap.entrySet): casting hack.
+	* java/util/concurrent/CopyOnWriteArrayList.java: new file.
+
+2006-07-09  Casey Marshall  <csm@gnu.org>
+
+	* gnu/java/io/ByteBufferOutputStream.java (write): new method.
+	(buffer): use flip() and slice() to get the buffer.
+	(toString): new method.
+	* gnu/java/security/Engine.java: merge mwringe's case-insensitive
+	algorithm name patch.
+	* gnu/javax/crypto/jce/GnuCrypto.java (<init>): qualify
+	PrivilegedAction.
+	* gnu/javax/crypto/key/dh/GnuDHPrivateKey.java (toString): new
+	method.
+	* gnu/javax/crypto/key/dh/GnuDHPublicKey.java (toString): new
+	method.
+	* java/security/Security.java: qualify generic types.
+
+2006-07-09  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/AbstractSessionContext.java (newInstance):
+	return `AbstractSessionContext.'
+	(getSession): check if the session is null.
+	* gnu/javax/net/ssl/Session.java (packetBufferSize): removed.
+	(<init>): initialize `applicationBufferSize.'
+	(getPacketBufferSize): return application buffer size, plus 2048.
+	* gnu/javax/net/ssl/provider/AbstractHandshake.java (PAD1, PAD2):
+	new constants.
+	(handleInput): implement; call `implHandleOutput,' and hash
+	messages as they are consumed.
+	(implHandleInput): new abstract method.
+	(handleOutput): fix hashing of produced bytes.
+	(status, handleV2Hello): new abstract methods.
+	(pollHandshake): don't hash the input here; add logging.
+	(hasMessage): add logging.
+	(reallocateBuffer): shift the existing contents down in the
+	buffer, if it is, on the whole, large enough for new input.
+	(genV2CertificateVerify): renamed...
+	(genV3CertificateVerify): to this, which is correct.
+	(generateKeys): fix PRF setup; generate an IV for 1.1; add
+	logging.
+	(generateFinished): add logging; update with correct padding.
+	(generateMasterSecret): add logging; fix PRF initialization.
+	* gnu/javax/net/ssl/provider/CipherSuite.java (mac): use mac
+	algorithm name "HMac-SHA1".
+	* gnu/javax/net/ssl/provider/ClientHello.java: make extendable.
+	* gnu/javax/net/ssl/provider/ClientHelloBuilder.java: new file.
+	* gnu/javax/net/ssl/provider/ClientHelloV2.java (<init>): order
+	the input buffer BIG_ENDIAN.
+	(cipherSpecs): made public; use qualified return type.
+	* gnu/javax/net/ssl/provider/Debug.java: new file.
+	* gnu/javax/net/ssl/provider/Extension.java (<init>): order the
+	input buffer BIG_ENDIAN.
+	(length): return the total length, including the length field.
+	(toString): add prefix to value.
+	* gnu/javax/net/ssl/provider/ExtensionList.java (<init>): order
+	the input buffer BIG_ENDIAN.
+	* gnu/javax/net/ssl/provider/InputSecurityParameters.java
+	(logger): new constant.
+	(suite): new field.
+	(<init>): also take a `CipherSuite' argument.
+	(decrypt): use `update,' not `doFinal' for decryption; add debug
+	logging; fix mac computation; fix copying fragment to output.
+	(cipherSuite): return `suite' field.
+	* gnu/javax/net/ssl/provider/Jessie.java (<init>): add
+	"TLSv1.1-RSA" signature.
+	* gnu/javax/net/ssl/provider/OutputSecurityParameters.java
+	(logger): new constant.
+	(suite): new field.
+	(<init>): take additional `CipherSuite' argument.
+	(encrypt): add debug logging; fix mac computation; various little
+	fixes.
+	(suite): new method.
+	* gnu/javax/net/ssl/provider/ProtocolVersion.java (forName): also
+	recognize "TLSv1.1".
+	* gnu/javax/net/ssl/provider/Random.java (copy): fix copying the
+	internal buffer.
+	* gnu/javax/net/ssl/provider/Record.java (<init>): order the input
+	buffer BIG_ENDIAN.
+	(toString): include length in output.
+	* gnu/javax/net/ssl/provider/SSLContextImpl.java (serverContext,
+	clientContext): declare both as `AbstractSessionContext.'
+	* gnu/javax/net/ssl/provider/SSLEngineImpl.java (logger): make an
+	instance of `SystemLogger.'
+	(mode): declare as a Mode.
+	(Mode): new enum.
+	(<init>): add logging; initialize `enabledProtocols' and
+	`enabledSuites.'
+	(beginHandshake): debug logging; handle Mode enum.
+	(closeOutbound): prepare `lastAlert' to carry the close alert.
+	(isInboundDone, isOutboundDone): implement.
+	(setUseClientMode): use Mode enum.
+	(unwrap): fix V2 hello handling; optimize calls when the cipher
+	suite is TLS_NULL_WITH_NULL_NULL; add debug logging; handle closue
+	alerts properly; fix record length reporting.
+	(wrap): set `outClosed' if we are sending a closure alert here;
+	delay changing output security params until we emit the change
+	notification; optimize initial handshake; fix input buffer
+	consumption; handle end of handshake.
+	* gnu/javax/net/ssl/provider/SSLRSASignatureImpl.java: new file.
+	* gnu/javax/net/ssl/provider/ServerDHParams.java (buffer): set
+	position to 0 in the buffer we return.
+	* gnu/javax/net/ssl/provider/ServerHandshake.java (version,
+	suite): removed.
+	(chooseSuite): make non-static; only choose a cipher suite that we
+	have a compatible certificate for.
+	(chooseCompression): use properties to enable/disable zlib.
+	(doHash): say no if we are handling a V2 hello.
+	(handleInput): rename to...
+	(implHandleInput): this; only handle a single handshake message in
+	this method (handleInput from the superclass will call us
+	repeatedly to drain the input buffer); various other fixes.
+	(implHandleOutput): debug logging; temporarily disable packing
+	more than one handshake per record; various little fixes.
+	(status, handleV2Hello): new methods.
+	(genDiffieHellman): use static parameters from the DiffieHellman
+	class.
+	(signParams): use correct signature algorithm.
+	* gnu/javax/net/ssl/provider/ServerHello.java (totalLength):
+	removed.
+	(disableExtensions): new field.
+	(length): don't query extensions if `disableExtensions' is true.
+	* gnu/javax/net/ssl/provider/ServerHelloBuilder.java
+	(setDisableExtensions): new method.
+	* gnu/javax/net/ssl/provider/ServerNameList.java: various parsing
+	fixes.
+	* gnu/javax/net/ssl/provider/SessionImpl.java (<init>): new
+	constructor.
+	(setApplicationBufferSize): new method.
+	(setPacketBufferSize): new method.
+	* gnu/javax/net/ssl/provider/SignatureAlgorithm.java
+	(getAlgorithm): new method.
+	* gnu/javax/net/ssl/provider/Util.java: make public; mark
+	security-sensitive methods deprecated.
+	* gnu/javax/net/ssl/provider/X509KeyManagerFactory.java
+	(chooseAliases): handle DSA; handle unrecognized signature
+	algorithms.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* jessie-tests/testCertificate.java: update for Builder
+	interface and API changes.
+	* jesasie-tests/testServerHello.java: likewise.
+	* jessie-tests/testServerKeyExchange.java: likewise.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/crypto/key/GnuPBEKey.java: new file.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/AbstractHandshake.java: implement
+	numerous "common" methods in server and client handshakes.
+	* gnu/javax/net/ssl/provider/AlertException.java: made public; add
+	cause constructors.
+	* gnu/javax/net/ssl/provider/Builder.java: new file.
+	* gnu/javax/net/ssl/provider/Certificate.java: make subclassable.
+	* gnu/javax/net/ssl/provider/CertificateBuilder.java: new file.
+	* gnu/javax/net/ssl/provider/CertificateRequest.java: make
+	subclassable.
+	* gnu/javax/net/ssl/provider/CertificateRequestBuilder.java: new
+	file.
+	* gnu/javax/net/ssl/provider/CipherSuite.java: remove dependence
+	on protocol version.
+	* gnu/javax/net/ssl/provider/ClientHello.java (hasExtensions): new
+	method.
+	* gnu/javax/net/ssl/provider/ClientHelloV2.java (cipherSpecs):
+	genericize collections.
+	* gnu/javax/net/ssl/provider/ClientKeyExchange.java: make version
+	argument explicit, instead of implied by the cipher suite.
+	* gnu/javax/net/ssl/provider/Constructed.java: expand JavaDocs.
+	* gnu/javax/net/ssl/provider/Finished.java: accept TLS 1.1 version
+	numbers, too.
+	* gnu/javax/net/ssl/provider/Handshake.java: make version
+	explicit, instead of implied by the cipher suite.
+	* gnu/javax/net/ssl/provider/InputSecurityParameters.java: made
+	public.
+	(suite): removed.
+	(session): new field (replaces/encapsulates `suite').
+	(<init>): made public; take a SessionImpl, not a CipherSuite.
+	(decrypt, decrypt, decrypt): add support for growable buffers AND
+	a fixed-size array of buffers (we use the former internally; the
+	latter is used to implement the scatter/gather model of
+	SSLEngine.
+	* gnu/javax/net/ssl/provider/Jessie.java: update algorithms.
+	* gnu/javax/net/ssl/provider/MacAlgorithm.java: just specify
+	NULL/MD5/SHA, not version-specific algorithms.
+	* gnu/javax/net/ssl/provider/OutputSecurityParameters.java:
+	replace suite with session; support scatter/gather operation.
+	* gnu/javax/net/ssl/provider/ProtocolVersion.java: implement
+	Comparable<ProtocolVersion>.
+	* gnu/javax/net/ssl/provider/Random.java: implement Builder.
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/SSLContextImpl.java: new file.
+	* gnu/javax/net/ssl/provider/SSLEngineImpl.java: numerous changes;
+	largely implemented now.
+	* gnu/javax/net/ssl/provider/SSLv3HMacMD5Impl.java: new file.
+	* gnu/javax/net/ssl/provider/SSLv3HMacSHAImpl.java: new file.
+	* gnu/javax/net/ssl/provider/ServerDHParams.java: implement
+	Builder.
+	(<init>): new constructor that takes known parameters.
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/ServerHandshake.java: numerous
+	changes; largely implemented now.
+	* gnu/javax/net/ssl/provider/ServerHello.java: make subclassable.
+	* gnu/javax/net/ssl/provider/ServerHelloBuilder.java: new file.
+	* gnu/javax/net/ssl/provider/ServerKeyExchange.java: make
+	subclassable.
+	* gnu/javax/net/ssl/provider/ServerKeyExchangeBuilder.java: new
+	file.
+	* gnu/javax/net/ssl/provider/SessionImpl.java: expanded.
+	* gnu/javax/net/ssl/provider/Signature.java: implement Builder.
+	(<init>): new method, that takes a pre-computed signature.
+	(buffer): new method.
+	* gnu/javax/net/ssl/provider/SimpleSessionContext.java: new file.
+	* gnu/javax/net/ssl/provider/X509KeyManagerFactory.java:
+	genericize Collections usage.
+	(Manager): extend X509ExtendedKeyManager; genericize fields.
+	(Manager.chooseEngineClientAlias): new method.
+	(Manager.chooseEngineServerAlias): new method.
+	* gnu/javax/net/ssl/provider/X509TrustManagerFactory.java (sep):
+	new constant; use it instead of constantly calling getProperty.
+	(init): genericize lists.
+	(Manager.trusted): removed.
+	(Manager.anchors): new field (replacement for above).
+	(<init>): handle changes to fields.
+	(getAcceptedIssuers): use `anchors.toArray().'
+	(checkTrusted): use a PKIX CertPathVerifier.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/AbstractSessionContext.java: renamed from
+	`SessionStore.' Implement SessionContext.
+	* gnu/javax/net/ssl/PrivateCredentials.java: genericize
+	collections.
+	* gnu/javax/net/ssl/Session.java (packetBufferSize): new field.
+	(values): genericize.
+	(random): make transient.
+	(truncatedMac, context): new fields.
+	(getLocalPrincipal, getPacketBufferSize, getPeerPrincipal)
+	(getSessionContext): implement.
+	(isTruncatedMac): new method.
+	(repair, privateData, setPrivateData): new abstract methods.
+	(PrivateData.serialVersionUID): new constant.
+	* gnu/javax/net/ssl/SessionStore.java: renamed to
+	`AbstractSessionContext.'
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/java/security/Requires.java: new annotation.
+	* gnu/java/security/action/GetSecurityPropertyAction.java:
+	implement PrivilegedAction<String>.
+	(run): return String.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/java/io/ByteBufferOutputStream.java: new file.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* gnu/classpath/debug/SystemLogger.java: extend Logger.
+	(SYSTEM): declare as instance of SystemLogger; set it to such an
+	instance.
+	(<clinit>): removed debug lines.
+	(<init>): new method.
+	(logv): new method.
+
+2006-06-28  Casey Marshall  <csm@gnu.org>
+
+	* java/security/Signature.java (update): new method.
+	* java/security/SignatureSpi.java (engineUpdate): new method.
+
+2006-06-10  Casey Marshall  <csm@gnu.org>
+
+	* jessie-tests/testClientHello.java: update for extensions
+	changes.
+	* jessie-tests/testExtensionList.java: likewise.
+	* jessie-tests/testServerHello.java: likewise.
+
+2006-06-10  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/ServerHello.java (extensions): return
+	an ExtensionList.
+	(setExtensionsLength): set the length in the buffer.
+	(toString): print out individual extensions.
+	* gnu/javax/net/ssl/provider/Extension.java (valueBytes): new
+	method.
+	(valueBuffer): new method.
+	(value): return an Extenion.Value.
+	(toString): print out extension value.
+	(Value): new abstract inner class.
+	* gnu/javax/net/ssl/provider/ClientHello.java (extensions): return
+	an ExtensionList.
+	(setExtensionListLength): set the length in the buffer.
+	(toString): print out extensions.
+	* gnu/javax/net/ssl/provider/ServerHandshake.java
+	(chooseSuite, chooseCompression): use generics and foreach loops.
+	* gnu/javax/net/ssl/provider/ExtensionList.java: new class.
+	* gnu/javax/net/ssl/provider/MaxFragmentLength.java: new class.
+	* gnu/javax/net/ssl/provider/CertificateURL.java: new class.
+	* gnu/javax/net/ssl/provider/UnresolvedExtensionValue.java: new
+	class. 
+	* gnu/javax/net/ssl/provider/TruncatedHMAC.java: new class.
+	* gnu/javax/net/ssl/provider/ServerNameList.java: new class.
+	* gnu/javax/net/ssl/provider/TrustedAuthorities.java: new class.
+	* gnu/javax/net/ssl/provider/CertificateStatusType.java: new
+	class. 
+	* gnu/javax/net/ssl/provider/CertificateStatusRequest.java: new
+	class.
+
+2006-06-05  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/Extension.java: add Javadoc.
+	(length): return the length of the extension value.
+	(setLength, setType, setValue, setValue): new methods.
+	* gnu/javax/net/ssl/provider/ExtensionList.java: new file.
+	* jessie-tests/run-tests.sh: add testExtensionList.
+	* jessie-tests/testExtensionList.java: new file.
+
+2006-06-05  Casey Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/CipherSuiteList.java: implement
+	Iterable<CipherSuite>.
+	(iterator): new method.
+	* gnu/javax/net/ssl/provider/CompressionMethodList.java: implement
+	Iterable<CompressionMethod>.
+	(iterator): new method.
+	* gnu/javax/net/ssl/provider/X500PrincipalList.java: implement
+	Iterable<X500Principal>.
+	(iterator): new method.
+
+2006-06-05  C. Scott Marshall  <csm@gnu.org>
+
+	* java/security/MessageDigest.java (update): new method.
+	* java/security/MessageDigestSpi.java (engineUpdate): new method.
+
+2006-06-03  C. Scott Marshall  <csm@gnu.org>
+
+	* gnu/javax/net/ssl/provider/ServerHelloDone.java: made public.
+	* jessie-tests/run-tests.sh: add `testServerHelloDone.'
+	* jessie-tests/testServerHelloDone.java: new test.
