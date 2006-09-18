@@ -1,3 +1,8 @@
+2006-09-18  Tom Tromey  <tromey@redhat.com>
+
+	* java/util/concurrent/CopyOnWriteArrayList.java
+	(CopyOnWriteArrayList): New constructor.
+
 2006-09-03  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
 
 	* gnu/javax/swing/text/html/parser/HTML_401F.java (defineElements):
