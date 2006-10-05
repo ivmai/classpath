@@ -904,7 +904,10 @@ public abstract class AbstractButton extends JComponent
     setDisplayedMnemonicIndex(-1);
     setOpaque(true);
     text = "";
-    updateUI();
+    // testing on JRE1.5 shows that the iconTextGap default value is 
+    // hard-coded here and the 'Button.iconTextGap' setting in the 
+    // UI defaults is ignored, at least by the MetalLookAndFeel
+    iconTextGap = 4;
   }
 
   /**
@@ -965,6 +968,8 @@ public abstract class AbstractButton extends JComponent
 
     if (icon != null)
       default_icon = icon;
+    
+    updateUI();
  }
  
   /**

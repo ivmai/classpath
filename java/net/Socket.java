@@ -1,5 +1,5 @@
 /* Socket.java -- Client socket implementation
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2006
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -81,13 +81,6 @@ public class Socket
    */
   // package-private because ServerSocket.implAccept() needs to access it.
   SocketImpl impl;
-
-  /**
-   * True if socket implementation was created by calling their
-   * create() method.
-   */
-  // package-private because ServerSocket.implAccept() needs to access it.
-  boolean implCreated;
 
   /**
    * True if the socket is bound.
@@ -315,21 +308,6 @@ public class Socket
 
   private SocketImpl getImpl() throws SocketException
   {
-    try
-      {
-	if (! implCreated)
-	  {
-	    impl.create(true);
-	    implCreated = true;
-	  }
-      }
-    catch (IOException e)
-      {
-	SocketException se = new SocketException(e.toString());
-	se.initCause(e);
-	throw se;
-      }
-
     return impl;
   }
 
@@ -363,6 +341,7 @@ public class Socket
     // bind to address/port
     try
       {
+	getImpl().create(true);
 	getImpl().bind(tmp.getAddress(), tmp.getPort());
 	bound = true;
       }
@@ -479,16 +458,22 @@ public class Socket
 
     InetAddress addr = null;
 
-    try
+    if (impl instanceof PlainSocketImpl)
+      addr = ((PlainSocketImpl) impl).getLocalAddress().getAddress();
+    
+    if (addr == null)
       {
-	addr = (InetAddress) getImpl().getOption(SocketOptions.SO_BINDADDR);
-      }
-    catch (SocketException e)
-      {
-	// (hopefully) shouldn't happen
-	// throw new java.lang.InternalError
-	//      ("Error in PlainSocketImpl.getOption");
-	return null;
+        try
+          {
+            addr = (InetAddress) getImpl().getOption(SocketOptions.SO_BINDADDR);
+          }
+        catch (SocketException e)
+          {
+            // (hopefully) shouldn't happen
+            // throw new java.lang.InternalError
+            //      ("Error in PlainSocketImpl.getOption");
+            return null;
+          }
       }
 
     // FIXME: According to libgcj, checkConnect() is supposed to be called
@@ -1001,12 +986,8 @@ public class Socket
     if (isClosed())
       return;
 
-    getImpl().close();
+    impl.close();
     impl = null;
-    bound = false;
-
-    if (getChannel() != null)
-      getChannel().close();
   }
 
   /**
@@ -1019,16 +1000,17 @@ public class Socket
     try
       {
 	if (isConnected())
-	  return ("Socket[addr=" + getImpl().getInetAddress() + ",port="
-	         + getImpl().getPort() + ",localport="
-	         + getImpl().getLocalPort() + "]");
+	  return (super.toString()
+                  + " [addr=" + getImpl().getInetAddress() + ",port="
+	          + getImpl().getPort() + ",localport="
+	          + getImpl().getLocalPort() + "]");
       }
     catch (SocketException e)
       {
 	// This cannot happen as we are connected.
       }
 
-    return "Socket[unconnected]";
+    return super.toString() + " [unconnected]";
   }
 
   /**
@@ -1206,17 +1188,10 @@ public class Socket
    */
   public boolean isConnected()
   {
-    try
-      {
-	if (getImpl() == null)
-	  return false;
+    if (impl == null)
+      return false;
 
-	return getImpl().getInetAddress() != null;
-      }
-    catch (SocketException e)
-      {
-	return false;
-      }
+    return impl.getInetAddress() != null;
   }
 
   /**
@@ -1228,6 +1203,13 @@ public class Socket
    */
   public boolean isBound()
   {
+    if (isClosed())
+      return false;
+    if (impl instanceof PlainSocketImpl)
+      {
+        InetSocketAddress addr = ((PlainSocketImpl) impl).getLocalAddress(); 
+        return addr != null && addr.getAddress() != null;
+      }
     return bound;
   }
 
@@ -1240,7 +1222,8 @@ public class Socket
    */
   public boolean isClosed()
   {
-    return impl == null;
+    SocketChannel channel = getChannel();
+    return impl == null || (channel != null && ! channel.isOpen());
   }
 
   /**

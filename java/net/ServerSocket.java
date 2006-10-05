@@ -79,6 +79,7 @@ public class ServerSocket
    * We need to retain the local address even after the socket is closed.
    */
   private InetSocketAddress local;
+  private int port;
 
   /*
    * This constructor is only used by java.nio.
@@ -93,6 +94,7 @@ public class ServerSocket
 
     this.impl = impl;
     this.impl.create(true);
+    setReuseAddress(true);
   }
 
   /*
@@ -219,43 +221,53 @@ public class ServerSocket
     if (isClosed())
       throw new SocketException("ServerSocket is closed");
 
-    if (! (endpoint instanceof InetSocketAddress))
-      throw new IllegalArgumentException("Address type not supported");
+    if (isBound())
+      throw new SocketException("Already bound");
 
-    InetSocketAddress tmp = (InetSocketAddress) endpoint;
+    InetAddress addr;
+    int port;
+
+    if (endpoint == null)
+      {
+        addr = InetAddress.ANY_IF;
+        port = 0;
+      }
+    else if (! (endpoint instanceof InetSocketAddress))
+      {
+        throw new IllegalArgumentException("Address type not supported");
+      }
+    else
+      {
+        InetSocketAddress tmp = (InetSocketAddress) endpoint;
+        if (tmp.isUnresolved())
+          throw new SocketException("Unresolved address");
+        addr = tmp.getAddress();
+        port = tmp.getPort();
+      }
 
     SecurityManager s = System.getSecurityManager();
     if (s != null)
-      s.checkListen(tmp.getPort());
-
-    InetAddress addr = tmp.getAddress();
-
-    // Initialize addr with 0.0.0.0.
-    if (addr == null)
-      addr = InetAddress.ANY_IF;
+      s.checkListen(port);
 
     try
       {
-	impl.bind(addr, tmp.getPort());
+	impl.bind(addr, port);
 	impl.listen(backlog);
-	local = new InetSocketAddress(
+        this.port = port;
+        local = new InetSocketAddress(
             (InetAddress) impl.getOption(SocketOptions.SO_BINDADDR),
             impl.getLocalPort());
       }
-    catch (IOException exception)
+    finally
       {
-	close();
-	throw exception;
-      }
-    catch (RuntimeException exception)
-      {
-	close();
-	throw exception;
-      }
-    catch (Error error)
-      {
-	close();
-	throw error;
+        try
+          {
+            if (local == null)
+	      close();
+          }
+        catch (IOException _)
+          {
+          }
       }
   }
 
@@ -367,7 +379,6 @@ public class ServerSocket
       throw new IllegalBlockingModeException();
 
     impl.accept(socket.impl);
-    socket.implCreated = true;
     socket.bound = true;
   }
 
@@ -378,14 +389,11 @@ public class ServerSocket
    */
   public void close() throws IOException
   {
-    if (isClosed())
-      return;
-
-    impl.close();
-    impl = null;
-
-    if (getChannel() != null)
-      getChannel().close();
+    if (impl != null)
+      {
+        impl.close();
+        impl = null;
+      }
   }
 
   /**
@@ -425,7 +433,8 @@ public class ServerSocket
    */
   public boolean isClosed()
   {
-    return impl == null;
+    ServerSocketChannel channel = getChannel();
+    return impl == null || (channel != null && ! channel.isOpen());
   }
 
   /**
@@ -573,7 +582,7 @@ public class ServerSocket
       return "ServerSocket[unbound]";
 
     return ("ServerSocket[addr=" + getInetAddress() + ",port="
-           + impl.getPort() + ",localport=" + impl.getLocalPort() + "]");
+           + port + ",localport=" + getLocalPort() + "]");
   }
 
   /**

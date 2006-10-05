@@ -356,7 +356,8 @@ if test "x${COMPILE_JNI}" = xyes; then
 		    crt_externs.h \
                     fcntl.h \
 		    sys/mman.h \
-		    magic.h])
+		    magic.h \
+                    sys/event.h sys/epoll.h])
 
   AC_EGREP_HEADER(uint32_t, stdint.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(uint32_t, inttypes.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
@@ -365,7 +366,7 @@ if test "x${COMPILE_JNI}" = xyes; then
 
   AC_CHECK_FUNCS([ftruncate fsync select \
 		  gethostname socket strerror fork pipe execve open close \
-		  lseek fstat read write htonl memset htons connect \
+		  lseek fstat read readv write writev htonl memset htons connect \
 		  getsockname getpeername bind listen accept \
 		  recvfrom send sendto setsockopt getsockopt time mktime \
 		  gethostbyname_r localtime_r \
@@ -373,11 +374,20 @@ if test "x${COMPILE_JNI}" = xyes; then
                   fcntl \
 		  mmap munmap mincore msync madvise getpagesize sysconf \
 		  lstat readlink \
-		  ])
+ 		  inet_aton inet_addr inet_pton \
+		  getifaddrs kqueue kevent epoll_create \
+                  readdir_r ])
 
   LIBMAGIC=
   AC_CHECK_LIB(magic, magic_open, LIBMAGIC=-lmagic)
   AC_SUBST(LIBMAGIC)
+
+  AC_MSG_CHECKING([whether struct sockaddr_in6 is in netinet/in.h])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[struct sockaddr_in6 addr6;]])],
+                    [AC_DEFINE(HAVE_INET6, 1,
+                     [Define if inet6 structures are defined in netinet/in.h.])
+                     AC_MSG_RESULT(yes)],
+                    [AC_MSG_RESULT(no)])
 
   AC_HEADER_TIME
   AC_STRUCT_TM
@@ -413,17 +423,17 @@ if test "x${COMPILE_JNI}" = xyes; then
 
   dnl When using gcc we want warnings, lots of warnings :-)
   if test "x${GCC}" = xyes; then
-    dnl We want ISO C90 pedantic ansi, but with longlong (jlong) support
+    dnl We want ISO C90 ansi, but with longlong (jlong) support
     dnl and modern POSIX and BSD C library functions/prototypes.
 
     dnl Warning flags for (almost) everybody.
     dnl Should probably be configurable
-    WARNING_CFLAGS='-pedantic -W -Wall -Wmissing-declarations -Wwrite-strings -Wmissing-prototypes -Wno-long-long'
+    WARNING_CFLAGS='-W -Wall -Wmissing-declarations -Wwrite-strings -Wmissing-prototypes -Wno-long-long'
     AC_SUBST(WARNING_CFLAGS)
 
     dnl Strict warning flags which not every module uses.
     dnl Should probably be configurable.
-    STRICT_WARNING_CFLAGS=-Wstrict-prototypes
+    STRICT_WARNING_CFLAGS='-Wstrict-prototypes -pedantic'
     AC_SUBST(STRICT_WARNING_CFLAGS)
 
     dnl Whether or not to add -Werror, also not used by all modueles.
@@ -799,7 +809,7 @@ dnl Build javah using ASM library
 dnl -----------------------------------------------------------
 AC_ARG_WITH([asm],
 	 AS_HELP_STRING([--with-asm=ABS.PATH],
-	                [specify path to ASM jar for javah]))
+	                [specify path to ASM jar to enable gjavah and grmic build]))
 case "$with_asm" in
 "")
         use_asm=false
@@ -898,13 +908,23 @@ tools/gjarsigner
 tools/gkeytool
 tools/gjar
 tools/gnative2ascii
-tools/gserialver])
+tools/gserialver
+tools/grmiregistry
+tools/gtnameserv
+tools/gorbd
+tools/grmid
+tools/grmic])
 AC_CONFIG_COMMANDS([gappletviewer],[chmod 755 tools/gappletviewer])
 AC_CONFIG_COMMANDS([gjarsigner],[chmod 755 tools/gjarsigner])
 AC_CONFIG_COMMANDS([gkeytool],[chmod 755 tools/gkeytool])
 AC_CONFIG_COMMANDS([gjar],[chmod 755 tools/gjar])
 AC_CONFIG_COMMANDS([gnative2ascii],[chmod 755 tools/gnative2ascii])
 AC_CONFIG_COMMANDS([gserialver],[chmod 755 tools/gserialver])
+AC_CONFIG_COMMANDS([grmiregistry],[chmod 755 tools/grmiregistry])
+AC_CONFIG_COMMANDS([gtnameserv],[chmod 755 tools/gtnameserv])
+AC_CONFIG_COMMANDS([gorbd],[chmod 755 tools/gorbd])
+AC_CONFIG_COMMANDS([grmid],[chmod 755 tools/grmid])
+AC_CONFIG_COMMANDS([grmic],[chmod 755 tools/grmic])
 
   if test "$use_asm" = true; then
     AC_CONFIG_FILES([tools/gjavah])
