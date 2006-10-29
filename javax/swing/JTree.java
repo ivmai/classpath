@@ -1279,13 +1279,6 @@ public class JTree extends JComponent implements Scrollable, Accessible
       TreeSelectionEvent rewritten = 
         (TreeSelectionEvent) ev.cloneWithSource(JTree.this);
       fireValueChanged(rewritten);
-
-      // Only repaint the changed nodes.
-      TreePath[] changed = ev.getPaths();
-      for (int i = 0; i < changed.length; i++)
-        {
-          repaint(getPathBounds(changed[i]));
-        }
     }
   }
 
@@ -1698,7 +1691,7 @@ public class JTree extends JComponent implements Scrollable, Accessible
                 if (direction < 0)
                   delta = Math.max(0, visibleRect.y - b.y);
                 else
-                  delta = b.y + b.height - visibleRect.height;
+                  delta = b.y + b.height - visibleRect.y;
               }
             else
               {
@@ -2433,9 +2426,19 @@ public class JTree extends JComponent implements Scrollable, Accessible
     return selectionModel.isPathSelected(path);
   }
 
+  /**
+   * Returns <code>true</code> when the specified row is selected,
+   * <code>false</code> otherwise. This call is delegated to the
+   * {@link TreeSelectionModel#isRowSelected(int)} method.
+   *
+   * @param row the row to check
+   *
+   * @return <code>true</code> when the specified row is selected,
+   *         <code>false</code> otherwise
+   */
   public boolean isRowSelected(int row)
   {
-    return selectionModel.isPathSelected(getPathForRow(row));
+    return selectionModel.isRowSelected(row);
   }
 
   public boolean isSelectionEmpty()
