@@ -45,21 +45,27 @@ import gnu.javax.swing.text.html.css.FontSize;
 import gnu.javax.swing.text.html.css.FontStyle;
 import gnu.javax.swing.text.html.css.FontWeight;
 import gnu.javax.swing.text.html.css.Length;
+import gnu.javax.swing.text.html.css.Selector;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
+import javax.swing.border.Border;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
@@ -86,7 +92,7 @@ import javax.swing.text.View;
  *  
  *  The rules are stored as named styles, and other information is stored to 
  *  translate the context of an element to a rule.
- * 
+ *
  * @author Lillian Angel (langel@redhat.com)
  */
 public class StyleSheet extends StyleContext
@@ -101,21 +107,35 @@ public class StyleSheet extends StyleContext
     implements CSSParserCallback
   {
     /**
-     * The selector for which the rules are currently parsed.
+     * The current style.
      */
-    private String[] selector;
+    private CSSStyle style;
+
+    /**
+     * The precedence of the stylesheet to be parsed.
+     */
+    private int precedence;
+
+    /**
+     * Creates a new CSS parser. This parser parses a CSS stylesheet with
+     * the specified precedence.
+     *
+     * @param prec the precedence, according to the constants defined in
+     *        CSSStyle
+     */
+    CSSStyleSheetParserCallback(int prec)
+    {
+      precedence = prec;
+    }
 
     /**
      * Called at the beginning of a statement.
      *
      * @param sel the selector
      */
-    public void startStatement(String sel)
+    public void startStatement(Selector sel)
     {
-      StringTokenizer tokens = new StringTokenizer(sel);
-      selector = new String[tokens.countTokens()];
-      for (int index = 0; tokens.hasMoreTokens(); index++)
-        selector[index] = tokens.nextToken();
+      style = new CSSStyle(precedence, sel);
     }
 
     /**
@@ -123,7 +143,8 @@ public class StyleSheet extends StyleContext
      */
     public void endStatement()
     {
-      selector = null;
+      css.add(style);
+      style = null;
     }
 
     /**
@@ -134,23 +155,13 @@ public class StyleSheet extends StyleContext
      */
     public void declaration(String property, String value)
     {
-      for (int i = 0; i < selector.length; i++)
-        {
-          CSSStyle style = (CSSStyle) css.get(selector[i]);
-          if (style == null)
-            {
-              style = new CSSStyle();
-              css.put(selector[i], style);
-            }
-          CSS.Attribute cssAtt = CSS.getAttribute(property);
-          Object val = CSS.getValue(cssAtt, value);
-          if (cssAtt != null)
-            style.addAttribute(cssAtt, val);
-          // else  // For debugging only.
-          //   System.err.println("no mapping for: " + property);
-        }
+      CSS.Attribute cssAtt = CSS.getAttribute(property);
+      Object val = CSS.getValue(cssAtt, value);
+      CSS.addInternal(style, cssAtt, value);
+      if (cssAtt != null)
+        style.addAttribute(cssAtt, val);
     }
-    
+
   }
 
   /**
@@ -158,8 +169,32 @@ public class StyleSheet extends StyleContext
    */
   private class CSSStyle
     extends SimpleAttributeSet
-    implements Style
+    implements Style, Comparable
   {
+
+    static final int PREC_UA = 400000;
+    static final int PREC_NORM = 300000;
+    static final int PREC_AUTHOR_NORMAL = 200000;
+    static final int PREC_AUTHOR_IMPORTANT = 100000;
+    static final int PREC_USER_IMPORTANT = 0;
+
+    /**
+     * The priority of this style when matching CSS selectors.
+     */
+    private int precedence;
+
+    /**
+     * The selector for this rule.
+     *
+     * This is package private to avoid accessor methods.
+     */
+    Selector selector;
+
+    CSSStyle(int prec, Selector sel)
+    {
+      precedence = prec;
+      selector = sel;
+    }
 
     public String getName()
     {
@@ -175,6 +210,17 @@ public class StyleSheet extends StyleContext
     public void removeChangeListener(ChangeListener listener)
     {
       // TODO: Implement this for correctness.
+    }
+
+    /**
+     * Sorts the rule according to the style's precedence and the
+     * selectors specificity.
+     */
+    public int compareTo(Object o)
+    {
+      CSSStyle other = (CSSStyle) o;
+      return other.precedence + other.selector.getSpecificity()
+             - precedence - selector.getSpecificity();
     }
     
   }
@@ -192,7 +238,7 @@ public class StyleSheet extends StyleContext
    * Maps element names (selectors) to AttributSet (the corresponding style
    * information).
    */
-  HashMap css = new HashMap();
+  ArrayList css = new ArrayList();
 
   /**
    * Maps selectors to their resolved styles.
@@ -371,14 +417,17 @@ public class StyleSheet extends StyleContext
     // the default.css.
     int count = tags.length;
     ArrayList styles = new ArrayList();
-    for (int i = 0; i < count; i++)
+    for (Iterator i = css.iterator(); i.hasNext();)
       {
-        Style style = (Style) css.get(tags[i]);
-        if (style != null)
+        CSSStyle style = (CSSStyle) i.next();
+        if (style.selector.matches(tags, classes, ids))
           styles.add(style);
-        // FIXME: Handle ID and CLASS attributes.
       }
+
+    // Sort selectors.
+    Collections.sort(styles);
     Style[] styleArray = new Style[styles.size()];
+    styleArray = (Style[]) styles.toArray(styleArray);
     Style resolved = new MultiStyle(selector,
                                     (Style[]) styles.toArray(styleArray));
     resolvedStyles.put(selector, resolved);
@@ -395,9 +444,15 @@ public class StyleSheet extends StyleContext
    */
   public Style getRule(String selector)
   {
-    // FIXME: This is a very rudimentary implementation. Should
-    // be extended to conform to the CSS spec.
-    return (Style) css.get(selector);
+    Selector sel = new Selector(selector);
+    CSSStyle best = null;
+    for (Iterator i = css.iterator(); i.hasNext();)
+      {
+        CSSStyle style = (CSSStyle) i.next();
+        if (style.compareTo(best) < 0)
+          best = style;
+      }
+    return best;
   }
   
   /**
@@ -408,7 +463,8 @@ public class StyleSheet extends StyleContext
    */
   public void addRule(String rule)
   {
-    CSSStyleSheetParserCallback cb = new CSSStyleSheetParserCallback();
+    CSSStyleSheetParserCallback cb =
+      new CSSStyleSheetParserCallback(CSSStyle.PREC_AUTHOR_NORMAL);
     // FIXME: Handle ref.
     StringReader in = new StringReader(rule);
     CSSParser parser = new CSSParser(in, cb);
@@ -419,7 +475,7 @@ public class StyleSheet extends StyleContext
     catch (IOException ex)
       {
         // Shouldn't happen. And if, then we
-        assert false;
+        System.err.println("IOException while parsing stylesheet: " + ex.getMessage());
       }
   }
   
@@ -451,7 +507,8 @@ public class StyleSheet extends StyleContext
   public void loadRules(Reader in, URL ref)
     throws IOException
   {
-    CSSStyleSheetParserCallback cb = new CSSStyleSheetParserCallback();
+    CSSStyleSheetParserCallback cb =
+      new CSSStyleSheetParserCallback(CSSStyle.PREC_UA);
     // FIXME: Handle ref.
     CSSParser parser = new CSSParser(in, cb);
     parser.parse();
@@ -543,13 +600,26 @@ public class StyleSheet extends StyleContext
   
   /**
    * Imports a style sheet from the url. The rules are directly added to the
-   * receiver.
+   * receiver. This is usually called when a <link> tag is resolved in an
+   * HTML document.
    * 
-   * @param url - the URL to import the StyleSheet from.
+   * @param url the URL to import the StyleSheet from
    */
   public void importStyleSheet(URL url)
   {
-    // FIXME: Not implemented
+    try
+      {
+        InputStream in = url.openStream();
+        Reader r = new BufferedReader(new InputStreamReader(in));
+        CSSStyleSheetParserCallback cb =
+          new CSSStyleSheetParserCallback(CSSStyle.PREC_AUTHOR_NORMAL);
+        CSSParser parser = new CSSParser(r, cb);
+        parser.parse();
+      }
+    catch (IOException ex)
+      {
+        // We can't do anything about it I guess.
+      }
   }
   
   /**
@@ -585,6 +655,7 @@ public class StyleSheet extends StyleContext
                               String value)
   {
     Object val = CSS.getValue(key, value);
+    CSS.addInternal(attr, key, value);
     attr.addAttribute(key, val);
   }
   
@@ -615,11 +686,31 @@ public class StyleSheet extends StyleContext
    */
   public AttributeSet translateHTMLToCSS(AttributeSet htmlAttrSet)
   {
-    // FIXME: Really convert HTML to CSS here.
     AttributeSet cssAttr = htmlAttrSet.copyAttributes();
-    MutableAttributeSet cssStyle = addStyle(null, null);
-    cssStyle.addAttributes(cssAttr);
-    return cssStyle;
+
+    // The HTML align attribute maps directly to the CSS text-align attribute.
+    Object o = htmlAttrSet.getAttribute(HTML.Attribute.ALIGN);
+    if (o != null)
+      cssAttr = addAttribute(cssAttr, CSS.Attribute.TEXT_ALIGN, o);
+
+    // The HTML width attribute maps directly to CSS width.
+    o = htmlAttrSet.getAttribute(HTML.Attribute.WIDTH);
+    if (o != null)
+      cssAttr = addAttribute(cssAttr, CSS.Attribute.WIDTH,
+                             CSS.getValue(CSS.Attribute.WIDTH, o.toString()));
+
+    // The HTML height attribute maps directly to CSS height.
+    o = htmlAttrSet.getAttribute(HTML.Attribute.HEIGHT);
+    if (o != null)
+      cssAttr = addAttribute(cssAttr, CSS.Attribute.HEIGHT,
+                             CSS.getValue(CSS.Attribute.HEIGHT, o.toString()));
+
+    o = htmlAttrSet.getAttribute(HTML.Attribute.NOWRAP);
+    if (o != null)
+      cssAttr = addAttribute(cssAttr, CSS.Attribute.WHITE_SPACE, "nowrap");
+
+    // TODO: Add more mappings.
+    return cssAttr;
   }
 
   /**
@@ -802,7 +893,7 @@ public class StyleSheet extends StyleContext
    */
   public BoxPainter getBoxPainter(AttributeSet a)
   {
-    return new BoxPainter(a);     
+    return new BoxPainter(a, this);     
   }
   
   /**
@@ -813,7 +904,7 @@ public class StyleSheet extends StyleContext
    */
   public ListPainter getListPainter(AttributeSet a)
   {
-    return new ListPainter(a);         
+    return new ListPainter(a, this);         
   }
   
   /**
@@ -920,17 +1011,42 @@ public class StyleSheet extends StyleContext
   public static class BoxPainter extends Object implements Serializable
   {
 
+    /**
+     * The left inset.
+     */
     private float leftInset;
+
+    /**
+     * The right inset.
+     */
     private float rightInset;
+
+    /**
+     * The top inset.
+     */
     private float topInset;
+
+    /**
+     * The bottom inset.
+     */
     private float bottomInset;
+
+    /**
+     * The border of the box.
+     */
+    private Border border;
+
+    /**
+     * The background color.
+     */
+    private Color background;
 
     /**
      * Package-private constructor.
      * 
      * @param as - AttributeSet for painter
      */
-    BoxPainter(AttributeSet as)
+    BoxPainter(AttributeSet as, StyleSheet ss)
     {
       Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
       if (l != null)
@@ -944,6 +1060,13 @@ public class StyleSheet extends StyleContext
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_BOTTOM);
       if (l != null)
         bottomInset = l.getValue();
+
+      // Determine border.
+      border = new CSSBorder(as);
+
+      // Determine background.
+      background = ss.getBackground(as);
+
     }
     
     
@@ -965,15 +1088,23 @@ public class StyleSheet extends StyleContext
         {
         case View.TOP:
           inset = topInset;
+          if (border != null)
+            inset += border.getBorderInsets(null).top;
           break;
         case View.BOTTOM:
           inset = bottomInset;
+          if (border != null)
+            inset += border.getBorderInsets(null).bottom;
           break;
         case View.LEFT:
           inset = leftInset;
+          if (border != null)
+            inset += border.getBorderInsets(null).left;
           break;
         case View.RIGHT:
           inset = rightInset;
+          if (border != null)
+            inset += border.getBorderInsets(null).right;
           break;
         default:
           inset = 0.0F;
@@ -994,7 +1125,16 @@ public class StyleSheet extends StyleContext
      */
     public void paint(Graphics g, float x, float y, float w, float h, View v)
     {
-      // FIXME: Not implemented.
+      
+      if (background != null)
+        {
+          g.setColor(background);
+          g.fillRect((int) x, (int) y, (int) w, (int) h);
+        }
+      if (border != null)
+        {
+          border.paintBorder(null, g, (int) x, (int) y, (int) w, (int) h);
+        }
     }
   }
   
@@ -1005,24 +1145,36 @@ public class StyleSheet extends StyleContext
    * 
    * @author Lillian Angel (langel@redhat.com)
    */
-  public static class ListPainter extends Object implements Serializable
+  public static class ListPainter implements Serializable
   {
-    
+
     /**
      * Attribute set for painter
      */
-    AttributeSet as;
-    
+    private AttributeSet attributes;
+
+    /**
+     * The associated style sheet.
+     */
+    private StyleSheet styleSheet;
+
+    /**
+     * The bullet type.
+     */
+    private String type;
+
     /**
      * Package-private constructor.
      * 
      * @param as - AttributeSet for painter
      */
-    ListPainter(AttributeSet as)
+    ListPainter(AttributeSet as, StyleSheet ss)
     {
-      this.as = as;
+      attributes = as;
+      styleSheet = ss;
+      type = (String) as.getAttribute(CSS.Attribute.LIST_STYLE_TYPE);
     }
-    
+
     /**
      * Paints the CSS list decoration according to the attributes given.
      * 
@@ -1037,7 +1189,19 @@ public class StyleSheet extends StyleContext
     public void paint(Graphics g, float x, float y, float w, float h, View v,
                       int item)
     {
-      // FIXME: Not implemented.
+      // FIXME: This is a very simplistic list rendering. We still need
+      // to implement different bullet types (see type field) and custom
+      // bullets via images.
+      View itemView = v.getView(item);
+      AttributeSet viewAtts = itemView.getAttributes();
+      Object tag = viewAtts.getAttribute(StyleConstants.NameAttribute);
+      // Only paint something here when the child view is an LI tag
+      // and the calling view is some of the list tags then).
+      if (tag != null && tag == HTML.Tag.LI)
+        {
+          g.setColor(Color.BLACK);
+          g.fillOval((int) x - 15, (int) (h / 2 - 3 + y), 6, 6);
+        }
     }
   }
 

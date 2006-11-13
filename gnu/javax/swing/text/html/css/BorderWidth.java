@@ -1,5 +1,5 @@
-/* SwingComponent.java -- An interface that defines a Swing component for peers
-   Copyright (C)  2006  Free Software Foundation, Inc.
+/* BorderWidth.java -- A CSS metric for border widths
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -35,55 +35,32 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.java.awt.peer.swing;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
+package gnu.javax.swing.text.html.css;
 
 /**
- * Defines some additional methods that the Swing components must implement
- * in order to work with the Swing peers. This is usually achieved by
- * subclassing a Swing component and forwarding the method calls to some
- * protected JComponent method.
- *
- * @author Roman Kennke (kennke@aicas.com)
+ * A special CSS metric for border widths. It basically understands everything
+ * as Length, and in addition to that provides a mapping for the border-width's
+ * thin, medium and think values.
  */
-public interface SwingComponent
+public class BorderWidth
+  extends Length
 {
 
   /**
-   * Returns the actual swing compenent.
+   * Creates a new BorderWidth instance.
    *
-   * @return the actual swing compenent
+   * @param val the CSS value to be interpreted
    */
-  JComponent getJComponent();
+  public BorderWidth(String val)
+  {
+    super(val);
+    if (val.equals("thin"))
+      floatValue = 1.F;
+    else if (val.equals("medium"))
+      floatValue = 2.F;
+    else if (val.equals("thick"))
+      floatValue = 3.F;
+  }
 
-  /**
-   * Handles a mouse event. This is usually forwarded to
-   * {@link Component#processMouseMotionEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse event
-   */
-  void handleMouseEvent(MouseEvent ev);
-
-  /**
-   * Handles a mouse motion event. This is usually forwarded to
-   * {@link Component#processMouseEvent(MouseEvent)} of the swing
-   * component.
-   *
-   * @param ev the mouse motion event
-   */
-  void handleMouseMotionEvent(MouseEvent ev);
-
-  /**
-   * Handles a key event. This is usually forwarded to
-   * {@link Component#processKeyEvent(KeyEvent)} of the swing
-   * component.
-   *
-   * @param ev the key event
-   */
-  void handleKeyEvent(KeyEvent ev);
 }

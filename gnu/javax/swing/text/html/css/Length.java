@@ -54,7 +54,12 @@ public class Length
   /**
    * The converted value.
    */
-  private float floatValue;
+  protected float floatValue;
+
+  /**
+   * Indicates when the value is a percentage value.
+   */
+  private boolean isPercentage;
 
   /**
    * Creates a new length converter instance.
@@ -65,16 +70,31 @@ public class Length
   {
     value = val;
     int i = value.indexOf("px");
-    floatValue = 0.0F;
-    if (i != -1)
+    int percent = value.indexOf("%");
+    try
       {
-        String sub = value.substring(0, i);
-        floatValue = Float.parseFloat(sub);
+        floatValue = 0.0F;
+        if (i != -1)
+          {
+            String sub = value.substring(0, i);
+            floatValue = Float.parseFloat(sub);
+          }
+        else if (percent != -1)
+          {
+            isPercentage = true;
+            String sub = value.substring(0, percent);
+            floatValue = Float.parseFloat(sub) / 100;
+          }
+        else
+          {
+            // TODO: Implement other length options.
+            floatValue = Float.parseFloat(value);
+          }
       }
-    else
+    catch (NumberFormatException ex)
       {
-        // TODO: Implement other length options.
-        floatValue = Float.parseFloat(value);
+        // Don't let such small problems interrupt CSS parsing.
+        System.err.println("couldn't parse: " + val);
       }
   }
 
@@ -86,5 +106,33 @@ public class Length
   public float getValue()
   {
     return floatValue;
+  }
+
+  /**
+   * Returns the absolute span for the case when this length value is
+   * a relative value.
+   *
+   * @param available the target span
+   *
+   * @return the absolute span
+   */
+  public float getValue(float available)
+  {
+    float span = floatValue;
+    if (isPercentage)
+      span *= available;
+    return span;
+  }
+
+  /**
+   * Returns <code>true</code> when the length value is a percentage
+   * value, <code>false</code> otherwise.
+   *
+   * @return <code>true</code> when the length value is a percentage
+   *         value, <code>false</code> otherwise
+   */
+  public boolean isPercentage()
+  {
+    return isPercentage;
   }
 }

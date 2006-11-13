@@ -92,7 +92,14 @@ public abstract class View implements SwingConstants
       {
         int numChildren = getViewCount();
         for (int i = 0; i < numChildren; i++)
-          getView(i).setParent(null);
+          {
+            View child = getView(i);
+            // It is important that we only reset the parent on views that
+            // actually belong to us. In FlowView the child may already be
+            // reparented.
+            if (child.getParent() == this)
+              child.setParent(null);
+          }
       }
 
     this.parent = parent;
@@ -262,7 +269,7 @@ public abstract class View implements SwingConstants
 
   public void removeAll()
   {
-    replace(0, getViewCount(), new View[0]); 
+    replace(0, getViewCount(), null);
   }
 
   public void remove(int index)
@@ -618,10 +625,12 @@ public abstract class View implements SwingConstants
                               DocumentEvent ev, Shape shape)
   {
     if (ec != null && shape != null)
-      preferenceChanged(null, true, true);
-    Container c = getContainer();
-    if (c != null)
-      c.repaint();
+      {
+        preferenceChanged(null, true, true);
+        Container c = getContainer();
+        if (c != null)
+          c.repaint();
+      }
   }
 
   /**
