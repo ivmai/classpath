@@ -1,3 +1,8 @@
+2006-11-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* gnu/java/util/regex/RETokenNamedProperty.java:
+	(getHandler(String)): Add support for 'all'.
+	
 2006-11-11  Andreas Tobler  <a.tobler@schweiz.org>
 
 	* gnu/java/awt/peer/gtk/GtkImageConsumer.java (setPixels): Handle data
