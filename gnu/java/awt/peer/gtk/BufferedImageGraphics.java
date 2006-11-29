@@ -54,11 +54,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
-import java.awt.image.DirectColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.awt.image.SinglePixelPackedSampleModel;
 import java.util.WeakHashMap;
 
 /**
@@ -100,12 +100,6 @@ public class BufferedImageGraphics extends CairoGraphics2D
    */
   private long cairo_t;
 
-  /**
-   * Colormodels we recognize for fast copying.
-   */  
-  static ColorModel rgb32 = new DirectColorModel(24, 0xFF0000, 0xFF00, 0xFF);
-  static ColorModel argb32 = new DirectColorModel(32, 0xFF0000, 0xFF00, 0xFF,
-						  0xFF000000);
   private boolean hasFastCM;
   private boolean hasAlpha;
 
@@ -117,12 +111,14 @@ public class BufferedImageGraphics extends CairoGraphics2D
     imageHeight = bi.getHeight();
     locked = false;
     
-    if(bi.getColorModel().equals(rgb32))
+    if (!(image.getSampleModel() instanceof SinglePixelPackedSampleModel))
+      hasFastCM = false;
+    else if(bi.getColorModel().equals(CairoSurface.cairoCM_opaque))
       {
 	hasFastCM = true;
 	hasAlpha = false;
       }
-    else if(bi.getColorModel().equals(argb32))
+    else if(bi.getColorModel().equals(CairoSurface.cairoColorModel))
       {
 	hasFastCM = true;
 	hasAlpha = true;
@@ -176,8 +172,11 @@ public class BufferedImageGraphics extends CairoGraphics2D
     imageWidth = copyFrom.imageWidth;
     imageHeight = copyFrom.imageHeight;
     locked = false;
+    
+    hasFastCM = copyFrom.hasFastCM;
+    hasAlpha = copyFrom.hasAlpha;
+
     copy( copyFrom, cairo_t );
-    setClip(0, 0, surface.width, surface.height);
   }
 
   /**
@@ -188,30 +187,79 @@ public class BufferedImageGraphics extends CairoGraphics2D
     if (locked)
       return;
     
+    double[] points = new double[]{x, y, width+x, height+y};
+    transform.transform(points, 0, points, 0, 2);
+    x = (int)points[0];
+    y = (int)points[1];
+    width = (int)Math.ceil(points[2] - points[0]);
+    height = (int)Math.ceil(points[3] - points[1]);
+
     int[] pixels = surface.getPixels(imageWidth * imageHeight);
 
     if( x > imageWidth || y > imageHeight )
       return;
+    
+    // Deal with negative width/height.
+    if (height < 0)
+      {
+        y += height;
+        height = -height;
+      }
+    if (width < 0)
+      {
+        x += width;
+        width = -width;
+      }
+    
     // Clip edges.
-    if( x < 0 ){ width = width + x; x = 0; }
-    if( y < 0 ){ height = height + y; y = 0; }
+    if( x < 0 )
+      x = 0;
+    if( y < 0 )
+      y = 0;
+    
     if( x + width > imageWidth ) 
       width = imageWidth - x;
     if( y + height > imageHeight ) 
       height = imageHeight - y;
     
-    // The setRGB method assumes (or should assume) that pixels are NOT
-    // alpha-premultiplied, but Cairo stores data with premultiplication
-    // (thus the pixels returned in getPixels are premultiplied).
-    // This is ignored for consistency, however, since in
-    // CairoGrahpics2D.drawImage we also use non-premultiplied data
     if(!hasFastCM)
-      image.setRGB(x, y, width, height, pixels, 
-		   x + y * imageWidth, imageWidth);
+      {
+        image.setRGB(x, y, width, height, pixels, 
+                     x + y * imageWidth, imageWidth);
+        // The setRGB method assumes (or should assume) that pixels are NOT
+        // alpha-premultiplied, but Cairo stores data with premultiplication
+        // (thus the pixels returned in getPixels are premultiplied).
+        // This is ignored for consistency, however, since in
+        // CairoGrahpics2D.drawImage we also use non-premultiplied data
+      
+      }
     else
-      System.arraycopy(pixels, y * imageWidth, 
-		       ((DataBufferInt)image.getRaster().getDataBuffer()).
-		       getData(), y * imageWidth, height * imageWidth);
+      {
+        int[] db = ((DataBufferInt)image.getRaster().getDataBuffer()).
+                  getData();
+        
+        // This should not fail, as we check the image sample model when we
+        // set the hasFastCM flag
+        SinglePixelPackedSampleModel sm = (SinglePixelPackedSampleModel)image.getSampleModel() ;
+        
+        int minX = image.getRaster().getSampleModelTranslateX();
+        int minY = image.getRaster().getSampleModelTranslateY();
+        
+        if (sm.getScanlineStride() == imageWidth && minX == 0) 
+          {
+            System.arraycopy(pixels, y * imageWidth, 
+                             db, y * imageWidth - minY,
+                             height * imageWidth);
+          }
+        else
+          {
+            int scanline = sm.getScanlineStride();
+            for (int i = y; i < height; i++)
+              System.arraycopy(pixels, i * imageWidth + x, db,
+                               (i - minY) * scanline + x - minX, width);
+              
+          }
+      }
   }
 
   /**
@@ -244,15 +292,19 @@ public class BufferedImageGraphics extends CairoGraphics2D
    */
   public void draw(Shape s)
   {
+    // Find total bounds of shape
+    Rectangle r = findStrokedBounds(s);
+    if (shiftDrawCalls)
+      {
+        r.width++;
+        r.height++;
+      }
+    
+    // Do the drawing
     if (comp == null || comp instanceof AlphaComposite)
       {
         super.draw(s);
-        Rectangle r = s.getBounds();
-        
-        if (shiftDrawCalls)
-          updateBufferedImage(r.x, r.y, r.width+1, r.height+1);
-        else
-          updateBufferedImage(r.x, r.y, r.width, r.height);
+        updateBufferedImage(r.x, r.y, r.width, r.height);
       }
     else
       {
@@ -263,7 +315,7 @@ public class BufferedImageGraphics extends CairoGraphics2D
         g2d.setColor(this.getColor());
         g2d.draw(s);
         
-        drawComposite(s.getBounds2D(), null);
+        drawComposite(r.getBounds2D(), null);
       }
   }
 
@@ -356,10 +408,17 @@ public class BufferedImageGraphics extends CairoGraphics2D
 
   public void drawGlyphVector(GlyphVector gv, float x, float y)
   {
+    // Find absolute bounds, in user-space, of this glyph vector 
+    Rectangle2D bounds = gv.getLogicalBounds();
+    bounds = new Rectangle2D.Double(x + bounds.getX(), y + bounds.getY(),
+                                    bounds.getWidth(), bounds.getHeight());
+    
+    // Perform draw operation
     if (comp == null || comp instanceof AlphaComposite)
       {
         super.drawGlyphVector(gv, x, y);
-        updateBufferedImage(0, 0, imageWidth, imageHeight);
+        updateBufferedImage((int)bounds.getX(), (int)bounds.getY(),
+                            (int)bounds.getWidth(), (int)bounds.getHeight());
       }
     else
       {
@@ -370,9 +429,6 @@ public class BufferedImageGraphics extends CairoGraphics2D
         g2d.setStroke(this.getStroke());
         g2d.drawGlyphVector(gv, x, y);
         
-        Rectangle2D bounds = gv.getLogicalBounds();
-        bounds = new Rectangle2D.Double(x + bounds.getX(), y + bounds.getY(),
-                                        bounds.getWidth(), bounds.getHeight());
         drawComposite(bounds, null);
       }
   }

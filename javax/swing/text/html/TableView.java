@@ -38,9 +38,12 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import java.awt.Shape;
+
 import gnu.javax.swing.text.html.css.Length;
 
 import javax.swing.SizeRequirements;
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BoxView;
 import javax.swing.text.Element;
@@ -75,6 +78,12 @@ class TableView
       super(el, X_AXIS);
     }
 
+    public void replace(int offset, int len, View[] views)
+    {
+      super.replace(offset, len, views);
+      gridValid = false;
+    }
+
     /**
      * Overridden to make rows not resizable along the Y axis.
      */
@@ -84,7 +93,27 @@ class TableView
       if (axis == Y_AXIS)
         span = super.getPreferredSpan(axis);
       else
-        span = super.getMaximumSpan(axis);
+        span = Integer.MAX_VALUE;
+      return span;
+    }
+
+    public float getMinimumSpan(int axis)
+    {
+      float span;
+      if (axis == X_AXIS)
+        span = totalColumnRequirements.minimum;
+      else
+        span = super.getMinimumSpan(axis);
+      return span;
+    }
+
+    public float getPreferredSpan(int axis)
+    {
+      float span;
+      if (axis == X_AXIS)
+        span = totalColumnRequirements.preferred;
+      else
+        span = super.getPreferredSpan(axis);
       return span;
     }
 
@@ -97,9 +126,10 @@ class TableView
     {
       if (r == null)
         r = new SizeRequirements();
-      r.minimum = totalColumnRequirements.minimum;
-      r.preferred = totalColumnRequirements.preferred;
-      r.maximum = totalColumnRequirements.maximum;
+      int adjust = (columnRequirements.length + 1) * cellSpacing;
+      r.minimum = totalColumnRequirements.minimum + adjust;
+      r.preferred = totalColumnRequirements.preferred + adjust;
+      r.maximum = totalColumnRequirements.maximum + adjust;
       r.alignment = 0.0F;
       return r;
     }
@@ -123,6 +153,8 @@ class TableView
               for (int j = 0; j < cv.colSpan; j++, realColumn++)
                 {
                   spans[i] += columnSpans[realColumn];
+                  if (j < cv.colSpan - 1)
+                    spans[i] += cellSpacing;
                 }
             }
         }
@@ -149,6 +181,14 @@ class TableView
     CellView(Element el)
     {
       super(el, Y_AXIS);
+    }
+
+    protected SizeRequirements calculateMajorAxisRequirements(int axis,
+                                                            SizeRequirements r)
+    {
+      r = super.calculateMajorAxisRequirements(axis, r);
+      r.maximum = Integer.MAX_VALUE;
+      return r;
     }
 
     /**
@@ -183,8 +223,10 @@ class TableView
 
   /**
    * The column requirements.
+   *
+   * Package private to avoid accessor methods.
    */
-  private SizeRequirements[] columnRequirements;
+  SizeRequirements[] columnRequirements;
 
   /**
    * The overall requirements across all columns.
@@ -215,7 +257,14 @@ class TableView
   /**
    * Indicates if the grid setup is ok.
    */
-  private boolean gridValid;
+  boolean gridValid;
+
+  /**
+   * Additional space that is added _between_ table cells.
+   *
+   * This is package private to avoid accessor methods.
+   */
+  int cellSpacing;
 
   /**
    * Creates a new HTML table view for the specified element.
@@ -318,6 +367,11 @@ class TableView
           r.minimum = width;
       }
 
+    // Adjust requirements when we have cell spacing.
+    int adjust = (columnRequirements.length + 1) * cellSpacing;
+    r.minimum += adjust;
+    r.preferred += adjust;
+
     // Apply the alignment.
     Object o = atts.getAttribute(CSS.Attribute.TEXT_ALIGN);
     r.alignment = 0.0F;
@@ -332,6 +386,8 @@ class TableView
           r.alignment = 1.0F;
       }
 
+    // Make it not resize in the horizontal direction.
+    r.maximum = r.preferred;
     return r;
   }
 
@@ -343,6 +399,16 @@ class TableView
                                  int[] spans)
   {
     updateGrid();
+
+    // Mark all rows as invalid.
+    int n = getViewCount();
+    for (int i = 0; i < n; i++)
+      {
+        View row = getView(i);
+        if (row instanceof RowView)
+          ((RowView) row).layoutChanged(axis);
+      }
+
     layoutColumns(targetSpan);
     super.layoutMinorAxis(targetSpan, axis, offsets, spans);
   }
@@ -361,8 +427,12 @@ class TableView
     // all columns of all rows.
     for (int r = 0; r < numRows; r++)
       {
-        RowView rowView = (RowView) getView(r);
-        int numCols = rowView.getViewCount();
+        View rowView = getView(r);
+        int numCols;
+        if (rowView instanceof RowView)
+          numCols = ((RowView) rowView).getViewCount();
+        else
+          numCols = 0;
 
         // We collect the normal (non-relative) column requirements in the
         // total variable and the relative requirements in the relTotal
@@ -533,7 +603,9 @@ class TableView
       }
 
     // Try to adjust the spans so that we fill the targetSpan.
-    long diff = targetSpan - sumPref;
+    // For adjustments we have to use the targetSpan minus the cumulated
+    // cell spacings.
+    long diff = targetSpan - (n + 1) * cellSpacing - sumPref;
     float factor = 0.0F;
     int[] diffs = null;
     if (diff != 0)
@@ -570,7 +642,7 @@ class TableView
       }
 
     // Actually perform adjustments.
-    int totalOffs = 0;
+    int totalOffs = cellSpacing;
     for (int i = 0; i < n; i++)
       {
         columnOffsets[i] = totalOffs;
@@ -580,8 +652,8 @@ class TableView
             columnSpans[i] += Math.round(adjust);
           }
         // Avoid overflow here.
-        totalOffs = (int) Math.min((long) totalOffs + (long) columnSpans[i],
-                                    Integer.MAX_VALUE);
+        totalOffs = (int) Math.min((long) totalOffs + (long) columnSpans[i]
+                                   + (long) cellSpacing, Integer.MAX_VALUE);
       }
   }
 
@@ -597,15 +669,23 @@ class TableView
         int numRows = getViewCount();
         for (int r = 0; r < numRows; r++)
           {
-            RowView rowView = (RowView) getView(r);
-            int numCols = rowView.getViewCount();
+            View rowView = getView(r);
+            int numCols;
+            if (rowView instanceof RowView)
+              numCols = ((RowView) rowView).getViewCount();
+            else
+              numCols = 0;
             maxColumns = Math.max(numCols, maxColumns);
           }
         columnWidths = new Length[maxColumns];
         for (int r = 0; r < numRows; r++)
           {
-            RowView rowView = (RowView) getView(r);
-            int numCols = rowView.getViewCount();
+            View rowView = getView(r);
+            int numCols;
+            if (rowView instanceof RowView)
+              numCols = ((RowView) rowView).getViewCount();
+            else
+              numCols = 0;
             int colIndex = 0;
             for (int c = 0; c < numCols; c++)
               {
@@ -643,5 +723,87 @@ class TableView
     else
       span = super.getMaximumSpan(axis);
     return span;
+  }
+
+  /**
+   * Overridden to fetch the CSS attributes when view gets connected.
+   */
+  public void setParent(View parent)
+  {
+    super.setParent(parent);
+    if (parent != null)
+      setPropertiesFromAttributes();
+  }
+
+  /**
+   * Fetches CSS and HTML layout attributes.
+   */
+  private void setPropertiesFromAttributes()
+  {
+    // Fetch and parse cell spacing.
+    Object o = getAttributes().getAttribute(CSS.Attribute.BORDER_SPACING);
+    if (o != null && o instanceof Length)
+      {
+        Length l = (Length) o;
+        cellSpacing = (int) l.getValue();
+      }
+  }
+
+  /**
+   * Overridden to adjust for cellSpacing.
+   */
+  protected SizeRequirements calculateMajorAxisRequirements(int axis,
+                                                            SizeRequirements r)
+  {
+    r = super.calculateMajorAxisRequirements(axis, r);
+    int adjust = (getViewCount() + 1) * cellSpacing;
+    r.minimum += adjust;
+    r.preferred += adjust;
+    r.maximum += adjust;
+    return r;
+  }
+
+  /**
+   * Overridden to adjust for cellSpacing.
+   */
+  protected void layoutMajorAxis(int targetSpan, int axis, int[] offsets,
+                                 int spans[])
+  {
+    int adjust = (getViewCount() + 1) * cellSpacing;
+    super.layoutMajorAxis(targetSpan - adjust, axis, offsets, spans);
+    for (int i = 0; i < offsets.length; i++)
+      {
+        offsets[i] += (i + 1) * cellSpacing;
+      }
+  }
+
+  /**
+   * Overridden to replace view factory with this one.
+   */
+  public void insertUpdate(DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.insertUpdate(e, a, this);
+  }
+
+  /**
+   * Overridden to replace view factory with this one.
+   */
+  public void removeUpdate(DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.removeUpdate(e, a, this);
+  }
+
+  /**
+   * Overridden to replace view factory with this one.
+   */
+  public void changedUpdate(DocumentEvent e, Shape a, ViewFactory f)
+  {
+    super.changedUpdate(e, a, this);
+  }
+
+  public void replace(int offset, int len, View[] views)
+  {
+    super.replace(offset, len, views);
+    gridValid = false;
   }
 }

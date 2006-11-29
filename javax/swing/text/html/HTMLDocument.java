@@ -184,8 +184,6 @@ public class HTMLDocument extends DefaultStyledDocument
   protected Element createLeafElement(Element parent, AttributeSet a, int p0,
                                       int p1)
   {
-    RunElement el = new RunElement(parent, a, p0, p1);
-    el.addAttribute(StyleConstants.NameAttribute, HTML.Tag.CONTENT);
     return new RunElement(parent, a, p0, p1);
   }
 
@@ -454,6 +452,8 @@ public class HTMLDocument extends DefaultStyledDocument
       String name = null;
       if (tag != null)
         name = tag.toString();
+      if (name == null)
+        name = super.getName();
       return name;
     }
   }
@@ -490,6 +490,8 @@ public class HTMLDocument extends DefaultStyledDocument
       String name = null;
       if (tag != null)
         name = tag.toString();
+      if (name == null)
+        name = super.getName();
       return name;
     }
     
@@ -511,7 +513,17 @@ public class HTMLDocument extends DefaultStyledDocument
    * @author Anthony Balkissoon abalkiss at redhat dot com
    */
   public class HTMLReader extends HTMLEditorKit.ParserCallback
-  {    
+  {
+    /**
+     * The maximum token threshold. We don't grow it larger than this.
+     */
+    private static final int MAX_THRESHOLD = 10000;
+
+    /**
+     * The threshold growth factor.
+     */
+    private static final int GROW_THRESHOLD = 5;
+
     /**
      * Holds the current character attribute set *
      */
@@ -523,12 +535,6 @@ public class HTMLDocument extends DefaultStyledDocument
      * A stack for character attribute sets *
      */
     Stack charAttrStack = new Stack();
-
-    /**
-     * The parse stack. This stack holds HTML.Tag objects that reflect the
-     * current position in the parsing process.
-     */
-    Stack parseStack = new Stack();
    
     /** A mapping between HTML.Tag objects and the actions that handle them **/
     HashMap tagToAction;
@@ -609,6 +615,11 @@ public class HTMLDocument extends DefaultStyledDocument
      * This is package private to avoid accessor methods.
      */
     Document textAreaDocument;
+
+    /**
+     * The token threshold. This gets increased while loading.
+     */
+    private int threshold;
 
     public class TagAction
     {
@@ -816,7 +827,7 @@ public class HTMLDocument extends DefaultStyledDocument
        */
       public void start(HTML.Tag t, MutableAttributeSet a)
       {
-        blockOpen(t, a);
+        super.start(t, a);
         inParagraph = true;
       }
       
@@ -826,7 +837,7 @@ public class HTMLDocument extends DefaultStyledDocument
        */
       public void end(HTML.Tag t)
       {
-        blockClose(t);
+        super.end(t);
         inParagraph = false;
       } 
     }
@@ -1162,6 +1173,7 @@ public class HTMLDocument extends DefaultStyledDocument
       this.offset = offset;
       this.popDepth = popDepth;
       this.pushDepth = pushDepth;
+      threshold = getTokenThreshold();
       initTags();
     }
     
@@ -1299,18 +1311,28 @@ public class HTMLDocument extends DefaultStyledDocument
      */
     public void flush() throws BadLocationException
     {
-      DefaultStyledDocument.ElementSpec[] elements;
-      elements = new DefaultStyledDocument.ElementSpec[parseBuffer.size()];
-      parseBuffer.copyInto(elements);
-      parseBuffer.removeAllElements();
-      if (offset == 0)
-        create(elements);
-      else
-        insert(offset, elements);
-
-      offset += HTMLDocument.this.getLength() - offset;
+      flushImpl();
     }
-    
+
+    /**
+     * Flushes the buffer and handle partial inserts.
+     *
+     */
+    private void flushImpl()
+      throws BadLocationException
+    {
+      int oldLen = getLength();
+      int size = parseBuffer.size();
+      ElementSpec[] elems = new ElementSpec[size];
+      parseBuffer.copyInto(elems);
+      if (oldLen == 0)
+        create(elems);
+      else
+        insert(offset, elems);
+      parseBuffer.removeAllElements();
+      offset += getLength() - oldLen;
+    }
+
     /**
      * This method is called by the parser to indicate a block of 
      * text was encountered.  Should insert the text appropriately.
@@ -1512,7 +1534,6 @@ public class HTMLDocument extends DefaultStyledDocument
 
       DefaultStyledDocument.ElementSpec element;
 
-      parseStack.push(t);
       AbstractDocument.AttributeContext ctx = getAttributeContext();
       AttributeSet copy = attr.copyAttributes();
       copy = ctx.addAttribute(copy, StyleConstants.NameAttribute, t);
@@ -1542,25 +1563,17 @@ public class HTMLDocument extends DefaultStyledDocument
       // If the previous tag is a start tag then we insert a synthetic
       // content tag.
       DefaultStyledDocument.ElementSpec prev;
-      prev = (DefaultStyledDocument.ElementSpec)
-	      parseBuffer.get(parseBuffer.size() - 1);
-      if (prev.getType() == DefaultStyledDocument.ElementSpec.StartTagType)
+      prev = parseBuffer.size() > 0 ? (DefaultStyledDocument.ElementSpec)
+                                parseBuffer.get(parseBuffer.size() - 1) : null;
+      if (prev != null &&
+          prev.getType() == DefaultStyledDocument.ElementSpec.StartTagType)
         {
-          AbstractDocument.AttributeContext ctx = getAttributeContext();
-          AttributeSet attributes = ctx.getEmptySet();
-          attributes = ctx.addAttribute(attributes, StyleConstants.NameAttribute,
-                                        HTML.Tag.CONTENT);
-          element = new DefaultStyledDocument.ElementSpec(attributes,
-			  DefaultStyledDocument.ElementSpec.ContentType,
-                                    new char[0], 0, 0);
-          parseBuffer.add(element);
+          addContent(new char[]{' '}, 0, 1);
         }
 
       element = new DefaultStyledDocument.ElementSpec(null,
 				DefaultStyledDocument.ElementSpec.EndTagType);
       parseBuffer.addElement(element);
-      if (parseStack.size() > 0)
-        parseStack.pop();
     }
     
     /**
@@ -1615,11 +1628,13 @@ public class HTMLDocument extends DefaultStyledDocument
       // Add the element to the buffer
       parseBuffer.addElement(element);
 
-      if (parseBuffer.size() > HTMLDocument.this.getTokenThreshold())
+      if (parseBuffer.size() > threshold)
         {
+          if (threshold <= MAX_THRESHOLD)
+            threshold *= GROW_THRESHOLD;
           try
             {
-              flush();
+              flushImpl();
             }
           catch (BadLocationException ble)
             {
@@ -1734,10 +1749,6 @@ public class HTMLDocument extends DefaultStyledDocument
       }
     };
       
-    // Set the parent HTML tag.
-    reader.parseStack.push(parent.getAttributes().getAttribute(
-      StyleConstants.NameAttribute));
-
     return reader;
   }   
   

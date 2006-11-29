@@ -50,6 +50,8 @@ import gnu.javax.swing.text.html.css.Selector;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,9 +109,9 @@ public class StyleSheet extends StyleContext
     implements CSSParserCallback
   {
     /**
-     * The current style.
+     * The current styles.
      */
-    private CSSStyle style;
+    private CSSStyle[] styles;
 
     /**
      * The precedence of the stylesheet to be parsed.
@@ -133,9 +135,11 @@ public class StyleSheet extends StyleContext
      *
      * @param sel the selector
      */
-    public void startStatement(Selector sel)
+    public void startStatement(Selector[] sel)
     {
-      style = new CSSStyle(precedence, sel);
+      styles = new CSSStyle[sel.length];
+      for (int i = 0; i < sel.length; i++)
+        styles[i] = new CSSStyle(precedence, sel[i]);
     }
 
     /**
@@ -143,8 +147,9 @@ public class StyleSheet extends StyleContext
      */
     public void endStatement()
     {
-      css.add(style);
-      style = null;
+      for (int i = 0; i < styles.length; i++)
+        css.add(styles[i]);
+      styles = null;
     }
 
     /**
@@ -157,9 +162,13 @@ public class StyleSheet extends StyleContext
     {
       CSS.Attribute cssAtt = CSS.getAttribute(property);
       Object val = CSS.getValue(cssAtt, value);
-      CSS.addInternal(style, cssAtt, value);
-      if (cssAtt != null)
-        style.addAttribute(cssAtt, val);
+      for (int i = 0; i < styles.length; i++)
+        {
+          CSSStyle style = styles[i];
+          CSS.addInternal(style, cssAtt, value);
+          if (cssAtt != null)
+            style.addAttribute(cssAtt, val);
+        }
     }
 
   }
@@ -172,11 +181,11 @@ public class StyleSheet extends StyleContext
     implements Style, Comparable
   {
 
-    static final int PREC_UA = 400000;
-    static final int PREC_NORM = 300000;
+    static final int PREC_UA = 0;
+    static final int PREC_NORM = 100000;
     static final int PREC_AUTHOR_NORMAL = 200000;
-    static final int PREC_AUTHOR_IMPORTANT = 100000;
-    static final int PREC_USER_IMPORTANT = 0;
+    static final int PREC_AUTHOR_IMPORTANT = 300000;
+    static final int PREC_USER_IMPORTANT = 400000;
 
     /**
      * The priority of this style when matching CSS selectors.
@@ -231,8 +240,10 @@ public class StyleSheet extends StyleContext
   /** Base font size (int) */
   int baseFontSize;
   
-  /** The style sheets stored. */
-  StyleSheet[] styleSheet;
+  /**
+   * The linked style sheets stored.
+   */
+  private ArrayList linked;
 
   /**
    * Maps element names (selectors) to AttributSet (the corresponding style
@@ -424,6 +435,21 @@ public class StyleSheet extends StyleContext
           styles.add(style);
       }
 
+    // Add styles from linked stylesheets.
+    if (linked != null)
+      {
+        for (int i = linked.size() - 1; i >= 0; i--)
+          {
+            StyleSheet ss = (StyleSheet) linked.get(i);
+            for (int j = ss.css.size() - 1; j >= 0; j--)
+              {
+                CSSStyle style = (CSSStyle) ss.css.get(j);
+                if (style.selector.matches(tags, classes, ids))
+                  styles.add(style);
+              }
+          }
+      }
+
     // Sort selectors.
     Collections.sort(styles);
     Style[] styleArray = new Style[styles.size()];
@@ -444,7 +470,6 @@ public class StyleSheet extends StyleContext
    */
   public Style getRule(String selector)
   {
-    Selector sel = new Selector(selector);
     CSSStyle best = null;
     for (Iterator i = css.iterator(); i.hasNext();)
       {
@@ -477,6 +502,9 @@ public class StyleSheet extends StyleContext
         // Shouldn't happen. And if, then we
         System.err.println("IOException while parsing stylesheet: " + ex.getMessage());
       }
+    // Clean up resolved styles cache so that the new styles are recognized
+    // on next stylesheet request.
+    resolvedStyles.clear();
   }
   
   /**
@@ -546,11 +574,9 @@ public class StyleSheet extends StyleContext
    */
   public void addStyleSheet(StyleSheet ss)
   {
-    if (styleSheet == null)
-      styleSheet = new StyleSheet[] {ss};
-    else
-      System.arraycopy(new StyleSheet[] {ss}, 0, styleSheet, 
-                       styleSheet.length, 1);
+    if (linked == null)
+      linked = new ArrayList();
+    linked.add(ss);
   }
   
   /**
@@ -560,31 +586,9 @@ public class StyleSheet extends StyleContext
    */
   public void removeStyleSheet(StyleSheet ss)
   {
-    if (styleSheet.length == 1 && styleSheet[0].equals(ss))
-      styleSheet = null;
-    else
+    if (linked != null)
       {
-        for (int i = 0; i < styleSheet.length; i++)
-          {
-            StyleSheet curr = styleSheet[i];
-            if (curr.equals(ss))
-              {
-                StyleSheet[] tmp = new StyleSheet[styleSheet.length - 1];
-                if (i != 0 && i != (styleSheet.length - 1))
-                  {
-                    System.arraycopy(styleSheet, 0, tmp, 0, i);
-                    System.arraycopy(styleSheet, i + 1, tmp, i,
-                                     styleSheet.length - i - 1);
-                  }
-                else if (i == 0)
-                  System.arraycopy(styleSheet, 1, tmp, 0, styleSheet.length - 1);
-                else
-                  System.arraycopy(styleSheet, 0, tmp, 0, styleSheet.length - 1);
-                
-                styleSheet = tmp;
-                break;
-              }
-          }
+        linked.remove(ss);
       }
   }
   
@@ -595,7 +599,17 @@ public class StyleSheet extends StyleContext
    */
   public StyleSheet[] getStyleSheets()
   {
-    return styleSheet;
+    StyleSheet[] linkedSS;
+    if (linked != null)
+      {
+        linkedSS = new StyleSheet[linked.size()];
+        linkedSS = (StyleSheet[]) linked.toArray(linkedSS);
+      }
+    else
+      {
+        linkedSS = null;
+      }
+    return linkedSS;
   }
   
   /**
@@ -697,18 +711,39 @@ public class StyleSheet extends StyleContext
     o = htmlAttrSet.getAttribute(HTML.Attribute.WIDTH);
     if (o != null)
       cssAttr = addAttribute(cssAttr, CSS.Attribute.WIDTH,
-                             CSS.getValue(CSS.Attribute.WIDTH, o.toString()));
+                             new Length(o.toString()));
 
     // The HTML height attribute maps directly to CSS height.
     o = htmlAttrSet.getAttribute(HTML.Attribute.HEIGHT);
     if (o != null)
       cssAttr = addAttribute(cssAttr, CSS.Attribute.HEIGHT,
-                             CSS.getValue(CSS.Attribute.HEIGHT, o.toString()));
+                             new Length(o.toString()));
 
     o = htmlAttrSet.getAttribute(HTML.Attribute.NOWRAP);
     if (o != null)
       cssAttr = addAttribute(cssAttr, CSS.Attribute.WHITE_SPACE, "nowrap");
 
+    // Map cellspacing attr of tables to CSS border-spacing.
+    o = htmlAttrSet.getAttribute(HTML.Attribute.CELLSPACING);
+    if (o != null)
+      cssAttr = addAttribute(cssAttr, CSS.Attribute.BORDER_SPACING,
+                             new Length(o.toString()));
+
+    // For table cells and headers, fetch the cellpadding value from the
+    // parent table and set it as CSS padding attribute.
+    HTML.Tag tag = (HTML.Tag)
+                   htmlAttrSet.getAttribute(StyleConstants.NameAttribute);
+    if ((tag == HTML.Tag.TD || tag == HTML.Tag.TH)
+        && htmlAttrSet instanceof Element)
+      {
+        Element el = (Element) htmlAttrSet;
+        AttributeSet tableAttrs = el.getParentElement().getParentElement()
+                                  .getAttributes();
+        o = tableAttrs.getAttribute(HTML.Attribute.CELLPADDING);
+        if (o != null)
+          cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING,
+                                 new Length(o.toString()));
+      }
     // TODO: Add more mappings.
     return cssAttr;
   }
@@ -824,10 +859,7 @@ public class StyleSheet extends StyleContext
    */
   public Font getFont(AttributeSet a)
   {
-    FontSize size = (FontSize) a.getAttribute(CSS.Attribute.FONT_SIZE);
-    int realSize = 12;
-    if (size != null)
-      realSize = size.getValue();
+    int realSize = getFontSize(a);
 
     // Decrement size for subscript and superscript.
     Object valign = a.getAttribute(CSS.Attribute.VERTICAL_ALIGN);
@@ -851,6 +883,41 @@ public class StyleSheet extends StyleContext
     return new Font(family, style, realSize);
   }
   
+  /**
+   * Resolves the fontsize for a given set of attributes.
+   *
+   * @param atts the attributes
+   *
+   * @return the resolved font size
+   */
+  private int getFontSize(AttributeSet atts)
+  {
+    int size = 12;
+    if (atts.isDefined(CSS.Attribute.FONT_SIZE))
+      {
+        FontSize fs = (FontSize) atts.getAttribute(CSS.Attribute.FONT_SIZE);
+        if (fs.isRelative())
+          {
+            int parSize = 12;
+            AttributeSet resolver = atts.getResolveParent();
+            if (resolver != null)
+              parSize = getFontSize(resolver);
+            size = fs.getValue(parSize); 
+          }
+        else
+          {
+            size = fs.getValue();
+          }
+      }
+    else
+      {
+        AttributeSet resolver = atts.getResolveParent();
+        if (resolver != null)
+          size = getFontSize(resolver);
+      }
+    return size;
+  }
+
   /**
    * Takes a set of attributes and turns it into a foreground
    * color specification. This is used to specify things like, brigher, more hue
@@ -1036,6 +1103,11 @@ public class StyleSheet extends StyleContext
      */
     private Border border;
 
+    private float leftPadding;
+    private float rightPadding;
+    private float topPadding;
+    private float bottomPadding;
+
     /**
      * The background color.
      */
@@ -1048,9 +1120,17 @@ public class StyleSheet extends StyleContext
      */
     BoxPainter(AttributeSet as, StyleSheet ss)
     {
-      Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
+      // Fetch margins.
+      Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN);
+      if (l != null)
+        {
+          topInset = bottomInset = leftInset = rightInset = l.getValue();
+        }
+      l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
       if (l != null)
         leftInset = l.getValue();
+      else if (as.getAttribute(StyleConstants.NameAttribute) == HTML.Tag.UL)
+        System.err.println("UL margin left value: " + l + " atts: " + as);
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_RIGHT);
       if (l != null)
         rightInset = l.getValue();
@@ -1060,6 +1140,26 @@ public class StyleSheet extends StyleContext
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_BOTTOM);
       if (l != null)
         bottomInset = l.getValue();
+
+      // Fetch padding.
+      l = (Length) as.getAttribute(CSS.Attribute.PADDING);
+      if (l != null)
+        {
+          leftPadding = rightPadding = topPadding = bottomPadding =
+            l.getValue();
+        }
+      l = (Length) as.getAttribute(CSS.Attribute.PADDING_LEFT);
+      if (l != null)
+        leftPadding = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.PADDING_RIGHT);
+      if (l != null)
+        rightPadding = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.PADDING_TOP);
+      if (l != null)
+        topPadding = l.getValue();
+      l = (Length) as.getAttribute(CSS.Attribute.PADDING_BOTTOM);
+      if (l != null)
+        bottomPadding = l.getValue();
 
       // Determine border.
       border = new CSSBorder(as);
@@ -1090,21 +1190,25 @@ public class StyleSheet extends StyleContext
           inset = topInset;
           if (border != null)
             inset += border.getBorderInsets(null).top;
+          inset += topPadding;
           break;
         case View.BOTTOM:
           inset = bottomInset;
           if (border != null)
             inset += border.getBorderInsets(null).bottom;
+          inset += bottomPadding;
           break;
         case View.LEFT:
           inset = leftInset;
           if (border != null)
             inset += border.getBorderInsets(null).left;
+          inset += leftPadding;
           break;
         case View.RIGHT:
           inset = rightInset;
           if (border != null)
             inset += border.getBorderInsets(null).right;
+          inset += rightPadding;
           break;
         default:
           inset = 0.0F;
@@ -1176,6 +1280,11 @@ public class StyleSheet extends StyleContext
     }
 
     /**
+     * Cached rectangle re-used in the paint method below.
+     */
+    private final Rectangle tmpRect = new Rectangle();
+
+    /**
      * Paints the CSS list decoration according to the attributes given.
      * 
      * @param g - the graphics configuration
@@ -1200,7 +1309,35 @@ public class StyleSheet extends StyleContext
       if (tag != null && tag == HTML.Tag.LI)
         {
           g.setColor(Color.BLACK);
-          g.fillOval((int) x - 15, (int) (h / 2 - 3 + y), 6, 6);
+          int centerX = (int) (x - 12);
+          int centerY = -1;
+          // For paragraphs (almost all cases) center bullet vertically
+          // in the middle of the first line.
+          tmpRect.setBounds((int) x, (int) y, (int) w, (int) h);
+          if (itemView.getViewCount() > 0)
+            {
+              View v1 = itemView.getView(0);
+              if (v1 instanceof ParagraphView && v1.getViewCount() > 0)
+                {             
+                  Shape a1 = itemView.getChildAllocation(0, tmpRect);
+                  Rectangle r1 = a1 instanceof Rectangle ? (Rectangle) a1
+                                                         : a1.getBounds();
+                  ParagraphView par = (ParagraphView) v1;
+                  Shape a = par.getChildAllocation(0, r1);
+                  if (a != null)
+                    {
+                      Rectangle r = a instanceof Rectangle ? (Rectangle) a
+                                                           : a.getBounds();
+                      centerY = (int) (r.height / 2 + r.y);
+                    }
+                }
+            }
+          if (centerY == -1)
+            {
+              System.err.println("WARNING LI child is not a paragraph view " + itemView.getView(0) + ", " + itemView.getViewCount());
+              centerY =(int) (h / 2 + y);
+            }
+          g.fillOval(centerX - 3, centerY - 3, 6, 6);
         }
     }
   }
