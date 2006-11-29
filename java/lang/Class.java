@@ -44,6 +44,7 @@ import gnu.java.lang.reflect.ClassSignatureParser;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -62,6 +63,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -1505,15 +1507,22 @@ public final class Class<T>
    */
   public Annotation[] getAnnotations()
   {
-    HashSet<Annotation> set = new HashSet<Annotation>();
-    set.addAll(Arrays.asList(getDeclaredAnnotations()));
-    Class[] interfaces = getInterfaces();
-    for (int i = 0; i < interfaces.length; i++)
-      set.addAll(Arrays.asList(interfaces[i].getAnnotations()));
-    Class<? super T> superClass = getSuperclass();
-    if (superClass != null)
-      set.addAll(Arrays.asList(superClass.getAnnotations()));
-    return set.toArray(new Annotation[set.size()]);
+    HashMap<Class, Annotation> map = new HashMap<Class, Annotation>();
+    for (Annotation a : getDeclaredAnnotations())
+      map.put((Class) a.annotationType(), a);
+    for (Class<? super T> s = getSuperclass();
+	 s != null;
+	 s = s.getSuperclass())
+      {
+	for (Annotation a : s.getDeclaredAnnotations())
+	  {
+	    Class k = (Class) a.annotationType();
+	    if (! map.containsKey(k) && k.isAnnotationPresent(Inherited.class))
+	      map.put(k, a);
+	  }
+      }
+    Collection<Annotation> v = map.values();
+    return v.toArray(new Annotation[v.size()]);
   }
 
   /**
