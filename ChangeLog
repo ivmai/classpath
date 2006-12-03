@@ -1,3 +1,239 @@
+2006-12-01  Mark Wielaard  <mark@klomp.org>
+
+	* java/text/DecimalFormat.java (parse): Always increment parsing
+	index and adjust pos result.
+
+2006-12-01  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/html/HTML.java
+	(Attribute.DYNAMIC_CLASS): New field.
+	(Attribute.PSEUDO_CLASS): New field.
+	* javax/swing/text/html/HTMLDocument.java
+	(HTMLReader.CharacterAction.start): Initialize anchor with link
+	pseudo attribute.
+	(updateSpecialClass): New helper method. Updates the dynamic
+	or pseudo class for anchor tags.
+	* javax/swing/text/html/HTMLEditorKit.java
+	(LinkController.lastAnchorElement): New field. For tracking
+	enter/exit of anchors.
+	(LinkController.activateLink): Set pseudo class to 'visited'.
+	(LinkController.mouseMoved): Added support for tracking
+	the 'hover' dynamic class.
+	* javax/swing/text/html/InlineView.java
+	(changedUpdate): Fetch new properties.
+	* javax/swing/text/html/StyleSheet.java
+	(attributeSetToMap): New helper method.
+	(getRule): Also append dynamic and pseudo class to key.
+	(resolveStyle): Resolve style based generally on all attributes.
+	* javax/swing/text/html/TableView.java
+	(RowView.layoutMajorAxis): Make sure the grid is valid.
+	(updateGrid): Made package private.
+	* gnu/javax/swing/text/html/css/Selector.java
+	(calculateSpecificity): Added support for dynamic and pseudo classes.
+	(matches): Changed to operate on general attributes.
+	Added support for dynamic and pseudo classes.
+
+2006-12-01  Mario Torre  <neugens@limasoftware.net>
+
+	* java/text/DecimalFormat.java (formatInternal): move the formatting of
+	fractional portion in a separate method.
+	Also fixes the handling of decimal separator and its associated field.
+	(handleFractionalPart): new method, needed to relax a bit
+	formatInternal.
+	
+2006-12-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/beans/beancontext/BeanContextServicesSupport.java:
+	(BCSSProxyServiceProvider.getCurrentServiceSelectors(BeanContextServices,
+	Class)): Implemented.
+	(BCSSProxyServiceProvider.getService(BeanContextServices, Object,
+	Class, Object)): Implemented.
+	(BCSSProxyServiceProvider.releaseService(BeanContextServices,
+	Object, Object)): Implemented.
+	(BCSSProxyServiceProvider.serviceRevoked(BeanContextServiceRevokedEvent)):
+	Implemented.
+	(initialiseBeanContextResources()): Implemented.
+	(releaseBeanContextResoures()): Implemented.
+	
+2006-12-01  Mark Wielaard  <mark@klomp.org>
+
+	* include/gnu_java_awt_peer_gtk_GdkFontPeer.h: Regenerated.
+
+2006-12-01  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/javax/swing/text/html/css/BorderStyle.java: New class for
+	handling border styles.
+	* gnu/javax/swing/text/html/css/BorderWidth.java
+	(isValid): New method.
+	* gnu/javax/swing/text/html/css/Length.java
+	(isValid): New method.
+	* javax/swing/text/html/CSS.java
+	(addInternal): Added shorthand parsing for border, padding and
+	margin.
+	(parseBackgroundShorthand): Added API docs.
+	(parsePaddingShorthand): New method. Handles padding shorthand
+	values.
+	(parseMarginShorthand): New method. Handles margin shorthand
+	values.
+	(parseBorderShorthand): New method. Handles border shorthand
+	values.
+	* javax/swing/text/html/StyleSheet.java
+	(translateHTMLToCSS): Set specific padding attributes.
+	(BoxPainter.BoxPainter): Don't handle PADDING and MARGIN here.
+	These shorthands are now handled in CSS.
+	(BoxPainter.paint): Exclude the outer margin.
+
+2006-12-01  Roman Kennke  <kennke@aicas.com>
+
+	* gnu/javax/swing/text/html/css/Length.java
+	(emBase): New field.
+	(exBase): New field.
+	(isFontEMRelative): New field.
+	(isFontEXRelative): New field.
+	(Length): Recognize and setup EM and EX relative values.
+	(getValue): Handle EM and EX relative values.
+	(isEMRelative): New method.
+	(isEXRelative): New method.
+	(setEMBase): New method.
+	(setEXBase): New method.
+	(setFontBases): New method.
+	* gnu/javax/swing/text/html/parser/support/Parser.java
+	(_handleEmptyTag): Use new isBlock() helper method.
+	(_handleEndTag_remaining): Use new isBlock() helper method.
+	(_handleStartTag): Consume whitespace after block start tag.
+	(Comment): Consume whitespace after a comment.
+	(isBlock): New helper method.
+	(readAttributes): Consider all characters in unquoted attribute
+	values.
+	* javax/swing/text/html/BlockView.java
+	(layoutMinorAxis): Use cached span value.
+	(paint): Added debug code (commented out).
+	(setPropertiesFromAttributes): Set the EM and EX base on lengths.
+	* javax/swing/text/html/CSSBorder.java
+	(CSSBorder): Take StyleSheet as argument. Call getBorderWidth()
+	with stylesheet.
+	(getBorderWidth): Set the EM and EX base on the length values.
+	* javax/swing/text/html/HTMLDocument.java
+	(HTMLReader.ParagraphAction.end): Do not set the inParagraph field.
+	(HTMLReader.ParagraphAction.start): Do not set the inParagraph field.
+	(HTMLReader.inImpliedParagraph): Removed.
+	(HTMLReader.inParagraph): Removed.
+	(HTMLReader.parseStack): New field.
+	(HTMLReader.addContent): Use new paragraph handling.
+	(HTMLReader.addSpecialElement): Use new paragraph handling.
+	(HTMLReader.blockClose): Use new paragraph handling.
+	(HTMLReader.blockOpen): Use new paragraph handling.
+	(HTMLReader.inImpliedParagraph): New helper method.
+	(HTMLReader.inParagraph): New helper method.
+	* javax/swing/text/html/ImageView.java
+	(attributes): New field. Caches view attributes.
+	(spans): New field. Caches CSS spans.
+	(getAttributes): Correctly setup CSS view attributes.
+	(getPreferredSpan): Use caches spans.
+	(getStyleSheet): Use the view's getDocument() method.
+	(setPropertiesFromAttributes): Cache spans and setup EM and EX.
+	(updateSize): Use cached spans.
+	* javax/swing/text/html/ParagraphView.java
+	(setPropertiesFromAttributes): Setup EM and EX.
+	* javax/swing/text/html/StyleSheet.java
+	(BoxPainter.BoxPainter): Setup EM and EX correctly.
+	(getEMBase): New helper method.
+	(getEXBase): New helper method.
+	* javax/swing/text/html/TableView.java
+	(width): New field. Caches the table width.
+	(calculateMinorAxisRequirements): Use caches span.
+	(setPropertiesFromAttributes): Cache span and setup EM/EX.
+	(updateGrid): Correctly setup EM/EX.
+
+2006-11-30  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/html/FormSubmitEvent.java: New class.
+	* javax/swing/text/html/FormView.java
+	(SubmitThread): New class for submitting data in a separate thread.
+	(actionPerformed): Fetch the actual for data.
+	(addData): New helper method.
+	(getElementFormData): New helper method.
+	(getFormData): New helper method.
+	(getInputFormData): New helper method.
+	(submitData): Implemented.
+	* javax/swing/text/html/FrameView.java
+	(createComponent): Add this as hyperlink listener.
+	Set the target document as frame document.
+	(getTopEditorPane): New helper method.
+	(hyperlinkUpdate): Implementation of the HyperlinkListener interface.
+	(handleHyperlinkEvent): New helper method.
+	(handleFormSubmitEvent): New helper method.
+	* javax/swing/text/html/HTMLDocument.java
+	(HTMLReader.BaseAction.start): Track the base target.
+	(HTMLReader.BaseAction.end): Removed.
+	(baseTarget): New field.
+	(frameDocument): New field.
+	(getBaseTarget): New property accessor.
+	(isFrameDocument): New property accessor.
+	(processHTMLFrameHyperlinkEvent): Implemented.
+	(setFrameDocument): New property accessor.
+	(updateFrame): New helper method.
+	(updateFrameSet): New helper method.
+	* javax/swing/text/html/HTMLEditorKit.java
+	(LinkController.createHyperlinkEvent): Handle frame documents.
+	(autoFormSubmission): New field.
+	(HTMLEditorKit): Set autoFormSubmission to true.
+	(isAutoFormSubmission): New property accessor.
+	(setAutoFormSubmission): New property accessor.
+
+2006-11-30  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/ElementIterator.java
+	(ElementRef): New inner class.
+	(currentDepth): Removed.
+	(currentElement): Removed.
+	(previousItem): Removed.
+	(stack): New field. Holds the iteration stack.
+	(state): Removed.
+	(ElementIterator(Document)): Removed init of removed fields.
+	(ElementIterator(Element)): Removed init of removed fields.
+	(current): Changed to stack based algorithm.
+	(deepestLeaf): New helper method.
+	(depth): Changed to stack based algorithm.
+	(first): Changed to stack based algorithm.
+	(next): Changed to stack based algorithm.
+	(previous): Changed to stack based algorithm.
+
+2006-11-30  Francis Kung  <fkung@redhat.com>
+
+	* .settings/org.eclipse.jdt.core.prefs: Set compilar compliance to 1.4.
+	* .externalToolBuilders/ClasspathJar.launch: Include sun.* classses.
+
+2006-11-30  Francis Kung  <fkung@redhat.com>
+
+	* gnu/java/awt/peer/gtk/BufferedImageGraphics.java
+	(draw): Set transform in buffered composite.
+	(drawComposite): Do not transform bounds; round bounds.
+	(drawGlyphVector):  Set transform in buffered composite.
+	(drawRenderedImage):  Set transform in buffered composite.
+	(fill):  Set transform in buffered composite.
+	(updateBufferedImage): Fix scanline & height calculations.
+	* gnu/java/awt/peer/gtk/CairoGraphics2D.java
+	(createPath): Simplify width & height calculation.
+	(drawImage): Also transform width & height.
+
+2006-11-30  Roman Kennke  <kennke@aicas.com>
+
+	* javax/swing/text/html/FrameSetView.java: New class. Implements
+	HTML framesets.
+	* javax/swing/text/html/FrameView.java: New class. Implements
+	HTML frames.
+	* javax/swing/text/html/HTMLDocument.java:
+	(HTMLReader.addSpecialElement): Only add one artificial space.
+	* javax/swing/text/html/HTMLEditorKit.java
+	(HTMLFactory.create): Uncomment code for FrameSetView and FrameView.
+	* gnu/javax/swing/text/html/parser/support/Parser.java
+	(_handleEmptyTag): Also consume whitespace after frame tags.
+
+2006-11-30  Gary Benson  <gbenson@redhat.com>
+
+	* java/lang/Thread.java: Javadoc fixes.
+
 2006-11-29  Tom Tromey  <tromey@redhat.com>
 
 	PR classpath/28203:

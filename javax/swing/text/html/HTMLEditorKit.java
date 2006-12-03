@@ -98,7 +98,12 @@ public class HTMLEditorKit
     extends MouseAdapter
     implements MouseMotionListener, Serializable
     {
-      
+
+      /**
+       * The element of the last anchor tag.
+       */
+      private Element lastAnchorElement;
+
       /**
        * Constructor
        */
@@ -162,10 +167,41 @@ public class HTMLEditorKit
                     AttributeSet aAtts = (AttributeSet)
                                    el.getAttributes().getAttribute(HTML.Tag.A);
                     if (aAtts != null)
-                      newCursor = kit.getLinkCursor();
+                      {
+                        if (el != lastAnchorElement)
+                          {
+                            if (lastAnchorElement != null)
+                              htmlDoc.updateSpecialClass(lastAnchorElement,
+                                                  HTML.Attribute.DYNAMIC_CLASS,
+                                                  null);
+                            lastAnchorElement = el;
+                            htmlDoc.updateSpecialClass(el,
+                                                  HTML.Attribute.DYNAMIC_CLASS,
+                                                  "hover");
+                          }
+                        newCursor = kit.getLinkCursor();
+                      }
+                    else
+                      {
+                        if (lastAnchorElement != null)
+                          htmlDoc.updateSpecialClass(lastAnchorElement,
+                                              HTML.Attribute.DYNAMIC_CLASS,
+                                              null);
+                        lastAnchorElement = null;
+                      }
+                  }
+                else
+                  {
+                    if (lastAnchorElement != null)
+                      htmlDoc.updateSpecialClass(lastAnchorElement,
+                                          HTML.Attribute.DYNAMIC_CLASS,
+                                          null);
+                    lastAnchorElement = null;
                   }
                 if (editor.getCursor() != newCursor)
-                  editor.setCursor(newCursor);
+                  {
+                    editor.setCursor(newCursor);
+                  }
               }
           }
       }
@@ -198,6 +234,8 @@ public class HTMLEditorKit
             if (anchorAtts != null)
               {
                 href = (String) anchorAtts.getAttribute(HTML.Attribute.HREF);
+                htmlDoc.updateSpecialClass(el, HTML.Attribute.PSEUDO_CLASS,
+                                           "visited");
               }
             else
               {
@@ -243,10 +281,25 @@ public class HTMLEditorKit
           {
             url = null;
           }
-        // TODO: Handle frame documents and target here.
-        HyperlinkEvent ev =
-          new HyperlinkEvent(editor, HyperlinkEvent.EventType.ACTIVATED, url,
-                             href, el);
+        HyperlinkEvent ev;
+        if (doc.isFrameDocument())
+          {
+            String target = null;
+            if (anchor != null)
+              target = (String) anchor.getAttribute(HTML.Attribute.TARGET);
+            if (target == null || target.equals(""))
+              target = doc.getBaseTarget();
+            if (target == null || target.equals(""))
+              target = "_self";
+            ev = new HTMLFrameHyperlinkEvent(editor,
+                                            HyperlinkEvent.EventType.ACTIVATED,
+                                            url, href, el, target);
+          }
+        else
+          {
+            ev = new HyperlinkEvent(editor, HyperlinkEvent.EventType.ACTIVATED,
+                                    url, href, el);
+          }
         return ev;
       }
     }
@@ -773,14 +826,14 @@ public class HTMLEditorKit
           else if (tag.equals(HTML.Tag.MENU) || tag.equals(HTML.Tag.DIR)
                    || tag.equals(HTML.Tag.UL) || tag.equals(HTML.Tag.OL))
             view = new ListView(element);
-          // FIXME: Uncomment when the views have been implemented
-          /*
-          else if (tag.equals(HTML.Tag.OBJECT))
-            view = new ObjectView(element);
           else if (tag.equals(HTML.Tag.FRAMESET))
             view = new FrameSetView(element);
           else if (tag.equals(HTML.Tag.FRAME))
-            view = new FrameView(element); */
+            view = new FrameView(element);
+          // FIXME: Uncomment when the views have been implemented
+          /*
+          else if (tag.equals(HTML.Tag.OBJECT))
+            view = new ObjectView(element); */
         }
       if (view == null)
         {
@@ -1065,13 +1118,22 @@ public class HTMLEditorKit
   
   /** The editor pane used. */
   JEditorPane editorPane;
-    
+
+  /**
+   * Whether or not the editor kit handles form submissions.
+   *
+   * @see #isAutoFormSubmission()
+   * @see #setAutoFormSubmission(boolean)
+   */
+  private boolean autoFormSubmission;
+
   /**
    * Constructs an HTMLEditorKit, creates a StyleContext, and loads the style sheet.
    */
   public HTMLEditorKit()
   {
     linkController = new LinkController();
+    autoFormSubmission = true;
   }
   
   /**
@@ -1416,4 +1478,39 @@ public class HTMLEditorKit
     styleSheet = s;
   }
 
+  /**
+   * Returns <code>true</code> when forms should be automatically submitted
+   * by the editor kit. Set this to <code>false</code> when you want to
+   * intercept form submission. In this case you'd want to listen for
+   * hyperlink events on the document and handle FormSubmitEvents specially.
+   *
+   * The default is <code>true</code>.
+   *
+   * @return <code>true</code> when forms should be automatically submitted
+   *         by the editor kit, <code>false</code> otherwise
+   *
+   * @since 1.5
+   *
+   * @see #setAutoFormSubmission(boolean)
+   * @see FormSubmitEvent
+   */
+  public boolean isAutoFormSubmission()
+  {
+    return autoFormSubmission;
+  }
+
+  /**
+   * Sets whether or not the editor kit should automatically submit forms.
+   *  
+   * @param auto <code>true</code> when the editor kit should handle form
+   *        submission, <code>false</code> otherwise
+   *
+   * @since 1.5
+   *
+   * @see #isAutoFormSubmission()
+   */
+  public void setAutoFormSubmission(boolean auto)
+  {
+    autoFormSubmission = auto;
+  }
 }

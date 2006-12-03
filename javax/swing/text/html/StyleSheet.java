@@ -52,6 +52,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +68,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.border.Border;
 import javax.swing.event.ChangeListener;
@@ -300,10 +303,20 @@ public class StyleSheet extends StyleContext
             selector.append('#');
             selector.append(atts.getAttribute(HTML.Attribute.ID));
           }
-        else if (atts.isDefined(HTML.Attribute.CLASS))
+        if (atts.isDefined(HTML.Attribute.CLASS))
           {
             selector.append('.');
             selector.append(atts.getAttribute(HTML.Attribute.CLASS));
+          }
+        if (atts.isDefined(HTML.Attribute.DYNAMIC_CLASS))
+          {
+            selector.append(':');
+            selector.append(atts.getAttribute(HTML.Attribute.DYNAMIC_CLASS));
+          }
+        if (atts.isDefined(HTML.Attribute.PSEUDO_CLASS))
+          {
+            selector.append(':');
+            selector.append(atts.getAttribute(HTML.Attribute.PSEUDO_CLASS));
           }
         selector.append(' ');
       }
@@ -326,10 +339,20 @@ public class StyleSheet extends StyleContext
             selector.append('#');
             selector.append(atts.getAttribute(HTML.Attribute.ID));
           }
-        else if (atts.isDefined(HTML.Attribute.CLASS))
+        if (atts.isDefined(HTML.Attribute.CLASS))
           {
             selector.append('.');
             selector.append(atts.getAttribute(HTML.Attribute.CLASS));
+          }
+        if (atts.isDefined(HTML.Attribute.DYNAMIC_CLASS))
+          {
+            selector.append(':');
+            selector.append(atts.getAttribute(HTML.Attribute.DYNAMIC_CLASS));
+          }
+        if (atts.isDefined(HTML.Attribute.PSEUDO_CLASS))
+          {
+            selector.append(':');
+            selector.append(atts.getAttribute(HTML.Attribute.PSEUDO_CLASS));
           }
       }
     return getResolvedStyle(selector.toString(), path, t);
@@ -357,7 +380,7 @@ public class StyleSheet extends StyleContext
   /**
    * Resolves a style. This creates arrays that hold the tag names,
    * class and id attributes and delegates the work to
-   * {@link #resolveStyle(String, String[], String[], String[])}.
+   * {@link #resolveStyle(String, String[], Map[])}.
    *
    * @param selector the selector
    * @param path the Element path
@@ -369,8 +392,7 @@ public class StyleSheet extends StyleContext
   {
     int count = path.size();
     String[] tags = new String[count];
-    String[] ids = new String[count];
-    String[] classes = new String[count];
+    Map[] attributes = new Map[count];
     for (int i = 0; i < count; i++)
       {
         Element el = (Element) path.get(i);
@@ -391,24 +413,16 @@ public class StyleSheet extends StyleContext
               tags[i] = t.toString();
             else
               tags[i] = null;
-            if (atts.isDefined(HTML.Attribute.CLASS))
-              classes[i] = atts.getAttribute(HTML.Attribute.CLASS).toString();
-            else
-              classes[i] = null;
-            if (atts.isDefined(HTML.Attribute.ID))
-              ids[i] = atts.getAttribute(HTML.Attribute.ID).toString();
-            else
-              ids[i] = null;
+            attributes[i] = attributeSetToMap(atts);
           }
         else
           {
             tags[i] = null;
-            classes[i] = null;
-            ids[i] = null;
+            attributes[i] = null;
           }
       }
     tags[0] = tag.toString();
-    return resolveStyle(selector, tags, ids, classes);
+    return resolveStyle(selector, tags, attributes);
   }
 
   /**
@@ -416,13 +430,11 @@ public class StyleSheet extends StyleContext
    *
    * @param selector the selector
    * @param tags the tags
-   * @param ids the corresponding ID attributes
-   * @param classes the corresponding CLASS attributes
+   * @param attributes the attributes of the tags
    *
    * @return the resolved style
    */
-  private Style resolveStyle(String selector, String[] tags, String[] ids,
-                             String[] classes)
+  private Style resolveStyle(String selector, String[] tags, Map[] attributes)
   {
     // FIXME: This style resolver is not correct. But it works good enough for
     // the default.css.
@@ -431,7 +443,7 @@ public class StyleSheet extends StyleContext
     for (Iterator i = css.iterator(); i.hasNext();)
       {
         CSSStyle style = (CSSStyle) i.next();
-        if (style.selector.matches(tags, classes, ids))
+        if (style.selector.matches(tags, attributes))
           styles.add(style);
       }
 
@@ -444,7 +456,7 @@ public class StyleSheet extends StyleContext
             for (int j = ss.css.size() - 1; j >= 0; j--)
               {
                 CSSStyle style = (CSSStyle) ss.css.get(j);
-                if (style.selector.matches(tags, classes, ids))
+                if (style.selector.matches(tags, attributes))
                   styles.add(style);
               }
           }
@@ -741,8 +753,13 @@ public class StyleSheet extends StyleContext
                                   .getAttributes();
         o = tableAttrs.getAttribute(HTML.Attribute.CELLPADDING);
         if (o != null)
-          cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING,
-                                 new Length(o.toString()));
+          {
+            Length l = new Length(o.toString());
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_BOTTOM, l);
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_LEFT, l);
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_RIGHT, l);
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_TOP, l);
+          }
       }
     // TODO: Add more mappings.
     return cssAttr;
@@ -882,7 +899,37 @@ public class StyleSheet extends StyleContext
       style |= fStyle.getValue();
     return new Font(family, style, realSize);
   }
-  
+
+  /**
+   * Determines the EM base value based on the specified attributes.
+   *
+   * @param atts the attibutes
+   *
+   * @return the EM base value
+   */
+  float getEMBase(AttributeSet atts)
+  {
+    Font font = getFont(atts);
+    FontRenderContext ctx = new FontRenderContext(null, false, false);
+    Rectangle2D bounds = font.getStringBounds("M", ctx);
+    return (float) bounds.getWidth();
+  }
+
+  /**
+   * Determines the EX base value based on the specified attributes.
+   *
+   * @param atts the attibutes
+   *
+   * @return the EX base value
+   */
+  float getEXBase(AttributeSet atts)
+  {
+    Font font = getFont(atts);
+    FontRenderContext ctx = new FontRenderContext(null, false, false);
+    Rectangle2D bounds = font.getStringBounds("x", ctx);
+    return (float) bounds.getHeight();
+  }
+
   /**
    * Resolves the fontsize for a given set of attributes.
    *
@@ -1120,49 +1167,62 @@ public class StyleSheet extends StyleContext
      */
     BoxPainter(AttributeSet as, StyleSheet ss)
     {
+      float emBase = ss.getEMBase(as);
+      float exBase = ss.getEXBase(as);
       // Fetch margins.
-      Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN);
+      Length l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
       if (l != null)
         {
-          topInset = bottomInset = leftInset = rightInset = l.getValue();
+          l.setFontBases(emBase, exBase);
+          leftInset = l.getValue();
         }
-      l = (Length) as.getAttribute(CSS.Attribute.MARGIN_LEFT);
-      if (l != null)
-        leftInset = l.getValue();
-      else if (as.getAttribute(StyleConstants.NameAttribute) == HTML.Tag.UL)
-        System.err.println("UL margin left value: " + l + " atts: " + as);
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_RIGHT);
       if (l != null)
-        rightInset = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          rightInset = l.getValue();
+        }
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_TOP);
       if (l != null)
-        topInset = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          topInset = l.getValue();
+        }
       l = (Length) as.getAttribute(CSS.Attribute.MARGIN_BOTTOM);
       if (l != null)
-        bottomInset = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          bottomInset = l.getValue();
+        }
 
       // Fetch padding.
-      l = (Length) as.getAttribute(CSS.Attribute.PADDING);
-      if (l != null)
-        {
-          leftPadding = rightPadding = topPadding = bottomPadding =
-            l.getValue();
-        }
       l = (Length) as.getAttribute(CSS.Attribute.PADDING_LEFT);
       if (l != null)
-        leftPadding = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          leftPadding = l.getValue();
+        }
       l = (Length) as.getAttribute(CSS.Attribute.PADDING_RIGHT);
       if (l != null)
-        rightPadding = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          rightPadding = l.getValue();
+        }
       l = (Length) as.getAttribute(CSS.Attribute.PADDING_TOP);
       if (l != null)
-        topPadding = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          topPadding = l.getValue();
+        }
       l = (Length) as.getAttribute(CSS.Attribute.PADDING_BOTTOM);
       if (l != null)
-        bottomPadding = l.getValue();
+        {
+          l.setFontBases(emBase, exBase);
+          bottomPadding = l.getValue();
+        }
 
       // Determine border.
-      border = new CSSBorder(as);
+      border = new CSSBorder(as, ss);
 
       // Determine background.
       background = ss.getBackground(as);
@@ -1229,15 +1289,18 @@ public class StyleSheet extends StyleContext
      */
     public void paint(Graphics g, float x, float y, float w, float h, View v)
     {
-      
+      int inX = (int) (x + leftInset);
+      int inY = (int) (y + topInset);
+      int inW = (int) (w - leftInset - rightInset);
+      int inH = (int) (h - topInset - bottomInset);
       if (background != null)
         {
           g.setColor(background);
-          g.fillRect((int) x, (int) y, (int) w, (int) h);
+          g.fillRect(inX, inY, inW, inH);
         }
       if (border != null)
         {
-          border.paintBorder(null, g, (int) x, (int) y, (int) w, (int) h);
+          border.paintBorder(null, g, inX, inY, inW, inH);
         }
     }
   }
@@ -1342,4 +1405,23 @@ public class StyleSheet extends StyleContext
     }
   }
 
+  /**
+   * Converts an AttributeSet to a Map. This is used for CSS resolving.
+   *
+   * @param atts the attributes to convert
+   *
+   * @return the converted map
+   */
+  private Map attributeSetToMap(AttributeSet atts)
+  {
+    HashMap map = new HashMap();
+    Enumeration keys = atts.getAttributeNames();
+    while (keys.hasMoreElements())
+      {
+        Object key = keys.nextElement();
+        Object value = atts.getAttribute(key);
+        map.put(key.toString(), value.toString());
+      }
+    return map;
+  }
 }

@@ -1,4 +1,4 @@
-/* BorderWidth.java -- A CSS metric for border widths
+/* FormSubmitEvent.java -- Event fired on form submit
    Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -36,43 +36,88 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
 
-package gnu.javax.swing.text.html.css;
+package javax.swing.text.html;
+
+import java.net.URL;
+
+import javax.swing.text.Element;
 
 /**
- * A special CSS metric for border widths. It basically understands everything
- * as Length, and in addition to that provides a mapping for the border-width's
- * thin, medium and think values.
+ * The event fired on form submit.
+ *
+ * @since 1.5
  */
-public class BorderWidth
-  extends Length
+public class FormSubmitEvent
+  extends HTMLFrameHyperlinkEvent
 {
 
+  // FIXME: Use enums when available.
   /**
-   * Creates a new BorderWidth instance.
-   *
-   * @param val the CSS value to be interpreted
+   * The submit method.
    */
-  public BorderWidth(String val)
+  public static class MethodType
   {
-    super(val);
-    if (val.equals("thin"))
-      floatValue = 1.F;
-    else if (val.equals("medium"))
-      floatValue = 2.F;
-    else if (val.equals("thick"))
-      floatValue = 3.F;
+    /**
+     * Indicates a form submit with HTTP method POST.
+     */
+    public static final MethodType POST = new MethodType();
+
+    /**
+     * Indicates a form submit with HTTP method GET.
+     */
+    public static final MethodType GET = new MethodType();
+
+    private MethodType()
+    {
+    }
   }
 
   /**
-   * Checks if the specified value makes up a valid border-width value.
-   *
-   * @param value the value to check
-   *
-   * @return <code>true</code> if the value is a valid border-width
+   * The submit method.
    */
-  public static boolean isValid(String value)
+  private MethodType method;
+
+  /**
+   * The actual submit data.
+   */
+  private String data;
+
+  /**
+   * Creates a new FormSubmitEvent.
+   *
+   * @param source the source
+   * @param type the type of hyperlink update
+   * @param url the action url
+   * @param el the associated element
+   * @param target the target attribute
+   * @param m the submit method
+   * @param d the submit data
+   */
+  FormSubmitEvent(Object source, EventType type, URL url, Element el,
+                  String target, MethodType m, String d)
   {
-    return value.equals("thin") || value.equals("medium")
-           || value.equals("thick") || Length.isValid(value);
+    super(source, type, url, el, target);
+    method = m;
+    data = d;
+  }
+
+  /**
+   * Returns the submit data.
+   *
+   * @return the submit data
+   */
+  public String getData()
+  {
+    return data;
+  }
+
+  /**
+   * Returns the HTTP submit method.
+   *
+   * @return the HTTP submit method
+   */
+  public MethodType getMethod()
+  {
+    return method;
   }
 }
