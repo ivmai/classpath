@@ -108,7 +108,7 @@ public class Server
    * {@link javax.management.ObjectName}s to
    * {@link java.lang.Object}s.
    */
-  private Map beans;
+  private final Map beans = new HashMap();
 
   /**
    * The default domain.
@@ -1646,9 +1646,7 @@ public class Server
 	    throw new MBeanRegistrationException(e, "Pre-registration failed.");
 	  }
       }
-    if (beans == null)
-      beans = new HashMap();
-    else if (beans.containsKey(name))
+    if (beans.containsKey(name))
       {
 	if (register != null)
 	  register.postRegister(Boolean.FALSE);
