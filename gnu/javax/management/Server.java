@@ -104,11 +104,6 @@ public class Server
 {
 
   /**
-   * The name of the delegate bean.
-   */
-  private static final ObjectName DELEGATE_NAME;
-
-  /**
    * The registered beans, represented as a map of
    * {@link javax.management.ObjectName}s to
    * {@link java.lang.Object}s.
@@ -126,6 +121,11 @@ public class Server
   private MBeanServer outer;
 
   /**
+   * The delegate bean.
+   */
+  private MBeanServerDelegate delegate;
+
+  /**
    * The class loader repository.
    */
   private ClassLoaderRepository repository;
@@ -135,24 +135,6 @@ public class Server
    * listener.
    */
   private Map listeners;
-
-  /**
-   * Initialise the delegate name.
-   */
-  static
-  {
-    try
-      {
-	DELEGATE_NAME = 
-	  new ObjectName("JMImplementation:type=MBeanServerDelegate");
-      }
-    catch (MalformedObjectNameException e)
-      {
-	throw (Error) 
-	  (new InternalError("Failed to construct " +
-			     "the delegate's object name.").initCause(e));
-      }
-  }
 
   /**
    * Constructs a new management server using the specified
@@ -171,28 +153,7 @@ public class Server
   {
     this.defaultDomain = defaultDomain;
     this.outer = outer;
-    try
-      {
-	registerMBean(delegate, DELEGATE_NAME);
-      }
-    catch (InstanceAlreadyExistsException e)
-      {
-	throw (Error) 
-	  (new InternalError("The delegate bean is " +
-			     "already registered.").initCause(e));
-      }
-    catch (MBeanRegistrationException e)
-      {
-	throw (Error) 
-	  (new InternalError("The delegate bean's preRegister " +
-			     "methods threw an exception.").initCause(e));
-      }
-    catch (NotCompliantMBeanException e)
-      {
-	throw (Error) 
-	  (new InternalError("The delegate bean is " +
-			     "not compliant.").initCause(e));
-      }
+    this.delegate = delegate;
   }
 
   /**
@@ -2058,14 +2019,14 @@ public class Server
 	  new IllegalArgumentException("The name was null.");
 	throw new RuntimeOperationsException(e);
       }
-    if (name.equals(DELEGATE_NAME))
+    Object bean = getBean(name);    
+    checkSecurity(name, null, "unregisterMBean");
+    if (bean == delegate)
       {
 	RuntimeException e =
 	  new IllegalArgumentException("The delegate can not be unregistered.");
 	throw new RuntimeOperationsException(e);
       }	
-    Object bean = getBean(name);    
-    checkSecurity(name, null, "unregisterMBean");
     MBeanRegistration register = null;
     if (bean instanceof MBeanRegistration)
       {
