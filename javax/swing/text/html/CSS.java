@@ -645,6 +645,7 @@ public class CSS implements Serializable
     if (numTokens == 1)
       {
         Length l = new Length(tokens.nextToken());
+        System.err.println("margin: " + l);
         atts.addAttribute(Attribute.MARGIN_BOTTOM, l);
         atts.addAttribute(Attribute.MARGIN_LEFT, l);
         atts.addAttribute(Attribute.MARGIN_RIGHT, l);
