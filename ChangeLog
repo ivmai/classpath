@@ -1,3 +1,21 @@
+2006-12-06  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* java/awt/ScrollPane.java (addNotify): Add a parent panel for any
+	lightweight component, not just for non-Panel components.
+	(addImpl): Do not call doLayout.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkButtonPeer.c
+	(setNativeBounds): Ensure widget parent is a GtkFixed before
+	calling gtk_fixed_move.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkLabelPeer.c
+	(setNativeBounds): Likewise.
+	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_GtkComponentPeer.c
+	(setNativeBounds): Likewise.
+
+2006-12-04  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* java/awt/Component.java (getFontImpl): Return a default font if
+	topmost parent's font is null.
+
 2006-12-04  Mark Wielaard  <mark@klomp.org>
 
 	* javax/swing/text/html/CSS.java (parseMarginShorthand):
