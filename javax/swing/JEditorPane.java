@@ -40,7 +40,7 @@ package javax.swing;
 
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -711,7 +711,10 @@ public class JEditorPane extends JTextComponent
       {
         try
         {
-          e = (EditorKit) Class.forName(className).newInstance();
+          // XXX - This should actually depend on the classloader
+          // registered with the type. See registerEditorKitForContentType.
+          ClassLoader ldr = ClassLoader.getSystemClassLoader();
+          e = (EditorKit) Class.forName(className, true, ldr).newInstance();
         }
         catch (Exception e2)
         {    
@@ -898,7 +901,7 @@ public class JEditorPane extends JTextComponent
     if (type != null)
       setContentType(type);
     InputStream stream = conn.getInputStream();
-    return stream;
+    return new BufferedInputStream(stream);
   }
 
   public String getText()
@@ -1061,10 +1064,6 @@ public class JEditorPane extends JTextComponent
       throw new IOException("invalid url");
 
     URL old = getPage();
-    // Reset scrollbar when URL actually changes.
-    if (! page.equals(old) && page.getRef() == null)
-      scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-
     // Only reload if the URL doesn't point to the same file.
     // This is not the same as equals because there might be different
     // URLs on the same file with different anchors.

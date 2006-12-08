@@ -1,5 +1,5 @@
-<!-- welcome.html -- Some HTML stuff to show Swing HTML
-    Copyright (C) 2006 Free Software Foundation, Inc.
+/* OptionListModel.java -- A special ListModel for use in the HTML renderer
+   Copyright (C) 2006 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -33,66 +33,74 @@ module.  An independent module is a module which is not derived from
 or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version. -->
+exception statement from your version. */
 
-<html>
 
-  <head>
-    <title>HTML text styles</title>
-  </head>
-  <body>
-  <form>
-  <a href="welcome.html">Back to start page</a>
-  <h1>Some form elements</h1>
-  <h2>Textarea</h2>
-  <textarea cols="30" rows="5">
-  Hello GNU Classpath world. This text should show up in a text area
-  that has a size of 30 columns and 5 rows
-  </textarea>
+package javax.swing.text.html;
 
-  <h2>Input fields</h2>
-  <p>
-  <input type="text" value="This is a normal textfield">
-  <input type="password" value="secret password">
-  </p>
+import java.util.BitSet;
 
-  <h2>Buttons</h2>
-  <p>
-  <input type="submit"></input>
-  <input type="reset"></input>
-  <input type="button" value="Some button"></input>
-  </p>
+import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
 
-  <h2>Checkboxes and Radiobuttons</h2>
-  <p>
-  <input type="checkbox" name="2">Check this!</input>
-  <input type="checkbox" name="2">Or this</input>
-  </p>
-  <p>
-  <input type="radio" name="1">A radio button</input>
-  <input type="radio" name="1">Another radio</input>
-  </p>
-  <h2>Select lists and combo boxes</h2>
-  <p>
-  <select>
-    <option>Value1</option>
-    <option>Value2</option>
-    <option>Value3</option>
-    <option label="Labeled value 4">Value4</option>
-    <option>Value5</option>
-    <option>Value6</option>
-  </select>
-  </p>
-  <p>
-  <select size="3">
-    <option>Value1</option>
-    <option>Value2</option>
-    <option>Value3</option>
-    <option label="Labeled value 4">Value4</option>
-    <option>Value5</option>
-    <option>Value6</option>
-  </select>
-  </p>
-  </form>
-  </body>
-</html>
+/**
+ * A special list model that encapsulates its selection model and supports
+ * storing of the initial value so that it can be resetted.
+ */
+class SelectListModel
+  extends DefaultListModel
+  implements ResetableModel
+{
+  /**
+   * The selection model.
+   */
+  private DefaultListSelectionModel selectionModel;
+
+  /**
+   * The initial selection.
+   */
+  private BitSet initialSelection;
+
+  /**
+   * Creates a new SelectListModel.
+   */
+  SelectListModel()
+  {
+    selectionModel = new DefaultListSelectionModel();
+    initialSelection = new BitSet();
+  }
+
+  /**
+   * Sets the initial selection.
+   *
+   * @param init the initial selection
+   */
+  void addInitialSelection(int init)
+  {
+    initialSelection.set(init);
+  }
+
+  /**
+   * Resets the model.
+   */
+  public void reset()
+  {
+    selectionModel.clearSelection();
+    for (int i = initialSelection.size(); i >= 0; i--)
+      {
+        if (initialSelection.get(i))
+          selectionModel.addSelectionInterval(i, i);
+      }
+  }
+
+  /**
+   * Returns the associated selection model.
+   *
+   * @return the associated selection model
+   */
+  ListSelectionModel getSelectionModel()
+  {
+    return selectionModel;
+  }
+}
