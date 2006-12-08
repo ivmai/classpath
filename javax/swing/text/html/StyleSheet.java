@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package javax.swing.text.html;
 
+import gnu.javax.swing.text.html.css.BorderWidth;
 import gnu.javax.swing.text.html.css.CSSColor;
 import gnu.javax.swing.text.html.css.CSSParser;
 import gnu.javax.swing.text.html.css.CSSParserCallback;
@@ -511,8 +512,7 @@ public class StyleSheet extends StyleContext
       }
     catch (IOException ex)
       {
-        // Shouldn't happen. And if, then we
-        System.err.println("IOException while parsing stylesheet: " + ex.getMessage());
+        // Shouldn't happen. And if, then don't let it bork the outside code.
       }
     // Clean up resolved styles cache so that the new styles are recognized
     // on next stylesheet request.
@@ -760,8 +760,41 @@ public class StyleSheet extends StyleContext
             cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_RIGHT, l);
             cssAttr = addAttribute(cssAttr, CSS.Attribute.PADDING_TOP, l);
           }
+        o = tableAttrs.getAttribute(HTML.Attribute.BORDER);
+        cssAttr = translateBorder(cssAttr, o);
       }
+
+    // Translate border attribute.
+    o = cssAttr.getAttribute(HTML.Attribute.BORDER);
+    cssAttr = translateBorder(cssAttr, o);
+
     // TODO: Add more mappings.
+    return cssAttr;
+  }
+
+  /**
+   * Translates a HTML border attribute to a corresponding set of CSS
+   * attributes.
+   *
+   * @param cssAttr the original set of CSS attributes to add to 
+   * @param o the value of the border attribute
+   *
+   * @return the new set of CSS attributes
+   */
+  private AttributeSet translateBorder(AttributeSet cssAttr, Object o)
+  {
+    if (o != null)
+      {
+        BorderWidth l = new BorderWidth(o.toString());
+        if (l.getValue() > 0)
+          {
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.BORDER_WIDTH, l);
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.BORDER_STYLE,
+                                   "solid");
+            cssAttr = addAttribute(cssAttr, CSS.Attribute.BORDER_COLOR,
+                                   new CSSColor("black"));
+          }
+      }
     return cssAttr;
   }
 
@@ -1397,7 +1430,6 @@ public class StyleSheet extends StyleContext
             }
           if (centerY == -1)
             {
-              System.err.println("WARNING LI child is not a paragraph view " + itemView.getView(0) + ", " + itemView.getViewCount());
               centerY =(int) (h / 2 + y);
             }
           g.fillOval(centerX - 3, centerY - 3, 6, 6);

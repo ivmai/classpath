@@ -1,6 +1,5 @@
 package javax.swing.text.html;
 
-import gnu.javax.swing.text.html.CombinedAttributes;
 import gnu.javax.swing.text.html.ImageViewIconFactory;
 import gnu.javax.swing.text.html.css.Length;
 
@@ -15,6 +14,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -40,16 +41,15 @@ public class ImageView extends View
     public boolean imageUpdate(Image image, int flags, int x, int y, int width, int height)
     {
       boolean widthChanged = false;
-      if ((flags & ImageObserver.WIDTH) != 0
-          && ! getElement().getAttributes().isDefined(HTML.Attribute.WIDTH))
+      if ((flags & ImageObserver.WIDTH) != 0 && spans[X_AXIS] == null)
         widthChanged = true;
       boolean heightChanged = false;
-      if ((flags & ImageObserver.HEIGHT) != 0
-          && ! getElement().getAttributes().isDefined(HTML.Attribute.HEIGHT))
-        widthChanged = true;
+      if ((flags & ImageObserver.HEIGHT) != 0 && spans[Y_AXIS] == null)
+        heightChanged = true;
       if (widthChanged || heightChanged)
-        preferenceChanged(ImageView.this, widthChanged, heightChanged);
-      return (flags & ALLBITS) != 0;
+        safePreferenceChanged(ImageView.this, widthChanged, heightChanged);
+      boolean ret = (flags & ALLBITS) != 0;
+      return ret;
     }
     
   }
@@ -112,8 +112,10 @@ public class ImageView extends View
 
   /**
    * The CSS width and height.
+   *
+   * Package private to avoid synthetic accessor methods.
    */
-  private Length[] spans;
+  Length[] spans;
 
   /**
    * The cached attributes.
@@ -128,9 +130,11 @@ public class ImageView extends View
   public ImageView(Element element)
   {
     super(element);
+    spans = new Length[2];
     observer = new Observer();
     reloadProperties = true;
     reloadImage = true;
+    loadOnDemand = false;
   }
  
   /**
@@ -416,7 +420,6 @@ public class ImageView extends View
     StyleSheet ss = getStyleSheet();
     float emBase = ss.getEMBase(atts);
     float exBase = ss.getEXBase(atts);
-    spans = new Length[2];
     spans[X_AXIS] = (Length) atts.getAttribute(CSS.Attribute.WIDTH);
     if (spans[X_AXIS] != null)
       {
@@ -487,7 +490,9 @@ public class ImageView extends View
     if (src != null)
       {
         // Call getImage(URL) to allow the toolkit caching of that image URL.
-        newImage = Toolkit.getDefaultToolkit().getImage(src);
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        newImage = tk.getImage(src);
+        tk.prepareImage(newImage, -1, -1, observer);
         if (newImage != null && getLoadsSynchronously())
           {
             // Load image synchronously.
@@ -546,6 +551,44 @@ public class ImageView extends View
           tk.prepareImage(newIm, width, height, observer);
         else
           tk.prepareImage(newIm, -1, -1, observer);
+      }
+  }
+
+  /**
+   * Calls preferenceChanged from the event dispatch thread and within
+   * a read lock to protect us from threading issues.
+   *
+   * @param v the view
+   * @param width true when the width changed
+   * @param height true when the height changed
+   */
+  void safePreferenceChanged(final View v, final boolean width,
+                             final boolean height)
+  {
+    if (SwingUtilities.isEventDispatchThread())
+      {
+        Document doc = getDocument();
+        if (doc instanceof AbstractDocument)
+          ((AbstractDocument) doc).readLock();
+        try
+          {
+            preferenceChanged(v, width, height);
+          }
+        finally
+          {
+            if (doc instanceof AbstractDocument)
+              ((AbstractDocument) doc).readUnlock();
+          }
+      }
+    else
+      {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            safePreferenceChanged(v, width, height);
+          }
+        });
       }
   }
 }

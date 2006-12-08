@@ -40,7 +40,6 @@ package javax.swing.text.html;
 
 import gnu.javax.swing.text.html.css.Length;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -142,8 +141,10 @@ public class BlockView extends BoxView
 
   /**
    * The box painter for this view.
+   *
+   * This is package private because the TableView needs access to it.
    */
-  private StyleSheet.BoxPainter painter;
+  StyleSheet.BoxPainter painter;
 
   /**
    * The width and height as specified in the stylesheet, null if not
@@ -522,7 +523,7 @@ public class BlockView extends BoxView
   public float getAlignment(int axis)
   {
     if (axis == X_AXIS)
-      return 0.0F;
+      return super.getAlignment(axis);
     if (axis == Y_AXIS)
       {
         if (getViewCount() == 0)
