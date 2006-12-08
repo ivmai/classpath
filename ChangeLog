@@ -1,3 +1,28 @@
+2006-12-06  Ben Konrath  <bkonrath@redhat.com>
+
+	Fixes PR 29853.
+	* gnu/xml/dom/DomAttr.java: Don't report mutation if oldValue and
+	newValue are the same.
+	* gnu/xml/dom/DomNode.java: Set parent if null during mutation.
+
+2006-12-06  Chris Burdess  <dog@gnu.org>
+
+	Fixes PR 29272.
+	* javax/xml/parsers/DocumentBuilderFactory.java: Fix broken Javadoc.
+	* gnu/xml/stream/SAXParser.java: Fix file descriptor leak.
+
+2006-12-06  Chris Burdess  <dog@gnu.org>
+
+	Fixes PR 29264.
+	* gnu/xml/stream/XMLStreamWriterImpl.java: Allow arbitrary text in
+	writeDTD method.
+
+2006-12-056  Chris Burdess  <dog@gnu.org>
+
+	Fixes PR 28816.
+	* javax/xml/validation/SchemaFactory.java: Use correct algorithm to
+	discover schema factory implementation class.
+
 2006-12-05  Roman Kennke  <kennke@aicas.com>
 
 	(paintComponent): Include paint area from event.
