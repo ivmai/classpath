@@ -1,3 +1,8 @@
+2006-12-08  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac (VERSION): Set to 0.93-generics.
+	* NEWS: Add release date.
+
 2006-12-05  Roman Kennke  <kennke@aicas.com>
 
 	* javax/swing/text/html/ImageView.java
