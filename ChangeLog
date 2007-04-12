@@ -1,3 +1,11 @@
+2007-04-12  Christian Thalinger  <twisti@complang.tuwien.ac.at>
+
+	* LICENSE: Added m4/ax_func_which_gethostbyname_r.m4 license.
+	* configure.ac: Added AX_FUNC_WHICH_GETHOSTBYNAME_R check.
+	* m4/ax_func_which_gethostbyname_r.m4: New file.
+	* native/jni/native-lib/cpnet.c (cpnet_getHostByName): Check for
+	different number of arguments of gethostbyname_r.
+
 2007-04-11  Francis Kung  <fkung@redhat.com>
 
 	* native/jni/gtk-peer/gnu_java_awt_peer_gtk_FreetypeGlyphVector.c
