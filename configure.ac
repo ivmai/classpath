@@ -419,6 +419,7 @@ if test "x${COMPILE_JNI}" = xyes; then
           [AC_MSG_RESULT(no)])])])
 
   AC_C_CONST
+  AC_C_INLINE
   AC_C_ATTRIBUTE
   AX_FUNC_WHICH_GETHOSTBYNAME_R
 
