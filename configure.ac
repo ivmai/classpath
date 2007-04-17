@@ -313,6 +313,7 @@ AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 dnl AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CPP
 
 # Handle -Werror default case.
@@ -603,6 +604,9 @@ if test "x${COMPILE_JNI}" = xyes; then
     fi
     if test "x${MOZILLA_FOUND}" = xno; then
       PKG_CHECK_MODULES(MOZILLA, seamonkey-plugin seamonkey-xpcom, [MOZILLA_FOUND=yes], [MOZILLA_FOUND=no])
+    fi
+    if test "x${MOZILLA_FOUND}" = xno; then
+      PKG_CHECK_MODULES(MOZILLA, iceape-plugin iceape-xpcom, [MOZILLA_FOUND=yes], [MOZILLA_FOUND=no])
     fi
     if test "x${MOZILLA_FOUND}" = xno; then
       AC_MSG_ERROR([Couldn't find plugin support headers and libraries, try --disable-plugin])
