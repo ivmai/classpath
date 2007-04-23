@@ -1,5 +1,9 @@
 2007-04-23  Mark Wielaard  <mark@klomp.org>
 
+	* configure.ac (VERSION): Set to 0.95.
+
+2007-04-23  Mark Wielaard  <mark@klomp.org>
+
 	* NEWS: Add new 0.95 features.
 
 2007-04-23  Jeroen Frijters  <jeroen@frijters.net>
