@@ -6,7 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([GNU Classpath],[0.98-pre],[classpath@gnu.org],[classpath])
+AC_INIT([GNU Classpath],[0.97.1],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
 AC_CANONICAL_TARGET
@@ -246,19 +246,6 @@ AC_ARG_ENABLE([plugin],
 AM_CONDITIONAL(CREATE_PLUGIN, test "x${COMPILE_PLUGIN}" = xyes)
 
 dnl -----------------------------------------------------------
-dnl Native java.math.BigInteger (enabled by default)
-dnl -----------------------------------------------------------
-AC_ARG_ENABLE([gmp],
-              [AS_HELP_STRING(--enable-gmp,
-                              compile native java.math.BigInteger library (disabled by --disable-gmp) [default=yes])],
-              [case "${enableval}" in
-                yes|true) COMPILE_GMP=yes ;;
-                no|false) COMPILE_GMP=no ;;
-                *) COMPILE_GMP=yes ;;
-              esac],
-              [COMPILE_GMP=yes])
-
-dnl -----------------------------------------------------------
 dnl Sets the native libraries installation dir
 dnl -----------------------------------------------------------
 AC_ARG_WITH([native-libdir],
@@ -382,7 +369,6 @@ if test "x${COMPILE_JNI}" = xyes; then
   dnl BSD_COMP is defined; just including sys/filio.h is simpler.
   dnl Check for crt_externs.h on Darwin.
   dnl Check for netinet/in_systm.h, netinet/ip.h and net/if.h for Windows CE.
-  dnl Check for sys/loadavg.h for getloadavg() on Solaris 9.
   AC_CHECK_HEADERS([unistd.h sys/types.h sys/config.h sys/ioctl.h \
 		    asm/ioctls.h \
 		    inttypes.h stdint.h utime.h sys/utime.h sys/filio.h \
@@ -394,8 +380,7 @@ if test "x${COMPILE_JNI}" = xyes; then
 		    magic.h \
                     sys/event.h sys/epoll.h \
 		    ifaddrs.h \
-		    netinet/in_systm.h netinet/ip.h net/if.h \
-		    sys/loadavg.h])
+		    netinet/in_systm.h netinet/ip.h net/if.h])
 
   AC_EGREP_HEADER(uint32_t, stdint.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
   AC_EGREP_HEADER(uint32_t, inttypes.h, AC_DEFINE(HAVE_INT32_DEFINED, 1, [Define to 1 if you have uint32_t]))
@@ -710,26 +695,6 @@ if test "x${COMPILE_JNI}" = xyes; then
 
     AC_SUBST(PLUGIN_DIR, $HOME/.mozilla/plugins/)
   fi
-
-  dnl Check for GNU MP library and header file
-  dnl for GNU MP versions >= 4.2 use __gmpz_combit; otherwise look for
-  dnl __gmpz_mul_si for earlier versions (>= 3.1).
-  dnl IMPORTANT: if you decide to look for __gmpz_combit, don't forget to
-  dnl change the name of the corresponding ac_ variable on lines 860...
-  if test "x${COMPILE_GMP}" = xyes; then
-    AC_CHECK_LIB(gmp, __gmpz_mul_si,
-      [GMP_CFLAGS=-I/usr/include
-       GMP_LIBS=-lgmp ],
-      [GMP_CFLAGS=
-       GMP_LIBS= ])
-    AC_SUBST(GMP_CFLAGS)
-    AC_SUBST(GMP_LIBS)
-
-    AC_CHECK_HEADERS([gmp.h])
-  fi
-
-else
-  COMPILE_GMP=no
 fi
 
 if test "x${REGENERATE_JNI_HEADERS}" = xyes; then
@@ -971,25 +936,6 @@ dnl -----------------------------------------------------------
 AC_SUBST(DEFAULT_PREFS_PEER)
 
 dnl -----------------------------------------------------------
-dnl Set GNU MP related params
-dnl -----------------------------------------------------------
-WANT_NATIVE_BIG_INTEGER=false
-if test "x${COMPILE_GMP}" = xyes; then
-  if test "x${ac_cv_lib_gmp___gmpz_mul_si}" = xyes; then
-    if test "x${ac_cv_header_gmp_h}" = xyes; then
-      WANT_NATIVE_BIG_INTEGER=true
-      AC_DEFINE(WITH_GNU_MP, 1, [Define to 1 if gmp is usable])
-    else
-      COMPILE_GMP=no
-    fi
-  else
-    COMPILE_GMP=no
-  fi
-fi
-AC_SUBST(WANT_NATIVE_BIG_INTEGER)
-AM_CONDITIONAL(CREATE_GMPBI_LIBRARY, test "x${COMPILE_GMP}" = xyes)
-
-dnl -----------------------------------------------------------
 dnl output files
 dnl -----------------------------------------------------------
 AC_CONFIG_FILES([Makefile
@@ -1010,7 +956,6 @@ native/jni/Makefile
 native/jni/classpath/Makefile
 native/jni/java-io/Makefile
 native/jni/java-lang/Makefile
-native/jni/java-math/Makefile
 native/jni/java-net/Makefile
 native/jni/java-nio/Makefile
 native/jni/java-util/Makefile

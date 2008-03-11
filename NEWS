@@ -1,4 +1,8 @@
-New in release 0.98
+Bug fixes in release 0.97.1 (Mar 11, 2007)
+
+* Include documentation for JSR166 (java.util.concurrent)
+* Fix STaX API compatability.
+* Include the tools properties file in the release tarball.
 
 New in release 0.97 (Feb 22, 2007)
 
