@@ -148,7 +148,6 @@ java_lang_VMMath.h \
 java_lang_VMProcess.h \
 java_lang_VMSystem.h \
 java_lang_reflect_VMArray.h \
-java_math_VMBigInteger.h \
 java_net_VMInetAddress.h \
 java_net_VMNetworkInterface.h \
 java_net_VMURLConnection.h \
@@ -157,6 +156,8 @@ java_nio_MappedByteBufferImpl.h \
 java_util_VMTimeZone.h
 
 if CREATE_JNI_HEADERS
+
+EXTRA_DIST=$(H_FILES)
 
 all-local: $(H_FILES)
 
@@ -394,8 +395,6 @@ java_lang_VMSystem.h: $(top_srcdir)/vm/reference/java/lang/VMSystem.java
 	$(JAVAH) -o $@ java.lang.VMSystem
 java_lang_reflect_VMArray.h: $(top_srcdir)/vm/reference/java/lang/reflect/VMArray.java
 	$(JAVAH) -o $@ java.lang.reflect.VMArray
-java_math_VMBigInteger.h: $(top_srcdir)/vm/reference/java/math/VMBigInteger.java
-	$(JAVAH) -o $@ java.math.VMBigInteger
 java_net_VMInetAddress.h: $(top_srcdir)/vm/reference/java/net/VMInetAddress.java
 	$(JAVAH) -o $@ java.net.VMInetAddress
 java_net_VMNetworkInterface.h: $(top_srcdir)/vm/reference/java/net/VMNetworkInterface.java
