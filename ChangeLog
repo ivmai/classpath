@@ -1,3 +1,54 @@
+2008-03-27  Mario Torre  <neugens@aicas.com>
+
+	* gnu/xml/stream/SAXParser.java (getProperty): throw
+	SAXNotRecognizedException instead of SAXNotSupportedException
+	after fall through all known properties.
+	* javax/xml/namespace/QName.java (valueOf): throw
+	IllegalArgumentException if string is null.
+	* java/util/concurrent/CopyOnWriteArrayList.java (lastIndexOf):
+	fixed indentation.
+	(indexOf): likewise. 
+
+2008-03-26  Mario Torre  <neugens@aicas.com>
+
+	* java/util/concurrent/CopyOnWriteArrayList.java (SubList.set): 
+	(SubList.clear): new method.
+	(SubList.checkMod): fix indentation.
+	(SubList.checkBoundsInclusive):  likewise. 
+	(SubList.checkBoundsExclusive): likewise.
+	(SubList): added synchronization. Now throw
+	IndexOutOfBoundsException instead of IllegalArgumentException
+	when index are out of range.
+	(SubList.size): added synchronization.
+	(SubList.get): likewise.
+	(SubList.listIterator): fixed indentation.
+	(SubList.set): added synchronization. Update the state of the storage
+	after modification.
+	(SubList.add): likewise.
+	(SubList.remove): likewise.
+	(SubList.addAll): likewise.
+
+2008-03-26  Mario Torre  <neugens@aicas.com>
+
+	* java/util/concurrent/CopyOnWriteArrayList.java (equals): removed
+	useless local variable. 
+	(hashCode): new method.
+
+2008-03-25  Mario Torre  <neugens@aicas.com>
+
+	* java/util/concurrent/CopyOnWriteArrayList.java (clone): clone method
+	in CopyOnWriteArrayList should just do a shallow copy. Fixed.
+	(equals): new method, override from base class.
+	(toString): likewise.
+
+2008-03-12  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* java/util/concurrent/CopyOnWriteArrayList.java:
+	Don't extend AbstractList.
+	(containsAll(Collection)): Implemented.
+	(listIterator()): Likewise.
+	(subList(int,int)): Likewise.
+
 2008-03-31  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* doc/www.gnu.org/events/events.wml:
