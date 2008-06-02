@@ -1,3 +1,10 @@
+2008-04-18  Mario Torre  <neugens@aicas.com>
+
+	PR classpath/35974
+	* java/util/logging/Logger.java: fix a deadlock and reformat code.
+	Now all the methods of the class get a lock on a static lock, this
+	avoids a lock when getLogger and log are used concurrently.
+
 2008-04-16  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* m4/gcc_attribute.m4 (GCC_ATTRIBUTE): Fix cache variable name.
