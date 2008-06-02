@@ -1451,7 +1451,7 @@ public final class String
     // Now we perform the conversion. Fortunately, there are no multi-character
     // lowercase expansions in Unicode 3.0.0.
     char[] newStr = new char[count];
-    VMSystem.arraycopy(value, offset, newStr, 0, count - (x - offset));
+    VMSystem.arraycopy(value, offset, newStr, 0, x - offset);
     do
       {
         char ch = value[x];
@@ -1507,7 +1507,7 @@ public final class String
         // Now we perform the conversion. Fortunately, there are no
         // multi-character lowercase expansions in Unicode 3.0.0.
         char[] newStr = new char[count];
-        VMSystem.arraycopy(value, offset, newStr, 0, count - (x - offset));
+        VMSystem.arraycopy(value, offset, newStr, 0, x - offset);
         do
           {
             char ch = value[x];
