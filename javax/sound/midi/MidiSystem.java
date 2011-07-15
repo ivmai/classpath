@@ -1,5 +1,5 @@
 /* MidiSystem.java -- Access system MIDI resources
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -425,7 +425,7 @@ public class MidiSystem
       for (int i = types.length; i > 0;)
       {
         int type = types[--i];
-        if (supported[type] == false)
+        if (supported.length > type && !supported[type])
         {
           count++;
           supported[type] = true;
@@ -481,7 +481,7 @@ public class MidiSystem
       for (int i = types.length; i > 0;)
       {
         int type = types[--i];
-        if (supported[type] == false)
+        if (supported.length > type && !supported[type])
         {
           count++;
           supported[type] = true;

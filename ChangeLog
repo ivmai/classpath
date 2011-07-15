@@ -1,5 +1,45 @@
 2011-07-15  Ivan Maidanski  <ivmai@mail.ru>
 
+	* javax/sound/midi/MidiMessage.java:
+	(MidiMessage(byte[])): Don't dereference "data" argument if it is
+	null.
+	(setMessage(byte[], int)): Check "length" parameter validity;
+	allocate new byte array for "data" only if the previous one is null or
+	not long enough.
+	* javax/sound/midi/SysexMessage.java:
+	(setMessage(byte[], int)): Likewise.
+	* javax/sound/midi/MidiSystem.java:
+	(getMidiFileTypes(), getMidiFileTypes(Sequence)): Defend against
+	running out of "supported" array (which is of length 3).
+	* javax/sound/midi/SysexMessage.java:
+	(setMessage(byte[], int)): Zero-extend data[0] byte (into "status"
+	local variable).
+	(clone()): Don't call arraycopy() if "data" is null.
+	* javax/sound/sampled/CompoundControl.java:
+	(CompoundControl(Type, Control[])): Remove FIXME for cloning (match
+	the RI behavior).
+	* javax/sound/sampled/EnumControl.java:
+	(EnumControl(Type, Object[], Object)): Likewise.
+	* javax/sound/sampled/CompoundControl.java:
+	(getMemberControls()): Do cloning of "memberControls" array.
+	* javax/sound/sampled/EnumControl.java:
+	(getValues()): Likewise.
+	(setValue(Object)): Swap sides in equals() call (to match the RI);
+	pass "value" to IllegalArgumentException constructor.
+	* javax/sound/sampled/EnumControl.java:
+	(toString()): Use getValue().
+	* javax/sound/sampled/Line.java:
+	(Info.klass): Make final; add generics.
+	(Info(Class)): If "klass" is null then use Line.class (to match the
+	RI).
+	(Info.matches(Info)): Use isInstance() and isAssignableFrom() instead
+	of equals() (to match the RI).
+	* javax/sound/sampled/spi/FormatConversionProvider.java
+	(isConversionSupported(AudioFormat, AudioFormat)): Search for at least
+	one "encodings" element matching "targ" (to match the RI).
+
+2011-07-15  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/javax/crypto/prng/CSPRNG.java (getSystemInstance()): Ignore
 	ClassCastException as well.
 

@@ -1,5 +1,5 @@
 /* SysexMessage.java -- System Exclusive MIDI message.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -85,10 +85,10 @@ public class SysexMessage extends MidiMessage
   public void setMessage(byte[] data, int length)
     throws InvalidMidiDataException
   {
-    if (data[0] != SYSTEM_EXCLUSIVE
-        && data[0] != SPECIAL_SYSTEM_EXCLUSIVE)
+    int status = data[0] & 0xff;
+    if (status != SYSTEM_EXCLUSIVE && status != SPECIAL_SYSTEM_EXCLUSIVE)
       throw new InvalidMidiDataException("Sysex message starts with 0x"
-                                         + Integer.toHexString(data[0])
+                                         + Integer.toHexString(status)
                                          + " instead of 0xF0 or 0xF7");
     super.setMessage(data, length);
   }
@@ -109,7 +109,10 @@ public class SysexMessage extends MidiMessage
       throw new InvalidMidiDataException("Sysex message starts with 0x"
                                          + Integer.toHexString(status)
                                          + " instead of 0xF0 or 0xF7");
-    this.data = new byte[length+1];
+    if (length < 0 || length > data.length)
+      throw new IndexOutOfBoundsException("length out of bounds: " + length);
+    if (this.data == null || this.data.length - 1 < length)
+      this.data = new byte[length + 1];
     this.data[0] = (byte) status;
     System.arraycopy(data, 0, this.data, 1, length);
     this.length = length+1;
@@ -132,7 +135,8 @@ public class SysexMessage extends MidiMessage
   public Object clone()
   {
     byte message[] = new byte[length];
-    System.arraycopy(data, 0, message, 0, length);
+    if (data != null)
+      System.arraycopy(data, 0, message, 0, message.length);
     return new SysexMessage(message);
   }
 }

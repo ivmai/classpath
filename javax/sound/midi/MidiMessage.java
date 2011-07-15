@@ -1,5 +1,5 @@
 /* MidiMessage.java -- base class for MIDI messages.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -65,7 +65,8 @@ public abstract class MidiMessage implements Cloneable
   protected MidiMessage(byte[] data)
   {
     this.data = data;
-    this.length = data.length;
+    if (data != null)
+      this.length = data.length;
   }
 
   /**
@@ -78,7 +79,10 @@ public abstract class MidiMessage implements Cloneable
   protected void setMessage(byte[] data, int length)
     throws InvalidMidiDataException
   {
-    this.data = new byte[length];
+    if (length < 0 || length > data.length)
+      throw new IndexOutOfBoundsException("length out of bounds: " + length);
+    if (this.data == null || this.data.length < length)
+      this.data = new byte[length];
     System.arraycopy(data, 0, this.data, 0, length);
     this.length = length;
   }
