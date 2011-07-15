@@ -332,6 +332,10 @@ public class CSPRNG
           {
             l.add((EntropySource)Class.forName(s.trim()).newInstance());
           }
+        catch (ClassCastException cce)
+          {
+            // ignore
+          }
         catch (ClassNotFoundException cnfe)
           {
             // ignore

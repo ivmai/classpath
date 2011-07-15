@@ -1,3 +1,8 @@
+2011-07-15  Ivan Maidanski  <ivmai@mail.ru>
+
+	* gnu/javax/crypto/prng/CSPRNG.java (getSystemInstance()): Ignore
+	ClassCastException as well.
+
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
 	* native/jni/midi-dssi/gnu_javax_sound_midi_dssi_DSSISynthesizer.c
