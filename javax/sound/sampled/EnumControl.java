@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -77,9 +77,7 @@ public abstract class EnumControl extends Control
   protected EnumControl(Type type, Object[] values, Object val)
   {
     super(type);
-    // FIXME: error checking: values.length>0, val in values... ?
-    // FIXME: clone here?
-    this.values = values;
+    this.values = values; // no cloning and error checking
     this.value = val;
   }
 
@@ -96,8 +94,9 @@ public abstract class EnumControl extends Control
    */
   public Object[] getValues()
   {
-    // FIXME: clone here?
-    return values;
+    Object[] valuesCopy = new Object[values.length];
+    System.arraycopy(values, 0, valuesCopy, 0, valuesCopy.length);
+    return valuesCopy;
   }
 
   /**
@@ -110,8 +109,8 @@ public abstract class EnumControl extends Control
   {
     for (int i = 0; i < values.length; ++i)
       {
-        if (! values[i].equals(value))
-          throw new IllegalArgumentException("value not supported");
+        if (!value.equals(values[i]))
+          throw new IllegalArgumentException("value not supported: " + value);
       }
     this.value = value;
   }
@@ -121,6 +120,6 @@ public abstract class EnumControl extends Control
    */
   public String toString()
   {
-    return super.toString() + ": " + value;
+    return super.toString() + ": " + getValue();
   }
 }

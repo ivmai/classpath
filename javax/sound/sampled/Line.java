@@ -51,7 +51,7 @@ public interface Line
    */
   class Info
   {
-    private Class<?> klass;
+    private final Class<?> klass;
 
     /**
      * Create a new Info object.  The argument is the class of the line,
@@ -60,6 +60,8 @@ public interface Line
      */
     public Info(Class<?> klass)
     {
+      if (klass == null)
+        klass = Line.class;
       this.klass = klass;
     }
 
@@ -78,7 +80,8 @@ public interface Line
      */
     public boolean matches(Info other)
     {
-      return klass.equals(other.klass);
+      return getClass().isInstance(other) &&
+               getLineClass().isAssignableFrom(other.getLineClass());
     }
 
     /**

@@ -1,5 +1,5 @@
 /* Control consisting of several other controls
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -72,8 +72,7 @@ public abstract class CompoundControl extends Control
   protected CompoundControl(Type type, Control[] members)
   {
     super(type);
-    // FIXME: clone?
-    this.memberControls = members;
+    this.memberControls = members; // no cloning
   }
 
   /**
@@ -81,8 +80,9 @@ public abstract class CompoundControl extends Control
    */
   public Control[] getMemberControls()
   {
-    // FIXME: clone?
-    return memberControls;
+    Control[] members = new Control[memberControls.length];
+    System.arraycopy(memberControls, 0, members, 0, members.length);
+    return members;
   }
 
   /**

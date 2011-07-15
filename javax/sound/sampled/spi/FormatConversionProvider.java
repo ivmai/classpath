@@ -1,5 +1,5 @@
 /* Format conversion API
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -140,7 +140,12 @@ public abstract class FormatConversionProvider
   public boolean isConversionSupported(AudioFormat targ, AudioFormat src)
   {
     AudioFormat[] encodings = getTargetFormats(targ.getEncoding(), src);
-    return encodings.length > 0;
+    for (int i = 0; i < encodings.length; ++i)
+      {
+        if (targ.matches(encodings[i]))
+          return true;
+      }
+    return false;
   }
 
   /**
