@@ -1,5 +1,5 @@
 /* Base64InputStream.java -- base-64 input stream.
-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -105,10 +105,13 @@ public class Base64InputStream extends FilterInputStream
    */
   public static byte[] decode(String base64) throws IOException
   {
+    byte bytes[] = new byte[base64.length()];
+    base64.getBytes(0, bytes.length, bytes, 0);
     Base64InputStream in =
-      new Base64InputStream(new ByteArrayInputStream(base64.getBytes()));
+      new Base64InputStream(new ByteArrayInputStream(bytes));
     ByteArrayOutputStream out =
-      new ByteArrayOutputStream((int) (base64.length() / 0.666));
+      new ByteArrayOutputStream((bytes.length >> 1) + bytes.length);
+
     byte[] buf = new byte[1024];
     int len;
     while ((len = in.read(buf)) != -1)
@@ -179,6 +182,7 @@ public class Base64InputStream extends FilterInputStream
                     ;
                   if (i != BASE_64_PAD)
                     throw new IOException("malformed Base-64 input");
+                  // Fall through.
                 case 3:
                   while (Character.isWhitespace((char) (i = in.read())))
                     ;

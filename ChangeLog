@@ -1,5 +1,45 @@
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
+	* gnu/java/io/Base64InputStream.java:
+	(decode(String)): Don't unnecessarily use FP arithmetic; use Latin-1
+	encoding (instead of the platform-default one) when converting
+	"base64" parameter value to bytes.
+	(read(byte[], int, int)): Add "Fall through" comment in the switch.
+	* gnu/java/net/loader/JarURLLoader.java: Add the copyright header.
+	(initialized): Make the field private.
+	(classPath): Likewise.
+	(indexSet): Likewise.
+	* gnu/java/net/protocol/http/HTTPURLConnection.java:
+	(requestHeaders): Make the field final.
+	* gnu/java/nio/FileChannelImpl.java:
+	(ch): Likewise.
+	(mode): Likewise.
+	* gnu/java/net/protocol/file/Handler.java:
+	(openConnection(URL)): Check also for "localhost" and "~" host names;
+	defend against a possible stack overflow in case of a missing FTP
+	handler class.
+	* gnu/java/nio/FileChannelImpl.java:
+	(FileChannelImpl(File, int)): Don't unnecessarily call isDirectory()
+	if the file is opened for writing (since a directory can't be opened
+	for writing).
+	(read(ByteBuffer, long)): Throw ClosedChannelException and
+	NonReadableChannelException if appropriate.
+	(map(FileChannel.MapMode, long, long)): Check that "position" plus
+	"size" is not overflowed.
+	(transferTo(long, long, WritableByteChannel)): Likewise.
+	(transferFrom(ReadableByteChannel, long, long)): Likewise.
+	(lockCheck(long, long, boolean)): Likewise.
+	(toString()): Output "0" prefix before the octal mode value.
+	* gnu/xml/dom/DomDocument.java:
+	(checkName(String, boolean)): Don't unnecessarily check for characters
+	with codes greater than 0xffff.
+	(checkChar(value, boolean)): Likewise.
+	* gnu/xml/dom/ImplementationSource.java:
+	(getFeature(String, int, int)): Check for features.length() is greater
+	than start value.
+
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/nio/charset/Cp874.java:
 	(lookup): Don't make the field private (to be accessible from MS874).
 	* gnu/java/nio/charset/MS874.java:

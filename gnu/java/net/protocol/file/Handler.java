@@ -1,5 +1,6 @@
 /* Handler.java -- "file" protocol handler for java.net
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +39,7 @@ exception statement from your version. */
 package gnu.java.net.protocol.file;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -74,15 +76,23 @@ public class Handler extends URLStreamHandler
     // If a hostname is set, then we need to switch protocols to ftp
     // in order to transfer this from the remote host.
     String host = url.getHost();
-    if ((host != null) && (! host.equals("")))
+    if ((host != null) && (! host.equals("")) &&
+        !host.equals("~") && !host.equals("localhost"))
       {
         // Reset the protocol (and implicitly the handler) for this URL.
         // Then have the URL attempt the connection again, as it will
         // get the changed handler the next time around.
         // If the ftp protocol handler is not installed, an
-        // exception will be thrown from the new openConnection() call.
+        // exception will be thrown.
         setURL (url, "ftp", url.getHost(), url.getPort(), url.getFile(),
                 url.getRef());
+        if (!"ftp".equals(url.getProtocol()))
+          {
+            // This shouldn't really happen. (Just to prevent infinite
+            // recursion in case of missing ftp.Handler class.)
+            throw new MalformedURLException("Protocol handler not found: "
+                                            + "ftp");
+          }
         return url.openConnection();
       }
 

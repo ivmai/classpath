@@ -1,5 +1,5 @@
 /* ImplementationSource.java --
-   Copyright (C) 2004 Free Software Foundation, Inc..
+   Copyright (C) 2004, 2010  Free Software Foundation, Inc..
 
 This file is part of GNU Classpath.
 
@@ -157,7 +157,7 @@ public class ImplementationSource
 
   final String getFeature(String features, int start, int end)
   {
-    if (features.length() > 0 && features.charAt(start) == '+')
+    if (features.length() > start && features.charAt(start) == '+')
       {
         return features.substring(start + 1, end);
       }

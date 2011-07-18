@@ -1,5 +1,5 @@
 /* HTTPURLConnection.java --
-   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -80,7 +80,7 @@ public class HTTPURLConnection
   boolean keepAlive;
 
   private Request request;
-  private Headers requestHeaders;
+  private final Headers requestHeaders = new Headers();
   private ByteArrayOutputStream requestSink;
   private boolean requestMethodSetExplicitly;
 
@@ -98,7 +98,6 @@ public class HTTPURLConnection
     throws IOException
   {
     super(url);
-    requestHeaders = new Headers();
     String proxy = SystemProperties.getProperty("http.proxyHost");
     if (proxy != null && proxy.length() > 0)
       {
