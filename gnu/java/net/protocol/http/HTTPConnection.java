@@ -1,5 +1,5 @@
 /* HTTPConnection.java --
-   Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -663,7 +663,7 @@ public class HTTPConnection
     ret.setHeader("User-Agent", userAgent);
     ret.setHeader("Connection", "keep-alive");
     ret.setHeader("Accept-Encoding",
-                  "chunked;q=1.0, gzip;q=0.9, deflate;q=0.8, " +
+                  "chunked;q=1.0, gzip;q=0.9, deflate, x-gzip;q=0.8, " +
                   "identity;q=0.6, *;q=0");
     if (cookieManager != null)
       {

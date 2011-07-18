@@ -1,5 +1,5 @@
 /* Request.java --
-   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2007, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -492,7 +492,7 @@ public class Request
     String contentCoding = responseHeaders.getValue("Content-Encoding");
     if (contentCoding != null && !"identity".equals(contentCoding))
       {
-        if ("gzip".equals(contentCoding))
+        if ("gzip".equals(contentCoding) || "x-gzip".equals(contentCoding))
           {
             in = new GZIPInputStream(in);
           }
