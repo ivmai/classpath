@@ -1,5 +1,5 @@
 /* PlainSocketImpl.java -- Default socket implementation
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -52,7 +52,9 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketImpl;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.channels.UnresolvedAddressException;
 
 /**
  * Written using on-line Java Platform 1.2 API Specification, as well
@@ -278,7 +280,16 @@ public class PlainSocketImpl extends SocketImpl
   {
     if (channel == null)
       create(true);
-    boolean connected = channel.connect(address, timeout);
+    boolean connected;
+    try
+      {
+        connected = channel.connect(address, timeout);
+      }
+    catch (UnresolvedAddressException e)
+      {
+        throw new UnknownHostException(
+                    ((InetSocketAddress) address).getHostName());
+      }
     if (!connected)
       throw new SocketTimeoutException("connect timed out");
 
