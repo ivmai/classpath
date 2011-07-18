@@ -1,5 +1,5 @@
 /* PrintStream.java -- OutputStream for printing output
-   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005, 2006
+   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -70,7 +70,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    * from the other, and we want to maximize performance. */
 
   // Line separator string.
-  private static final char[] line_separator
+  private final char[] line_separator
     = SystemProperties.getProperty("line.separator", "\n").toCharArray();
 
   /**
@@ -136,7 +136,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
   public PrintStream (String fileName)
     throws FileNotFoundException
   {
-    this (new FileOutputStream(new File(fileName)), false);
+    this (new FileOutputStream(fileName), false);
   }
 
   /**
@@ -155,7 +155,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
   public PrintStream (String fileName, String encoding)
       throws FileNotFoundException,UnsupportedEncodingException
   {
-    this (new FileOutputStream(new File(fileName)), false, encoding);
+    this (new FileOutputStream(fileName), false, encoding);
   }
 
   /**
@@ -304,11 +304,12 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     try
       {
-        writeChars(str, 0, str.length());
+        writeChars(str);
         if (println)
-          writeChars(line_separator, 0, line_separator.length);
-        if (auto_flush)
-          flush();
+          writeChars(line_separator);
+        if (auto_flush
+            && (println || str.lastIndexOf ('\n') >= 0))
+          out.flush();
       }
     catch (InterruptedIOException iioe)
       {
@@ -320,16 +321,17 @@ public class PrintStream extends FilterOutputStream implements Appendable
       }
   }
 
-  private synchronized void print (char[] chars, int pos, int len,
-                                   boolean println)
+  private synchronized void print (char[] chars, boolean println)
   {
     try
       {
-        writeChars(chars, pos, len);
+        writeChars(chars);
         if (println)
-          writeChars(line_separator, 0, line_separator.length);
-        if (auto_flush)
-          flush();
+          writeChars(line_separator);
+        if (auto_flush
+            && (println || chars == line_separator
+                || lastIndexOfNewLine(chars) >= 0))
+          out.flush();
       }
     catch (InterruptedIOException iioe)
       {
@@ -341,17 +343,26 @@ public class PrintStream extends FilterOutputStream implements Appendable
       }
   }
 
-  private void writeChars(char[] buf, int offset, int count)
-    throws IOException
+  // Equivalent to: new String(chars).lastIndexOf('\n')
+  private static int lastIndexOfNewLine (char[] chars)
   {
-      byte[] bytes = (new String(buf, offset, count)).getBytes(encoding);
-      out.write(bytes, 0, bytes.length);
+    int i = chars.length;
+    while (i-- > 0)
+      if (chars[i] == '\n')
+        break;
+    return i;
   }
 
-  private void writeChars(String str, int offset, int count)
+  private void writeChars(char[] buf)
     throws IOException
   {
-      byte[] bytes = str.substring(offset, offset+count).getBytes(encoding);
+      writeChars(new String(buf));
+  }
+
+  private void writeChars(String str)
+    throws IOException
+  {
+      byte[] bytes = str.getBytes(encoding);
       out.write(bytes, 0, bytes.length);
   }
 
@@ -440,9 +451,9 @@ public class PrintStream extends FilterOutputStream implements Appendable
    *
    * @param ch The <code>char</code> value to be printed
    */
-  public synchronized void print (char ch)
+  public void print (char ch)
   {
-    print(new char[]{ch}, 0, 1, false);
+    print(new char[] { ch }, false);
   }
 
   /**
@@ -453,7 +464,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void print (char[] charArray)
   {
-    print(charArray, 0, charArray.length, false);
+    print(charArray, false);
   }
 
   /**
@@ -463,7 +474,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println ()
   {
-    print(line_separator, 0, line_separator.length, false);
+    print(line_separator, false);
   }
 
   /**
@@ -567,9 +578,9 @@ public class PrintStream extends FilterOutputStream implements Appendable
    *
    * @param ch The <code>char</code> value to be printed
    */
-  public synchronized void println (char ch)
+  public void println (char ch)
   {
-    print(new char[]{ch}, 0, 1, true);
+    print(new char[] { ch }, true);
   }
 
   /**
@@ -582,7 +593,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
    */
   public void println (char[] charArray)
   {
-    print(charArray, 0, charArray.length, true);
+    print(charArray, true);
   }
 
   /**
@@ -596,10 +607,10 @@ public class PrintStream extends FilterOutputStream implements Appendable
   {
     try
       {
-        out.write (oneByte & 0xff);
+        out.write (oneByte);
 
         if (auto_flush && (oneByte == '\n'))
-          flush ();
+          out.flush();
       }
     catch (InterruptedIOException iioe)
       {
@@ -626,7 +637,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
         out.write (buffer, offset, len);
 
         if (auto_flush)
-          flush ();
+          out.flush();
       }
     catch (InterruptedIOException iioe)
       {
@@ -655,7 +666,7 @@ public class PrintStream extends FilterOutputStream implements Appendable
   /** @since 1.5 */
   public PrintStream append(CharSequence cs, int start, int end)
   {
-    print(cs == null ? "null" : cs.subSequence(start, end).toString());
+    print((cs == null ? "null" : cs).subSequence(start, end).toString());
     return this;
   }
 
