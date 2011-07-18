@@ -1,5 +1,5 @@
 /* QtToolkit.java --
-   Copyright (C)  2005, 2006, 2007  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -164,7 +164,7 @@ public class QtToolkit extends ClasspathToolkit
 
     // make sure the GUI thread has started.
     while (!guiThread.isRunning())
-      ;
+      Thread.yield();
 
     if( graphicsEnv == null )
       graphicsEnv = new QtGraphicsEnvironment( this );

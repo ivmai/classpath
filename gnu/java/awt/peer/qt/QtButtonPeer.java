@@ -1,5 +1,5 @@
 /* QtButtonPeer.java --
-   Copyright (C)  2005  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -53,7 +53,8 @@ public class QtButtonPeer extends QtComponentPeer implements ButtonPeer
   protected void setup()
   {
     super.setup();
-    setLabel( ((Button)owner).getLabel() );
+    String label = ((Button)owner).getLabel();
+    setLabel( label != null ? label : "" );
   }
 
   /**
