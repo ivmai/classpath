@@ -80,7 +80,7 @@ public class FieldView extends PlainView
    */
   private void checkContainer()
   {
-    Container c = getContainer();
+    final Container c = getContainer();
 
     if (c instanceof JTextField)
       {
@@ -90,7 +90,7 @@ public class FieldView extends PlainView
         // (which is what the RI does).
         horizontalVisibility.addChangeListener(new ChangeListener(){
           public void stateChanged(ChangeEvent event) {
-            getContainer().repaint();
+            c.repaint();
           }
         });
 

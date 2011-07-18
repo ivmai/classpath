@@ -1,5 +1,5 @@
 /* VariableHeightLayoutCache.java --
-   Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -252,11 +252,15 @@ public class VariableHeightLayoutCache
       }
     NodeRecord nr = new NodeRecord(row, depth, node, parent);
     NodeDimensions d = getNodeDimensions();
-    Rectangle r = RECT_CACHE;
-    if (d != null)
-      r = d.getNodeDimensions(node, row, depth, nr.isExpanded, r);
-    else
-      r.setBounds(0, 0, 0, 0);
+
+    Rectangle r;
+    if (d == null ||
+        (r = d.getNodeDimensions(node, row, depth, nr.isExpanded,
+                                 RECT_CACHE)) == null)
+      {
+        r = RECT_CACHE;
+        r.setBounds(0, 0, 0, 0);
+      }
 
     if (! visible)
       r.y = -1;

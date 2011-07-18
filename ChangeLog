@@ -1,3 +1,45 @@
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
+	* javax/swing/JFileChooser.java:
+	(setCurrentDirectory(File)): Handle null "dir" case first; call
+	isTraversable for "dir" (if not traversable then go to the parent
+	until a traversable one is found); call firePropertyChange() only if
+	new "dir" is not equal to "currentDir" value.
+	* javax/swing/UIManager.java:
+	(installed): Make the static variable private.
+	(auxLookAndFeels): Likewise.
+	(currentLookAndFeel): Likewise.
+	(currentUIDefaults): Likewise.
+	(lookAndFeelDefaults): Likewise.
+	(<clinit>()): Use getCrossPlatformLookAndFeelClassName() instead of
+	a direct MetalLookAndFeel constructor invocation (in case of unset
+	"swing.defaultlaf" property).
+	(setInstalledLookAndFeels(UIManager.LookAndFeelInfo[])): Check for
+	null "infos" parameter.
+	* javax/swing/filechooser/FileSystemView.java:
+	(getFiles(File, boolean)): Don't call listFiles() twice; return an
+	empty array in case of a non-existent directory.
+	* javax/swing/plaf/basic/BasicInternalFrameUI.java:
+	(componentResized(ComponentEvent)): Ignore if "frame" is null.
+	* javax/swing/plaf/basic/BasicToolBarUI.java:
+	(dragTo(Point, Point)): Don't call setBounds() if "p" offset is null.
+	(floatAt(Point, Point)): Don't call setFloatingLocation() if "p"
+	offset is null.
+	(mousePressed(MouseEvent)): Don't call setOffset() if cachedBounds
+	is null.
+	* javax/swing/plaf/basic/BasicTreeUI.java:
+	(getNodeDimensions(Object, int, int, boolean, Rectangle)): Defend
+	against null currentCellRenderer.
+	* javax/swing/text/FieldView.java:
+	(checkContainer()): Use "c" local variable (instead of getContainer())
+	in ChangeListener.stateChanged() (at least to guard against NPE).
+	* javax/swing/tree/FixedHeightLayoutCache.java:
+	(getBounds()): Don't set r.bounds in case of null returned by
+	getNodeDimensions().
+	* javax/swing/tree/VariableHeightLayoutCache.java:
+	(countRows(Object, Object, int, int)): If getNodeDimensions() returns
+	null then use RECT_CACHE and setBounds().
+
 2011-07-15  Ivan Maidanski  <ivmai@mail.ru>
 
 	* javax/sound/midi/MidiMessage.java:

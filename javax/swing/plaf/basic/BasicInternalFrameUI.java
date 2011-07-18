@@ -1,5 +1,5 @@
 /* BasicInternalFrameUI.java --
-   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -457,7 +457,7 @@ public class BasicInternalFrameUI extends InternalFrameUI
      */
     public void componentResized(ComponentEvent e)
     {
-      if (frame.isMaximum())
+      if (frame != null && frame.isMaximum())
         {
           Container parent = frame.getParent();
           Insets i = parent.getInsets();

@@ -1,5 +1,5 @@
 /* FixedHeightLayoutCache.java -- Fixed cell height tree layout cache
-Copyright (C) 2002, 2004, 2006,  Free Software Foundation, Inc.
+Copyright (C) 2002, 2004, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -350,6 +350,9 @@ public class FixedHeightLayoutCache
           {
             Rectangle dim = getNodeDimensions(last, r.row, r.depth,
                                               r.isExpanded, rect);
+            if (dim == null)
+              return null;
+
             r.bounds = dim;
           }
 

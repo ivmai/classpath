@@ -1,5 +1,6 @@
 /* UIManager.java --
-   Copyright (C) 2002, 2003, 2004, 2005, 2006,  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -212,20 +213,20 @@ public class UIManager implements Serializable
   private static final long serialVersionUID = -5547433830339189365L;
 
   /** The installed look and feel(s). */
-  static LookAndFeelInfo [] installed = {
+  private static LookAndFeelInfo [] installed = {
     new LookAndFeelInfo("Metal", "javax.swing.plaf.metal.MetalLookAndFeel"),
     new LookAndFeelInfo("GNU", "gnu.javax.swing.plaf.gnu.GNULookAndFeel")
   };
 
   /** The installed auxiliary look and feels. */
-  static LookAndFeel[] auxLookAndFeels;
+  private static LookAndFeel[] auxLookAndFeels;
 
   /** The current look and feel. */
-  static LookAndFeel currentLookAndFeel;
+  private static LookAndFeel currentLookAndFeel;
 
-  static MultiplexUIDefaults currentUIDefaults;
+  private static MultiplexUIDefaults currentUIDefaults;
 
-  static UIDefaults lookAndFeelDefaults;
+  private static UIDefaults lookAndFeelDefaults;
 
   /** Property change listener mechanism. */
   static PropertyChangeSupport listeners
@@ -242,7 +243,7 @@ public class UIManager implements Serializable
           }
         else
           {
-            setLookAndFeel(new MetalLookAndFeel());
+            setLookAndFeel(getCrossPlatformLookAndFeelClassName());
           }
       }
     catch (Exception ex)
@@ -882,6 +883,8 @@ public class UIManager implements Serializable
    */
   public static void setInstalledLookAndFeels(UIManager.LookAndFeelInfo[] infos)
   {
+    if (infos == null)
+      throw new NullPointerException();
     installed = infos;
   }
 

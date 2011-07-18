@@ -1,5 +1,5 @@
 /* FileSystemView.java --
-   Copyright (C) 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -150,9 +150,11 @@ public abstract class FileSystemView
    */
   public File[] getFiles(File dir, boolean useFileHiding)
   {
-    if (dir == null || dir.listFiles() == null)
+    if (dir == null)
       return null;
     File[] files = dir.listFiles();
+    if (files == null)
+      return new File[0];
     if (! useFileHiding)
       return files;
     ArrayList trim = new ArrayList();
