@@ -1,5 +1,5 @@
 /* QtCheckboxPeer.java --
-   Copyright (C)  2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -66,7 +66,8 @@ public class QtCheckboxPeer extends QtComponentPeer implements CheckboxPeer
   {
     super.setup();
     setCheckboxGroup( ((Checkbox)owner).getCheckboxGroup() );
-    setLabel( ((Checkbox)owner).getLabel() );
+    String label = ((Checkbox)owner).getLabel();
+    setLabel( label != null ? label : "" );
     setState( ((Checkbox)owner).getState() );
   }
 
@@ -79,9 +80,10 @@ public class QtCheckboxPeer extends QtComponentPeer implements CheckboxPeer
         group.setSelectedCheckbox((Checkbox)owner);
 
     int sel = checked ? ItemEvent.SELECTED : ItemEvent.DESELECTED;
+    String label = ((Checkbox)owner).getLabel();
     ItemEvent e = new ItemEvent((Checkbox)owner,
                                 ItemEvent.ITEM_STATE_CHANGED,
-                                ((Checkbox)owner).getLabel(),
+                                label != null ? label : "",
                                 sel);
     QtToolkit.eventQueue.postEvent(e);
   }

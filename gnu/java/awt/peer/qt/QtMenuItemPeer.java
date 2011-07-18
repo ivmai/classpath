@@ -1,5 +1,5 @@
 /* QtMenuItemPeer.java --
-   Copyright (C)  2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -54,6 +54,8 @@ public class QtMenuItemPeer extends QtMenuComponentPeer
   protected void init()
   {
     String label = ((MenuItem)owner).getLabel();
+    if (label == null)
+      label = "";
     create(label, label.equals("-"), (owner instanceof CheckboxMenuItem));
   }
 

@@ -1,5 +1,5 @@
 /* GtkImageConsumer.java
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -53,11 +53,11 @@ import java.util.Hashtable;
  */
 public class GtkImageConsumer implements ImageConsumer
 {
-  private GtkImage target;
+  private final GtkImage target;
   private int width, height;
   private Hashtable<?,?> properties;
   private int[] pixelCache = null;
-  private ImageProducer source;
+  private final ImageProducer source;
 
   public GtkImageConsumer(GtkImage target, ImageProducer source)
   {
@@ -111,10 +111,11 @@ public class GtkImageConsumer implements ImageConsumer
     if (pixelCache == null)
       return; // Not sure this should ever happen.
 
+    int thisWidth = this.width;
     if (cm.equals(GtkImage.nativeModel))
       for (int i = 0; i < height; i++)
         System.arraycopy (pixels, offset + (i * scansize),
-                          pixelCache, (y + i) * this.width + x,
+                          pixelCache, (y + i) * thisWidth + x,
                           width);
     else
       {
@@ -124,11 +125,9 @@ public class GtkImageConsumer implements ImageConsumer
               for (int j = 0; j < width; j++)
                 {
                   // get in RRGGBBAA and convert to AARRGGBB
-                  int pix = cm.getRGB(pixels[offset + (i * scansize) + x + j]);
-                  int a = ((pix & 0xFF000000) >> 24) & 0xFF;
-                  int rgb = (pix & 0x00FFFFFF) << 8;
-                  pix = rgb | a;
-                  pixelCache[(y + i) * this.width + x + j] = pix;
+                  int pix = cm.getRGB(pixels[offset + (i * scansize) + j]);
+                  pixelCache[(y + i) * thisWidth + x + j] =
+                        (pix << 8) | (pix >>> 24);
                 }
           }
         else
@@ -137,13 +136,10 @@ public class GtkImageConsumer implements ImageConsumer
               for (int j = 0; j < width; j++)
                 {
                   // get in AARRGGBB and convert to AABBGGRR
-                  int pix = cm.getRGB(pixels[offset + (i * scansize) + x + j]);
-                  byte b = (byte)(pix & 0xFF);
-                  byte r = (byte)(((pix & 0x00FF0000) >> 16) & 0xFF);
-                  pix &= 0xFF00FF00;
-                  pix |= ((b & 0xFF) << 16);
-                  pix |= (r & 0xFF);
-                  pixelCache[(y + i) * this.width + x + j] = pix;
+                  int pix = cm.getRGB(pixels[offset + (i * scansize) + j]);
+                  pixelCache[(y + i) * thisWidth + x + j] =
+                        (pix & 0xFF00FF00) | ((pix & 0xFF) << 16) |
+                        ((pix >> 16) & 0xFF);
                 }
           }
       }

@@ -1,5 +1,5 @@
 /* GtkButtonPeer.java -- Implements ButtonPeer with GTK
-   Copyright (C) 1998, 1999, 2004, 2006  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2004, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -75,12 +75,13 @@ public class GtkButtonPeer extends GtkComponentPeer
 
   void create ()
   {
-    create (((Button) awtComponent).getLabel ());
+    String label = ((Button) awtComponent).getLabel ();
+    create (label != null ? label : "");
   }
 
   public void setLabel (String label)
   {
-    gtkSetLabel(label);
+    gtkSetLabel(label != null ? label : "");
   }
 
   void postActionEvent (int mods)

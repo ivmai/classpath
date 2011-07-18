@@ -1,5 +1,5 @@
 /* GtkClipboardNotifier.java -- Helper for announcing GtkSelection changes.
-   Copyright (C) 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -51,7 +51,8 @@ class GtkClipboardNotifier extends Thread
    * The one and only instance. All operations are synchronized on
    * this.
    */
-  private static GtkClipboardNotifier notifier = new GtkClipboardNotifier();
+  private static final GtkClipboardNotifier notifier
+    = new GtkClipboardNotifier();
 
   /**
    * Creates a deamon thread that monitors this for change
@@ -118,6 +119,10 @@ class GtkClipboardNotifier extends Thread
         try
           {
             clipboard.setContents(new GtkSelection(clipboard), null);
+          }
+        catch (ThreadDeath t)
+          {
+            throw t;
           }
         catch (Throwable t)
           {
