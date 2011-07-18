@@ -1,5 +1,5 @@
 /* Cp874.java -- Charset implementation for the Cp874 character set.
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -43,7 +43,7 @@ public final class Cp874 extends ByteCharset
   /**
    * This is the lookup table for this encoding
    */
-    private static final char[] lookup =
+    static final char[] lookup =
     {
         0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
         0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,

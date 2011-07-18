@@ -1,5 +1,5 @@
-/* UTF_16.java --
-   Copyright (C) 2002, 2004, 2005, 2010  Free Software Foundation, Inc.
+/* UnicodeBig.java --
+   Copyright (C) 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,29 +38,20 @@ exception statement from your version. */
 
 package gnu.java.nio.charset;
 
-import gnu.classpath.SystemProperties;
-
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
 /**
- * UTF-16 charset.
+ * UTF-16 big endian with a byte-order mark
  *
- * @author Jesse Rosenstock
+ * @author Ivan Maidanski
  */
-final class UTF_16 extends Charset
+final class UnicodeBig extends Charset
 {
-  UTF_16 ()
+  UnicodeBig ()
   {
-    super ("UTF-16", new String[] {
-        // witnessed by the internet
-        "UTF16",
-        /* These names are provided by
-         * http://oss.software.ibm.com/cgi-bin/icu/convexp?s=ALL
-         */
-        "ISO-10646-UCS-2", "unicode", "csUnicode", "ucs-2"
-    });
+    super ("UnicodeBig", new String[] {});
   }
 
   public boolean contains (Charset cs)
@@ -72,14 +63,11 @@ final class UTF_16 extends Charset
 
   public CharsetDecoder newDecoder ()
   {
-    return new UTF_16Decoder (this, UTF_16Decoder.UNKNOWN_ENDIAN);
+    return new UTF_16Decoder (this, UTF_16Decoder.MAYBE_BIG_ENDIAN);
   }
 
   public CharsetEncoder newEncoder ()
   {
-    return new UTF_16Encoder(this,
-            "UnicodeLittle".equals(
-                SystemProperties.getProperty("sun.io.unicode.encoding")) ?
-            UTF_16Encoder.LITTLE_ENDIAN : UTF_16Encoder.BIG_ENDIAN, true);
+    return new UTF_16Encoder (this, UTF_16Encoder.BIG_ENDIAN, true);
   }
 }

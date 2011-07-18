@@ -1,5 +1,22 @@
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
+	* gnu/java/nio/charset/Cp874.java:
+	(lookup): Don't make the field private (to be accessible from MS874).
+	* gnu/java/nio/charset/MS874.java:
+	(lookup): Remove since has the same content as in Cp874 class.
+	(MS874()): Use Cp874.lookup.
+	* gnu/java/nio/charset/Provider.java:
+	(Provider()): Add UnicodeBig charset.
+	* gnu/java/nio/charset/UTF_16.java:
+	(UTF_16()): Remove "UnicodeBig" from the aliases list.
+	(newEncoder()): Use little or big endian depending on the system
+	property value.
+	* gnu/java/nio/charset/UnicodeBig.java: New file.
+	* gnu/java/nio/charset/UnicodeLittle.java:
+	(UnicodeLittle()): Update the comment.
+
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/awt/peer/gtk/GtkButtonPeer.java:
 	(create(String)): Pass an empty string instead of null to native
 	create/gtkSetLabel().
