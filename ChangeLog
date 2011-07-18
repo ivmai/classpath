@@ -1,5 +1,27 @@
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
+	* gnu/java/net/PlainSocketImpl.java:
+	(connect(SocketAddress, int)): Convert thrown
+	UnresolvedAddressException into UnknownHostException instance.
+	* gnu/java/net/loader/FileURLLoader.java:
+	(dir): Make the field private and final.
+	(FileURLLoader(URLClassLoader, URLStreamHandlerCache,
+	URLStreamHandlerFactory, URL, URL)): Unquote the path.
+	* gnu/java/net/protocol/file/Connection.java:
+	(Connection(URL)): Likewise.
+	(StaticData): Make the private class final.
+	(permission): Make the field final.
+	(StaticData.lineSeparator): Likewise.
+	(unquote(String)): Directly decode 2- and 3-byte UTF-8 sequences
+	(instead of calling getBytes() and arraycopy()).
+	(getDirectoryListing()): Guard against NPE in case file.list() returns
+	null.
+	(getHeaderField()): Call getDirectoryListing() instead of
+	file.isDirectory() (since getDirectoryListing caches the result).
+	(getContentLength()): Likewise.
+
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/io/Base64InputStream.java:
 	(decode(String)): Don't unnecessarily use FP arithmetic; use Latin-1
 	encoding (instead of the platform-default one) when converting

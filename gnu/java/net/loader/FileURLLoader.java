@@ -1,5 +1,5 @@
 /* FileURLLoader.java -- a URLLoader for file URLs
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,6 +41,7 @@ package gnu.java.net.loader;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandlerFactory;
@@ -52,7 +53,7 @@ import java.util.StringTokenizer;
  */
 public final class FileURLLoader extends URLLoader
 {
-  File dir; //the file for this file url
+  private final File dir; //the file for this file url
 
   public FileURLLoader(URLClassLoader classloader,
                        URLStreamHandlerCache cache,
@@ -60,7 +61,16 @@ public final class FileURLLoader extends URLLoader
                        URL url, URL absoluteUrl)
   {
     super(classloader, cache, factory, url, absoluteUrl);
-    dir = new File(absoluteUrl.getFile());
+    String path = absoluteUrl.getFile();
+    try
+      {
+        path = gnu.java.net.protocol.file.Connection.unquote(path);
+      }
+    catch (MalformedURLException e)
+      {
+        // ignore
+      }
+    dir = new File(path);
   }
 
   /** get resource with the name "name" in the file url */

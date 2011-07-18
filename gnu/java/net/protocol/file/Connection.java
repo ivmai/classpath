@@ -1,5 +1,5 @@
-/* FileURLConnection.java -- URLConnection class for "file" protocol
-   Copyright (C) 1998, 1999, 2003 Free Software Foundation, Inc.
+/* Connection.java -- URLConnection class for "file" protocol
+   Copyright (C) 1998, 1999, 2003, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -76,7 +77,7 @@ public class Connection extends URLConnection
    */
   private static final String DEFAULT_PERMISSION = "read";
 
-  private static class StaticData
+  private static final class StaticData
   {
     /**
      * HTTP-style DateFormat, used to format the last-modified header.
@@ -85,7 +86,7 @@ public class Connection extends URLConnection
       = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'",
                              new Locale ("En", "Us", "Unix"));
 
-    static String lineSeparator =
+    static final String lineSeparator =
       SystemProperties.getProperty("line.separator");
   }
 
@@ -113,7 +114,7 @@ public class Connection extends URLConnection
   /**
    * FilePermission to read the file
    */
-  private FilePermission permission;
+  private final FilePermission permission;
 
   /**
    * Calls superclass constructor to initialize.
@@ -121,8 +122,17 @@ public class Connection extends URLConnection
   public Connection(URL url)
   {
     super (url);
-
-    permission = new FilePermission(getURL().getFile(), DEFAULT_PERMISSION);
+    String path = getURL().getFile();
+    try
+      {
+        path = unquote(path);
+      }
+    catch (MalformedURLException e)
+      {
+        // ignore
+      }
+    permission = new FilePermission(path.replace('/', File.separatorChar),
+                   DEFAULT_PERMISSION);
   }
 
   /**
@@ -157,17 +167,22 @@ public class Connection extends URLConnection
               throw new MalformedURLException(str + " : Invalid quoted character");
             buf[pos++] = (byte) (hi * 16 + lo);
           }
-        else if (c > 127) {
-            try {
-                byte [] c_as_bytes = Character.toString(c).getBytes("utf-8");
-                final int c_length = c_as_bytes.length;
-                System.arraycopy(c_as_bytes, 0, buf, pos, c_length);
-                pos += c_length;
-            }
-            catch (java.io.UnsupportedEncodingException x2) {
-                throw (Error) new InternalError().initCause(x2);
-            }
-        }
+        else if (c > 127)
+          {
+            if (c <= 0x7ff)
+              {
+                buf[pos] = (byte)((c >> 6) | 0xc0);
+                buf[pos + 1] = (byte)((c & 0x3f) | 0x80);
+                pos += 2;
+              }
+            else
+              {
+                buf[pos] = (byte)((c >> 12) | 0xe0);
+                buf[pos + 1] = (byte)(((c >> 6) & 0x3f) | 0x80);
+                buf[pos + 2] = (byte)((c & 0x3f) | 0x80);
+                pos += 3;
+              }
+          }
         else
           buf[pos++] = (byte) c;
       }
@@ -175,7 +190,7 @@ public class Connection extends URLConnection
       {
         return new String(buf, 0, pos, "utf-8");
       }
-    catch (java.io.UnsupportedEncodingException x2)
+    catch (UnsupportedEncodingException x2)
       {
         throw (Error) new InternalError().initCause(x2);
       }
@@ -231,11 +246,12 @@ public class Connection extends URLConnection
 
         String[] files = file.list();
 
-        for (int i = 0; i < files.length; i++)
-          {
-            writer.write(files[i]);
-            writer.write(StaticData.lineSeparator);
-          }
+        if (files != null)
+          for (int i = 0; i < files.length; i++)
+            {
+              writer.write(files[i]);
+              writer.write(StaticData.lineSeparator);
+            }
 
         directoryListing = sink.toByteArray();
       }
@@ -315,7 +331,7 @@ public class Connection extends URLConnection
           return guessContentTypeFromName(file.getName());
         else if (field.equals("content-length"))
           {
-            if (file.isDirectory())
+            if (getDirectoryListing() != null)
               {
                 return Integer.toString(getContentLength());
               }
@@ -349,9 +365,9 @@ public class Connection extends URLConnection
         if (!connected)
           connect();
 
-        if (file.isDirectory())
+        if (getDirectoryListing() != null)
           {
-            return getDirectoryListing().length;
+            return directoryListing.length;
           }
         return (int) file.length();
       }
