@@ -1,5 +1,14 @@
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
+	* gnu/java/net/protocol/http/HTTPConnection.java:
+	(newRequest(String, String)): Add "x-gzip" to the HTTP
+	"Accept-Encoding" header field.
+	* gnu/java/net/protocol/http/Request.java:
+	(createResponseBodyStream(Headers, int, int, InputStream, boolean)):
+	Recognize "x-gzip" content coding (as an alias for "gzip").
+
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/net/PlainSocketImpl.java:
 	(connect(SocketAddress, int)): Convert thrown
 	UnresolvedAddressException into UnknownHostException instance.
