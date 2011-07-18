@@ -1,5 +1,6 @@
 /* FileChannelImpl.java --
-   Copyright (C) 2002, 2004, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -126,9 +127,9 @@ public final class FileChannelImpl extends FileChannel
   /**
    * This is the actual native file descriptor value
    */
-  private VMChannel ch;
+  private final VMChannel ch;
 
-  private int mode;
+  private final int mode;
 
   final String description;
 
@@ -150,9 +151,10 @@ public final class FileChannelImpl extends FileChannel
     this.ch = new VMChannel();
     ch.openFile(path, mode);
 
-    // First open the file and then check if it is a a directory
-    // to avoid race condition.
-    if (file.isDirectory())
+    // First open the file and then check if it is a directory
+    // to avoid race condition.  If the file is opened for writing
+    // successfully then it is already guaranteed to be not a directory.
+    if ((mode & WRITE) == 0 && file.isDirectory())
       {
         try
           {
@@ -163,7 +165,7 @@ public final class FileChannelImpl extends FileChannel
             /* ignore it */
           }
 
-        throw new FileNotFoundException(description + " is a directory");
+        throw new FileNotFoundException(path + " is a directory");
       }
   }
 
@@ -237,6 +239,13 @@ public final class FileChannelImpl extends FileChannel
   {
     if (position < 0)
       throw new IllegalArgumentException ("position: " + position);
+
+    if (!isOpen ())
+      throw new ClosedChannelException ();
+
+    if ((mode & READ) == 0)
+       throw new NonReadableChannelException ();
+
     long oldPosition = implPosition ();
     position (position);
     int result = read(dst);
@@ -317,7 +326,7 @@ public final class FileChannelImpl extends FileChannel
     else
       throw new IllegalArgumentException ("mode: " + mode);
 
-    if (position < 0 || size < 0 || size > Integer.MAX_VALUE)
+    if (((position + size) | position | size) < 0 || size > Integer.MAX_VALUE)
       throw new IllegalArgumentException ("position: " + position
                                           + ", size: " + size);
     return ch.map(nmode, position, (int) size);
@@ -360,8 +369,7 @@ public final class FileChannelImpl extends FileChannel
                           WritableByteChannel target)
     throws IOException
   {
-    if (position < 0
-        || count < 0)
+    if (((position + count) | position | count) < 0)
       throw new IllegalArgumentException ("position: " + position
                                           + ", count: " + count);
 
@@ -424,8 +432,7 @@ public final class FileChannelImpl extends FileChannel
                             long count)
     throws IOException
   {
-    if (position < 0
-        || count < 0)
+    if (((position + count) | position | count) < 0)
       throw new IllegalArgumentException ("position: " + position
                                           + ", count: " + count);
 
@@ -456,8 +463,7 @@ public final class FileChannelImpl extends FileChannel
   private void lockCheck(long position, long size, boolean shared)
     throws IOException
   {
-    if (position < 0
-        || size < 0)
+    if (((position + size) | position | size) < 0)
       throw new IllegalArgumentException ("position: " + position
                                           + ", size: " + size);
 
@@ -558,7 +564,7 @@ public final class FileChannelImpl extends FileChannel
   {
     return (super.toString()
             + "[ fd: " + ch.getState()
-            + "; mode: " + Integer.toOctalString(mode)
+            + "; mode: 0" + (mode != 0 ? Integer.toOctalString(mode) : "") 
             + "; " + description + " ]");
   }
 

@@ -1,5 +1,6 @@
 /* DomDocument.java --
-   Copyright (C) 1999,2000,2001,2004 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2004, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -436,8 +437,8 @@ public class DomDocument
             (c < 0x2c00 || c > 0x2fef) &&
             (c < 0x3001 || c > 0xd7ff) &&
             (c < 0xf900 || c > 0xfdcf) &&
-            (c < 0xfdf0 || c > 0xfffd) &&
-            (c < 0x10000 || c > 0xeffff))
+            (c < 0xfdf0 || c > 0xfffd)
+            /* && (c < 0x10000 || c > 0xeffff) */)
           {
             throw new DomDOMException(DOMException.INVALID_CHARACTER_ERR,
                                       name, null, c);
@@ -494,7 +495,7 @@ public class DomDocument
                 (c < 0x3001 || c > 0xd7ff) &&
                 (c < 0xf900 || c > 0xfdcf) &&
                 (c < 0xfdf0 || c > 0xfffd) &&
-                (c < 0x10000 || c > 0xeffff) &&
+                /* (c < 0x10000 || c > 0xeffff) && */
                 c != 0x00b7 &&
                 (c < 0x0300 || c > 0x036f) &&
                 (c < 0x203f || c > 0x2040))
@@ -575,8 +576,8 @@ public class DomDocument
         // assume surrogate pairing checks out OK, for simplicity
         if ((c >= 0x0020 && c <= 0xd7ff) ||
             (c == 0x000a || c == 0x000d || c == 0x0009) ||
-            (c >= 0xe000 && c <= 0xfffd) ||
-            (c >= 0x10000 && c <= 0x10ffff))
+            (c >= 0xe000 && c <= 0xfffd)
+            /* || (c >= 0x10000 && c <= 0x10ffff) */)
           {
             continue;
           }
