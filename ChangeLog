@@ -1,5 +1,42 @@
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/io/PrintStream.java:
+	(line_separator): Convert static field to an instance one (to match
+	the RI functionality).
+	(PrintStream(String)): Use "new FileOutputStream(fileName)" instead of
+	"new FileOutputStream(new File(fileName))".
+	(PrintStream(String, String)): Likewise.
+	(print(char[], int, int, boolean)): Remove "pos" and "len" arguments.
+	(writeChars(char[], int, int): Likewise.
+	(print(String, boolean)): Don't pass "pos" and "len" parameters to
+	writeChars() (as they are always set to 0 and buf.length,
+	respectively).
+	(print(char[], boolean)): Likewise.
+	(print(char)): Likewise.
+	(print(char[])): Likewise.
+	(println()): Likewise.
+	(println(char)): Likewise.
+	(println(char[])): Likewise.
+	(print(String, boolean)): Call flush() only if needed (to match the
+	RI).
+	(print(char[], boolean)): Likewise.
+	(print(String, boolean)): Directly call out.flush() instead of flush()
+	(the same as in the RI).
+	(print(char[], boolean)): Likewise.
+	(write(int)): Likewise.
+	(write(byte[], int, int)): Likewise.
+	(lastIndexOfNewLine(char[])): New private static method (called from
+	print() only).
+	(writeChars(char[])): Redirect to writeChars(String).
+	(writeChars(String)): Don't call substring().
+	(print(char)): Remove unnecessary synchronized.
+	(println(char)): Likewise.
+	(write(int)): Remove unnecessary "&" operation.
+	(append(CharSequence, int, int)): Call subSequence() also for "null"
+	string (the same as in the RI).
+
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/net/protocol/http/HTTPConnection.java:
 	(newRequest(String, String)): Add "x-gzip" to the HTTP
 	"Accept-Encoding" header field.
