@@ -1,3 +1,22 @@
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
+	* java/lang/Character.java:
+	(UnicodeBlock.forName(String)): Remove the trailing dot character for
+	exception messages.
+	(charCache): Make the private field final.
+	(convertCharData(String[])): New private static function (called
+	during the class initialization only).
+	(blocks): Call convertCharData() (which creates the appropriate array
+	and calls zeroBasedStringValue() for each array element).
+	(data): Likewise.
+	(numValue): Likewise.
+	(upper): Likewise.
+	(lower): Likewise.
+	(direction): Likewise.
+	(readCodePoint(int)): Remove unnecessary "&" operation.
+	(reverseBytes(char)): Likewise.
+	(isSpace(char)): Simplify the expression.
+
 2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
 
 	* java/io/PrintStream.java:

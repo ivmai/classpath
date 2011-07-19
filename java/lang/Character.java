@@ -1,5 +1,6 @@
 /* java.lang.Character -- Wrapper class for char, and Unicode subsets
-   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -305,7 +306,7 @@ public final class Character implements Serializable, Comparable<Character>
           break;
       }
       throw new IllegalArgumentException("No Unicode block found for " +
-                                         blockName + ".");
+                                         blockName);
     }
 
     /**
@@ -2054,7 +2055,7 @@ public final class Character implements Serializable, Comparable<Character>
   // conversions via valueOf().  We must cache at least 0..127;
   // this constant controls how much we actually cache.
   private static final int MAX_CACHE = 127;
-  private static Character[] charCache = new Character[MAX_CACHE + 1];
+  private static final Character[] charCache = new Character[MAX_CACHE + 1];
   static
   {
      for (char i=0; i <= MAX_CACHE; i++)
@@ -2418,125 +2419,35 @@ public final class Character implements Serializable, Comparable<Character>
    * @see #readCodePoint(int)
    * @see CharData#BLOCKS
    */
-  private static final char[][] blocks =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.BLOCKS[0]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[1]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[2]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[3]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[4]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[5]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[6]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[7]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[8]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[9]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[10]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[11]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[12]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[13]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[14]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[15]),
-                 String.zeroBasedStringValue(CharData.BLOCKS[16])};
+  private static final char[][] blocks = convertCharData(CharData.BLOCKS);
 
   /**
    * Stores unicode attribute offset lookup table. Exploit package visibility
    * of String.value to avoid copying the array.
    * @see CharData#DATA
    */
-  private static final char[][] data =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.DATA[0]),
-                 String.zeroBasedStringValue(CharData.DATA[1]),
-                 String.zeroBasedStringValue(CharData.DATA[2]),
-                 String.zeroBasedStringValue(CharData.DATA[3]),
-                 String.zeroBasedStringValue(CharData.DATA[4]),
-                 String.zeroBasedStringValue(CharData.DATA[5]),
-                 String.zeroBasedStringValue(CharData.DATA[6]),
-                 String.zeroBasedStringValue(CharData.DATA[7]),
-                 String.zeroBasedStringValue(CharData.DATA[8]),
-                 String.zeroBasedStringValue(CharData.DATA[9]),
-                 String.zeroBasedStringValue(CharData.DATA[10]),
-                 String.zeroBasedStringValue(CharData.DATA[11]),
-                 String.zeroBasedStringValue(CharData.DATA[12]),
-                 String.zeroBasedStringValue(CharData.DATA[13]),
-                 String.zeroBasedStringValue(CharData.DATA[14]),
-                 String.zeroBasedStringValue(CharData.DATA[15]),
-                 String.zeroBasedStringValue(CharData.DATA[16])};
+  private static final char[][] data = convertCharData(CharData.DATA);
 
   /**
    * Stores unicode numeric value attribute table. Exploit package visibility
    * of String.value to avoid copying the array.
    * @see CharData#NUM_VALUE
    */
-  private static final char[][] numValue =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[0]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[1]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[2]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[3]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[4]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[5]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[6]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[7]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[8]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[9]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[10]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[11]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[12]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[13]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[14]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[15]),
-                 String.zeroBasedStringValue(CharData.NUM_VALUE[16])};
+  private static final char[][] numValue = convertCharData(CharData.NUM_VALUE);
 
   /**
    * Stores unicode uppercase attribute table. Exploit package visibility
    * of String.value to avoid copying the array.
    * @see CharData#UPPER
    */
-  private static final char[][] upper =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.UPPER[0]),
-                 String.zeroBasedStringValue(CharData.UPPER[1]),
-                 String.zeroBasedStringValue(CharData.UPPER[2]),
-                 String.zeroBasedStringValue(CharData.UPPER[3]),
-                 String.zeroBasedStringValue(CharData.UPPER[4]),
-                 String.zeroBasedStringValue(CharData.UPPER[5]),
-                 String.zeroBasedStringValue(CharData.UPPER[6]),
-                 String.zeroBasedStringValue(CharData.UPPER[7]),
-                 String.zeroBasedStringValue(CharData.UPPER[8]),
-                 String.zeroBasedStringValue(CharData.UPPER[9]),
-                 String.zeroBasedStringValue(CharData.UPPER[10]),
-                 String.zeroBasedStringValue(CharData.UPPER[11]),
-                 String.zeroBasedStringValue(CharData.UPPER[12]),
-                 String.zeroBasedStringValue(CharData.UPPER[13]),
-                 String.zeroBasedStringValue(CharData.UPPER[14]),
-                 String.zeroBasedStringValue(CharData.UPPER[15]),
-                 String.zeroBasedStringValue(CharData.UPPER[16])};
+  private static final char[][] upper = convertCharData(CharData.UPPER);
 
   /**
    * Stores unicode lowercase attribute table. Exploit package visibility
    * of String.value to avoid copying the array.
    * @see CharData#LOWER
    */
-  private static final char[][] lower =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.LOWER[0]),
-                 String.zeroBasedStringValue(CharData.LOWER[1]),
-                 String.zeroBasedStringValue(CharData.LOWER[2]),
-                 String.zeroBasedStringValue(CharData.LOWER[3]),
-                 String.zeroBasedStringValue(CharData.LOWER[4]),
-                 String.zeroBasedStringValue(CharData.LOWER[5]),
-                 String.zeroBasedStringValue(CharData.LOWER[6]),
-                 String.zeroBasedStringValue(CharData.LOWER[7]),
-                 String.zeroBasedStringValue(CharData.LOWER[8]),
-                 String.zeroBasedStringValue(CharData.LOWER[9]),
-                 String.zeroBasedStringValue(CharData.LOWER[10]),
-                 String.zeroBasedStringValue(CharData.LOWER[11]),
-                 String.zeroBasedStringValue(CharData.LOWER[12]),
-                 String.zeroBasedStringValue(CharData.LOWER[13]),
-                 String.zeroBasedStringValue(CharData.LOWER[14]),
-                 String.zeroBasedStringValue(CharData.LOWER[15]),
-                 String.zeroBasedStringValue(CharData.LOWER[16])};
+  private static final char[][] lower = convertCharData(CharData.LOWER);
 
   /**
    * Stores unicode direction attribute table. Exploit package visibility
@@ -2544,25 +2455,16 @@ public final class Character implements Serializable, Comparable<Character>
    * @see CharData#DIRECTION
    */
   // Package visible for use by String.
-  static final char[][] direction =
-    new char[][]{
-                 String.zeroBasedStringValue(CharData.DIRECTION[0]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[1]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[2]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[3]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[4]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[5]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[6]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[7]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[8]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[9]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[10]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[11]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[12]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[13]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[14]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[15]),
-                 String.zeroBasedStringValue(CharData.DIRECTION[16])};
+  static final char[][] direction = convertCharData(CharData.DIRECTION);
+
+  private static char[][] convertCharData(String[] strArray)
+  {
+    int len = strArray.length;
+    char[][] charsArray = new char[len][];
+    for (int i = 0; i < len; i++)
+      charsArray[i] = String.zeroBasedStringValue(strArray[i]);
+    return charsArray;
+  }
 
   /**
    * Stores unicode titlecase table. Exploit package visibility of
@@ -2608,7 +2510,7 @@ public final class Character implements Serializable, Comparable<Character>
   static char readCodePoint(int codePoint)
   {
     int plane = codePoint >>> 16;
-    char offset = (char) (codePoint & 0xffff);
+    char offset = (char) codePoint;
     return data[plane][(char) (blocks[plane][offset >> CharData.SHIFT[plane]] + offset)];
   }
 
@@ -3814,7 +3716,7 @@ public final class Character implements Serializable, Comparable<Character>
   public static boolean isSpace(char ch)
   {
     // Performing the subtraction up front alleviates need to compare longs.
-    return ch-- <= ' ' && ((1 << ch)
+    return ch <= ' ' && ((1 << (ch - 1))
                            & ((1 << (' ' - 1))
                               | (1 << ('\t' - 1))
                               | (1 << ('\n' - 1))
@@ -4240,7 +4142,7 @@ public final class Character implements Serializable, Comparable<Character>
    */
   public static char reverseBytes(char val)
   {
-    return (char) (((val >> 8) & 0xff) | ((val << 8) & 0xff00));
+    return (char) ((val >> 8) | (val << 8));
   }
 
   /**
