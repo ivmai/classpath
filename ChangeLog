@@ -1,5 +1,16 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/Stack.java: Update the internal implementation comment.
+	(pop()): Use Vector methods (which could be overridden in a Stack
+	subclass) instead of manipulating Vector internal data directly.
+	(peek()): Likewise.
+	(search(Object)): Likewise.
+	(pop()): Remove unnecessary SuppressWarnings annotation.
+	(peek()): Likewise.
+	(empty()): Call size(); remove unnecessary synchronized.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/io/StreamTokenizer.java:
 	(whitespace): Replace with private final byte[] ctype.
 	(alphabetic): Likewise.
