@@ -1,5 +1,5 @@
 /* CharsetDecoder.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -132,10 +132,11 @@ public abstract class CharsetDecoder
     reset();
     out.flip ();
 
-    // Unfortunately, resizing the actual charbuffer array is required.
-    char[] resized = new char[out.remaining()];
+    // Resizing the actual charbuffer array is not required.
+    /* char[] resized = new char[out.remaining()];
     out.get(resized);
-    return CharBuffer.wrap(resized);
+    return CharBuffer.wrap(resized); */
+    return out;
   }
 
   public final CoderResult decode (ByteBuffer in, CharBuffer out,
