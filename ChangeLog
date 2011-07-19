@@ -1,5 +1,20 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/net/MimeTypeMapper.java:
+	(mime_strings): Change to private scope; change type to a flat array
+	(even elements contain keys, and every key is followed by its value
+	in the next array element).
+	(mime_types): Make the field final; set the initial HashMap capacity
+	to value enough to avoid resizing.
+	(MimeTypeMapper()): Change mime_types filling code (since
+	mime_strings type/format is changed).
+	(main(String[])): Likewise.
+	(main(String[])): If an argument is passed to main() then use it as
+	the path name of the file containing MIME types to read (instead of
+	the hard-coded one).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/io/BufferedInputStream.java:
 	(BufferedInputStream(InputStream,int)): If "in" argument is null then
 	leave buf value null (to match the RI).
