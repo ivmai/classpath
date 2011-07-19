@@ -1,5 +1,6 @@
 /* OutputStreamWriter.java -- Writer that converts chars to bytes
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -37,6 +38,8 @@ exception statement from your version. */
 
 
 package java.io;
+
+import gnu.classpath.SystemProperties;
 
 import gnu.java.nio.charset.EncodingHelper;
 
@@ -99,9 +102,15 @@ public class OutputStreamWriter extends Writer
   private final String encodingName;
 
   /**
+   * Indicates a Unicode byte-order mark should to be written to the
+   * underlying stream on the next write() call.
+   */
+  private boolean needsUnicodeBOM;
+
+  /**
    * Buffer output before character conversion as it has costly overhead.
    */
-  private final CharBuffer outputBuffer;
+  private final CharBuffer outputBuffer = CharBuffer.allocate(BUFFER_SIZE);
   private final static int BUFFER_SIZE = 1024;
 
   /**
@@ -123,7 +132,6 @@ public class OutputStreamWriter extends Writer
     CharsetEncoder encoder;
     String encodingName;
     this.out = out;
-    outputBuffer = CharBuffer.allocate(BUFFER_SIZE);
 
     try
       {
@@ -133,53 +141,58 @@ public class OutputStreamWriter extends Writer
             encodingName = "ISO8859_1";
             encoder = null;
           }
-       else
-         {
-           /*
-            * Workaround for encodings with a byte-order-mark.
-            * We only want to write it once per stream.
-            */
-           try
-             {
-               if(encoding_scheme.equalsIgnoreCase("UnicodeBig") ||
-                  encoding_scheme.equalsIgnoreCase("UTF-16") ||
-                  encoding_scheme.equalsIgnoreCase("UTF16"))
-                 {
-                   encoding_scheme = "UTF-16BE";
-                   out.write((byte)0xFE);
-                   out.write((byte)0xFF);
-                 }
-               else if(encoding_scheme.equalsIgnoreCase("UnicodeLittle"))
-                 {
-                   encoding_scheme = "UTF-16LE";
-                   out.write((byte)0xFF);
-                   out.write((byte)0xFE);
-                 }
-             }
-           catch(IOException ioe)
-             {
-             }
+        else
+          {
+            /*
+             * Workaround for encodings with a byte-order-mark.
+             * We only want to write it once per stream.
+             */
+            String adjustedEncoding = adjustUnicodeEncoding(encoding_scheme);
+            if (adjustedEncoding != encoding_scheme)
+              {
+                // UnicodeBig/Little and UTF-16 require a byte-order mark.
+                needsUnicodeBOM = true;
+              }
 
-           Charset cs = EncodingHelper.getCharset(encoding_scheme);
-           if(cs == null)
-             throw new UnsupportedEncodingException("Encoding "+encoding_scheme+
-                                                    " unknown");
-           encoder = cs.newEncoder();
-           encodingName = EncodingHelper.getOldCanonical(cs.name());
+            Charset cs = EncodingHelper.getCharset(adjustedEncoding);
+            if(cs == null)
+              throw new UnsupportedEncodingException("Encoding unknown: "
+                                                     + encoding_scheme);
+            encoder = cs.newEncoder();
+            encodingName = EncodingHelper.getOldCanonical(cs.name());
 
-           encoder.onMalformedInput(CodingErrorAction.REPLACE);
-           encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-         }
+            encoder.onMalformedInput(CodingErrorAction.REPLACE);
+            encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+          }
       }
     catch(RuntimeException e)
       {
         // Default to ISO Latin-1, will happen if this is called, for instance,
         //  before the NIO provider is loadable.
         encoder = null;
+        needsUnicodeBOM = false;
         encodingName = "ISO8859_1";
       }
     this.encoder = encoder;
     this.encodingName = encodingName;
+  }
+
+  private static String adjustUnicodeEncoding(String encoding)
+  {
+    if (encoding.equalsIgnoreCase("UnicodeLittle"))
+      return "UTF-16LE";
+    if (encoding.equalsIgnoreCase("UnicodeBig"))
+      return "UTF-16BE";
+    if (encoding.equalsIgnoreCase("UTF-16") ||
+        encoding.equalsIgnoreCase("UTF16")) // an alias for UTF-16
+      {
+        // Unicode encoding with a system-dependent endian.
+        // If the system property is unset then use big-endian.
+        return "UnicodeLittle".equals(SystemProperties.getProperty(
+                                      "sun.io.unicode.encoding")) ?
+                 "UTF-16LE" : "UTF-16BE";
+      }
+    return encoding;
   }
 
   /**
@@ -193,17 +206,23 @@ public class OutputStreamWriter extends Writer
     CharsetEncoder encoder;
     String encodingName;
     this.out = out;
-    outputBuffer = CharBuffer.allocate(BUFFER_SIZE);
     try
       {
-        String encoding = System.getProperty("file.encoding");
-        Charset cs = Charset.forName(encoding);
+        String encoding = SystemProperties.getProperty("file.encoding");
+        String adjustedEncoding = adjustUnicodeEncoding(encoding);
+        if (adjustedEncoding != encoding)
+          {
+            // UnicodeBig/Little and UTF-16 require a byte-order mark.
+            needsUnicodeBOM = true;
+          }
+        Charset cs = Charset.forName(adjustedEncoding);
         encoder = cs.newEncoder();
         encodingName =  EncodingHelper.getOldCanonical(cs.name());
       }
     catch(RuntimeException e)
       {
         encoder = null;
+        needsUnicodeBOM = false;
         encodingName = "ISO8859_1";
       }
 
@@ -228,11 +247,28 @@ public class OutputStreamWriter extends Writer
   public OutputStreamWriter(OutputStream out, Charset cs)
   {
     this.out = out;
+
+    String encoding = cs.name();
+    String adjustedEncoding = adjustUnicodeEncoding(encoding);
+    if (adjustedEncoding != encoding)
+      {
+        // Adjust cs according to the adjusted encoding (for Unicode with BOM)
+        try
+          {
+            cs = Charset.forName(adjustedEncoding);
+            encoding = adjustedEncoding;
+            needsUnicodeBOM = true;
+          }
+        catch (IllegalArgumentException e)
+          {
+            // ignore
+          }
+      }
+
     encoder = cs.newEncoder();
     encoder.onMalformedInput(CodingErrorAction.REPLACE);
     encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-    outputBuffer = CharBuffer.allocate(BUFFER_SIZE);
-    encodingName = EncodingHelper.getOldCanonical(cs.name());
+    encodingName = EncodingHelper.getOldCanonical(encoding);
   }
 
   /**
@@ -249,7 +285,6 @@ public class OutputStreamWriter extends Writer
   {
     this.out = out;
     encoder = enc;
-    outputBuffer = CharBuffer.allocate(BUFFER_SIZE);
     Charset cs = enc.charset();
     if (cs == null)
       encodingName = "US-ASCII";
@@ -267,9 +302,17 @@ public class OutputStreamWriter extends Writer
   {
     if(out == null)
       return;
-    flush();
-    out.close ();
-    out = null;
+    try
+      {
+        flushBuffer();
+        out.flush(); // this call may be omitted since done by out.close().
+        // Close the stream even if an error occurred while flushing.
+      }
+    finally
+      {
+        out.close();
+        out = null;
+      }
   }
 
   /**
@@ -291,17 +334,25 @@ public class OutputStreamWriter extends Writer
    */
   public void flush () throws IOException
   {
-      if(out != null){
-          if(outputBuffer != null){
-              char[] buf = new char[outputBuffer.position()];
-              if(buf.length > 0){
-                  outputBuffer.flip();
-                  outputBuffer.get(buf);
-                  writeConvert(buf, 0, buf.length);
-                  outputBuffer.clear();
-              }
-          }
-          out.flush ();
+    if(out != null)
+      {
+        flushBuffer();
+        out.flush ();
+      }
+  }
+
+  // Might be used by other java.io classes (e.g., by a PrintStream
+  // implementation based on OutputStreamWriter).
+  void flushBuffer() throws IOException
+  {
+    int count = outputBuffer.position();
+    if (count > 0 && out != null)
+      {
+        char[] buf = new char[count];
+        outputBuffer.flip();
+        outputBuffer.get(buf);
+        writeConvert(buf, 0, count);
+        outputBuffer.clear();
       }
   }
 
@@ -315,33 +366,36 @@ public class OutputStreamWriter extends Writer
    * @param count The number of chars to write.
    *
    * @exception IOException If an error occurs
+   * @exception NullPointerException if <code>buf</code> is <code>null</code>
    */
   public void write (char[] buf, int offset, int count) throws IOException
   {
     if(out == null)
-      throw new IOException("Stream is closed.");
-    if(buf == null)
-      throw new IOException("Buffer is null.");
+      throw new IOException("Stream closed");
 
-    if(outputBuffer != null)
-        {
-            if(count >= outputBuffer.remaining())
-                {
-                    int r = outputBuffer.remaining();
-                    outputBuffer.put(buf, offset, r);
-                    writeConvert(outputBuffer.array(), 0, BUFFER_SIZE);
-                    outputBuffer.clear();
-                    offset += r;
-                    count -= r;
-                    // if the remaining bytes is larger than the whole buffer,
-                    // just don't buffer.
-                    if(count >= outputBuffer.remaining()){
-                      writeConvert(buf, offset, count);
-                      return;
-                    }
-                }
-            outputBuffer.put(buf, offset, count);
-        } else writeConvert(buf, offset, count);
+    if (needsUnicodeBOM && count > 0)
+      {
+        outputBuffer.put((char)0xfeff);
+        needsUnicodeBOM = false;
+      }
+
+    if(count >= outputBuffer.remaining())
+      {
+        int r = outputBuffer.remaining();
+        outputBuffer.put(buf, offset, r);
+        writeConvert(outputBuffer.array(), 0, BUFFER_SIZE);
+        outputBuffer.clear();
+        offset += r;
+        count -= r;
+        // if the remaining bytes is larger than the whole buffer,
+        // just don't buffer.
+        if(count >= outputBuffer.remaining())
+          {
+            writeConvert(buf, offset, count);
+            return;
+          }
+      }
+    outputBuffer.put(buf, offset, count);
   }
 
  /**
@@ -350,36 +404,47 @@ public class OutputStreamWriter extends Writer
   private void writeConvert (char[] buf, int offset, int count)
       throws IOException
   {
-    if(encoder == null)
-    {
-      byte[] b = new byte[count];
-      for(int i=0;i<count;i++)
+    if (encoder == null)
+      {
+        byte[] b = new byte[count];
+        for(int i=0;i<count;i++)
         b[i] = nullConversion(buf[offset+i]);
-      out.write(b);
-    } else {
-      try  {
-        ByteBuffer output = encoder.encode(CharBuffer.wrap(buf,offset,count));
-        encoder.reset();
-        if(output.hasArray())
-          out.write(output.array());
-        else
-          {
-            byte[] outbytes = new byte[output.remaining()];
-            output.get(outbytes);
-            out.write(outbytes);
-          }
-      } catch(IllegalStateException e) {
-        throw new IOException("Internal error.");
-      } catch(MalformedInputException e) {
-        throw new IOException("Invalid character sequence.");
-      } catch(CharacterCodingException e) {
-        throw new IOException("Unmappable character.");
+        out.write(b);
       }
-    }
+    else
+      {
+        try
+          {
+            ByteBuffer output =
+                        encoder.encode(CharBuffer.wrap(buf, offset, count));
+            encoder.reset();
+            if(output.hasArray())
+              out.write(output.array());
+            else
+              {
+                byte[] outbytes = new byte[output.remaining()];
+                output.get(outbytes);
+                out.write(outbytes);
+              }
+          }
+        catch(IllegalStateException e)
+          {
+            throw new IOException("Internal error");
+          }
+        catch(MalformedInputException e)
+          {
+            throw new IOException("Invalid character sequence");
+          }
+        catch(CharacterCodingException e)
+          {
+            throw new IOException("Unmappable character");
+          }
+      }
   }
 
-  private byte nullConversion(char c) {
-          return (byte)((c <= 0xFF)?c:'?');
+  private static byte nullConversion(char c)
+  {
+    return (byte)(c <= 0xFF ? c : '?');
   }
 
   /**
@@ -393,12 +458,10 @@ public class OutputStreamWriter extends Writer
    * @param count The number of chars to write
    *
    * @exception IOException If an error occurs
+   * @exception NullPointerException if <code>str</code> is <code>null</code>
    */
   public void write (String str, int offset, int count) throws IOException
   {
-    if(str == null)
-      throw new IOException("String is null.");
-
     write(str.toCharArray(), offset, count);
   }
 
@@ -411,19 +474,16 @@ public class OutputStreamWriter extends Writer
    */
   public void write (int ch) throws IOException
   {
-          // No buffering, no encoding ... just pass through
-          if (encoder == null && outputBuffer == null) {
-                  out.write(nullConversion((char)ch));
-          } else {
-                  if (outputBuffer != null) {
-                          if (outputBuffer.remaining() == 0) {
-                                  writeConvert(outputBuffer.array(), 0, BUFFER_SIZE);
-                                  outputBuffer.clear();
-                          }
-                          outputBuffer.put((char)ch);
-                  } else {
-                      writeConvert(new char[]{ (char)ch }, 0, 1);
-                  }
-          }
+    if (needsUnicodeBOM)
+      {
+        outputBuffer.put((char)0xfeff);
+        needsUnicodeBOM = false;
+      }
+    if (outputBuffer.remaining() == 0)
+      {
+      writeConvert(outputBuffer.array(), 0, BUFFER_SIZE);
+      outputBuffer.clear();
+      }
+    outputBuffer.put((char)ch);
   }
 } // class OutputStreamWriter

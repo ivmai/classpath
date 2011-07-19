@@ -1,5 +1,37 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/io/OutputStreamWriter.java:
+	(needsUnicodeBOM): New private field.
+	(outputBuffer): Move initialization from the constructors.
+	(OutputStreamWriter(OutputStream,String)): Call adjustUnicodeEncoding
+	and set needsUnicodeBOM if appropriate.
+	(OutputStreamWriter(OutputStream)): Likewise.
+	(OutputStreamWriter(OutputStream,Charset)): Likewise.
+	(OutputStreamWriter(OutputStream,String)): Adjust
+	UnsupportedEncodingException messages format.
+	(adjustUnicodeEncoding(String)): New private static method.
+	(close()): Replace flush() call with flushBuffer() and out.flush()
+	called inside a try block; call out.close() inside finally block.
+	(flush()): Move buffer flushing code to flushBuffer(); call
+	flushBuffer().
+	(flush()): Don't check outputBuffer for null.
+	(write(char[],int,int)): Likewise.
+	(flushBuffer()): New package-private method.
+	(write(char[],int,int)): Document NPE.
+	(write(String,int,int)): Likewise.
+	(write(char[],int,int)): Remove the trailing dot character for the
+	exception messages.
+	(writeConvert(char[],int,int)): Likewise.
+	(write(char[],int,int)): Handle needsUnicodeBOM case.
+	(write(char)): Likewise.
+	(nullConversion(char)): Convert to a static method.
+	(write(String,int,int)): Throw NPE (instead of IOException) if the
+	argument is null.
+	(write(char)): Remove unbuffered writing since outputBuffer is always
+	non-null.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/util/zip/ZipEntry.java:
 	(generalPurposeFlags): New private field (used for "encrypted" flag
 	only).
