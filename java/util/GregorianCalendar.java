@@ -1,5 +1,5 @@
 /* java.util.GregorianCalendar
-   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2007
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2007, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -405,10 +405,20 @@ public class GregorianCalendar extends Calendar
   {
     int relativeDay = (year - 1) * 365 + ((year - 1) >> 2) + dayOfYear
                       - EPOCH_DAYS; // gregorian days from 1 to epoch.
-    int gregFactor = (int) Math.floor((double) (year - 1) / 400.)
-                     - (int) Math.floor((double) (year - 1) / 100.);
+    return (relativeDay + gregOffsetFor(year)) * 60L * 60L * 24L * 1000L
+            >= gregorianCutover;
+  }
 
-    return ((relativeDay + gregFactor) * 60L * 60L * 24L * 1000L >= gregorianCutover);
+  /**
+   * @return the number of days between the gregorian and julian calendars
+   * for a given year
+   */
+  private static int gregOffsetFor(int year)
+  {
+    // equivalent to: floor((year - 1) / 400.0) - floor((year - 1) / 100.0)
+    if (year > 0)
+      year--;
+    return year / 400 - year / 100;
   }
 
   /**
@@ -663,9 +673,7 @@ public class GregorianCalendar extends Calendar
 
     int relativeDay = (year - 1) * 365 + ((year - 1) >> 2) + dayOfYear
                       - EPOCH_DAYS; // gregorian days from 1 to epoch.
-    int gregFactor = (int) Math.floor((double) (year - 1) / 400.)
-                     - (int) Math.floor((double) (year - 1) / 100.);
-
+    int gregFactor = gregOffsetFor(year);
     if ((relativeDay + gregFactor) * 60L * 60L * 24L * 1000L >= gregorianCutover)
       relativeDay += gregFactor;
     else
@@ -728,10 +736,7 @@ public class GregorianCalendar extends Calendar
         //
         // The additional leap year factor accounts for the fact that
         // a leap day is not seen on Jan 1 of the leap year.
-        int gregOffset = (int) Math.floor((double) (year - 1) / 400.)
-                         - (int) Math.floor((double) (year - 1) / 100.);
-
-        return julianDay + gregOffset;
+        return julianDay + gregOffsetFor(year);
       }
     else
       julianDay -= 2;
@@ -886,8 +891,8 @@ public class GregorianCalendar extends Calendar
    */
   public int hashCode()
   {
-    int val = (int) ((gregorianCutover >>> 32) ^ (gregorianCutover & 0xffffffff));
-    return super.hashCode() ^ val;
+    return (int) (gregorianCutover >>> 32) ^ (int) gregorianCutover
+            ^ super.hashCode();
   }
 
   /**
@@ -1314,7 +1319,8 @@ public class GregorianCalendar extends Calendar
            * of days required in the first week?
            */
           if (minimalDays - (7 + firstWeekday - getFirstDayOfWeek()) % 7 < 1)
-            return week + 1; /* Add week 1: firstWeekday through to firstDayOfWeek */
+            week++; /* Add week 1: firstWeekday through to firstDayOfWeek */
+          return week;
         }
       case DAY_OF_MONTH:
         {
