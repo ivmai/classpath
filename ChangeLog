@@ -1,5 +1,16 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/nio/channels/FileLock.java:
+	(FileLock(FileChannel, long, long, boolean)): Test for position plus
+	size overflow; throw exception with a message.
+	* java/security/BasicPermission.java:
+	(equals(Object)): Compare obj against this instance first.
+	* java/security/Security.java:
+	(providers): Make the private field final.
+	(secprops): Likewise.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/net/Inet6Address.java:
 	(isLinkLocalAddress()): Fix a bug (cast integer const to byte).
 	(isSiteLocalAddress()): Likewise.

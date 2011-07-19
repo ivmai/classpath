@@ -1,5 +1,5 @@
 /* Security.java --- Java base security class implementation
-   Copyright (C) 1999, 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 1999, 2001, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -68,8 +68,8 @@ public final class Security
 {
   private static final String ALG_ALIAS = "Alg.Alias.";
 
-  private static Vector providers = new Vector();
-  private static Properties secprops = new Properties();
+  private static final Vector providers = new Vector();
+  private static final Properties secprops = new Properties();
 
   static
     {

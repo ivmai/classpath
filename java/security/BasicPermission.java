@@ -1,5 +1,5 @@
 /* BasicPermission.java -- implements a simple named permission
-   Copyright (C) 1998, 1999, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 1998, 1999, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -157,8 +157,8 @@ public abstract class BasicPermission extends Permission
    */
   public boolean equals(Object obj)
   {
-    return getClass().isInstance(obj)
-      && getName().equals(((BasicPermission) obj).getName());
+    return obj == this || (getClass().isInstance(obj)
+             && getName().equals(((BasicPermission) obj).getName()));
   }
 
   /**

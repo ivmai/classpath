@@ -1,5 +1,5 @@
 /* FileLock.java --
-   Copyright (C) 2002, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -60,8 +60,8 @@ public abstract class FileLock
   protected FileLock(FileChannel channel, long position, long size,
                      boolean shared)
   {
-    if (position < 0 || size < 0)
-      throw new IllegalArgumentException();
+    if (((position + size) | position | size) < 0)
+      throw new IllegalArgumentException("Negative position or size");
 
     this.channel = channel;
     this.position = position;
