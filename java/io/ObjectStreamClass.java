@@ -1,6 +1,7 @@
 /* ObjectStreamClass.java -- Class used to write class information
    about serialized objects.
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -195,7 +196,7 @@ public class ObjectStreamClass implements Serializable
    */
   public String toString()
   {
-    return "java.io.ObjectStreamClass< " + name + ", " + uid + " >";
+    return name + ": static final long serialVersionUID = " + uid + "L;";
   }
 
   // Returns true iff the class that this ObjectStreamClass represents
@@ -312,7 +313,8 @@ public class ObjectStreamClass implements Serializable
    * already set UID is found.
    */
   void setClass(Class cl, ObjectStreamClass superClass) throws InvalidClassException
-  {hierarchy = null;
+  {
+    hierarchy = null;
     this.clazz = cl;
 
     cacheMethods();
@@ -534,7 +536,7 @@ outer:
     return package1.equals(package2);
   }
 
-  final static Class[] noArgs = new Class[0];
+  private static final Class[] noArgs = new Class[0];
 
   private static Method findAccessibleMethod(String name, Class from)
   {
@@ -581,10 +583,12 @@ outer:
       || (l == ClassLoader.getSystemClassLoader() /* application loader */);
   }
 
-  static Hashtable methodCache = new Hashtable();
+  private static final Hashtable methodCache = new Hashtable();
 
-  static final Class[] readObjectSignature  = { ObjectInputStream.class };
-  static final Class[] writeObjectSignature = { ObjectOutputStream.class };
+  private static final Class[] readObjectSignature
+    = { ObjectInputStream.class };
+  private static final Class[] writeObjectSignature
+    = { ObjectOutputStream.class };
 
   private void cacheMethods()
   {
@@ -769,7 +773,7 @@ outer:
     calculateOffsets();
   }
 
-  static Hashtable uidCache = new Hashtable();
+  private static final Hashtable uidCache = new Hashtable();
 
   // Returns the serial version UID defined by class, or if that
   // isn't present, calculates value of serial version UID.
@@ -892,10 +896,13 @@ outer:
 
     data_out.writeUTF(cl.getName());
 
-    int modifiers = cl.getModifiers();
     // just look at interesting bits
-    modifiers = modifiers & (Modifier.ABSTRACT | Modifier.FINAL
-                             | Modifier.INTERFACE | Modifier.PUBLIC);
+    int modifiers = cl.getModifiers() & (Modifier.ABSTRACT | Modifier.FINAL
+                                      | Modifier.INTERFACE | Modifier.PUBLIC);
+    Method[] methods = cl.getDeclaredMethods();
+    if ((modifiers & Modifier.INTERFACE) != 0)
+      modifiers = methods.length > 0 ? modifiers | Modifier.ABSTRACT :
+                   modifiers & ~Modifier.ABSTRACT;
     data_out.writeInt(modifiers);
 
     // Pretend that an array has no interfaces, because when array
@@ -953,7 +960,6 @@ outer:
       }
 
     Method method;
-    Method[] methods = cl.getDeclaredMethods();
     Arrays.sort(methods, memberComparator);
     for (int i = 0; i < methods.length; i++)
       {
@@ -1033,7 +1039,7 @@ outer:
         {
             try
             {
-                final Constructor c = clazz.getConstructor(new Class[0]);
+                final Constructor c = clazz.getConstructor(noArgs);
 
                 AccessController.doPrivileged(new PrivilegedAction()
                 {
@@ -1068,13 +1074,11 @@ outer:
 
   public static final ObjectStreamField[] NO_FIELDS = {};
 
-  private static Hashtable<Class,ObjectStreamClass> classLookupTable
+  private static final Hashtable<Class,ObjectStreamClass> classLookupTable
     = new Hashtable<Class,ObjectStreamClass>();
   private static final NullOutputStream nullOutputStream = new NullOutputStream();
   private static final Comparator interfaceComparator = new InterfaceComparator();
   private static final Comparator memberComparator = new MemberComparator();
-  private static final
-    Class[] writeMethodArgTypes = { java.io.ObjectOutputStream.class };
 
   private ObjectStreamClass superClass;
   private Class<?> clazz;

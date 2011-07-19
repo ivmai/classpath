@@ -1,5 +1,5 @@
 /* ObjectInputStream.java -- Class used to read serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -208,7 +208,8 @@ public class ObjectInputStream extends InputStream
     if (DEBUG)
       depth += 2;
 
-    if(dump) dumpElement("MARKER: 0x" + Integer.toHexString(marker) + " ");
+    if(DEBUG && dump) dumpElement("MARKER: 0x" +
+                                  Integer.toHexString(marker) + " ");
 
     try
       {
@@ -255,35 +256,35 @@ public class ObjectInputStream extends InputStream
        case TC_BLOCKDATA:
        case TC_BLOCKDATALONG:
         {
-          if (marker == TC_BLOCKDATALONG)
-            { if(dump) dumpElementln("BLOCKDATALONG"); }
-          else
-            { if(dump) dumpElementln("BLOCKDATA"); }
+          if(DEBUG && dump) dumpElementln(marker == TC_BLOCKDATALONG ?
+                                          "BLOCKDATALONG" : "BLOCKDATA");
+          ret_val = null;
           readNextBlock(marker);
+          break;
         }
 
        case TC_NULL:
         {
-          if(dump) dumpElementln("NULL");
+          if(DEBUG && dump) dumpElementln("NULL");
           ret_val = null;
           break;
         }
 
        case TC_REFERENCE:
         {
-          if(dump) dumpElement("REFERENCE ");
+          if(DEBUG && dump) dumpElement("REFERENCE ");
           int oid = realInputStream.readInt();
-          if(dump) dumpElementln(Integer.toHexString(oid));
+          if(DEBUG && dump) dumpElementln(Integer.toHexString(oid));
           ret_val = lookupHandle(oid);
           if (!shared)
             throw new
-              InvalidObjectException("References can not be read unshared.");
+              InvalidObjectException("References can not be read unshared");
           break;
         }
 
        case TC_CLASS:
         {
-          if(dump) dumpElementln("CLASS");
+          if(DEBUG && dump) dumpElementln("CLASS");
           ObjectStreamClass osc = (ObjectStreamClass)readObject();
           Class clazz = osc.forClass();
           assignNewHandle(clazz,shared);
@@ -293,7 +294,7 @@ public class ObjectInputStream extends InputStream
 
        case TC_PROXYCLASSDESC:
         {
-          if(dump) dumpElementln("PROXYCLASS");
+          if(DEBUG && dump) dumpElementln("PROXYCLASS");
           int n_intf = this.realInputStream.readInt();
           String[] intfs = new String[n_intf];
           for (int i = 0; i < n_intf; i++)
@@ -327,7 +328,7 @@ public class ObjectInputStream extends InputStream
             {
               byte b = this.realInputStream.readByte();
               if (b != TC_ENDBLOCKDATA)
-                throw new IOException("Data annotated to class was not consumed." + b);
+                throw new IOException("Data annotated to class was not consumed: " + b);
             }
           else
             is_consumed = false;
@@ -345,7 +346,7 @@ public class ObjectInputStream extends InputStream
             {
               byte b = this.realInputStream.readByte();
               if (b != TC_ENDBLOCKDATA)
-                throw new IOException("Data annotated to class was not consumed." + b);
+                throw new IOException("Data annotated to class was not consumed: " + b);
             }
           else
             is_consumed = false;
@@ -357,9 +358,9 @@ public class ObjectInputStream extends InputStream
 
        case TC_STRING:
         {
-          if(dump) dumpElement("STRING=");
+          if(DEBUG && dump) dumpElement("STRING=");
           String s = this.realInputStream.readUTF();
-          if(dump) dumpElementln(s);
+          if(DEBUG && dump) dumpElementln(s);
           ret_val = processResolution(null, s, assignNewHandle(s,shared),
                                       shared);
           break;
@@ -367,9 +368,9 @@ public class ObjectInputStream extends InputStream
 
        case TC_LONGSTRING:
         {
-          if(dump) dumpElement("STRING=");
+          if(DEBUG && dump) dumpElement("STRING=");
           String s = this.realInputStream.readUTFLong();
-          if(dump) dumpElementln(s);
+          if(DEBUG && dump) dumpElementln(s);
           ret_val = processResolution(null, s, assignNewHandle(s,shared),
                                       shared);
           break;
@@ -377,16 +378,17 @@ public class ObjectInputStream extends InputStream
 
        case TC_ARRAY:
         {
-          if(dump) dumpElementln("ARRAY");
+          if(DEBUG && dump) dumpElementln("ARRAY");
           ObjectStreamClass osc = (ObjectStreamClass)readObject();
           Class componentType = osc.forClass().getComponentType();
-          if(dump) dumpElement("ARRAY LENGTH=");
+          if(DEBUG && dump) dumpElement("ARRAY LENGTH=");
           int length = this.realInputStream.readInt();
-          if(dump) dumpElementln (length + "; COMPONENT TYPE=" + componentType);
+          if(DEBUG && dump) dumpElementln (length + "; COMPONENT TYPE=" +
+                                           componentType);
           Object array = Array.newInstance(componentType, length);
           int handle = assignNewHandle(array,shared);
           readArrayElements(array, componentType);
-          if(dump)
+          if(DEBUG && dump)
             for (int i = 0, len = Array.getLength(array); i < len; i++)
               dumpElementln("  ELEMENT[" + i + "]=", Array.get(array, i));
           ret_val = processResolution(null, array, handle, shared);
@@ -395,13 +397,13 @@ public class ObjectInputStream extends InputStream
 
        case TC_OBJECT:
         {
-          if(dump) dumpElementln("OBJECT");
+          if(DEBUG && dump) dumpElementln("OBJECT");
           ObjectStreamClass osc = (ObjectStreamClass)readObject();
           Class clazz = osc.forClass();
 
           if (!osc.realClassIsSerializable)
-            throw new NotSerializableException
-              (clazz + " is not Serializable, and thus cannot be deserialized.");
+            throw new NotSerializableException(clazz +
+                    " is not Serializable, and thus cannot be deserialized");
 
           if (osc.realClassIsExternalizable)
             {
@@ -422,7 +424,8 @@ public class ObjectInputStream extends InputStream
                   setBlockDataMode(oldmode);
                   if (!oldmode)
                     if (this.realInputStream.readByte() != TC_ENDBLOCKDATA)
-                      throw new IOException("No end of block data seen for class with readExternal (ObjectInputStream) method.");
+                      throw new IOException("No end of block data seen for" +
+                        " class with readExternal (ObjectInputStream) method");
                 }
 
               ret_val = processResolution(osc, obj, handle,shared);
@@ -445,7 +448,8 @@ public class ObjectInputStream extends InputStream
           for (int i = 0; i < hierarchy.length; i++)
           {
               this.currentObjectStreamClass = hierarchy[i];
-              if(dump) dumpElementln("Reading fields of " + this.currentObjectStreamClass.getName ());
+              if(DEBUG && dump) dumpElementln("Reading fields of " +
+                                  this.currentObjectStreamClass.getName ());
 
               // XXX: should initialize fields in classes in the hierarchy
               // that aren't in the stream
@@ -467,7 +471,7 @@ public class ObjectInputStream extends InputStream
 
               if (this.currentObjectStreamClass.hasWriteMethod())
                 {
-                  if(dump) dumpElement("ENDBLOCKDATA? ");
+                  if(DEBUG && dump) dumpElement("ENDBLOCKDATA? ");
                   try
                     {
                       /* Read blocks until an end marker */
@@ -477,12 +481,13 @@ public class ObjectInputStream extends InputStream
                           parseContent(writeMarker, shared);
                           writeMarker = this.realInputStream.readByte();
                         }
-                      if(dump) dumpElementln("yes");
+                      if(DEBUG && dump) dumpElementln("yes");
                     }
                   catch (EOFException e)
                     {
-                      throw (IOException) new IOException
-                        ("No end of block data seen for class with readObject (ObjectInputStream) method.").initCause(e);
+                      throw (IOException) new IOException("No end of block" +
+                        " data seen for class with readObject" +
+                        " (ObjectInputStream) method").initCause(e);
                     }
                 }
             }
@@ -498,16 +503,16 @@ public class ObjectInputStream extends InputStream
         }
 
        case TC_RESET:
-        if(dump) dumpElementln("RESET");
+        if(DEBUG && dump) dumpElementln("RESET");
         clearHandles();
         ret_val = readObject();
         break;
 
        case TC_EXCEPTION:
         {
-          if(dump) dumpElement("EXCEPTION=");
+          if(DEBUG && dump) dumpElement("EXCEPTION=");
           Exception e = (Exception)readObject();
-          if(dump) dumpElementln(e.toString());
+          if(DEBUG && dump) dumpElementln(e.toString());
           clearHandles();
           throw new WriteAbortedException("Exception thrown during writing of stream", e);
         }
@@ -515,16 +520,16 @@ public class ObjectInputStream extends InputStream
        case TC_ENUM:
          {
            /* TC_ENUM classDesc newHandle enumConstantName */
-           if (dump)
+           if (DEBUG && dump)
              dumpElementln("ENUM=");
            ObjectStreamClass osc = (ObjectStreamClass) readObject();
-	   int enumHandle = assignNewHandle(null, shared);
+           int enumHandle = assignNewHandle(null, shared);
            String constantName = (String) readObject();
-           if (dump)
+           if (DEBUG && dump)
              dumpElementln("CONSTANT NAME = " + constantName);
            Class clazz = osc.forClass();
            Enum instance = Enum.valueOf(clazz, constantName);
-	   rememberHandle(instance, shared, enumHandle);
+           rememberHandle(instance, shared, enumHandle);
            ret_val = instance;
            break;
          }
@@ -613,15 +618,16 @@ public class ObjectInputStream extends InputStream
   protected ObjectStreamClass readClassDescriptor()
     throws ClassNotFoundException, IOException
   {
-    if(dump) dumpElement("CLASSDESC NAME=");
+    if(DEBUG && dump) dumpElement("CLASSDESC NAME=");
     String name = this.realInputStream.readUTF();
-    if(dump) dumpElement(name + "; UID=");
+    if(DEBUG && dump) dumpElement(name + "; UID=");
     long uid = this.realInputStream.readLong ();
-    if(dump) dumpElement(Long.toHexString(uid) + "; FLAGS=");
+    if(DEBUG && dump) dumpElement(Long.toHexString(uid) + "; FLAGS=");
     byte flags = this.realInputStream.readByte ();
-    if(dump) dumpElement(Integer.toHexString(flags) + "; FIELD COUNT=");
+    if(DEBUG && dump) dumpElement(Integer.toHexString(flags) +
+                                  "; FIELD COUNT=");
     short field_count = this.realInputStream.readShort();
-    if(dump) dumpElementln(Short.toString(field_count));
+    if(DEBUG && dump) dumpElementln(Short.toString(field_count));
     ObjectStreamField[] fields = new ObjectStreamField[field_count];
     ObjectStreamClass osc = new ObjectStreamClass(name, uid,
                                                   flags, fields);
@@ -629,11 +635,11 @@ public class ObjectInputStream extends InputStream
 
     for (int i = 0; i < field_count; i++)
       {
-        if(dump) dumpElement("  TYPE CODE=");
+        if(DEBUG && dump) dumpElement("  TYPE CODE=");
         char type_code = (char)this.realInputStream.readByte();
-        if(dump) dumpElement(type_code + "; FIELD NAME=");
+        if(DEBUG && dump) dumpElement(type_code + "; FIELD NAME=");
         String field_name = this.realInputStream.readUTF();
-        if(dump) dumpElementln(field_name);
+        if(DEBUG && dump) dumpElementln(field_name);
         String class_name;
 
         // If the type code is an array or an object we must
@@ -766,8 +772,9 @@ public class ObjectInputStream extends InputStream
                              newfieldmapping, 0, fieldmapping.length);
             fieldmapping = newfieldmapping;
           }
-        fieldmapping[map_idx++] = stream_field;
-        fieldmapping[map_idx++] = real_field;
+        fieldmapping[map_idx] = stream_field;
+        fieldmapping[map_idx + 1] = real_field;
+        map_idx += 2;
       }
     osc.fieldMapping = fieldmapping;
 
@@ -872,7 +879,8 @@ public class ObjectInputStream extends InputStream
     String name = osc.getName();
     try
       {
-        return Class.forName(name, true, currentLoader());
+        return Class.forName(name, true,
+                             VMStackWalker.firstNonNullClassLoader());
       }
     catch(ClassNotFoundException x)
       {
@@ -897,15 +905,6 @@ public class ObjectInputStream extends InputStream
         else
           throw x;
       }
-  }
-
-  /**
-   * Returns the most recent user defined ClassLoader on the execution stack
-   * or null if none is found.
-   */
-  private ClassLoader currentLoader()
-  {
-    return VMStackWalker.firstNonNullClassLoader();
   }
 
   /**
@@ -971,7 +970,7 @@ public class ObjectInputStream extends InputStream
   protected Class<?> resolveProxyClass(String[] intfs)
     throws IOException, ClassNotFoundException
   {
-    ClassLoader cl = currentLoader();
+    ClassLoader cl = VMStackWalker.firstNonNullClassLoader();
 
     Class<?>[] clss = new Class<?>[intfs.length];
     if(cl == null)
@@ -1028,11 +1027,11 @@ public class ObjectInputStream extends InputStream
   protected void readStreamHeader()
     throws IOException, StreamCorruptedException
   {
-    if(dump) dumpElement("STREAM MAGIC ");
+    if(DEBUG && dump) dumpElement("STREAM MAGIC ");
     if (this.realInputStream.readShort() != STREAM_MAGIC)
       throw new StreamCorruptedException("Invalid stream magic number");
 
-    if(dump) dumpElementln("STREAM VERSION ");
+    if(DEBUG && dump) dumpElementln("STREAM VERSION ");
     if (this.realInputStream.readShort() != STREAM_VERSION)
       throw new StreamCorruptedException("Invalid stream version number");
   }
@@ -1395,9 +1394,8 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return (char)(((prim_field_data[off++] & 0xFF) << 8)
-                        | (prim_field_data[off] & 0xFF));
+          return (char)((prim_field_data[off] << 8)
+                        | (prim_field_data[off + 1] & 0xFF));
         }
 
         public byte get(String name, byte defvalue)
@@ -1420,9 +1418,8 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return (short)(((prim_field_data[off++] & 0xFF) << 8)
-                         | (prim_field_data[off] & 0xFF));
+          return (short)((prim_field_data[off] << 8)
+                         | (prim_field_data[off + 1] & 0xFF));
         }
 
         public int get(String name, int defvalue)
@@ -1434,11 +1431,10 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return ((prim_field_data[off++] & 0xFF) << 24)
-            | ((prim_field_data[off++] & 0xFF) << 16)
-            | ((prim_field_data[off++] & 0xFF) << 8)
-            | (prim_field_data[off] & 0xFF);
+          return (prim_field_data[off] << 24)
+            | ((prim_field_data[off + 1] & 0xFF) << 16)
+            | ((prim_field_data[off + 2] & 0xFF) << 8)
+            | (prim_field_data[off + 3] & 0xFF);
         }
 
         public long get(String name, long defvalue)
@@ -1450,15 +1446,14 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return (long)(((prim_field_data[off++] & 0xFFL) << 56)
-                        | ((prim_field_data[off++] & 0xFFL) << 48)
-                        | ((prim_field_data[off++] & 0xFFL) << 40)
-                        | ((prim_field_data[off++] & 0xFFL) << 32)
-                        | ((prim_field_data[off++] & 0xFF) << 24)
-                        | ((prim_field_data[off++] & 0xFF) << 16)
-                        | ((prim_field_data[off++] & 0xFF) << 8)
-                        | (prim_field_data[off] & 0xFF));
+          return ((long)((prim_field_data [off] << 24)
+                      | ((prim_field_data [off + 1] & 0xff) << 16)
+                      | ((prim_field_data [off + 2] & 0xff) << 8)
+                       | (prim_field_data [off + 3] & 0xff)) << 32) |
+                  ((long)(prim_field_data [off + 4] & 0xff) << 24) |
+                       (((prim_field_data [off + 5] & 0xff) << 16)
+                      | ((prim_field_data [off + 6] & 0xff) << 8)
+                       | (prim_field_data [off + 7] & 0xff));
         }
 
         public float get(String name, float defvalue)
@@ -1470,11 +1465,10 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return Float.intBitsToFloat(((prim_field_data[off++] & 0xFF) << 24)
-                                      | ((prim_field_data[off++] & 0xFF) << 16)
-                                      | ((prim_field_data[off++] & 0xFF) << 8)
-                                      | (prim_field_data[off] & 0xFF));
+          return Float.intBitsToFloat((prim_field_data[off] << 24)
+                        | ((prim_field_data[off + 1] & 0xFF) << 16)
+                        | ((prim_field_data[off + 2] & 0xFF) << 8)
+                        | (prim_field_data[off + 3] & 0xFF));
         }
 
         public double get(String name, double defvalue)
@@ -1486,16 +1480,15 @@ public class ObjectInputStream extends InputStream
             return defvalue;
 
           int off = field.getOffset();
-
-          return Double.longBitsToDouble
-            ( (long) (((prim_field_data[off++] & 0xFFL) << 56)
-                      | ((prim_field_data[off++] & 0xFFL) << 48)
-                      | ((prim_field_data[off++] & 0xFFL) << 40)
-                      | ((prim_field_data[off++] & 0xFFL) << 32)
-                      | ((prim_field_data[off++] & 0xFF) << 24)
-                      | ((prim_field_data[off++] & 0xFF) << 16)
-                      | ((prim_field_data[off++] & 0xFF) << 8)
-                      | (prim_field_data[off] & 0xFF)));
+          return Double.longBitsToDouble(
+                   ((long)((prim_field_data [off] << 24)
+                        | ((prim_field_data [off + 1] & 0xff) << 16)
+                        | ((prim_field_data [off + 2] & 0xff) << 8)
+                         | (prim_field_data [off + 3] & 0xff)) << 32) |
+                    ((long)(prim_field_data [off + 4] & 0xff) << 24) |
+                         (((prim_field_data [off + 5] & 0xff) << 16)
+                        | ((prim_field_data [off + 6] & 0xff) << 8)
+                         | (prim_field_data [off + 7] & 0xff)));
         }
 
         public Object get(String name, Object defvalue)
@@ -1668,13 +1661,13 @@ public class ObjectInputStream extends InputStream
   {
     Pair<Boolean,Object> result = handles.get(handle);
     if (result == null)
-      throw new StreamCorruptedException("The handle, " +
+      throw new StreamCorruptedException("The handle " +
                                          Integer.toHexString(handle) +
-                                         ", is invalid.");
+                                         " is invalid");
     if (!result.getLeft())
-      throw new InvalidObjectException("The handle, " +
+      throw new InvalidObjectException("The handle " +
                                        Integer.toHexString(handle) +
-                                       ", is not shared.");
+                                       " is not shared");
     return result.getRight();
   }
 
@@ -1746,7 +1739,7 @@ public class ObjectInputStream extends InputStream
     byte marker = this.realInputStream.readByte();
     while (marker == TC_RESET)
       {
-        if(dump) dumpElementln("RESET");
+        if(DEBUG && dump) dumpElementln("RESET");
         clearHandles();
         marker = this.realInputStream.readByte();
       }
@@ -1757,19 +1750,20 @@ public class ObjectInputStream extends InputStream
   {
     if (marker == TC_BLOCKDATA)
       {
-        if(dump) dumpElement("BLOCK DATA SIZE=");
+        if(DEBUG && dump) dumpElement("BLOCK DATA SIZE=");
         this.blockDataBytes = this.realInputStream.readUnsignedByte();
-        if(dump) dumpElementln (Integer.toString(this.blockDataBytes));
+        if(DEBUG && dump) dumpElementln(Integer.toString(this.blockDataBytes));
       }
     else if (marker == TC_BLOCKDATALONG)
       {
-        if(dump) dumpElement("BLOCK DATA LONG SIZE=");
+        if(DEBUG && dump) dumpElement("BLOCK DATA LONG SIZE=");
         this.blockDataBytes = this.realInputStream.readInt();
-        if(dump) dumpElementln (Integer.toString(this.blockDataBytes));
+        if(DEBUG && dump) dumpElementln (Integer.toString(this.blockDataBytes));
       }
     else
       {
-        throw new EOFException("Attempt to read primitive data, but no data block is active.");
+        throw new EOFException(
+          "Attempt to read primitive data, but no data block is active");
       }
 
     if (this.blockData.length < this.blockDataBytes)
@@ -1880,7 +1874,7 @@ public class ObjectInputStream extends InputStream
             {
               boolean value =
                 read_value ? this.realInputStream.readBoolean() : false;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setBooleanField(obj, value);
@@ -1890,7 +1884,7 @@ public class ObjectInputStream extends InputStream
             {
               byte value =
                 read_value ? this.realInputStream.readByte() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setByteField(obj, value);
@@ -1900,7 +1894,7 @@ public class ObjectInputStream extends InputStream
             {
               char value =
                 read_value ? this.realInputStream.readChar(): 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setCharField(obj, value);
@@ -1910,7 +1904,7 @@ public class ObjectInputStream extends InputStream
             {
               double value =
                 read_value ? this.realInputStream.readDouble() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setDoubleField(obj, value);
@@ -1920,7 +1914,7 @@ public class ObjectInputStream extends InputStream
             {
               float value =
                 read_value ? this.realInputStream.readFloat() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setFloatField(obj, value);
@@ -1930,7 +1924,7 @@ public class ObjectInputStream extends InputStream
             {
               int value =
                 read_value ? this.realInputStream.readInt() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setIntField(obj, value);
@@ -1940,7 +1934,7 @@ public class ObjectInputStream extends InputStream
             {
               long value =
                 read_value ? this.realInputStream.readLong() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setLongField(obj, value);
@@ -1950,7 +1944,7 @@ public class ObjectInputStream extends InputStream
             {
               short value =
                 read_value ? this.realInputStream.readShort() : 0;
-              if (dump && read_value && set_value)
+              if (DEBUG && dump && read_value && set_value)
                 dumpElementln("  " + field_name + ": " + value);
               if (set_value)
                 real_field.setShortField(obj, value);

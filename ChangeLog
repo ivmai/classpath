@@ -1,5 +1,56 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/io/DataInputStream.java:
+	(buf): Make the field private and final.
+	* java/io/ObjectStreamClass.java:
+	(methodCache): Likewise.
+	(uidCache): Likewise.
+	* java/io/DataInputStream.java:
+	(convertToInt(byte[])): Optimize the conversion expression.
+	(convertToLong(byte[])): Likewise.
+	* java/io/ObjectInputStream.java: Globally replace every "if(dump)"
+	with "if(DEBUG && dump)" (this eliminates the debug-printing code
+	when the debugging mode is off).
+	* java/io/ObjectOutputStream.java: Likewise.
+	* java/io/ObjectInputStream.java:
+	(parseContent(byte)): Set ret_val to null and add "break" to
+	TC_BLOCKDATA[LONG] case.
+	(parseContent(byte)): Remove the trailing dot character for exception
+	messages.
+	(lookupHandle(int)): Likewise.
+	(readNextBlock(byte)): Likewise.
+	* java/io/ObjectOutputStream.java:
+	(writeObject(Object)): Likewise.
+	(useProtocolVersion(int)): Likewise.
+	* java/io/ObjectInputStream.java:
+	(readClassDescriptor()): Optimize sequential storing of 2 objects into
+	"fieldmapping" array (use single index increment instead of a double
+	one).
+	(resolveClass(ObjectStreamClass)): Directly call
+	VMStackWalker.firstNonNullClassLoader() (since it expects that the
+	method which calls it is itself directly called from the user code).
+	(resolveProxyClass(String[])): Likewise.
+	(currentLoader()): Remove.
+	(readFields()): Optimize the code which accesses prim_field_data.
+	* java/io/ObjectOutputStream.java:
+	(putFields()): Likewise.
+	(writeObject(Object)): Remove debug print of "1".
+	* java/io/ObjectStreamClass.java:
+	(toString()): Change the returned string format (to match the RI and
+	the serialver tool output format).
+	(setClass(Class, ObjectStreamClass)): Reformat the code (make the
+	correct identation of "hierarchy" assignment statement).
+	(noArgs): Make the field private.
+	(readObjectSignature): Likewise.
+	(writeObjectSignature): Likewise.
+	(calculateClassUID(Class)): Adjust ABSTRACT modifier bit according to
+	whether it is an interface class or not.
+	(newInstance()): Use noArgs static field.
+	(classLookup): Make the field final.
+	(writeMethodArgTypes): Remove unused private field.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/text/CollationElementIterator.java:
 	(setText(String)): Remove intern() call for work_text (since
 	unnecessary).
