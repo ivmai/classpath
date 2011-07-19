@@ -1,5 +1,6 @@
 /* Locale.java -- i18n locales
-   Copyright (C) 1998, 1999, 2001, 2002, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -91,50 +92,62 @@ import java.util.spi.LocaleNameProvider;
  */
 public final class Locale implements Serializable, Cloneable
 {
+
+  /**
+   * Locale cache. Only created locale objects are stored.
+   * Contains all supported locales when getAvailableLocales()
+   * got called. This static field must be initialized before
+   * getLocaleInternal() is called.
+   */
+  private static final transient HashMap<String, Locale> localeMap
+    = new HashMap<String, Locale>(32);
+
   /** Locale which represents the English language. */
-  public static final Locale ENGLISH = getLocale("en");
+  public static final Locale ENGLISH = getLocaleInternal("en", "");
 
   /** Locale which represents the French language. */
-  public static final Locale FRENCH = getLocale("fr");
+  public static final Locale FRENCH = getLocaleInternal("fr", "");
 
   /** Locale which represents the German language. */
-  public static final Locale GERMAN = getLocale("de");
+  public static final Locale GERMAN = getLocaleInternal("de", "");
 
   /** Locale which represents the Italian language. */
-  public static final Locale ITALIAN = getLocale("it");
+  public static final Locale ITALIAN = getLocaleInternal("it", "");
 
   /** Locale which represents the Japanese language. */
-  public static final Locale JAPANESE = getLocale("ja");
+  public static final Locale JAPANESE = getLocaleInternal("ja", "");
 
   /** Locale which represents the Korean language. */
-  public static final Locale KOREAN = getLocale("ko");
+  public static final Locale KOREAN = getLocaleInternal("ko", "");
 
   /** Locale which represents the Chinese language. */
-  public static final Locale CHINESE = getLocale("zh");
+  public static final Locale CHINESE = getLocaleInternal("zh", "");
 
   /** Locale which represents the Chinese language as used in China. */
-  public static final Locale SIMPLIFIED_CHINESE = getLocale("zh", "CN");
+  public static final Locale SIMPLIFIED_CHINESE
+    = getLocaleInternal("zh", "CN");
 
   /**
    * Locale which represents the Chinese language as used in Taiwan.
    * Same as TAIWAN Locale.
    */
-  public static final Locale TRADITIONAL_CHINESE = getLocale("zh", "TW");
+  public static final Locale TRADITIONAL_CHINESE
+    = getLocaleInternal("zh", "TW");
 
   /** Locale which represents France. */
-  public static final Locale FRANCE = getLocale("fr", "FR");
+  public static final Locale FRANCE = getLocaleInternal("fr", "FR");
 
   /** Locale which represents Germany. */
-  public static final Locale GERMANY = getLocale("de", "DE");
+  public static final Locale GERMANY = getLocaleInternal("de", "DE");
 
   /** Locale which represents Italy. */
-  public static final Locale ITALY = getLocale("it", "IT");
+  public static final Locale ITALY = getLocaleInternal("it", "IT");
 
   /** Locale which represents Japan. */
-  public static final Locale JAPAN = getLocale("ja", "JP");
+  public static final Locale JAPAN = getLocaleInternal("ja", "JP");
 
   /** Locale which represents Korea. */
-  public static final Locale KOREA = getLocale("ko", "KR");
+  public static final Locale KOREA = getLocaleInternal("ko", "KR");
 
   /**
    * Locale which represents China.
@@ -155,21 +168,21 @@ public final class Locale implements Serializable, Cloneable
   public static final Locale TAIWAN = TRADITIONAL_CHINESE;
 
   /** Locale which represents the United Kingdom. */
-  public static final Locale UK = getLocale("en", "GB");
+  public static final Locale UK = getLocaleInternal("en", "GB");
 
   /** Locale which represents the United States. */
-  public static final Locale US = getLocale("en", "US");
+  public static final Locale US = getLocaleInternal("en", "US");
 
   /** Locale which represents the English speaking portion of Canada. */
-  public static final Locale CANADA = getLocale("en", "CA");
+  public static final Locale CANADA = getLocaleInternal("en", "CA");
 
   /** Locale which represents the French speaking portion of Canada. */
-  public static final Locale CANADA_FRENCH = getLocale("fr", "CA");
+  public static final Locale CANADA_FRENCH = getLocaleInternal("fr", "CA");
 
   /** The root locale, used as the base case in lookups by
    *  locale-sensitive operations.
    */
-  public static final Locale ROOT = new Locale("","","");
+  public static final Locale ROOT = new Locale("","","", 0);
 
   /**
    * Compatible with JDK 1.1+.
@@ -208,13 +221,6 @@ public final class Locale implements Serializable, Cloneable
    * Array storing all available locales.
    */
   private static transient Locale[] availableLocales;
-
-  /**
-   * Locale cache. Only created locale objects are stored.
-   * Contains all supported locales when getAvailableLocales()
-   * got called.
-   */
-  private static transient HashMap localeMap;
 
   /**
    * The default locale. Except for during bootstrapping, this should never be
@@ -277,13 +283,11 @@ public final class Locale implements Serializable, Cloneable
    * @param variant the variant of the locale to retrieve.
    * @return the locale.
    */
-  private static Locale getLocale(String language, String country, String variant)
+  private static Locale getLocale(String language, String country,
+                                  String variant)
   {
-    if (localeMap == null)
-      localeMap = new HashMap(256);
-
     String name = language + "_" + country + "_" + variant;
-    Locale locale = (Locale) localeMap.get(name);
+    Locale locale = localeMap.get(name);
 
     if (locale == null)
       {
@@ -292,6 +296,41 @@ public final class Locale implements Serializable, Cloneable
       }
 
     return locale;
+  }
+
+  private static Locale getLocaleInternal(String language, String country)
+  {
+    return getLocaleInternal(language, country, "");
+  }
+
+  /**
+   * This is the same as getLocale() except for the strings being passed
+   * must be in the correct capitalization, intern()'ed and not null.
+   */
+  private static Locale getLocaleInternal(String language, String country,
+                                          String variant)
+  {
+    String name = language + "_" + country + "_" + variant;
+    Locale locale = localeMap.get(name);
+
+    if (locale == null)
+      {
+        locale = new Locale(language, country, variant,
+                            language.hashCode() ^ country.hashCode()
+                            ^ variant.hashCode());
+        localeMap.put(name, locale);
+      }
+
+    return locale;
+  }
+
+  private Locale(String language, String country, String variant,
+                 int hashcode)
+  {
+    this.language = language;
+    this.country = country;
+    this.variant = variant;
+    this.hashcode = hashcode;
   }
 
   /**
@@ -422,7 +461,7 @@ public final class Locale implements Serializable, Cloneable
             if (index > 0)
               {
                 variant = country.substring(index + 1);
-                country = country.substring(0, index - 1);
+                country = country.substring(0, index);
               }
 
             availableLocales[i] = getLocale(language, country, variant);
@@ -958,7 +997,7 @@ public final class Locale implements Serializable, Cloneable
   public Object clone()
   {
     // This class is final, so no need to use native super.clone().
-    return new Locale(language, country, variant);
+    return new Locale(language, country, variant, hashcode);
   }
 
   /**
