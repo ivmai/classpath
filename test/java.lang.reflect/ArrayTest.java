@@ -2,7 +2,7 @@ import java.lang.reflect.Array;
 
 public class ArrayTest {
 	public static void main(String[] args) {
-		System.loadLibrary("javalangreflect");
+		//System.loadLibrary("javalangreflect");
 
 		Object[] objArray = new Object[9];
 		boolean[] boolArray = new boolean[9];
@@ -27,7 +27,7 @@ public class ArrayTest {
 			E.printStackTrace();
 		}
 		System.out.println(": newInstance(<primitive Class>,int)");
-	
+
 		try {
 			objArray = (Object[])Array.newInstance(java.lang.Object.class, 9);
 			System.out.print(objArray != null ? "PASSED" : "FAILED");
