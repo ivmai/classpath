@@ -1,5 +1,5 @@
 /* CharsetEncoder.java --
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -184,7 +184,10 @@ public abstract class CharsetEncoder
 
     out.flip ();
 
-    // Unfortunately, resizing the actual bytebuffer array is required.
+    // Resizing the actual bytebuffer array is not required.
+    if (out.remaining() >= n - (n >> 2))
+      return out;
+
     byte[] resized = new byte[out.remaining()];
     out.get(resized);
     return ByteBuffer.wrap(resized);

@@ -1,5 +1,14 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/nio/charset/CharsetDecoder.java:
+	(decode(ByteBuffer)): Remove resizing of the output character buffer
+	since it is not required by the specification; update the comment.
+	* java/nio/charset/CharsetEncoder.java:
+	(encode(CharBuffer)): Resize the output byte buffer only in case of
+	wasting 25% of space (or more); update the comment.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/nio/channels/FileLock.java:
 	(FileLock(FileChannel, long, long, boolean)): Test for position plus
 	size overflow; throw exception with a message.
