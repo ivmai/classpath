@@ -1,5 +1,40 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/io/File.java:
+	(canRead()): Call checkRead().
+	(canRead()): Remove VMFile.exists() call (since redundant
+	according to the specification of the corresponding VMFile function).
+	(canWrite()): Likewise.
+	(canExecute()): Likewise.
+	(setReadOnly()): Likewise.
+	(normalizePath(String)): Make private method static; convert the
+	comment to the documentational one.
+	(normalizePath(String)): Use isDriveLetter().
+	(getCanonicalPath()): Likewise.
+	(normalizePath(String)): Handle various Windows paths correctly.
+	(File(String,String)): Likewise.
+	(getParent()): Likewise.
+	(isDriveLetter(char)): New private method.
+	(File(String,String)): Refine the documentation.
+	(isAbsolute()): Likewise.
+	(File(String,String)): Document NPE.
+	(File(String,String)): Don't append '/' if the path is already
+	terminated with it.
+	(toURI()): Likewise.
+	(getParent()): Use PlatformHelper.beginWithRootPathPrefix(); update
+	the comments.
+	(list(FilenameFilter)): Remove exists() call; call
+	VMFile.isDirectory() instead of isDirectory() and only if
+	VMFile.list() returns null.
+	(list(FilenameFilter)): Don't create a copy of the resulting array if
+	no file names are filtered out.
+	(listFiles(FileFilter)): Likewise.
+	(toURI()): Handle Windows UNC paths.
+	(createTempFile(String,String,File)): Insert a space between message
+	parts of the thrown IllegalArgumentException.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* gnu/java/io/PlatformHelper.java:
 	PlatformHelper: Make class final.
 	(isWindows): Remove field (the field is not used in Classpath).

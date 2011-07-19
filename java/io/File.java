@@ -1,5 +1,5 @@
 /* File.java -- Class representing a file on disk
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2006
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -40,6 +40,8 @@ exception statement from your version. */
 package java.io;
 
 import gnu.classpath.SystemProperties;
+
+import gnu.java.io.PlatformHelper;
 
 import gnu.java.lang.CPStringBuilder;
 
@@ -129,9 +131,9 @@ public class File implements Serializable, Comparable<File>
    */
   public boolean canRead()
   {
-    // Test for existence. This also does the SecurityManager check
-    if (!exists())
-      return false;
+    checkRead();
+
+    // No need to explicitly test for existence.
 
     return VMFile.canRead(path);
   }
@@ -155,9 +157,7 @@ public class File implements Serializable, Comparable<File>
     // First do a SecurityCheck before doing anything else.
     checkWrite();
 
-    // Test for existence.  This is required by the spec
-    if (! VMFile.exists(path))
-      return false;
+    // No need to explicitly test for existence.
 
     if (VMFile.isDirectory(path))
       return VMFile.canWriteDirectory(path);
@@ -180,10 +180,9 @@ public class File implements Serializable, Comparable<File>
    */
   public boolean canExecute()
   {
-    if (!VMFile.exists(path))
-      return false;
-
     checkExec();
+
+    // No need to explicitly test for existence.
 
     return VMFile.canExecute(path);
   }
@@ -282,19 +281,19 @@ public class File implements Serializable, Comparable<File>
     path = normalizePath (name);
   }
 
-  // Remove duplicate and redundant separator characters.
-  private String normalizePath(String p)
+  /**
+   * Remove duplicate and redundant separator characters.
+   */
+  private static String normalizePath(String p)
   {
     // On Windows, convert any '/' to '\'.  This appears to be the same logic
     // that Sun's Win32 Java performs.
+    p = p.replace ('/', separatorChar);
     if (separatorChar == '\\')
       {
-        p = p.replace ('/', '\\');
         // We have to special case the "\c:" prefix.
-        if (p.length() > 2 && p.charAt(0) == '\\' &&
-            ((p.charAt(1) >= 'a' && p.charAt(1) <= 'z') ||
-            (p.charAt(1) >= 'A' && p.charAt(1) <= 'Z')) &&
-            p.charAt(2) == ':')
+        if (p.length() > 2 && p.charAt(0) == '\\'
+            && isDriveLetter(p.charAt(1)) && p.charAt(2) == ':')
           p = p.substring(1);
       }
 
@@ -302,77 +301,71 @@ public class File implements Serializable, Comparable<File>
     int plen = p.length();
 
     // Special case: permit Windows UNC path prefix.
-    if (dupSeparator.equals("\\\\") && dupIndex == 0)
+    if (dupIndex == 0 && separatorChar == '\\')
       dupIndex = p.indexOf(dupSeparator, 1);
 
-    if (dupIndex == -1)
+    if (dupIndex != -1)
+      {
+        // Remove duplicate separator characters.
+        CPStringBuilder newpath = new CPStringBuilder(plen);
+        dupIndex++;
+        int last = 0;
+        for (;;)
+          {
+            newpath.append(p.substring(last, dupIndex));
+            // Ignore the duplicate '/' characters.
+            while (++dupIndex < plen)
+              if (p.charAt(dupIndex) != separatorChar)
+                break;
+            if (dupIndex == plen)
+              break;
+            last = dupIndex;
+            dupIndex = p.indexOf(dupSeparator, last + 1) + 1;
+            if (dupIndex == 0)
+              {
+                newpath.append(p.substring(last));
+                break;
+              }
+          }
+          p = newpath.toString();
+          // Update plen.
+          plen = p.length();
+      }
+
+    if (plen > 1 && p.charAt(plen - 1) == separatorChar)
       {
         // Ignore trailing separator (though on Windows "a:\", for
         // example, is a valid and minimal path).
-        if (plen > 1 && p.charAt (plen - 1) == separatorChar)
-          {
-            if (! (separatorChar == '\\' && ((plen == 3 && p.charAt(1) == ':')
-                || (plen == 2 && p.charAt(0) == separatorChar))))
-              return p.substring (0, plen - 1);
-          }
-        else
-          return p;
+        if (separatorChar != '\\' || (plen == 2 ? p.charAt(0) != '\\' :
+            p.charAt(plen - 2) != ':' || p.lastIndexOf('\\', plen - 3) >= 0))
+          p = p.substring(0, plen - 1);
       }
 
-    CPStringBuilder newpath = new CPStringBuilder(plen);
-    int last = 0;
-    while (dupIndex != -1)
-      {
-        newpath.append(p.substring(last, dupIndex));
-        // Ignore the duplicate path characters.
-        while (p.charAt(dupIndex) == separatorChar)
-          {
-            dupIndex++;
-            if (dupIndex == plen)
-              {
-                if ((separatorChar == '\\'
-                    && newpath.length() == 2
-                    && newpath.charAt(1) == ':')
-                    || (separatorChar != '\\' && newpath.length() == 0))
-                  {
-                    newpath.append(separatorChar);
-                  }
-                return newpath.toString();
-              }
-          }
-        newpath.append(separatorChar);
-        last = dupIndex;
-        dupIndex = p.indexOf(dupSeparator, last);
-      }
+    return p;
+  }
 
-    // Again, ignore possible trailing separator (except special cases
-    // like "a:\" on Windows).
-    int end;
-    if (plen > 1 && p.charAt (plen - 1) == separatorChar)
-    {
-      if (separatorChar == '\\'
-        && ((plen == 3 && p.charAt(1) == ':')
-            || (plen == 2 && p.charAt(0) == separatorChar)))
-        end = plen;
-      else
-        end = plen - 1;
-    }
-    else
-      end = plen;
-    newpath.append(p.substring(last, end));
-
-    return newpath.toString();
+  /**
+   * A convenient method to check whether the argument is a valid drive
+   * letter (on a Windows platform).
+   *
+   * @author Ivan Maidanski
+   */
+  private static boolean isDriveLetter(char ch)
+  {
+    return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
   }
 
   /**
    * This method initializes a new <code>File</code> object to represent
    * a file in the specified named directory.  The path name to the file
    * will be the directory name plus the separator string plus the file
-   * name.  If the directory path name ends in the separator string, another
-   * separator string will still be appended.
+   * name. If dirPath is null then the new <code>File</code> instance is
+   * created as if by invoking the single-argument <code>File</code>
+   * constructor.
    *
    * @param dirPath The path to the directory the file resides in
    * @param name The name of the file
+   * @exception NullPointerException If <code>name</code> is <code>null</code>
    */
   public File(String dirPath, String name)
   {
@@ -380,35 +373,29 @@ public class File implements Serializable, Comparable<File>
       throw new NullPointerException();
     if (dirPath != null)
       {
-        if (dirPath.length() > 0)
-          {
-            // Try to be smart about the number of separator characters.
-            if (dirPath.charAt(dirPath.length() - 1) == separatorChar
-                || name.length() == 0)
-              path = normalizePath(dirPath + name);
-            else
-              path = normalizePath(dirPath + separatorChar + name);
-          }
-        else
+        if (dirPath.length() == 0)
           {
             // If dirPath is empty, use a system dependant
-            // default prefix.
-            // Note that the leading separators in name have
-            // to be chopped off, to prevent them forming
-            // a UNC prefix on Windows.
-            if (separatorChar == '\\' /* TODO use ON_WINDOWS */)
-              {
-                int skip = 0;
-                while(name.length() > skip
-                    && (name.charAt(skip) == separatorChar
-                    || name.charAt(skip) == '/'))
-                  {
-                    skip++;
-                  }
-                name = name.substring(skip);
-              }
-            path = normalizePath(separatorChar + name);
+            // default prefix (root directory).
+            dirPath = separator;
           }
+
+        // Note that the leading separators in name have
+        // to be chopped off, to prevent them forming
+        // a UNC prefix on Windows.
+        char ch;
+        int skip = 0;
+        while (name.length() > skip
+               && ((ch = name.charAt(skip)) == separatorChar || ch == '/'))
+          skip++;
+        name = name.substring(skip);
+
+        // Try to be smart about the number of separator characters.
+        if ((ch = dirPath.charAt(dirPath.length() - 1)) == separatorChar
+            || ch == '/' || (name.length() == 0 && skip == 0))
+          path = normalizePath(dirPath + name);
+        else
+          path = normalizePath(dirPath + separator + name);
       }
     else
       path = normalizePath(name);
@@ -498,13 +485,11 @@ public class File implements Serializable, Comparable<File>
   {
     // On Windows, getAbsolutePath might end up calling us, so we
     // have to special case that call to avoid infinite recursion.
-    if (separatorChar == '\\' && path.length() == 2 &&
-        ((path.charAt(0) >= 'a' && path.charAt(0) <= 'z') ||
-         (path.charAt(0) >= 'A' && path.charAt(0) <= 'Z')) &&
-        path.charAt(1) == ':')
-    {
+    if (separatorChar == '\\' && path.length() == 2
+        && isDriveLetter(path.charAt(0)) && path.charAt(1) == ':')
+      {
         return VMFile.toCanonicalForm(path);
-    }
+      }
     // Call getAbsolutePath first to make sure that we do the
     // current directory handling, because the native code
     // may have a different idea of the current directory.
@@ -549,59 +534,28 @@ public class File implements Serializable, Comparable<File>
    */
   public String getParent()
   {
-    String prefix = null;
-    int nameSeqIndex = 0;
+    int prefixLen = PlatformHelper.beginWithRootPathPrefix(path);
 
-    if (path.equals(""))
-      return null;
-
+    // Sun's JRE 1.4 returns null if the prefix is the only
+    // component of the path - so "/" gives null on UNIX and
+    // "C:", "\\", etc. return null on Windows.
     // The "prefix", if present, is the leading "/" on UNIX and
     // either the drive specifier (e.g. "C:") or the leading "\\"
     // of a UNC network path on Windows.
-    if (separatorChar == '/' && path.charAt (0) == '/')
-      {
-        prefix = "/";
-        nameSeqIndex = 1;
-      }
-    else if (separatorChar == '\\' && path.length() > 1)
-      {
-        if ((path.charAt (0) == '\\' && path.charAt (1) == '\\')
-            || (((path.charAt (0) >= 'a' && path.charAt (0) <= 'z')
-                 || (path.charAt (0) >= 'A' && path.charAt (0) <= 'Z'))
-                && path.charAt (1) == ':'))
-          {
-            prefix = path.substring (0, 2);
-            nameSeqIndex = 2;
-          }
-      }
+    if (path.length() == prefixLen)
+      return null;
 
     // According to the JDK docs, the returned parent path is the
     // portion of the name sequence before the last separator
-    // character, if found, prefixed by the prefix, otherwise null.
-    if (nameSeqIndex < path.length())
-      {
-        String nameSeq = path.substring (nameSeqIndex, path.length());
-        int last = nameSeq.lastIndexOf (separatorChar);
-        if (last == -1)
-          return prefix;
-        else if (last == (nameSeq.length() - 1))
-          // Note: The path would not have a trailing separator
-          // except for cases like "C:\" on Windows (see
-          // normalizePath( )), where Sun's JRE 1.4 returns null.
-          return null;
-        else if (last == 0)
-          last++;
+    // character, if found, prefixed by the root path prefix, otherwise null.
+    int pos = path.lastIndexOf(separatorChar);
+    if (pos <= prefixLen)
+      pos = prefixLen;
 
-        if (prefix != null)
-          return prefix + nameSeq.substring (0, last);
-        else
-          return nameSeq.substring (0, last);
-      }
-    else
-      // Sun's JRE 1.4 returns null if the prefix is the only
-      // component of the path - so "/" gives null on UNIX and
-      // "C:", "\\", etc. return null on Windows.
-      return null;
+    // Note: The path would not have a trailing separator
+    // except for cases like "C:\" on Windows or "/" on Unix (see
+    // normalizePath()), where Sun's JRE 1.4 returns null.
+    return pos > 0 ? path.substring(0, pos) : null;
   }
 
   /**
@@ -650,7 +604,8 @@ public class File implements Serializable, Comparable<File>
    * This method returns true if this object represents an absolute file
    * path and false if it does not.  The definition of an absolute path varies
    * by system.  As an example, on GNU systems, a path is absolute if it starts
-   * with a "/".
+   * with a "/". On Win32 systems, a path is absolute if it starts with
+   * "d:\" ('d' is a drive letter) or "\\server\share".
    *
    * @return <code>true</code> if this object represents an absolute
    * file name, <code>false</code> otherwise.
@@ -774,16 +729,18 @@ public class File implements Serializable, Comparable<File>
   {
     checkRead();
 
-    if (!exists() || !isDirectory())
-      return null;
-
     // Get the list of files
     String files[] = VMFile.list(path);
 
     // Check if an error occured in listInternal().
-    // This is an unreadable directory, pretend there is nothing inside.
     if (files == null)
-      return new String[0];
+      {
+        if (!VMFile.isDirectory(path))
+          return null; // not a directory or does not exist
+
+        // This is an unreadable directory, pretend there is nothing inside.
+        return new String[0];
+      }
 
     if (filter == null)
       return files;
@@ -797,6 +754,8 @@ public class File implements Serializable, Comparable<File>
         else
           files[i] = null;
       }
+    if (count == files.length)
+      return files; // all files are accepted
 
     String[] retfiles = new String[count];
     count = 0;
@@ -930,6 +889,8 @@ public class File implements Serializable, Comparable<File>
     for (int i = 0; i < fobjlist.length; i++)
       if (filter.accept(fobjlist[i]) == true)
         ++count;
+    if (count == fobjlist.length)
+      return fobjlist; // all files are accepted
 
     File[] final_list = new File[count];
     count = 0;
@@ -959,19 +920,19 @@ public class File implements Serializable, Comparable<File>
    */
   public URI toURI()
   {
-    String abspath = getAbsolutePath();
+    String abspath = getAbsolutePath().replace(separatorChar, '/');
 
-    if (isDirectory() || path.equals(""))
-      abspath = abspath + separatorChar;
+    if (!abspath.endsWith("/") && (path.equals("") || isDirectory()))
+      abspath = abspath + "/"; // append '/' for a directory
 
-    if (separatorChar == '\\')
-      abspath = separatorChar + abspath;
+    if (abspath.startsWith("//"))
+      abspath = "//" + abspath; // handle Windows UNC path
+    else if (!abspath.startsWith("/"))
+      abspath = "/" + abspath; // handle Windows absolute path (e.g., "c:/")
 
     try
       {
-        return new URI("file", null, null, -1,
-                       abspath.replace(separatorChar, '/'),
-                       null, null);
+        return new URI("file", null, null, -1, abspath, null, null);
       }
     catch (URISyntaxException use)
       {
@@ -1126,7 +1087,8 @@ public class File implements Serializable, Comparable<File>
       {
         // make sure prefix is not longer than 7 characters
         if (prefix.length() >= 8)
-          throw new IllegalArgumentException("Prefix too long: " + prefix + "(valid length 3..7)");
+          throw new IllegalArgumentException("Prefix too long: " + prefix
+                                             + " (valid length 3..7)");
 
         long mask = 0x000000ffffFFFFL >> (prefix.length() * 4);
         do
@@ -1382,9 +1344,7 @@ public class File implements Serializable, Comparable<File>
     // Do a security check before trying to do anything else.
     checkWrite();
 
-    // Test for existence.
-    if (! VMFile.exists(path))
-      return false;
+    // No need to explicitly test for existence.
 
     return VMFile.setReadOnly(path);
   }
