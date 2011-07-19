@@ -1,5 +1,5 @@
 /* Timer.java -- Timer that runs TimerTasks at a later time.
-   Copyright (C) 2000, 2001, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -360,17 +360,18 @@ public class Timer
    * executed immediately. Stops running when canceled or when the parent
    * Timer has been finalized and no more tasks have to be executed.
    */
-  private static final class Scheduler implements Runnable
+  private static final class Scheduler extends Thread
   {
     // The priority queue containing all the TimerTasks.
-    private TaskQueue queue;
+    private final TaskQueue queue;
 
     /**
      * Creates a new Scheduler that will schedule the tasks on the
      * given TaskQueue.
      */
-    public Scheduler(TaskQueue queue)
+    Scheduler(TaskQueue queue, String name)
     {
+      super(name);
       this.queue = queue;
     }
 
@@ -442,10 +443,7 @@ public class Timer
 
   // The queue that all the tasks are put in.
   // Given to the scheduler
-  private TaskQueue queue;
-
-  // The Scheduler that does all the real work
-  private Scheduler scheduler;
+  private final TaskQueue queue = new TaskQueue();
 
   // Used to run the scheduler.
   // Also used to checked if the Thread is still running by calling
@@ -513,12 +511,10 @@ public class Timer
    */
   private Timer(boolean daemon, int priority, String name)
   {
-    canceled = false;
-    queue = new TaskQueue();
-    scheduler = new Scheduler(queue);
-    thread = new Thread(scheduler, name);
+    Scheduler thread = new Scheduler(queue, name);
     thread.setDaemon(daemon);
     thread.setPriority(priority);
+    this.thread = thread;
     thread.start();
   }
 

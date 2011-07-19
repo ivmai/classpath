@@ -1,5 +1,5 @@
 /* ResourceBundle -- aids in loading resource bundles
-   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -123,7 +123,7 @@ public abstract class ResourceBundle
    *
    * @see BundleKey
    */
-  private static Map<BundleKey,Object> bundleCache =
+  private static final Map<BundleKey,Object> bundleCache =
     new LinkedHashMap<BundleKey,Object>(CACHE_SIZE + 1, 0.75F, true)
   {
     public boolean removeEldestEntry(Map.Entry<BundleKey,Object> entry)
@@ -498,7 +498,17 @@ public abstract class ResourceBundle
             else
               is = classloader.getResourceAsStream(resourceName);
             if (is != null)
-              bundle = new PropertyResourceBundle(is);
+              {
+                bundle = new PropertyResourceBundle(is);
+                try
+                  {
+                    is.close();
+                  }
+                catch (IOException ex)
+                  {
+                    // ignore
+                  }
+              }
           }
         catch (IOException ex)
           {

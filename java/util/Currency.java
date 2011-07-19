@@ -1,5 +1,5 @@
 /* Currency.java -- Representation of a currency
-   Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -107,7 +107,7 @@ public final class Currency
    * @see #getInstance(java.util.Locale)
    * @serial ignored.
    */
-  private static transient Map countryMap;
+  private static final transient Map countryMap = new HashMap();
 
   /**
    * A cache of <code>Currency</code> instances to
@@ -119,17 +119,13 @@ public final class Currency
    * @see #readResolve()
    * @serial ignored.
    */
-  private static transient Map cache;
+  private static final transient Map cache = new HashMap();
 
   /**
    * Instantiates the cache and reads in the properties.
    */
   static
   {
-    /* Create a hash map for the locale mappings */
-    countryMap = new HashMap();
-    /* Create a hash map for the cache */
-    cache = new HashMap();
     /* Create the properties object */
     properties = new Properties();
     /* Try and load the properties from our iso4217.properties resource */
@@ -176,7 +172,7 @@ public final class Currency
     if (countryCode.equals(""))
       {
         throw new
-          IllegalArgumentException("Invalid (empty) country code for locale:"
+          IllegalArgumentException("Invalid (empty) country code for locale: "
                                    + loc);
       }
     /* Construct the key for the currency */

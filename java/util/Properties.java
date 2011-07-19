@@ -1,5 +1,6 @@
 /* Properties.java -- a set of persistent properties
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -473,9 +474,9 @@ label   = Name:\\u0020</pre>
     // Eliminate tail recursion.
     do
       {
-        String value = (String) prop.get(key);
-        if (value != null)
-          return value;
+        Object value = prop.get(key);
+        if (value instanceof String) // skip non-String values
+          return (String) value;
         prop = prop.defaults;
       }
     while (prop != null);

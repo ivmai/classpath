@@ -1,5 +1,5 @@
 /* AbstractPreferences -- Partial implementation of a Preference node
-   Copyright (C) 2001, 2003, 2004, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2004, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -101,7 +101,7 @@ public abstract class AbstractPreferences extends Preferences {
      * accessed by earlier <code>getChild()</code> or <code>childSpi()</code>
      * invocations and that have not been removed.
      */
-    private HashMap<String, AbstractPreferences> childCache
+    private final HashMap<String, AbstractPreferences> childCache
       = new HashMap<String, AbstractPreferences>();
 
     /**

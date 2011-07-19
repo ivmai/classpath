@@ -1,5 +1,38 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/Calendar.java:
+	(ctorArgTypes): Make final.
+	* java/util/ResourceBundle.java:
+	(bundleCache): Likewise.
+	* java/util/Timer.java:
+	(Scheduler.queue): Likewise.
+	* java/util/prefs/AbstractPreferences.java:
+	(childCache): Likewise.
+	* java/util/Calendar.java:
+	(getAvailableLocales()): Use Locale.ROOT instead of Locale("", "").
+	(hashCode()): Optimize the expression.
+	* java/util/Currency.java:
+	(countryMap): Make final and initialize immediately.
+	(cache): Likewise.
+	* java/util/Timer.java:
+	(queue): Likewise.
+	(Currency(Locale)): Add a missing space after ';' in the exception
+	message.
+	* java/util/Properties.java:
+	(getProperty(String)): Skip non-String values (instead of throwing
+	a ClassCastException).
+	* java/util/ResourceBundle.java:
+	(tryBundle(String,ClassLoader)): Explicitly close the input stream.
+	* java/util/Timer.java:
+	(Scheduler): Extends Thread instead of implementing Runnable.
+	(Scheduler.Scheduler(TaskQueue)): Pass also String name; call
+	super(name).
+	(scheduler): Remove unused private field.
+	(Timer(boolean,int,String)): Don't explicitly initialize "canceled"
+	to false; call Scheduler constructor instead of Thread one.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/util/logging/Handler.java:
 	(setFormatter(Formatter)): Directly check for null argument instead
 	of using getClass() hack.
