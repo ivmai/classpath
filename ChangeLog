@@ -1,5 +1,51 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/lang/Double.java:
+	(hashCode()): Optimize the expression (for speed).
+	* java/lang/Long.java:
+	(hashCode()): Likewise.
+	(bitCount(long)): Likewise.
+	(reverseBytes(long)): Likewise.
+	(reverse(long)): Likewise.
+	* java/lang/ExceptionInInitializerError.java:
+	(ExceptionInInitializerError(String)): Invoke initCause() to disallow
+	"cause" subsequent modification.
+	* java/lang/Integer.java:
+	(parseInt(String,int,boolean)): Adjust NumberFormatException messages.
+	* java/lang/Long.java:
+	(parseLong(String,int,boolean)): Allow '+' character; invoke
+	numberFormatExceptionForInputString(str) instead of invoking the
+	default constructor of NumberFormatException.
+	(numberFormatExceptionForInputString(String)): New convenient private
+	method (for creating NumberFormatException instance with the
+	appropriate message).
+	* java/lang/StackTraceElement.java:
+	(equals(Object, Object)): Replace the argument types (of the private
+	method) to String (as it is only invoked with the string arguments);
+	update the comment.
+	(hashCode(Object)): Likewise.
+	* java/lang/String.java:
+	(stringToCharset(String)): Make UnsupportedEncodingException
+	messages look better.
+	* java/lang/System.java:
+	(err): Place the field definition as early as possible (to get
+	System.err initialized before initializing System.out/in).
+	(out): Place the field definition as early as possible but after
+	"err" definition.
+	* java/lang/Thread.java:
+	(Thread(ThreadGroup,Runnable,String,long)): Directly check for null
+	string argument instead of using toString() hack; do the check before
+	the security check.
+	(sleep(long)): Fix the comment (for zero argument).
+	(sleep(long,int)): Likewise.
+	(setPriority(int)): Remove the trailing dot character for exception
+	message.
+	* java/lang/Throwable.java:
+	(writeObject(ObjectOutputStream)): New method (to initialize the stack
+	trace before writing the object).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/sql/Date.java:
 	(sdf): Make the private field final.
 	* java/sql/Time.java:

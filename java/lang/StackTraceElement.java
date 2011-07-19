@@ -1,5 +1,6 @@
 /* StackTraceElement.java -- One function call or call stack element
-   Copyright (C) 2001, 2002, 2004, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2004, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -255,25 +256,25 @@ public final class StackTraceElement implements Serializable
   }
 
   /**
-   * Compare two objects according to Collection semantics.
+   * Compare two strings according to Collection semantics.
    *
-   * @param o1 the first object
-   * @param o2 the second object
-   * @return o1 == null ? o2 == null : o1.equals(o2)
+   * @param s1 the first string
+   * @param s2 the second string
+   * @return s1 == null ? s2 == null : s1.equals(s2)
    */
-  private static boolean equals(Object o1, Object o2)
+  private static boolean equals(String s1, String s2)
   {
-    return o1 == null ? o2 == null : o1.equals(o2);
+    return s1 == null ? s2 == null : s1.equals(s2);
   }
 
   /**
-   * Hash an object according to Collection semantics.
+   * Hash a string according to Collection semantics.
    *
-   * @param o the object to hash
-   * @return o1 == null ? 0 : o1.hashCode()
+   * @param s the string to hash
+   * @return s == null ? 0 : s.hashCode()
    */
-  private static int hashCode(Object o)
+  private static int hashCode(String s)
   {
-    return o == null ? 0 : o.hashCode();
+    return s == null ? 0 : s.hashCode();
   }
 }

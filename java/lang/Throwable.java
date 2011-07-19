@@ -1,5 +1,6 @@
 /* java.lang.Throwable -- Root class for all Exceptions and Errors
-   Copyright (C) 1998, 1999, 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2002, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -41,6 +42,8 @@ import gnu.classpath.SystemProperties;
 
 import gnu.java.lang.CPStringBuilder;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -554,6 +557,12 @@ public class Throwable implements Serializable
       }
 
     this.stackTrace = st;
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    getStackTrace();
+    out.defaultWriteObject();
   }
 
   /**

@@ -1,6 +1,7 @@
 /* ExceptionInInitializerError.java -- thrown when class initialization fails
    with an uncaught exception
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -84,6 +85,7 @@ public class ExceptionInInitializerError extends LinkageError
   {
     super(s);
     exception = null;
+    initCause(null); // disallow subsequent initCause
   }
 
   /**

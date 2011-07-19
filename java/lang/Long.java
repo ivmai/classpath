@@ -1,5 +1,6 @@
 /* Long.java -- object wrapper for long
-   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -486,7 +487,7 @@ public final class Long extends Number implements Comparable<Long>
    */
   public int hashCode()
   {
-    return (int) (value ^ (value >>> 32));
+    return (int) value ^ (int) (value >>> 32);
   }
 
   /**
@@ -611,7 +612,7 @@ public final class Long extends Number implements Comparable<Long>
     // Successively collapse alternating bit groups into a sum.
     x = ((x >> 1) & 0x5555555555555555L) + (x & 0x5555555555555555L);
     x = ((x >> 2) & 0x3333333333333333L) + (x & 0x3333333333333333L);
-    int v = (int) ((x >>> 32) + x);
+    int v = (int) (x >>> 32) + (int) x;
     v = ((v >> 4) & 0x0f0f0f0f) + (v & 0x0f0f0f0f);
     v = ((v >> 8) & 0x00ff00ff) + (v & 0x00ff00ff);
     return ((v >> 16) & 0x0000ffff) + (v & 0x0000ffff);
@@ -724,7 +725,7 @@ public final class Long extends Number implements Comparable<Long>
   {
     int hi = Integer.reverseBytes((int) val);
     int lo = Integer.reverseBytes((int) (val >>> 32));
-    return (((long) hi) << 32) | lo;
+    return (((long) hi) << 32) | (lo & 0xffffffffL);
   }
 
   /**
@@ -733,9 +734,9 @@ public final class Long extends Number implements Comparable<Long>
    */
   public static long reverse(long val)
   {
-    long hi = Integer.reverse((int) val) & 0xffffffffL;
-    long lo = Integer.reverse((int) (val >>> 32)) & 0xffffffffL;
-    return (hi << 32) | lo;
+    int hi = Integer.reverse((int) val);
+    int lo = Integer.reverse((int) (val >>> 32));
+    return (((long) hi) << 32) | (lo & 0xffffffffL);
   }
 
   /**
@@ -788,18 +789,24 @@ public final class Long extends Number implements Comparable<Long>
   private static long parseLong(String str, int radix, boolean decode)
   {
     if (! decode && str == null)
-      throw new NumberFormatException();
+      throw new NumberFormatException("null");
     int index = 0;
     int len = str.length();
     boolean isNeg = false;
     if (len == 0)
-      throw new NumberFormatException();
+      throw numberFormatExceptionForInputString(str);
     int ch = str.charAt(index);
     if (ch == '-')
       {
         if (len == 1)
-          throw new NumberFormatException();
+          throw numberFormatExceptionForInputString(str);
         isNeg = true;
+        ch = str.charAt(++index);
+      }
+    else if (ch == '+')
+      {
+        if (len == 1)
+          throw numberFormatExceptionForInputString(str);
         ch = str.charAt(++index);
       }
     if (decode)
@@ -823,7 +830,7 @@ public final class Long extends Number implements Comparable<Long>
           }
       }
     if (index == len)
-      throw new NumberFormatException();
+      throw numberFormatExceptionForInputString(str);
 
     long max = MAX_VALUE / radix;
     // We can't directly write `max = (MAX_VALUE + 1) / radix'.
@@ -835,13 +842,19 @@ public final class Long extends Number implements Comparable<Long>
     while (index < len)
       {
         if (val < 0 || val > max)
-          throw new NumberFormatException();
+          throw numberFormatExceptionForInputString(str);
 
         ch = Character.digit(str.charAt(index++), radix);
         val = val * radix + ch;
         if (ch < 0 || (val < 0 && (! isNeg || val != MIN_VALUE)))
-          throw new NumberFormatException();
+          throw numberFormatExceptionForInputString(str);
       }
     return isNeg ? -val : val;
+  }
+
+  private static NumberFormatException numberFormatExceptionForInputString(
+    String str)
+  {
+    return new NumberFormatException("for input string: \"" + str + "\"");
   }
 }
