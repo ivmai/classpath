@@ -1,5 +1,5 @@
 /* Integer.java -- object wrapper for int
-   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005
+   Copyright (C) 1998, 1999, 2001, 2002, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -793,12 +793,12 @@ public final class Integer extends Number implements Comparable<Integer>
   static int parseInt(String str, int radix, boolean decode)
   {
     if (! decode && str == null)
-      throw new NumberFormatException();
+      throw new NumberFormatException("null");
     int index = 0;
     int len = str.length();
     boolean isNeg = false;
     if (len == 0)
-      throw new NumberFormatException("string length is null");
+      throw new NumberFormatException("string length is 0");
     int ch = str.charAt(index);
     if (ch == '-')
       {

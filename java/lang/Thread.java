@@ -1,6 +1,6 @@
 /* Thread -- an independent thread of executable code
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -349,6 +349,9 @@ public class Thread implements Runnable
    */
   public Thread(ThreadGroup group, Runnable target, String name, long size)
   {
+    if (name == null)
+      throw new NullPointerException();
+
     // Bypass System.getSecurityManager, for bootstrap efficiency.
     SecurityManager sm = SecurityManager.current;
     Thread current = currentThread();
@@ -363,8 +366,7 @@ public class Thread implements Runnable
       sm.checkAccess(group);
 
     this.group = group;
-    // Use toString hack to detect null.
-    this.name = name.toString();
+    this.name = name;
     this.runnable = target;
     this.stacksize = size;
     this.locals = new ThreadLocalMap();
@@ -855,7 +857,7 @@ public class Thread implements Runnable
    * are no guarantees which thread will be next to run, but most VMs will
    * choose the highest priority thread that has been waiting longest.
    *
-   * @param ms the number of milliseconds to sleep, or 0 for forever
+   * @param ms the number of milliseconds to sleep
    * @throws InterruptedException if the Thread is (or was) interrupted;
    *         it's <i>interrupted status</i> will be cleared
    * @throws IllegalArgumentException if ms is negative
@@ -881,7 +883,7 @@ public class Thread implements Runnable
    * immediately when time expires, because some other thread may be
    * active.  So don't expect real-time performance.
    *
-   * @param ms the number of milliseconds to sleep, or 0 for forever
+   * @param ms the number of milliseconds to sleep
    * @param ns the number of extra nanoseconds to sleep (0-999999)
    * @throws InterruptedException if the Thread is (or was) interrupted;
    *         it's <i>interrupted status</i> will be cleared
@@ -1037,7 +1039,7 @@ public class Thread implements Runnable
     checkAccess();
     if (priority < MIN_PRIORITY || priority > MAX_PRIORITY)
       throw new IllegalArgumentException("Invalid thread priority value "
-                                         + priority + ".");
+                                         + priority);
     priority = Math.min(priority, group.getMaxPriority());
     VMThread t = vmThread;
     if (t != null)

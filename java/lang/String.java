@@ -1,5 +1,5 @@
 /* String.java -- immutable character sequences; the object of string literals
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -359,13 +359,13 @@ public final class String
       }
     catch(IllegalCharsetNameException e)
       {
-        throw new UnsupportedEncodingException("Encoding: "+encoding+
-                                               " not found.");
+        throw new UnsupportedEncodingException("Encoding not found: " +
+                                               encoding);
       }
     catch(UnsupportedCharsetException e)
       {
-        throw new UnsupportedEncodingException("Encoding: "+encoding+
-                                               " not found.");
+        throw new UnsupportedEncodingException("Encoding not found: " +
+                                               encoding);
       }
   }
 

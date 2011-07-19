@@ -74,16 +74,17 @@ public final class System
   // in vm/reference/java/lang/Runtime for implications of this fact.
 
   /**
-   * The standard InputStream. This is assigned at startup and starts its
-   * life perfectly valid. Although it is marked final, you can change it
-   * using {@link #setIn(InputStream)} through some hefty VM magic.
+   * The standard output PrintStream.  This is assigned at startup and
+   * starts its life perfectly valid. Although it is marked final, you can
+   * change it using {@link #setErr(PrintStream)} through some hefty VM magic.
    *
-   * <p>This corresponds to the C stdin and C++ cin variables, which
-   * typically input from the keyboard, but may be used to pipe input from
-   * other processes or files.  That should all be transparent to you,
-   * however.
+   * <p>This corresponds to the C stderr and C++ cerr variables, which
+   * typically output error messages to the screen, but may be used to pipe
+   * output to other processes or files.  That should all be transparent to
+   * you, however.
    */
-  public static final InputStream in = VMSystem.makeStandardInputStream();
+  public static final PrintStream err = VMSystem.makeStandardErrorStream();
+  // System.err is initialized first (before System.out and System.in).
 
   /**
    * The standard output PrintStream.  This is assigned at startup and
@@ -100,16 +101,16 @@ public final class System
   private static final String LINE_SEPARATOR = SystemProperties.getProperty("line.separator");
 
   /**
-   * The standard output PrintStream.  This is assigned at startup and
-   * starts its life perfectly valid. Although it is marked final, you can
-   * change it using {@link #setErr(PrintStream)} through some hefty VM magic.
+   * The standard InputStream. This is assigned at startup and starts its
+   * life perfectly valid. Although it is marked final, you can change it
+   * using {@link #setIn(InputStream)} through some hefty VM magic.
    *
-   * <p>This corresponds to the C stderr and C++ cerr variables, which
-   * typically output error messages to the screen, but may be used to pipe
-   * output to other processes or files.  That should all be transparent to
-   * you, however.
+   * <p>This corresponds to the C stdin and C++ cin variables, which
+   * typically input from the keyboard, but may be used to pipe input from
+   * other processes or files.  That should all be transparent to you,
+   * however.
    */
-  public static final PrintStream err = VMSystem.makeStandardErrorStream();
+  public static final InputStream in = VMSystem.makeStandardInputStream();
 
   /**
    * A cached copy of the environment variable map.

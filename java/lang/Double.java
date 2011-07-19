@@ -1,5 +1,5 @@
 /* Double.java -- object wrapper for double
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -485,7 +485,7 @@ public final class Double extends Number implements Comparable<Double>
   public int hashCode()
   {
     long v = doubleToLongBits(value);
-    return (int) (v ^ (v >>> 32));
+    return (int) (v >>> 32) ^ (int) v;
   }
 
   /**
