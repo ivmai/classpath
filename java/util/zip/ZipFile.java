@@ -1,5 +1,5 @@
 /* ZipFile.java --
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -206,7 +206,7 @@ public class ZipFile implements ZipConstants
         catch (IOException _)
           {
           }
-        throw new ZipException("Not a valid zip file");
+        throw new ZipException("Not a valid zip file: " + name);
       }
   }
 
@@ -262,9 +262,7 @@ public class ZipFile implements ZipConstants
           throw new ZipException("Wrong Central Directory signature: " + name);
 
         inp.skip(4);
-        int flags = inp.readLeShort();
-        if ((flags & 1) != 0)
-          throw new ZipException("invalid CEN header (encrypted entry)");
+        int generalPurposeFlags = inp.readLeShort();
         int method = inp.readLeShort();
         int dostime = inp.readLeInt();
         int crc = inp.readLeInt();
@@ -278,6 +276,7 @@ public class ZipFile implements ZipConstants
         String name = inp.readString(nameLen);
 
         ZipEntry entry = new ZipEntry(name);
+        entry.setGeneralPurposeFlags(generalPurposeFlags);
         entry.setMethod(method);
         entry.setCrc(crc & 0xffffffffL);
         entry.setSize(size & 0xffffffffL);
@@ -320,23 +319,12 @@ public class ZipFile implements ZipConstants
   }
 
   /**
-   * Calls the <code>close()</code> method when this ZipFile has not yet
-   * been explicitly closed.
-   */
-  protected void finalize() throws IOException
-  {
-    if (!closed && raf != null) close();
-  }
-
-  /**
    * Returns an enumeration of all Zip entries in this Zip file.
    *
    * @exception IllegalStateException when the ZipFile has already been closed
    */
   public Enumeration<? extends ZipEntry> entries()
   {
-    checkClosed();
-
     try
       {
         return new ZipEntryEnumeration(getEntries().values().iterator());
@@ -377,8 +365,6 @@ public class ZipFile implements ZipConstants
    */
   public ZipEntry getEntry(String name)
   {
-    checkClosed();
-
     try
       {
         LinkedHashMap<String, ZipEntry> entries = getEntries();
@@ -418,15 +404,26 @@ public class ZipFile implements ZipConstants
    */
   public InputStream getInputStream(ZipEntry entry) throws IOException
   {
-    checkClosed();
-
-    LinkedHashMap<String, ZipEntry> entries = getEntries();
     String name = entry.getName();
-    ZipEntry zipEntry = entries.get(name);
-    if (zipEntry == null)
-      return null;
+    ZipEntry zipEntry;
+    PartialInputStream inp;
 
-    PartialInputStream inp = new PartialInputStream(raf, 1024);
+    synchronized(raf)
+      {
+        checkClosed();
+
+        if (entries == null)
+          readEntries();
+
+        zipEntry = entries.get(name);
+        if (zipEntry == null)
+          return null;
+        if (zipEntry.isEncrypted())
+          throw new ZipException("Entry is encrypted: " + name);
+
+        inp = new PartialInputStream(raf, 1024);
+      }
+
     inp.seek(zipEntry.offset);
 
     if (inp.readLeInt() != LOCSIG)
@@ -485,8 +482,6 @@ public class ZipFile implements ZipConstants
    */
   public int size()
   {
-    checkClosed();
-
     try
       {
         return getEntries().size();
