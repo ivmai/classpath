@@ -1,5 +1,5 @@
 /* Calendar.java --
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006,
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -603,7 +603,7 @@ public abstract class Calendar
   private static final HashMap<Locale,Class> cache = new HashMap<Locale,Class>();
 
   /** Preset argument types for calendar-class constructor lookup.  */
-  private static Class[] ctorArgTypes = new Class[]
+  private static final Class[] ctorArgTypes = new Class[]
                                         {
                                           TimeZone.class, Locale.class
                                         };
@@ -677,7 +677,7 @@ public abstract class Calendar
    */
   public static synchronized Locale[] getAvailableLocales()
   {
-    ResourceBundle rb = getBundle(new Locale("", ""));
+    ResourceBundle rb = getBundle(Locale.ROOT);
     return (Locale[]) rb.getObject("availableLocales");
   }
 
@@ -1035,9 +1035,8 @@ public abstract class Calendar
   public int hashCode()
   {
     long time = getTimeInMillis();
-    int val = (int) ((time & 0xffffffffL) ^ (time >> 32));
-    val += (getFirstDayOfWeek() + (isLenient() ? 1230 : 1237)
-            + getMinimalDaysInFirstWeek());
+    int val = ((int) time ^ (int) (time >> 32)) + getFirstDayOfWeek()
+              + (isLenient() ? 1230 : 1237) + getMinimalDaysInFirstWeek();
     TimeZone self = getTimeZone();
     if (self != null)
       val ^= self.hashCode();
