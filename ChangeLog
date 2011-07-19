@@ -1,5 +1,10 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/text/Bidi.java:
+	(requiresBidi(char[], int, int)): Optimize the expression (for speed).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/lang/Character.java:
 	(UnicodeBlock.forName(String)): Remove the trailing dot character for
 	exception messages.
