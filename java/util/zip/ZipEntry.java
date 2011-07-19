@@ -1,5 +1,6 @@
 /* ZipEntry.java --
-   Copyright (C) 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -67,6 +68,9 @@ public class ZipEntry implements ZipConstants, Cloneable
   private int crc;
   /** Comment or null if none */
   private String comment = null;
+
+  private short generalPurposeFlags;
+
   /** The compression method. Either DEFLATED or STORED, by default -1. */
   private byte method = -1;
   /** Flags specifying what we know about this entry */
@@ -150,12 +154,12 @@ public class ZipEntry implements ZipConstants, Cloneable
       {
        Calendar cal = Calendar.getInstance();
        cal.setTimeInMillis(time);
-       dostime = (cal.get(Calendar.YEAR) - 1980 & 0x7f) << 25
-          | (cal.get(Calendar.MONTH) + 1) << 21
-          | (cal.get(Calendar.DAY_OF_MONTH)) << 16
-          | (cal.get(Calendar.HOUR_OF_DAY)) << 11
-          | (cal.get(Calendar.MINUTE)) << 5
-          | (cal.get(Calendar.SECOND)) >> 1;
+       dostime = (((cal.get(Calendar.YEAR) - 1980) & 0x7f) << 25)
+                | ((cal.get(Calendar.MONTH) + 1) << 21)
+                | (cal.get(Calendar.DAY_OF_MONTH) << 16)
+                | (cal.get(Calendar.HOUR_OF_DAY) << 11)
+                | (cal.get(Calendar.MINUTE) << 5)
+                | (cal.get(Calendar.SECOND) >> 1);
        known |= KNOWN_DOSTIME;
        return dostime;
       }
@@ -310,6 +314,27 @@ public class ZipEntry implements ZipConstants, Cloneable
   public long getCrc()
   {
     return (known & KNOWN_CRC) != 0 ? crc & 0xffffffffL : -1L;
+  }
+
+  /**
+   * Sets in the value of the general purpose flags for the zip entry.
+   *
+   * @param generalPurposeFlags the general purpose flags.
+   */
+  void setGeneralPurposeFlags(int generalPurposeFlags)
+  {
+    this.generalPurposeFlags = (short) generalPurposeFlags;
+  }
+
+  /**
+   * Uses the general purpose flags to determine whether the entry is encrypted.
+   *
+   * @return {@code true} if the entry is encrypted, {@code false} otherwise.
+   */
+  boolean isEncrypted()
+  {
+    // bit 0 means it's encrypted.  bit 6 means strong encryption but in this case bit 0 is still set.
+    return (generalPurposeFlags & 0x1) != 0;
   }
 
   /**

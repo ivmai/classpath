@@ -1,5 +1,33 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/zip/ZipEntry.java:
+	(generalPurposeFlags): New private field (used for "encrypted" flag
+	only).
+	(getDOSTime()): Adjust/add parenthesis to make the expression more
+	readable.
+	(setGeneralPurposeFlags(int)): New package-private method (used by
+	ZipFile only).
+	(isEncrypted()): Likewise.
+	* java/util/zip/ZipFile.java:
+	(checkZipFile()): Put the name of the file to the thrown exception
+	message.
+	(readEntries()): Rename "flags" local variable to
+	"generalPurposeFlags" one; do not test for an encrypted entry here;
+	invoke setGeneralPurposeFlags().
+	(finalize()): Comment out (since the only system resource used is
+	freed by "raf" finalizer).
+	(entries()): Remove unnecessary checkClosed() invocation (since it
+	is performed in getEntries()).
+	(getEntry(String)): Likewise.
+	(size()): Likewise.
+	(getInputStream(ZipEntry)): Check for encrypted entry (and throw the
+	exception with the appropriate message).
+	(getInputStream(ZipEntry)): Inline getEntries() call and put
+	checkClosed(), readEntries(), entries.get(), new PartialInputStream()
+	inside a single synchronized block.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/lang/Double.java:
 	(hashCode()): Optimize the expression (for speed).
 	* java/lang/Long.java:
