@@ -266,7 +266,7 @@ public final class CollationElementIterator
     this.text = new StringCharacterIterator(text);
     this.index = 0;
 
-    String work_text = text.intern();
+    String work_text = text;
 
     ArrayList<RuleBasedCollator.CollationElement> aElement = new ArrayList<RuleBasedCollator.CollationElement>();
     ArrayList<Integer> aIdx = new ArrayList<Integer>();
