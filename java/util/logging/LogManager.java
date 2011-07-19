@@ -1,6 +1,6 @@
 /* LogManager.java -- a class for maintaining Loggers and managing
    configuration properties
-   Copyright (C) 2002, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2006, 2007, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -423,9 +423,8 @@ public class LogManager
   public synchronized Logger getLogger(String name)
   {
     WeakReference<Logger> ref;
-
-    /* Throw a NullPointerException if name is null. */
-    name.getClass();
+    if (name == null)
+      throw new NullPointerException();
 
     ref = loggers.get(name);
     if (ref != null)
@@ -739,7 +738,7 @@ public class LogManager
       {
         String value = getLogManager().getProperty(propertyName);
         if (value != null)
-          return Level.parse(getLogManager().getProperty(propertyName));
+          return Level.parse(value);
         else
            return defaultValue;
       }
