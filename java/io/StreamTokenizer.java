@@ -1,5 +1,6 @@
 /* StreamTokenizer.java -- parses streams of characters into tokens
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003  Free Software Foundation
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -103,12 +104,14 @@ public class StreamTokenizer
   /* Indicates whether C style comments are recognized and skipped. */
   private boolean slashStar = false;
 
-  /* Attribute tables of each byte from 0x00 to 0xFF. */
-  private boolean[] whitespace = new boolean[256];
-  private boolean[] alphabetic = new boolean[256];
-  private boolean[] numeric = new boolean[256];
-  private boolean[] quote = new boolean[256];
-  private boolean[] comment = new boolean[256];
+  /* Attribute table of each byte from 0x00 to 0xFF. */
+  private final byte[] ctype = new byte[256];
+
+  private static final byte CT_WHITESPACE = 0x1;
+  private static final byte CT_ALPHA = 0x2;
+  private static final byte CT_NUMERIC = 0x4;
+  private static final byte CT_QUOTE = 0x8;
+  private static final byte CT_COMMENT = 0x10;
 
   /* The Reader associated with this class. */
   private PushbackReader in;
@@ -128,6 +131,7 @@ public class StreamTokenizer
    *
    * @deprecated Since JDK 1.1.
    */
+  @Deprecated
   public StreamTokenizer(InputStream is)
   {
     this(new InputStreamReader(is));
@@ -177,13 +181,7 @@ public class StreamTokenizer
   public void commentChar(int ch)
   {
     if (ch >= 0 && ch <= 255)
-      {
-        comment[ch] = true;
-        whitespace[ch] = false;
-        alphabetic[ch] = false;
-        numeric[ch] = false;
-        quote[ch] = false;
-      }
+      ctype[ch] = CT_COMMENT;
   }
 
   /**
@@ -224,27 +222,27 @@ public class StreamTokenizer
 
   private boolean isWhitespace(int ch)
   {
-    return (ch >= 0 && ch <= 255 && whitespace[ch]);
+    return ch >= 0 && ch <= 255 && (ctype[ch] & CT_WHITESPACE) != 0;
   }
 
   private boolean isAlphabetic(int ch)
   {
-    return ((ch > 255) || (ch >= 0 && alphabetic[ch]));
+    return ch > 255 || (ch >= 0 && (ctype[ch] & CT_ALPHA) != 0);
   }
 
   private boolean isNumeric(int ch)
   {
-    return (ch >= 0 && ch <= 255 && numeric[ch]);
+    return ch >= 0 && ch <= 255 && (ctype[ch] & CT_NUMERIC) != 0;
   }
 
   private boolean isQuote(int ch)
   {
-    return (ch >= 0 && ch <= 255 && quote[ch]);
+    return ch >= 0 && ch <= 255 && (ctype[ch] & CT_QUOTE) != 0;
   }
 
   private boolean isComment(int ch)
   {
-    return (ch >= 0 && ch <= 255 && comment[ch]);
+    return ch >= 0 && ch <= 255 && (ctype[ch] & CT_COMMENT) != 0;
   }
 
   /**
@@ -509,12 +507,6 @@ public class StreamTokenizer
     return ttype;
   }
 
-  private void resetChar(int ch)
-  {
-    whitespace[ch] = alphabetic[ch] = numeric[ch] = quote[ch] = comment[ch] =
-      false;
-  }
-
   /**
    * This method makes the specified character an ordinary character.  This
    * means that none of the attributes (whitespace, alphabetic, numeric,
@@ -526,7 +518,7 @@ public class StreamTokenizer
   public void ordinaryChar(int ch)
   {
     if (ch >= 0 && ch <= 255)
-      resetChar(ch);
+      ctype[ch] = 0;
   }
 
   /**
@@ -548,7 +540,7 @@ public class StreamTokenizer
     if (hi > 255)
       hi = 255;
     for (int i = low; i <= hi; i++)
-      resetChar(i);
+      ctype[i] = 0;
   }
 
   /**
@@ -563,11 +555,11 @@ public class StreamTokenizer
    */
   public void parseNumbers()
   {
-    for (int i = 0; i <= 9; i++)
-      numeric['0' + i] = true;
+    for (int ch = '0'; ch <= '9'; ch++)
+      ctype[ch] |= CT_NUMERIC;
 
-    numeric['.'] = true;
-    numeric['-'] = true;
+    ctype['.'] |= CT_NUMERIC;
+    ctype['-'] |= CT_NUMERIC;
   }
 
   /**
@@ -590,13 +582,7 @@ public class StreamTokenizer
   public void quoteChar(int ch)
   {
     if (ch >= 0 && ch <= 255)
-      {
-        quote[ch] = true;
-        comment[ch] = false;
-        whitespace[ch] = false;
-        alphabetic[ch] = false;
-        numeric[ch] = false;
-      }
+      ctype[ch] = CT_QUOTE;
   }
 
   /**
@@ -691,10 +677,7 @@ public class StreamTokenizer
     if (hi > 255)
       hi = 255;
     for (int i = low; i <= hi; i++)
-      {
-        resetChar(i);
-        whitespace[i] = true;
-      }
+      ctype[i] = CT_WHITESPACE;
   }
 
   /**
@@ -713,6 +696,6 @@ public class StreamTokenizer
     if (hi > 255)
       hi = 255;
     for (int i = low; i <= hi; i++)
-      alphabetic[i] = true;
+      ctype[i] |= CT_ALPHA;
   }
 }
