@@ -1,5 +1,5 @@
 /* URLClassLoader.java --  ClassLoader that loads classes from one or more URLs
-   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -294,6 +294,14 @@ public class URLClassLoader extends SecureClassLoader
         // Create a loader for this URL.
         URLLoader loader = null;
         String file = newUrl.getFile();
+        try
+          {
+            file = gnu.java.net.protocol.file.Connection.unquote(file);
+          }
+        catch (MalformedURLException e)
+          {
+            // ignore
+          }
         String protocol = newUrl.getProtocol();
 
         // If we have a file: URL, we want to make it absolute
@@ -759,9 +767,17 @@ public class URLClassLoader extends SecureClassLoader
     if (protocol.equals("file"))
       {
         String file = url.getFile();
-
+        try
+          {
+            file = gnu.java.net.protocol.file.Connection.unquote(file);
+          }
+        catch (MalformedURLException e)
+          {
+            // ignore
+          }
+        file = file.replace('/', File.separatorChar);
         // If the file end in / it must be an directory.
-        if (file.endsWith("/") || file.endsWith(File.separator))
+        if (file.endsWith(File.separator))
           {
             // Grant permission to read everything in that directory and
             // all subdirectories.

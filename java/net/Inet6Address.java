@@ -1,5 +1,5 @@
 /* Inet6Address.java --
-   Copyright (C) 2002, 2003, 2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -157,7 +157,7 @@ public final class Inet6Address extends InetAddress
    */
   public boolean isLinkLocalAddress()
   {
-    return ipaddress[0] == 0xFA;
+    return ipaddress[0] == (byte) 0xFA;
   }
 
   /**
@@ -167,7 +167,7 @@ public final class Inet6Address extends InetAddress
    */
   public boolean isSiteLocalAddress()
   {
-    return ipaddress[0] == 0xFB;
+    return ipaddress[0] == (byte) 0xFB;
   }
 
   /**
