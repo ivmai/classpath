@@ -1,5 +1,5 @@
 /* Bidi.java -- Bidirectional Algorithm implementation
-   Copyright (C) 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -161,7 +161,7 @@ public final class Bidi
     if (val instanceof NumericShaper)
       shaper = (NumericShaper) val;
 
-    char[] text = new char[iter.getEndIndex() - iter.getBeginIndex()];
+    this.text = new char[iter.getEndIndex() - iter.getBeginIndex()];
     this.embeddings = new byte[this.text.length];
     this.embeddingOffset = 0;
     this.length = text.length;
@@ -983,16 +983,13 @@ public final class Bidi
   {
     for (int i = start; i < end; i++)
       {
-        byte dir = Character.getDirectionality(text[i]);
-        if (dir != Character.DIRECTIONALITY_LEFT_TO_RIGHT
-            && dir != Character.DIRECTIONALITY_EUROPEAN_NUMBER
-            && dir != Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR
-            && dir != Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR
-            && dir != Character.DIRECTIONALITY_ARABIC_NUMBER
-            && dir != Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR
-            && dir != Character.DIRECTIONALITY_SEGMENT_SEPARATOR
-            && dir != Character.DIRECTIONALITY_WHITESPACE
-            && dir != Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR)
+        char c = text[i];
+        if (c > '\u0590' && ((1 << Character.getDirectionality(c)) &
+            ((1 << Character.DIRECTIONALITY_RIGHT_TO_LEFT) |
+            (1 << Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC) |
+            (1 << Character.DIRECTIONALITY_ARABIC_NUMBER) |
+            (1 << Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING) |
+            (1 << Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE))) != 0)
           return true;
       }
 

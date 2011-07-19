@@ -1,5 +1,6 @@
 /* CollationElementIterator.java -- Walks through collation elements
-   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004  Free Software Foundation
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2010
+   Free Software Foundation
 
 This file is part of GNU Classpath.
 
@@ -266,7 +267,7 @@ public final class CollationElementIterator
     this.text = new StringCharacterIterator(text);
     this.index = 0;
 
-    String work_text = text.intern();
+    String work_text = text;
 
     ArrayList a_element = new ArrayList();
     ArrayList a_idx = new ArrayList();

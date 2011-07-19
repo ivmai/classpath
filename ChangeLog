@@ -1,5 +1,16 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/text/Bidi.java:
+	(Bidi(AttributedCharacterIterator)): Fix uninitialized "text" field
+	bug (initialize "text" instance field instead of creating "text" local
+	variable).
+	(requiresBidi(char[], int, int)): Optimize the expression (for speed).
+	* java/text/CollationElementIterator.java:
+	(setText(String)): Remove intern() call for work_text (since
+	unnecessary).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/lang/Character.java:
 	(UnicodeBlock.forName(String)): Remove the trailing dot character for
 	exception messages.
