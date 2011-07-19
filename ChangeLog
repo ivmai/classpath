@@ -1,5 +1,30 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* gnu/java/io/PlatformHelper.java:
+	PlatformHelper: Make class final.
+	(isWindows): Remove field (the field is not used in Classpath).
+	(pathSeparator): Likewise.
+	(pathSeparatorChar): Likewise.
+	(separator): Make private instead of public (the field is not used in
+	Classpath outside this class); use SystemProperties.
+	(separatorChar): Likewise.
+	(PlatformHelper()): New private constructor (to prohibit
+	instantiation).
+	(beginWithRootPathPrefix(String)): Use platform-specific separator
+	instead of a backslash character (since the latter denotes an escape
+	sequence on Unix).
+	(endWithSeparator(String)): Likewise.
+	(lastIndexOfSeparator(String)): Likewise.
+	(beginWithRootPathPrefix(String)): Recognize "d:" and
+	"\\server\share\" prefixes on a Win32 platform; use "separatorChar"
+	to check for a non-Unix platform; recognize NetWare-specific path
+	formats.
+	(beginWithRootPathPrefix(String)): Update documentation.
+	(isRootDirectory(String)): Likewise.
+	(lastIndexOfSeparator(String)): Optimize the implementation.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/util/Locale.java:
 	(localeMap): Immediately define its value; make it final; use generics
 	for HashMap type; move localeMap definition to the beginning of the
