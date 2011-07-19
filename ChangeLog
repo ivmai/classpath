@@ -1,5 +1,44 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/Locale.java:
+	(localeMap): Immediately define its value; make it final; use generics
+	for HashMap type; move localeMap definition to the beginning of the
+	class (to be initialized first); update the comment.
+	(ENGLISH): Call getLocaleInternal() instead of getLocale() (for
+	efficiency).
+	(FRENCH): Likewise.
+	(GERMAN): Likewise.
+	(ITALIAN): Likewise.
+	(JAPANESE): Likewise.
+	(KOREAN): Likewise.
+	(CHINESE): Likewise.
+	(SIMPLIFIED_CHINESE): Likewise.
+	(TRADITIONAL_CHINESE): Likewise.
+	(FRANCE): Likewise.
+	(GERMANY): Likewise.
+	(ITALY): Likewise.
+	(JAPAN): Likewise.
+	(KOREA): Likewise.
+	(UK): Likewise.
+	(US): Likewise.
+	(CANADA): Likewise.
+	(CANADA_FRENCH): Likewise.
+	(ROOT): Call private 4-argument constructor (with the hash code)
+	instead of the 3-argument one (for efficiency).
+	(clone()): Likewise.
+	(getLocale(String,String,String)): Remove localeMap initialization;
+	remove localeMap.get() result casting.
+	(getLocaleInternal(String,String)): New private method (for
+	convenience since it is always called with unset "variant").
+	(getLocaleInternal(String,String,String)): New private method (same as
+	getLocale() but with the additional constraints for the arguments).
+	(Locale(String,String,String,int)): New private constructor
+	(used only by ROOT, getLocaleInternal() and clone()).
+	(getAvailableLocales()): Fix "country" computation expression (for
+	the case when "variant" is specified).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/io/OutputStreamWriter.java:
 	(needsUnicodeBOM): New private field.
 	(outputBuffer): Move initialization from the constructors.
