@@ -1,5 +1,6 @@
 /* Time.java -- Wrapper around java.util.Date
-   Copyright (C) 1999, 2000, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2003, 2004, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -59,10 +60,8 @@ public class Timestamp extends java.util.Date
   /**
    * Used for parsing and formatting this date.
    */
-  private static SimpleDateFormat dateFormat =
+  private static final SimpleDateFormat dateFormat =
     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  private static DecimalFormat decimalFormat = new DecimalFormat("000000000");
-  private static StringBuffer sbuf = new StringBuffer(29);
 
   /**
     * The nanosecond value for this object
@@ -75,9 +74,13 @@ public class Timestamp extends java.util.Date
    *
    * @param str The string to parse.
    * @return The resulting <code>java.sql.Timestamp</code> value.
+   * @exception IllegalArgumentException If the argument is <code>null</code>
+   * or not in the valid SQL timestamp format
    */
   public static Timestamp valueOf(String str)
   {
+    if (str == null)
+      throw new IllegalArgumentException();
     int nanos = 0;
     int dot = str.indexOf('.');
     if (dot != -1)
@@ -86,7 +89,9 @@ public class Timestamp extends java.util.Date
           throw new IllegalArgumentException(str);
 
         int len = str.length() - dot - 1;
-        if (len < 1 || len > 9)
+        char ch;
+        if (len < 1 || len > 9 ||
+            (ch = str.charAt(dot + 1)) == '-' || ch == '+')
           throw new IllegalArgumentException(str);
 
         nanos = Integer.parseInt(str.substring(dot + 1));
@@ -129,12 +134,16 @@ public class Timestamp extends java.util.Date
    * @param minute The minute for this Timestamp (0-59)
    * @param second The second for this Timestamp (0-59)
    * @param nanos The nanosecond value for this Timestamp (0 to 999,999,9999)
+   * @exception IllegalArgumentException If <code>nanos</code> is outside
+   * 0 .. 999999999
    * @deprecated
    */
   public Timestamp(int year, int month, int day, int hour, int minute,
     int second, int nanos)
   {
     super(year, month, day, hour, minute, second);
+    if (nanos > 999999999 || nanos < 0)
+      throw new IllegalArgumentException("nanos > 999999999 or < 0");
     this.nanos = nanos;
   }
 
@@ -143,12 +152,29 @@ public class Timestamp extends java.util.Date
    * specified time value representing the number of milliseconds since
    * Jan 1, 1970 at 12:00 midnight GMT.
    *
-   * @param date The time value to intialize this <code>Time</code> to.
+   * @param time The time value to intialize this <code>Time</code> to.
    */
-  public Timestamp(long date)
+  public Timestamp(long time)
   {
-    super(date - (date % 1000));
-    nanos = (int) (date % 1000) * 1000000;
+    super((time / 1000) * 1000);
+    nanos = (int) (time % 1000) * 1000000;
+    if (nanos < 0)
+      {
+        nanos = 1000000000 + nanos;
+        super.setTime((time / 1000 - 1) * 1000);
+      }
+  }
+
+  public void setTime(long time)
+  {
+    nanos = (int) (time % 1000) * 1000000;
+    if (nanos < 0)
+      {
+        nanos = 1000000000 + nanos;
+        super.setTime((time / 1000 - 1) * 1000);
+      }
+    else
+      super.setTime((time / 1000) * 1000);
   }
 
   /**
@@ -167,17 +193,18 @@ public class Timestamp extends java.util.Date
    */
   public String toString()
   {
+    String nanoStr = Integer.toString(nanos);
+    int end = nanoStr.length() - 1;
+    while (nanoStr.charAt(end) == '0')
+      if (--end < 0)
+        break;
+    String timeStr;
     synchronized (dateFormat)
       {
-        sbuf.setLength(0);
-        dateFormat.format(this, sbuf, null);
-        sbuf.append('.');
-        decimalFormat.format(nanos, sbuf, null);
-        int end = sbuf.length() - 1;
-        while (end > 20 && sbuf.charAt(end) == '0')
-          end--;
-        return sbuf.substring(0, end + 1);
+        timeStr = dateFormat.format(this);
       }
+    return timeStr + ".00000000".substring(0, end >= 0 ? 9 - end : 2) +
+             nanoStr.substring(0, end + 1);
   }
 
   /**
@@ -193,9 +220,13 @@ public class Timestamp extends java.util.Date
    * This method sets the nanosecond value for this object.
    *
    * @param nanos The nanosecond value for this object.
+   * @exception IllegalArgumentException If the argument is outside
+   * 0 .. 999999999
    */
   public void setNanos(int nanos)
   {
+    if (nanos > 999999999 || nanos < 0)
+      throw new IllegalArgumentException("nanos > 999999999 or < 0");
     this.nanos = nanos;
   }
 
