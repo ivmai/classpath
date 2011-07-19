@@ -1,5 +1,5 @@
 /* ObjectOutputStream.java -- Class used to write serialized objects
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -252,14 +252,14 @@ public class ObjectOutputStream extends OutputStream
   {
     if (useSubclassMethod)
       {
-        if (dump)
+        if (DEBUG && dump)
           dumpElementln ("WRITE OVERRIDE: " + obj);
 
         writeObjectOverride(obj);
         return;
       }
 
-    if (dump)
+    if (DEBUG && dump)
       dumpElementln ("WRITE: ", obj);
 
     depth += 2;
@@ -298,7 +298,7 @@ public class ObjectOutputStream extends OutputStream
                     writeObject (osc);
                   }
                 else
-                  {System.err.println("1");
+                  { //System.err.println("1");
                     realOutput.writeByte(TC_PROXYCLASSDESC);
                     Class[] intfs = cl.getInterfaces();
                     realOutput.writeInt(intfs.length);
@@ -437,18 +437,18 @@ public class ObjectOutputStream extends OutputStream
                     fieldsAlreadyWritten = false;
                     if (currentObjectStreamClass.hasWriteMethod())
                       {
-                        if (dump)
+                        if (DEBUG && dump)
                           dumpElementln ("WRITE METHOD CALLED FOR: ", obj);
                         setBlockDataMode(true);
                         callWriteMethod(obj, currentObjectStreamClass);
                         setBlockDataMode(false);
                         realOutput.writeByte(TC_ENDBLOCKDATA);
-                        if (dump)
+                        if (DEBUG && dump)
                           dumpElementln ("WRITE ENDBLOCKDATA FOR: ", obj);
                       }
                     else
                       {
-                        if (dump)
+                        if (DEBUG && dump)
                           dumpElementln ("WRITE FIELDS CALLED FOR: ", obj);
                         writeFields(obj, currentObjectStreamClass);
                       }
@@ -487,8 +487,8 @@ public class ObjectOutputStream extends OutputStream
         catch (IOException ioe)
           {
             StreamCorruptedException ex =
-              new StreamCorruptedException
-              (ioe + " thrown while exception was being written to stream.");
+              new StreamCorruptedException(ioe +
+                    " thrown while exception was being written to stream");
             if (DEBUG)
               {
                 ex.printStackTrace(System.out);
@@ -505,7 +505,7 @@ public class ObjectOutputStream extends OutputStream
         setBlockDataMode(old_mode);
         depth -= 2;
 
-        if (dump)
+        if (DEBUG && dump)
           dumpElementln ("END: ", obj);
       }
   }
@@ -673,11 +673,11 @@ public class ObjectOutputStream extends OutputStream
   public void useProtocolVersion(int version) throws IOException
   {
     if (version != PROTOCOL_VERSION_1 && version != PROTOCOL_VERSION_2)
-      throw new IllegalArgumentException("Invalid protocol version requested.");
+      throw new IllegalArgumentException("Invalid protocol version requested");
 
     if (nextOID != baseWireHandle)
       throw new IllegalStateException("Protocol version cannot be changed "
-                                      + "after serialization started.");
+                                      + "after serialization started");
 
     protocolVersion = version;
   }
@@ -1058,8 +1058,8 @@ public class ObjectOutputStream extends OutputStream
 
           checkType(field, 'C');
           int off = field.getOffset();
-          prim_field_data[off++] = (byte)(value >>> 8);
-          prim_field_data[off] = (byte)value;
+          prim_field_data[off] = (byte)(value >>> 8);
+          prim_field_data[off + 1] = (byte)value;
         }
 
         public void put(String name, double value)
@@ -1069,14 +1069,16 @@ public class ObjectOutputStream extends OutputStream
           checkType(field, 'D');
           int off = field.getOffset();
           long l_value = Double.doubleToLongBits (value);
-          prim_field_data[off++] = (byte)(l_value >>> 52);
-          prim_field_data[off++] = (byte)(l_value >>> 48);
-          prim_field_data[off++] = (byte)(l_value >>> 40);
-          prim_field_data[off++] = (byte)(l_value >>> 32);
-          prim_field_data[off++] = (byte)(l_value >>> 24);
-          prim_field_data[off++] = (byte)(l_value >>> 16);
-          prim_field_data[off++] = (byte)(l_value >>> 8);
-          prim_field_data[off] = (byte)l_value;
+          int v = (int) (l_value >>> 32);
+          prim_field_data[off] = (byte)(v >>> 24);
+          prim_field_data[off + 1] = (byte)(v >>> 16);
+          prim_field_data[off + 2] = (byte)(v >>> 8);
+          prim_field_data[off + 3] = (byte)v;
+          v = (int) l_value;
+          prim_field_data[off + 4] = (byte)(v >>> 24);
+          prim_field_data[off + 5] = (byte)(v >>> 16);
+          prim_field_data[off + 6] = (byte)(v >>> 8);
+          prim_field_data[off + 7] = (byte)v;
         }
 
         public void put(String name, float value)
@@ -1086,10 +1088,10 @@ public class ObjectOutputStream extends OutputStream
           checkType(field, 'F');
           int off = field.getOffset();
           int i_value = Float.floatToIntBits(value);
-          prim_field_data[off++] = (byte)(i_value >>> 24);
-          prim_field_data[off++] = (byte)(i_value >>> 16);
-          prim_field_data[off++] = (byte)(i_value >>> 8);
-          prim_field_data[off] = (byte)i_value;
+          prim_field_data[off] = (byte)(i_value >>> 24);
+          prim_field_data[off + 1] = (byte)(i_value >>> 16);
+          prim_field_data[off + 2] = (byte)(i_value >>> 8);
+          prim_field_data[off + 3] = (byte)i_value;
         }
 
         public void put(String name, int value)
@@ -1097,10 +1099,10 @@ public class ObjectOutputStream extends OutputStream
           ObjectStreamField field = getField(name);
           checkType(field, 'I');
           int off = field.getOffset();
-          prim_field_data[off++] = (byte)(value >>> 24);
-          prim_field_data[off++] = (byte)(value >>> 16);
-          prim_field_data[off++] = (byte)(value >>> 8);
-          prim_field_data[off] = (byte)value;
+          prim_field_data[off] = (byte)(value >>> 24);
+          prim_field_data[off + 1] = (byte)(value >>> 16);
+          prim_field_data[off + 2] = (byte)(value >>> 8);
+          prim_field_data[off + 3] = (byte)value;
         }
 
         public void put(String name, long value)
@@ -1108,14 +1110,16 @@ public class ObjectOutputStream extends OutputStream
           ObjectStreamField field = getField(name);
           checkType(field, 'J');
           int off = field.getOffset();
-          prim_field_data[off++] = (byte)(value >>> 52);
-          prim_field_data[off++] = (byte)(value >>> 48);
-          prim_field_data[off++] = (byte)(value >>> 40);
-          prim_field_data[off++] = (byte)(value >>> 32);
-          prim_field_data[off++] = (byte)(value >>> 24);
-          prim_field_data[off++] = (byte)(value >>> 16);
-          prim_field_data[off++] = (byte)(value >>> 8);
-          prim_field_data[off] = (byte)value;
+          int v = (int) (value >>> 32);
+          prim_field_data[off] = (byte)(v >>> 24);
+          prim_field_data[off + 1] = (byte)(v >>> 16);
+          prim_field_data[off + 2] = (byte)(v >>> 8);
+          prim_field_data[off + 3] = (byte)v;
+          v = (int) value;
+          prim_field_data[off + 4] = (byte)(v >>> 24);
+          prim_field_data[off + 5] = (byte)(v >>> 16);
+          prim_field_data[off + 6] = (byte)(v >>> 8);
+          prim_field_data[off + 7] = (byte)v;
         }
 
         public void put(String name, short value)
@@ -1123,8 +1127,8 @@ public class ObjectOutputStream extends OutputStream
           ObjectStreamField field = getField(name);
           checkType(field, 'S');
           int off = field.getOffset();
-          prim_field_data[off++] = (byte)(value >>> 8);
-          prim_field_data[off] = (byte)value;
+          prim_field_data[off] = (byte)(value >>> 8);
+          prim_field_data[off + 1] = (byte)value;
         }
 
         public void put(String name, Object value)

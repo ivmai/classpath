@@ -1,5 +1,5 @@
 /* DataInputStream.java -- FilteredInputStream that implements DataInput
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005, 2008
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2005, 2008, 2010
    Free Software Foundation
 
 This file is part of GNU Classpath.
@@ -60,7 +60,7 @@ import gnu.java.lang.CPStringBuilder;
 public class DataInputStream extends FilterInputStream implements DataInput
 {
   // Byte buffer, used to make primitive read calls more efficient.
-  byte[] buf = new byte [8];
+  private final byte[] buf = new byte [8];
 
   /**
    * This constructor initializes a new <code>DataInputStream</code>
@@ -722,22 +722,22 @@ public class DataInputStream extends FilterInputStream implements DataInput
 
   static int convertToInt (byte[] buf)
   {
-    return (((buf [0] & 0xff) << 24)
-            | ((buf [1] & 0xff) << 16)
-            | ((buf [2] & 0xff) << 8)
-            | (buf [3] & 0xff));
+    return (buf [0] << 24)
+	| ((buf [1] & 0xff) << 16)
+	| ((buf [2] & 0xff) << 8)
+         | (buf [3] & 0xff);
   }
 
   static long convertToLong (byte[] buf)
   {
-    return (((long)(buf [0] & 0xff) << 56) |
-            ((long)(buf [1] & 0xff) << 48) |
-            ((long)(buf [2] & 0xff) << 40) |
-            ((long)(buf [3] & 0xff) << 32) |
+    return ((long)((buf [0] << 24)
+                | ((buf [1] & 0xff) << 16)
+                | ((buf [2] & 0xff) << 8)
+                 | (buf [3] & 0xff)) << 32) |
             ((long)(buf [4] & 0xff) << 24) |
-            ((long)(buf [5] & 0xff) << 16) |
-            ((long)(buf [6] & 0xff) <<  8) |
-            ((long)(buf [7] & 0xff)));
+                 (((buf [5] & 0xff) << 16)
+                | ((buf [6] & 0xff) << 8)
+                 | (buf [7] & 0xff));
   }
 
   // FIXME: This method should be re-thought.  I suspect we have multiple
