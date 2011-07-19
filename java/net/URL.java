@@ -1,5 +1,5 @@
 /* URL.java -- Uniform Resource Locator Class
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -474,8 +474,7 @@ public final class URL implements Serializable
             authority = context.authority;
           }
         else // Protocol NOT specified in spec. and no context available.
-          throw new MalformedURLException("Absolute URL required with null"
-                                          + " context: " + spec);
+          throw new MalformedURLException("No protocol specified: " + spec);
       }
 
     protocol = protocol.trim();
