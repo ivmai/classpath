@@ -1,5 +1,6 @@
 /* java.lang.StrictMath -- common mathematical functions, strict Java
-   Copyright (C) 1998, 2001, 2002, 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2001, 2002, 2003, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -456,9 +457,10 @@ public final strictfp class StrictMath
         double r = x - (PI_L / 2 - x * (p / q));
         return negative ? PI / 2 + r : PI / 2 - r;
       }
+    double z = (1 - x) * 0.5;
     if (negative) // x<=-0.5.
       {
-        double z = (1 + x) * 0.5;
+        // z = (1+orig_x)*0.5
         double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z
                                                          * (PS4 + z * PS5)))));
         double q = 1 + z * (QS1 + z * (QS2 + z * (QS3 + z * QS4)));
@@ -466,8 +468,7 @@ public final strictfp class StrictMath
         double w = p / q * s - PI_L / 2;
         return PI - 2 * (s + w);
       }
-    double z = (1 - x) * 0.5; // x>0.5.
-    double s = sqrt(z);
+    double s = sqrt(z); // x>=0.5
     double df = (float) s;
     double c = (z - df * df) / (s + df);
     double p = z * (PS0 + z * (PS1 + z * (PS2 + z * (PS3 + z
@@ -478,12 +479,12 @@ public final strictfp class StrictMath
   }
 
   /**
-   * The trigonometric function <em>arcsin</em>. The range of angles returned
+   * The trigonometric function <em>arctan</em>. The range of angles returned
    * is -pi/2 to pi/2 radians (-90 to 90 degrees). If the argument is NaN, the
    * result is NaN; and the arctangent of 0 retains its sign.
    *
    * @param x the tan to turn back into an angle
-   * @return arcsin(x)
+   * @return arctan(x)
    * @see #atan2(double, double)
    */
   public static double atan(double x)
@@ -1520,8 +1521,8 @@ public final strictfp class StrictMath
     if (x != x || y != y)
       return Double.NaN;
 
-    // When x < 0, yisint tells if y is not an integer (0), even(1),
-    // or odd (2).
+    // When x < 0, yisint tells if y is not an integer (0), odd (1),
+    // or even (2).
     int yisint = 0;
     if (x < 0 && floor(y) == y)
       yisint = (y % 2 == 0) ? 2 : 1;
@@ -1539,8 +1540,6 @@ public final strictfp class StrictMath
       }
     if (y == 2)
       return x * x;
-    if (y == 0.5)
-      return sqrt(x);
 
     // More special cases, of x.
     if (x == 0 || ax == Double.POSITIVE_INFINITY || ax == 1)
@@ -1554,10 +1553,18 @@ public final strictfp class StrictMath
             else if (yisint == 1)
               ax = -ax;
           }
+        else
+          {
+            // Check for x == -0 with odd y.
+            if (1 / x < 0 && ay % 2 == 1) // yisint cannot be used here
+              ax = -ax;
+          }
         return ax;
       }
     if (x < 0 && yisint == 0)
       return Double.NaN;
+    if (y == 0.5) // x!=0
+      return sqrt(x);
 
     // Now we can start!
     double t;
@@ -1639,7 +1646,7 @@ public final strictfp class StrictMath
     }
 
     // Split up y into y1+y2 and compute (y1+y2)*(t1+t2).
-    boolean negative = x < 0 && yisint == 1;
+    boolean negative = yisint == 1; // Implies x<0.
     double y1 = (float) y;
     double p_l = (y - y1) * t1 + y * t2;
     double p_h = y1 * t1;
@@ -1690,12 +1697,14 @@ public final strictfp class StrictMath
     if (x == Double.NEGATIVE_INFINITY || ! (x < Double.POSITIVE_INFINITY)
         || y == 0 || y != y)
       return Double.NaN;
+    if (x == 0) // Filter out -0 case.
+      return x;
+    if (x == y || -x == y)
+      return 0 * x; // Get correct sign.
 
     boolean negative = x < 0;
     x = abs(x);
     y = abs(y);
-    if (x == y || x == 0)
-      return 0 * x; // Get correct sign.
 
     // Achieve x < 2y, then take first shot at remainder.
     if (y < TWO_1023)
@@ -1713,11 +1722,11 @@ public final strictfp class StrictMath
       }
     else
       {
-        y *= 0.5;
-        if (x > y)
+        double half = y * 0.5;
+        if (x > half)
           {
             x -= y;
-            if (x >= y)
+            if (x >= half)
               x -= y;
           }
       }
@@ -2186,7 +2195,7 @@ public final strictfp class StrictMath
     int[] iq = new int[20];
     double[] f = new double[20];
     double[] q = new double[20];
-    boolean recompute = false;
+    boolean recompute;
 
     // Initialize jk, jz, jv, q0; note that 3>q0.
     int jk = 4;
@@ -2210,6 +2219,7 @@ public final strictfp class StrictMath
 
     do
       {
+        recompute = false;
         // Distill q[] into iq[] reversingly.
         for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
           {
@@ -2482,15 +2492,16 @@ public final strictfp class StrictMath
         v = invert ? -1 : 1;
         return (negative ? -1 : 1) * (v - 2 * (x - (w * w / (w + v) - r)));
       }
-    if (! invert)
-      return w;
-
-    // Compute -1.0/(x+r) accurately.
-    z = (float) w;
-    v = r - (z - x);
-    double a = -1 / w;
-    double t = (float) a;
-    return t + a * (1 + t * z + t * v);
+    if (invert)
+      {
+        // Compute -1.0/(x+r) accurately.
+        z = (float) w;
+        v = r - (z - x);
+        double a = -1 / w;
+        double t = (float) a;
+        w = t + a * (1 + t * z + t * v);
+      }
+    return negative ? -w : w;
   }
 
   /**
