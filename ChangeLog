@@ -1,5 +1,55 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/sql/Date.java:
+	(sdf): Make the private field final.
+	* java/sql/Time.java:
+	(sdf): Likewise.
+	* java/sql/Timestamp.java:
+	(dateFormat): Likewise.
+	* java/sql/Date.java:
+	(getHours()): Remove unnecessary throws IllegalArgumentException.
+	(getMinutes()): Likewise.
+	(getSeconds()): Likewise.
+	(setHours(int)): Likewise.
+	(setMinutes(int)): Likewise.
+	(setSeconds(int)): Likewise.
+	* java/sql/Time.java:
+	(getDate()): Likewise.
+	(getDay()): Likewise.
+	(getMonth()): Likewise.
+	(getYear()): Likewise.
+	(setDate(int)): Likewise.
+	(setMonth(int)): Likewise.
+	(setYear(int)): Likewise.
+	* java/sql/Date.java:
+	(valueOf(String)): Throw IllegalArgumentException if the argument
+	is null (to match the RI); document the exception.
+	* java/sql/Time.java:
+	(valueOf(String)): Likewise.
+	* java/sql/Timestamp.java:
+	(valueOf(String)): Likewise.
+	* java/sql/Time.java:
+	(Time(int,int,int)): Invoke the super constructor with the specified
+	time and with a fixed date (1970-01-01) instead of invoking it with
+	the current time (in millis) and adjusting the time (hours, minutes,
+	seconds) to the specified one.
+	* java/sql/Timestamp.java:
+	(decimalFormat): Remove unused private field.
+	(sbuf): Likewise.
+	(valueOf(String)): Don't allow '+' and '-' for "nanos" part.
+	(Timestamp(int,int,int,int,int,int,int)): Throw
+	IllegalArgumentException if "nanos" argument is invalid; document the
+	exception.
+	(setNanos(int)): Likewise.
+	(Timestamp(long)): Rename the argument to "time" (from "date").
+	(Timestamp(long)): Handle negative time correctly.
+	(setTime(long)): Override the super method to adjust "nanos" part (the
+	implementation is similar to the constructor's one).
+	(toString()): Manually format "nanos" part (instead of using the
+	shared DecimalFormat and StringBuffer instances).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/applet/Applet.java:
 	(width): Remove unused private transient field.
 	(height): Likewise.

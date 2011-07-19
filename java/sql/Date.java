@@ -1,5 +1,6 @@
 /* Date.java -- Wrapper around java.util.Date
-   Copyright (C) 1999, 2000, 2003, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2003, 2005, 2006, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -53,7 +54,8 @@ public class Date extends java.util.Date
   /**
    * Used for parsing and formatting this date.
    */
-  private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+  private static final SimpleDateFormat sdf
+    = new SimpleDateFormat("yyyy-MM-dd");
 
   /**
    * This method initializes a new instance of this class with the
@@ -88,7 +90,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public int getHours() throws IllegalArgumentException
+  public int getHours()
   {
     throw new IllegalArgumentException();
   }
@@ -99,7 +101,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public int getMinutes() throws IllegalArgumentException
+  public int getMinutes()
   {
     throw new IllegalArgumentException();
   }
@@ -110,7 +112,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public int getSeconds() throws IllegalArgumentException
+  public int getSeconds()
   {
     throw new IllegalArgumentException();
   }
@@ -121,7 +123,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public void setHours(int newValue) throws IllegalArgumentException
+  public void setHours(int newValue)
   {
     throw new IllegalArgumentException();
   }
@@ -132,7 +134,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public void setMinutes(int newValue) throws IllegalArgumentException
+  public void setMinutes(int newValue)
   {
     throw new IllegalArgumentException();
   }
@@ -143,7 +145,7 @@ public class Date extends java.util.Date
    * @throws IllegalArgumentException when it's called.
    * @deprecated
    */
-  public void setSeconds(int newValue) throws IllegalArgumentException
+  public void setSeconds(int newValue)
   {
     throw new IllegalArgumentException();
   }
@@ -154,9 +156,13 @@ public class Date extends java.util.Date
    *
    * @param str The string to parse.
    * @return The resulting <code>java.sql.Date</code> value.
+   * @exception IllegalArgumentException If the argument is <code>null</code>
+   * or not in the valid SQL date format (yyyy-MM-dd).
    */
   public static Date valueOf (String str)
   {
+    if (str == null)
+      throw new IllegalArgumentException();
     try
       {
         java.util.Date d = (java.util.Date) sdf.parseObject(str);
