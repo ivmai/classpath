@@ -1,6 +1,6 @@
 /* Stack.java - Class that provides a Last In First Out (LIFO)
    datatype, known more commonly as a Stack
-   Copyright (C) 1998, 1999, 2001, 2004, 2005
+   Copyright (C) 1998, 1999, 2001, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -61,9 +61,8 @@ package java.util;
  */
 public class Stack<T> extends Vector<T>
 {
-  // We could use Vector methods internally for the following methods,
-  // but have used Vector fields directly for efficiency (i.e. this
-  // often reduces out duplicate bounds checking).
+  // We use Vector methods internally for the following methods (since
+  // the former may be overridden in the subclasses).
 
   /**
    * Compatible with JDK 1.0+.
@@ -102,17 +101,10 @@ public class Stack<T> extends Vector<T>
    * @return the Object popped from the stack
    * @throws EmptyStackException if the stack is empty
    */
-  @SuppressWarnings("unchecked")
   public synchronized T pop()
   {
-    if (elementCount == 0)
-      throw new EmptyStackException();
-
-    modCount++;
-    T obj = (T) elementData[--elementCount];
-
-    // Set topmost element to null to assist the gc in cleanup.
-    elementData[elementCount] = null;
+    T obj = peek();
+    removeElementAt(size() - 1);
     return obj;
   }
 
@@ -122,13 +114,12 @@ public class Stack<T> extends Vector<T>
    * @return the top Object on the stack
    * @throws EmptyStackException if the stack is empty
    */
-  @SuppressWarnings("unchecked")
   public synchronized T peek()
   {
-    if (elementCount == 0)
+    int len = size();
+    if (len == 0)
       throw new EmptyStackException();
-
-    return (T) elementData[elementCount - 1];
+    return elementAt(len - 1);
   }
 
   /**
@@ -136,9 +127,9 @@ public class Stack<T> extends Vector<T>
    *
    * @return true if the stack contains no items, false otherwise
    */
-  public synchronized boolean empty()
+  public boolean empty()
   {
-    return elementCount == 0;
+    return size() == 0;
   }
 
   /**
@@ -152,10 +143,7 @@ public class Stack<T> extends Vector<T>
    */
   public synchronized int search(Object o)
   {
-    int i = elementCount;
-    while (--i >= 0)
-      if (equals(o, elementData[i]))
-        return elementCount - i;
-    return -1;
+    int i = lastIndexOf(o);
+    return i >= 0 ? size() - i : -1;
   }
 }
