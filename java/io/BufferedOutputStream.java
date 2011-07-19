@@ -1,5 +1,5 @@
 /* BufferedOutputStream.java -- Buffer output into large blocks before writing
-   Copyright (C) 1998, 2000, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000, 2003, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -87,12 +87,25 @@ public class BufferedOutputStream extends FilterOutputStream
    *
    * @param out The underlying <code>OutputStream</code> to write data to
    * @param size The size of the internal buffer
+   *
+   * @exception IllegalArgumentException If <code>size</code> is non-positive
    */
   public BufferedOutputStream(OutputStream out, int size)
   {
     super(out);
 
+    if (size <= 0)
+      throw new IllegalArgumentException();
     buf = new byte[size];
+  }
+
+  private void flushBuffer() throws IOException
+  {
+    if (count == 0)
+      return;
+
+    out.write(buf, 0, count);
+    count = 0;
   }
 
   /**
@@ -103,11 +116,7 @@ public class BufferedOutputStream extends FilterOutputStream
    */
   public synchronized void flush() throws IOException
   {
-    if (count == 0)
-      return;
-
-    out.write(buf, 0, count);
-    count = 0;
+    flushBuffer();
     out.flush();
   }
 
@@ -149,10 +158,9 @@ public class BufferedOutputStream extends FilterOutputStream
   public synchronized void write(int b) throws IOException
   {
     if (count == buf.length)
-      flush();
+      flushBuffer();
 
-    buf[count] = (byte)(b & 0xFF);
-    ++count;
+    buf[count++] = (byte)b;
   }
 
   /**
@@ -171,10 +179,11 @@ public class BufferedOutputStream extends FilterOutputStream
   public synchronized void write(byte[] buf, int offset, int len)
     throws IOException
   {
-    // Buffer can hold everything.  Note that the case where LEN < 0
-    // is automatically handled by the downstream write.
-    if (len < (this.buf.length - count))
+    if (len < this.buf.length)
       {
+        if (len > this.buf.length - count)
+          flushBuffer();
+        // Buffer can hold everything.
         System.arraycopy(buf, offset, this.buf, count, len);
         count += len;
       }
@@ -183,8 +192,8 @@ public class BufferedOutputStream extends FilterOutputStream
         // The write was too big.  So flush the buffer and write the new
         // bytes directly to the underlying stream, per the JDK 1.2
         // docs.
-        flush();
-        out.write (buf, offset, len);
+        flushBuffer();
+        out.write(buf, offset, len);
       }
   }
 

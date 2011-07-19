@@ -1,5 +1,6 @@
 /* Writer.java -- Base class for character output streams
-   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -205,7 +206,7 @@ public abstract class Writer implements Appendable, Closeable, Flushable
   /** @since 1.5 */
   public Writer append(CharSequence cs, int start, int end) throws IOException
   {
-    write(cs == null ? "null" : cs.subSequence(start, end).toString());
+    write((cs == null ? "null" : cs).subSequence(start, end).toString());
     return this;
   }
 }

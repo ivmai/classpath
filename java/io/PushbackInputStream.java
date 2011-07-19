@@ -1,5 +1,6 @@
 /* PushbackInputStream.java -- An input stream that can unread bytes
-   Copyright (C) 1998, 1999, 2001, 2002, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -91,14 +92,23 @@ public class PushbackInputStream extends FilterInputStream
    *
    * @param in The subordinate <code>InputStream</code> to read from
    * @param size The pushback buffer size to use
+   *
+   * @exception IllegalArgumentException If <code>size</code> is non-positive
    */
   public PushbackInputStream(InputStream in, int size)
   {
     super(in);
-    if (size < 0)
+    if (size <= 0)
       throw new IllegalArgumentException();
-    buf = new byte[size];
-    pos = buf.length;
+    if (in != null)
+      buf = new byte[size];
+    pos = size;
+  }
+
+  private void ensureOpen() throws IOException
+  {
+    if (buf == null)
+      throw new IOException("Stream closed");
   }
 
   /**
@@ -116,15 +126,9 @@ public class PushbackInputStream extends FilterInputStream
    */
   public int available() throws IOException
   {
-    try
-      {
-        return (buf.length - pos) + super.available();
-      }
-    catch (NullPointerException npe)
-      {
-        throw new IOException ("Stream closed");
-      }
-  }
+    ensureOpen();
+    return (buf.length - pos) + super.available();
+  } 
 
   /**
    * This method closes the stream and releases any associated resources.
@@ -133,8 +137,11 @@ public class PushbackInputStream extends FilterInputStream
    */
   public synchronized void close() throws IOException
   {
-    buf = null;
-    super.close();
+    if (buf != null)
+      {
+        buf = null;
+        super.close();
+      }
   }
 
   /**
@@ -175,6 +182,7 @@ public class PushbackInputStream extends FilterInputStream
    */
   public synchronized int read() throws IOException
   {
+    ensureOpen();
     if (pos < buf.length)
       return ((int) buf[pos++]) & 0xFF;
 
@@ -207,6 +215,7 @@ public class PushbackInputStream extends FilterInputStream
    */
   public synchronized int read(byte[] b, int off, int len) throws IOException
   {
+    ensureOpen();
     int numBytes = Math.min(buf.length - pos, len);
 
     if (numBytes > 0)
@@ -243,6 +252,7 @@ public class PushbackInputStream extends FilterInputStream
    */
   public synchronized void unread(int b) throws IOException
   {
+    ensureOpen();
     if (pos <= 0)
       throw new IOException("Insufficient space in pushback buffer");
 
@@ -287,6 +297,7 @@ public class PushbackInputStream extends FilterInputStream
   public synchronized void unread(byte[] b, int off, int len)
     throws IOException
   {
+    ensureOpen();
     if (pos < len)
       throw new IOException("Insufficient space in pushback buffer");
 
@@ -319,6 +330,7 @@ public class PushbackInputStream extends FilterInputStream
    */
   public synchronized long skip(long n) throws IOException
   {
+    ensureOpen();
     final long origN = n;
 
     if (n > 0L)
