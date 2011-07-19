@@ -1,5 +1,5 @@
 /* MemoryHandler.java -- a class for buffering log messages in a memory buffer
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -336,10 +336,8 @@ public class MemoryHandler
   public void setPushLevel(Level pushLevel)
   {
     LogManager.getLogManager().checkAccess();
-
-    /* Throws a NullPointerException if pushLevel is null. */
-    pushLevel.getClass();
-
+    if (pushLevel == null)
+      throw new NullPointerException();
     this.pushLevel = pushLevel;
   }
 }

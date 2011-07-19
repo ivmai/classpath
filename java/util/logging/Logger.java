@@ -1,5 +1,5 @@
 /* Logger.java -- a class for logging messages
-   Copyright (C) 2002, 2004, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2006, 2007, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -202,7 +202,7 @@ public class Logger
    *            package issuing log records and consist of dot-separated Java
    *            identifiers.
    * @throws IllegalArgumentException if a logger for the subsystem identified
-   *             by <code>name</code> has already been created, but uses a a
+   *             by <code>name</code> has already been created, but uses a
    *             resource bundle for localizing messages.
    * @throws NullPointerException if <code>name</code> is <code>null</code>.
    * @return a logger for the subsystem specified by <code>name</code> that

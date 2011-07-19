@@ -1,6 +1,6 @@
 /* StreamHandler.java --
    A class for publishing log messages to instances of java.io.OutputStream
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -285,9 +285,8 @@ public class StreamHandler
     throws SecurityException
   {
     LogManager.getLogManager().checkAccess();
-
-    /* Throw a NullPointerException if out is null. */
-    out.getClass();
+    if (out == null)
+      throw new NullPointerException();
 
     try
     {

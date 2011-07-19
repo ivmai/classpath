@@ -1,5 +1,5 @@
 /* Handler.java -- a class for publishing log messages
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -179,10 +179,8 @@ h.setFormatter(h.getFormatter());</pre>
     throws SecurityException
   {
     LogManager.getLogManager().checkAccess();
-
-    /* Throws a NullPointerException if formatter is null. */
-    formatter.getClass();
-
+    if (formatter == null)
+      throw new NullPointerException();
     this.formatter = formatter;
   }
 
@@ -288,13 +286,18 @@ h.setFormatter(h.getFormatter());</pre>
   }
 
 
+  /**
+   * Sets the error manager which will be invoked on errors occur while
+   * using this handler.
+   *
+   * @exception NullPointerException If <code>manager</code> is
+   * <code>null</code>
+   */
   public void setErrorManager(ErrorManager manager)
   {
     LogManager.getLogManager().checkAccess();
-
-    /* Make sure manager is not null. */
-    manager.getClass();
-
+    if (manager == null)
+      throw new NullPointerException();
     this.errorManager = manager;
   }
 
@@ -342,9 +345,8 @@ h.setFormatter(h.getFormatter());</pre>
   public void setLevel(Level level)
   {
     LogManager.getLogManager().checkAccess();
-
-    /* Throw NullPointerException if level is null.  */
-    level.getClass();
+    if (level == null)
+      throw new NullPointerException();
     this.level = level;
   }
 
