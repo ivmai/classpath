@@ -1,5 +1,17 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/GregorianCalendar.java:
+	(gregOffsetFor(int)): New private static method (integer arithmetic
+	is used instead of a FP one).
+	(isGregorian(int, int)): Use gregOffsetFor().
+	(computeTime()): Likewise.
+	(getLinearDay(int, int, boolean)): Likewise.
+	(hashCode()): Optimize the expression.
+	(getActualMaximum(int)): Fix a bug for WEEK_OF_YEAR case (a missing
+	return is added replacing a case branch fall-through).
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/util/Stack.java: Update the internal implementation comment.
 	(pop()): Use Vector methods (which could be overridden in a Stack
 	subclass) instead of manipulating Vector internal data directly.
