@@ -1,5 +1,72 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/io/BufferedInputStream.java:
+	(BufferedInputStream(InputStream,int)): If "in" argument is null then
+	leave buf value null (to match the RI).
+	* java/io/PushbackInputStream.java:
+	(PushbackInputStream(InputStream,int)): Likewise.
+	* java/io/BufferedInputStream.java:
+	(available()): Check stream is not closed.
+	(skip(long)): Likewise.
+	(close()): Don't call super.close() if the stream is already closed.
+	* java/io/PushbackInputStream.java:
+	(close()): Likewise.
+	* java/io/BufferedInputStream.java:
+	(reset()): Remove the trailing dot character for exception messages.
+	(refill()): Likewise.
+	* java/io/BufferedOutputStream.java:
+	(BufferedOutputStream(OutputStream,int)): Throw
+	IllegalArgumentException is non-positive "size" value; document it.
+	* java/io/PushbackInputStream.java:
+	(PushbackInputStream(OutputStream,int)): Likewise.
+	* java/io/BufferedWriter.java:
+	(BufferedWriter(Writer,int)): Likewise.
+	* java/io/BufferedOutputStream.java:
+	(flushBuffer()): New private method (move the code from flush()).
+	(flush()): Call flushBuffer().
+	(write()): Call flushBuffer() instead of flush().
+	(write(byte[], int, int)): Likewise.
+	(write()): Remove unnecessary "&" operation.
+	* java/io/BufferedWriter.java:
+	(out): Make the field final.
+	* java/io/RandomAccessFile.java:
+	(ch): Likewise.
+	(fd): Likewise.
+	(out): Likewise.
+	(in): Likewise.
+	* java/io/BufferedWriter.java:
+	(buffer): Make the field private.
+	(count): Likewise.
+	(BufferedWriter(Writer,int)): Initialize buffer to null if out is
+	null indicating that the stream is already closed (the same as in
+	the RI).
+	(close()): Put localFlush() call into the try clause and out.close()
+	into finally (the same as in the RI); don't call out.close() if out
+	is null.
+	* java/io/FilterOutputStream.java:
+	(close()): Ignore exceptions in flush() (the same as in the RI).
+	* java/io/Writer.java:
+	(append(CharSequence,int,int)): Call subSequence() also for "null"
+	string.
+	* java/io/PushbackInputStream.java:
+	(ensureOpen()): New private method.
+	(available()): Call ensureOpen().
+	(read()): Likewise.
+	(read(byte[],int,int)): Likewise.
+	(unread(int)): Likewise.
+	(skip(long)): Likewise.
+	* java/io/RandomAccessFile.java:
+	(getFD()): Don't initialize fd (as it is already set in the
+	constructor).
+	(setLength(long)): Call length() only once; don't call seek() if the
+	file pointer is guaranteed to be in the requested position; call
+	a "restore" seek() in a finally clause.
+	* java/io/Reader.java:
+	(skip(long)): Throw IllegalArgumentException if the argument is
+	negative; document it.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/io/DataInputStream.java:
 	(buf): Make the field private and final.
 	* java/io/ObjectStreamClass.java:

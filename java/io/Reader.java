@@ -1,5 +1,6 @@
 /* Reader.java -- base class of classes that read input as a stream of chars
-   Copyright (C) 1998, 1999, 2000, 2003, 2004, 2005  Free Software Foundation
+   Copyright (C) 1998, 1999, 2000, 2003, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -262,11 +263,14 @@ public abstract class Reader implements Closeable, Readable
     *
     * @return The actual number of chars skipped.
     *
+    * @exception IllegalArgumentException If <code>count</code> is negative
     * @exception IOException If an error occurs
     */
   public long skip(long count) throws IOException
   {
-    if (count <= 0)
+    if (count < 0)
+      throw new IllegalArgumentException("Skip value is negative");
+    if (count == 0)
       return 0;
     int bsize = count > 1024 ? 1024 : (int) count;
     char[] buffer = new char[bsize];

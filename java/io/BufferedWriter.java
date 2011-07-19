@@ -1,5 +1,5 @@
 /* BufferedWriter.java -- Buffer output into large blocks before writing
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -66,20 +66,20 @@ public class BufferedWriter extends Writer
    * This is the underlying <code>Writer</code> to which this object
    * sends its output.
    */
-  private Writer out;
+  private final Writer out;
 
   /**
    * This is the internal char array used for buffering output before
    * writing it.
    */
-  char[] buffer;
+  private char[] buffer;
 
   /**
    * This is the number of chars that are currently in the buffer and
    * are waiting to be written to the underlying stream.  It always points to
    * the index into the buffer where the next char of data will be stored
    */
-  int count;
+  private int count;
 
   /**
    * This method initializes a new <code>BufferedWriter</code> instance
@@ -100,12 +100,16 @@ public class BufferedWriter extends Writer
    *
    * @param out The underlying <code>Writer</code> to write data to
    * @param size The size of the internal buffer
+   *
+   * @exception IllegalArgumentException If <code>size</code> is non-positive
    */
   public BufferedWriter (Writer out, int size)
   {
     super(out.lock);
+    if (size <= 0)
+      throw new IllegalArgumentException();
     this.out = out;
-    this.buffer = new char[size];
+    this.buffer = out != null ? new char[size] : null;
     this.count = 0;
   }
 
@@ -122,9 +126,17 @@ public class BufferedWriter extends Writer
       {
         // It is safe to call localFlush even if the stream is already
         // closed.
-        localFlush ();
-        out.close();
-        buffer = null;
+        try
+          {
+            localFlush();
+            // Close the stream even if an error occurred while flushing.
+          }
+        finally
+          {
+            if (out != null)
+	      out.close();
+	    buffer = null;
+          }
       }
   }
 

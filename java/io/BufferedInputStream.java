@@ -1,5 +1,6 @@
 /* BufferedInputStream.java -- An input stream that implements buffering
-   Copyright (C) 1998, 1999, 2001, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -137,10 +138,15 @@ public class BufferedInputStream extends FilterInputStream
     super(in);
     if (size <= 0)
       throw new IllegalArgumentException();
-    buf = new byte[size];
-    // initialize pos & count to bufferSize, to prevent refill from
-    // allocating a new buffer (if the caller starts out by calling mark()).
-    pos = count = bufferSize = size;
+    if (in != null)
+      {
+        buf = new byte[size];
+        // initialize pos & count to bufferSize, to prevent refill from
+        // allocating a new buffer (if the caller starts out by calling
+        // mark()).
+        pos = count = size;
+      }
+    bufferSize = size;
   }
 
   /**
@@ -158,6 +164,8 @@ public class BufferedInputStream extends FilterInputStream
    */
   public synchronized int available() throws IOException
   {
+    if (buf == null)
+      throw new IOException("Stream closed");
     return count - pos + super.available();
   }
 
@@ -169,11 +177,14 @@ public class BufferedInputStream extends FilterInputStream
    */
   public void close() throws IOException
   {
-    // Free up the array memory.
-    buf = null;
-    pos = count = 0;
-    markpos = -1;
-    super.close();
+    if (buf != null)
+      {
+        // Free up the array memory.
+        buf = null;
+        pos = count = 0;
+        markpos = -1;
+        super.close();
+      }
   }
 
   /**
@@ -302,7 +313,7 @@ public class BufferedInputStream extends FilterInputStream
   public synchronized void reset() throws IOException
   {
     if (markpos == -1)
-      throw new IOException(buf == null ? "Stream closed." : "Invalid mark.");
+      throw new IOException(buf == null ? "Stream closed" : "Invalid mark");
 
     pos = markpos;
   }
@@ -320,9 +331,6 @@ public class BufferedInputStream extends FilterInputStream
    */
   public synchronized long skip(long n) throws IOException
   {
-    if (buf == null)
-      throw new IOException("Stream closed.");
-
     final long origN = n;
 
     while (n > 0L)
@@ -347,7 +355,7 @@ public class BufferedInputStream extends FilterInputStream
   private boolean refill() throws IOException
   {
     if (buf == null)
-      throw new IOException("Stream closed.");
+      throw new IOException("Stream closed");
 
     if (markpos == -1 || count - markpos >= marklimit)
       {

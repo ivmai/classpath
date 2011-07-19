@@ -1,5 +1,6 @@
 /* RandomAccessFile.java -- Class supporting random file I/O
-   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -62,11 +63,11 @@ public class RandomAccessFile implements DataOutput, DataInput, Closeable
 {
 
   // The underlying file.
-  private FileChannelImpl ch;
-  private FileDescriptor fd;
+  private final FileChannelImpl ch;
+  private final FileDescriptor fd;
   // The corresponding input and output streams.
-  private DataOutputStream out;
-  private DataInputStream in;
+  private final DataOutputStream out;
+  private final DataInputStream in;
 
 
   /**
@@ -193,12 +194,7 @@ public class RandomAccessFile implements DataOutput, DataInput, Closeable
    */
   public final FileDescriptor getFD () throws IOException
   {
-    synchronized (this)
-      {
-        if (fd == null)
-          fd = new FileDescriptor (ch);
-        return fd;
-      }
+    return fd;
   }
 
   /**
@@ -235,14 +231,22 @@ public class RandomAccessFile implements DataOutput, DataInput, Closeable
 
     // FileChannel.truncate() can only shrink a file.
     // To expand it we need to seek forward and write at least one byte.
-    if (newLen < length())
+    long length = length();
+    if (newLen < length)
       ch.truncate (newLen);
-    else if (newLen > length())
+    else if (newLen > length)
       {
         long pos = getFilePointer();
-        seek(newLen - 1);
-        write(0);
-        seek(pos);
+        try
+          {
+            if (newLen - 1 != pos)
+              seek(newLen - 1);
+            write(0);
+          }
+        finally
+          {
+            seek(pos);
+          }
       }
   }
 

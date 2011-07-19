@@ -1,5 +1,6 @@
 /* FilterOutputStream.java -- Parent class for output streams that filter
-   Copyright (C) 1998, 1999, 2001, 2003, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2001, 2003, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -81,7 +82,14 @@ public class FilterOutputStream extends OutputStream
     */
   public void close() throws IOException
   {
-    flush();
+    try
+      {
+        flush();
+      }
+    catch (IOException e)
+      {
+        // ignore
+      }
     out.close();
   }
 
