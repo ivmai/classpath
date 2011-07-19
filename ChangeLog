@@ -1,5 +1,24 @@
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/applet/Applet.java:
+	(width): Remove unused private transient field.
+	(height): Likewise.
+	(setStub(AppletStub)): Check permissions first.
+	(setStub(AppletStub)): Don't call appletResize() for the new stub
+	(as in the RI).
+	(isActive()): If stub is unset then return false (instead of throwing
+	NPE); update the comment.
+	(resize(int,int)): Ignore this call if the width and height are both
+	unmodified; pass the values to the corresponding super method; don't
+	store the values to the private width/height fields (as in the RI).
+	(getLocale()): Fix the implementation according to the specification
+	(if the locale is unset then return the default one).
+	(play(URL)): Don't ignore exceptions (including NPE); ignore only the
+	case when the clip is missing (according to the specification).
+	(play(URL, String)): Likewise.
+
+2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/util/Calendar.java:
 	(ctorArgTypes): Make final.
 	* java/util/ResourceBundle.java:

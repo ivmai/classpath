@@ -1,5 +1,5 @@
 /* Applet.java -- Java base applet class
-   Copyright (C) 1999, 2002, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2004, 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -38,6 +38,7 @@ exception statement from your version. */
 
 package java.applet;
 
+import java.awt.AWTPermission;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -83,12 +84,6 @@ public class Applet extends Panel
   /** The applet stub for this applet. */
   private transient AppletStub stub;
 
-  /** Some applets call setSize in their constructors.  In that case,
-      these fields are used to store width and height values until a
-      stub is set. */
-  private transient int width;
-  private transient int height;
-
   /**
    * The accessibility context for this applet.
    *
@@ -117,22 +112,26 @@ public class Applet extends Panel
    */
   public final void setStub(AppletStub stub)
   {
+    if (this.stub != null)
+      {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null)
+          sm.checkPermission(new AWTPermission("setAppletStub"));
+      }
     this.stub = stub;
-
-    if (width != 0 && height != 0)
-      stub.appletResize (width, height);
   }
 
   /**
    * Tests whether or not this applet is currently active. An applet is active
    * just before the browser invokes start(), and becomes inactive just
-   * before the browser invokes stop().
+   * before the browser invokes stop(). If the stub is unset then this method
+   * returns false.
    *
    * @return <code>true</code> if this applet is active
    */
   public boolean isActive()
   {
-    return stub.isActive();
+    return stub != null && stub.isActive();
   }
 
   /**
@@ -188,13 +187,13 @@ public class Applet extends Panel
    */
   public void resize(int width, int height)
   {
-    if (stub == null)
+    Dimension dim = size();
+    if (width != dim.width || height != dim.height)
       {
-        this.width = width;
-        this.height = height;
+        super.resize(width, height);
+        if (stub != null)
+          stub.appletResize(width, height);
       }
-    else
-      stub.appletResize(width, height);
   }
 
   /**
@@ -332,7 +331,8 @@ public class Applet extends Panel
    */
   public Locale getLocale()
   {
-    return super.getLocale();
+    Locale locale = super.getLocale();
+    return locale != null ? locale : Locale.getDefault();
   }
 
   /**
@@ -359,13 +359,8 @@ public class Applet extends Panel
   public void play(URL url)
   {
     AudioClip ac = getAudioClip(url);
-    try
-      {
-        ac.play();
-      }
-    catch (Exception ignored)
-      {
-      }
+    if (ac != null)
+      ac.play();
   }
 
   /**
@@ -380,13 +375,9 @@ public class Applet extends Panel
    */
   public void play(URL url, String name)
   {
-    try
-      {
-        getAudioClip(url, name).play();
-      }
-    catch (Exception ignored)
-      {
-      }
+    AudioClip ac = getAudioClip(url, name);
+    if (ac != null)
+      ac.play();
   }
 
   /**
