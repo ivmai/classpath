@@ -1,6 +1,6 @@
 /* SimpleDateFormat.java -- A class for parsing/formating simple
    date constructs
-   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005
+   Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2010
    Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -74,13 +74,13 @@ public class SimpleDateFormat extends DateFormat
    * ID, size, and character used are stored for each sequence
    * of pattern characters.
    */
-  private class CompiledField
+  private static final class CompiledField
   {
     /**
      * The ID of the field within the local pattern characters.
      * Package private for use in out class.
      */
-    int field;
+    final int field;
 
     /**
      * The size of the character sequence.
@@ -91,7 +91,7 @@ public class SimpleDateFormat extends DateFormat
     /**
      * The character used.
      */
-    private char character;
+    private final char character;
 
     /**
      * Constructs a compiled field using the
@@ -102,7 +102,7 @@ public class SimpleDateFormat extends DateFormat
      * @param s the size of the field.
      * @param c the character used.
      */
-    public CompiledField(int f, int s, char c)
+    CompiledField(int f, int s, char c)
     {
       field = f;
       size = s;
@@ -113,7 +113,7 @@ public class SimpleDateFormat extends DateFormat
      * Retrieves the ID of the field relative to
      * the local pattern characters.
      */
-    public int getField()
+    int getField()
     {
       return field;
     }
@@ -121,7 +121,7 @@ public class SimpleDateFormat extends DateFormat
     /**
      * Retrieves the size of the character sequence.
      */
-    public int getSize()
+    int getSize()
     {
       return size;
     }
@@ -129,7 +129,7 @@ public class SimpleDateFormat extends DateFormat
     /**
      * Retrieves the character used in the sequence.
      */
-    public char getCharacter()
+    char getCharacter()
     {
       return character;
     }
@@ -560,7 +560,7 @@ public class SimpleDateFormat extends DateFormat
    * @return a version of the pattern using the characters in
    *         <code>newChars</code>.
    */
-  private String translateLocalizedPattern(String pattern,
+  private static String translateLocalizedPattern(String pattern,
                                            String oldChars, String newChars)
   {
     int len = pattern.length();
@@ -865,7 +865,8 @@ public class SimpleDateFormat extends DateFormat
                                        buf.getAttributes());
   }
 
-  private void withLeadingZeros(int value, int length, FormatBuffer buffer)
+  private static void withLeadingZeros(int value, int length,
+                                       FormatBuffer buffer)
   {
     String valStr = String.valueOf(value);
     for (length -= valStr.length(); length > 0; length--)
@@ -873,7 +874,7 @@ public class SimpleDateFormat extends DateFormat
     buffer.append(valStr);
   }
 
-  private boolean expect(String source, ParsePosition pos, char ch)
+  private static boolean expect(String source, ParsePosition pos, char ch)
   {
     int x = pos.getIndex();
     boolean r = x < source.length() && source.charAt(x) == ch;
@@ -1111,21 +1112,25 @@ public class SimpleDateFormat extends DateFormat
                 numberFormat.setMinimumIntegerDigits(fmt_count);
                 if (maybe2DigitYear)
                   index = pos.getIndex();
-                Number n = null;
-                if (limit_digits)
+                Number n;
+                if (limit_digits
+                    && dateStr.length() > pos.getIndex() + fmt_count)
                   {
                     // numberFormat.setMaximumIntegerDigits(fmt_count) may
                     // not work as expected. So we explicitly use substring
                     // of dateStr.
-                    int origPos = pos.getIndex();
-                    pos.setIndex(0);
-                    n = numberFormat.parse(dateStr.substring(origPos, origPos + fmt_count), pos);
-                    pos.setIndex(origPos + pos.getIndex());
+                    n = numberFormat.parse(dateStr.substring(0,
+                                            pos.getIndex() + fmt_count), pos);
                   }
                 else
                   n = numberFormat.parse(dateStr, pos);
-                if (pos == null || ! (n instanceof Long))
-                  return null;
+
+                if (!(n instanceof Long))
+                  {
+                    if (n != null) // set error index if not yet
+                      pos.setErrorIndex(pos.getIndex());
+                    return null;
+                  }
                 value = n.intValue() + offset;
               }
             else if (set1 != null)
@@ -1136,8 +1141,8 @@ public class SimpleDateFormat extends DateFormat
                 for (i = offset; i < set1.length; ++i)
                   {
                     if (set1[i] != null)
-                      if (dateStr.toUpperCase().startsWith(set1[i].toUpperCase(),
-                                                           index))
+                      if (dateStr.regionMatches(true, index, set1[i], 0,
+                                                set1[i].length()))
                         {
                           found = true;
                           pos.setIndex(index + set1[i].length());
@@ -1149,8 +1154,8 @@ public class SimpleDateFormat extends DateFormat
                     for (i = offset; i < set2.length; ++i)
                       {
                         if (set2[i] != null)
-                          if (dateStr.toUpperCase().startsWith(set2[i].toUpperCase(),
-                                                               index))
+                          if (dateStr.regionMatches(true, index, set2[i], 0,
+                                                set2[i].length()))
                             {
                               found = true;
                               pos.setIndex(index + set2[i].length());
@@ -1223,7 +1228,7 @@ public class SimpleDateFormat extends DateFormat
    * <code>String</code> representation.
    * </p>
    * <p>
-   * The supplied <code>String</code> must be a three
+   * The supplied <code>String</code> must start with a three
    * or four digit signed number, with an optional 'GMT'
    * prefix.  The first one or two digits represents the hours,
    * while the last two represent the minutes.  The
@@ -1254,7 +1259,7 @@ public class SimpleDateFormat extends DateFormat
    * @return the parsed offset, or null if parsing
    *         failed.
    */
-  private Integer computeOffset(String zoneString, ParsePosition pos)
+  private static Integer computeOffset(String zoneString, ParsePosition pos)
   {
     Pattern pattern =
       Pattern.compile("(GMT)?([+-])([012])?([0-9]):?([0-9]{2})");
@@ -1277,8 +1282,9 @@ public class SimpleDateFormat extends DateFormat
       {
         int sign = matcher.group(2).equals("+") ? 1 : -1;
         int hour = Integer.parseInt(matcher.group(4));
-        if (!matcher.group(3).equals(""))
-          hour += (Integer.parseInt(matcher.group(3)) * 10);
+        String hourLeading = matcher.group(3);
+        if (hourLeading != null && hourLeading.length() > 0)
+          hour += Integer.parseInt(hourLeading) * 10;
         int minutes = Integer.parseInt(matcher.group(5));
 
         if (hour > 23)
