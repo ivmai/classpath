@@ -1,5 +1,5 @@
 /* ParagraphView.java -- A composite View
-   Copyright (C) 2005  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -213,10 +213,60 @@ public class ParagraphView extends FlowView implements TabExpander
     super(element, Y_AXIS);
   }
 
+  /**
+   * Returns the next tab stop position for the given position.
+   *
+   * @param x the given x position
+   * @param tabOffset the text stream position of the tab occurrence
+   * @return the ending position of the tab expansion
+   */
   public float nextTabStop(float x, int tabOffset)
   {
-    throw new InternalError("Not implemented yet");
+    if (justification != StyleConstants.ALIGN_LEFT) // not left justified?
+      return x + DEF_TAB_STOP_OFFSET;
+
+    float tabBase = getTabBase();
+    if (x <= tabBase) // adjust x if needed
+      x = tabBase;
+
+    TabSet tabs = getTabSet();
+    if (tabs == null) // no tabs defined?
+      return tabBase + ((int) (x - tabBase) / TAB_DEFAULT_SIZE + 1) *
+                        TAB_DEFAULT_SIZE; // use tab fixed positions
+
+    TabStop tabStop = tabs.getTabAfter(x - tabBase + .01f);
+    if (tabStop == null) // no more tabs set?
+      {
+        // FIXME: what value should be returned here?
+        return x + DEF_TAB_STOP_OFFSET / 2;
+      }
+
+    float tabStopPos = tabStop.getPosition();
+
+    int alignment = tabStop.getAlignment();
+    if (alignment == TabStop.ALIGN_CENTER
+        || alignment == TabStop.ALIGN_RIGHT
+        || alignment == TabStop.ALIGN_DECIMAL)
+      { // handle non-default alignment style
+        int nextOfs = findOffsetToCharactersInString(
+                                    alignment == TabStop.ALIGN_DECIMAL ?
+                                      TAB_AND_DECIMAL_CHARS : TAB_CHARS,
+                                    tabOffset + 1);
+
+        float partialSize = getPartialSize(tabOffset + 1,
+                                    nextOfs >= 0 ? nextOfs : getEndOffset());
+        if (alignment == TabStop.ALIGN_CENTER)
+          partialSize /= 2;
+        tabStopPos = Math.max(x - tabBase, tabStopPos - partialSize);
+      }
+
+    return tabBase + tabStopPos;
   }
+
+  private static final int DEF_TAB_STOP_OFFSET = 10;
+  private static final int TAB_DEFAULT_SIZE = 72;
+  private static final char[] TAB_CHARS = { '\t' };
+  private static final char[] TAB_AND_DECIMAL_CHARS = { '\t', '.' };
 
   /**
    * Creates a new view that represents a row within a flow.

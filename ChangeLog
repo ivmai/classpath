@@ -1,5 +1,14 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* javax/swing/text/ParagraphView.java:
+	(nextTabStop(float,int)): Implement; document.
+	(DEF_TAB_STOP_OFFSET): New private static field (used by nextTabStop).
+	(TAB_DEFAULT_SIZE): Likewise.
+	(TAB_CHARS): Likewise.
+	(TAB_AND_DECIMAL_CHARS): Likewise.
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* vm/reference/java/io/VMFile.java:
 	(canWriteDirectory(File)): Remove unused method.
 	(listRoots()): Add FIXME.
