@@ -1,5 +1,5 @@
 /* Demo.java -- Simple Java Print Service Demo
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -49,6 +49,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -292,7 +293,7 @@ public class Demo extends JFrame
 
             // use set to remove duplicates
             DocFlavor[] docflavors = dialogSelectedService.getSupportedDocFlavors();
-            HashSet set = new HashSet();
+            Set<String> set = new HashSet<String>();
             for (int i=0; i < docflavors.length; i++)
               {
                 String charset = docflavors[i].getParameter("charset");
@@ -303,7 +304,7 @@ public class Demo extends JFrame
               }
 
             dialogSelectedServicedocFormat.removeAllItems();
-            for (Iterator it = set.iterator(); it.hasNext(); )
+            for (Iterator<String> it = set.iterator(); it.hasNext(); )
               dialogSelectedServicedocFormat.addItem(it.next());
           }
         else

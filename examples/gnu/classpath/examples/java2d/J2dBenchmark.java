@@ -1,6 +1,6 @@
 /* J2dBenchmark.java -- Benchmarking utility for java2d,
    based on the Aicas AWT benchmarker
- Copyright (C) 2006 Free Software Foundation, Inc.
+ Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath examples.
 
@@ -225,9 +225,9 @@ public class J2dBenchmark
 
   void printReport()
   {
-    for (Iterator i = testSetMap.testIterator(); i.hasNext();)
+    for (Iterator<String> i = testSetMap.testIterator(); i.hasNext();)
       {
-        TestRecorder recorder = testSetMap.getTest((String) i.next());
+        TestRecorder recorder = testSetMap.getTest(i.next());
         System.out.println("TEST " + recorder.getTestName() + ": average "
                            + recorder.getAverage() + "ms ["
                            + recorder.getMinTime() + "-"
@@ -1234,8 +1234,6 @@ public class J2dBenchmark
 
     boolean doPaint = false;
 
-    boolean withClipping = false;
-
     public GraphicsTest()
     {
       paintThread = new Thread(this);
@@ -1495,7 +1493,7 @@ class TestContext
 
 class TestSet
 {
-  private Map testsMap = new TreeMap();
+  private Map<String, TestRecorder> testsMap = new TreeMap<String, TestRecorder>();
 
   public void putTest(String testName, TestRecorder recoder)
   {
@@ -1504,10 +1502,10 @@ class TestSet
 
   public TestRecorder getTest(String testName)
   {
-    return (TestRecorder) testsMap.get(testName);
+    return testsMap.get(testName);
   }
 
-  public Iterator testIterator()
+  public Iterator<String> testIterator()
   {
     return testsMap.keySet().iterator();
   }

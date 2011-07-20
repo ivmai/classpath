@@ -1,5 +1,5 @@
 /* Demo.java -- And example of copy/paste datatransfer
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath examples.
 
@@ -252,6 +252,7 @@ class Demo
    * to/from the clipboard when the user requests that for the text,
    * image, object of file component.
    */
+  @SuppressWarnings("unchecked")
   public void actionPerformed (ActionEvent evt)
   {
     Button b = (Button) evt.getSource();
@@ -337,19 +338,22 @@ class Demo
 
     if (b == pasteFiles)
       {
-        java.util.List fs = null;
+        java.util.List<File> fs = null;
         try
           {
-            fs = (java.util.List) c.getData(DataFlavor.javaFileListFlavor);
+            fs = (java.util.List<File>) c.getData(DataFlavor.javaFileListFlavor);
           }
         catch (UnsupportedFlavorException dfnse)
           {
+            // Ignore.
           }
         catch (IOException ioe)
           {
+            // Ignore.
           }
         catch (ClassCastException cce)
           {
+            // Ignore.
           }
         if (fs == null)
           t.beep();
@@ -454,13 +458,13 @@ class Demo
         }
     }
 
-    void setFiles(java.util.List list)
+    void setFiles(java.util.List<File> list)
     {
       File[] fs = new File[list.size()];
       int i = 0;
-      Iterator it = list.iterator();
+      Iterator<File> it = list.iterator();
       while (it.hasNext())
-        fs[i++] = (File) it.next();
+        fs[i++] = it.next();
 
       setFiles(fs);
     }

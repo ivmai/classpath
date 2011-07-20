@@ -1,5 +1,5 @@
 /* PlayingDesk.java --
- Copyright (C) 2005 Free Software Foundation, Inc.
+ Copyright (C) 2005, 2011  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath.
 
@@ -124,17 +124,17 @@ public class PlayingDesk
   /**
    * The collection of the red dots.
    */
-  ArrayList reds = new ArrayList();
+  ArrayList<Point> reds = new ArrayList<Point>();
 
   /**
    * The collection of the black dots.
    */
-  ArrayList blacks = new ArrayList();
+  ArrayList<Point> blacks = new ArrayList<Point>();
 
   /**
    * The array of hints.
    */
-  ArrayList hints = new ArrayList();
+  ArrayList<Point> hints = new ArrayList<Point>();
 
   /**
    * When the game is completed, obtains the value of the two end points of the
@@ -177,9 +177,9 @@ public class PlayingDesk
   /**
    * Check maybe a game is finished after setting the point N
    */
-  public Point[] checkFinished(Collection x, Point N)
+  public Point[] checkFinished(Collection<Point> x, Point N)
   {
-    Iterator iter = x.iterator();
+    Iterator<Point> iter = x.iterator();
     Point p;
 
     // The victory, if happens, must occur inside these boundaries:
@@ -191,7 +191,7 @@ public class PlayingDesk
 
     while (iter.hasNext())
       {
-        p = (Point) iter.next();
+        p = iter.next();
 
         if (p.x > ax && p.x < bx && p.y > ay && p.y < by)
           {
@@ -241,13 +241,13 @@ public class PlayingDesk
   /**
    * Check for the presence of the given point in the collection.
    */
-  public final boolean pointPresent(int x, int y, Collection in)
+  public final boolean pointPresent(int x, int y, Collection<Point> in)
   {
-    Iterator iter = in.iterator();
+    Iterator<Point> iter = in.iterator();
     Point p;
     while (iter.hasNext())
       {
-        p = (Point) iter.next();
+        p = iter.next();
         if (p.x == x && p.y == y)
           return true;
       }
@@ -300,9 +300,9 @@ public class PlayingDesk
    * Draw a collection of dots (the collor must be set before calling the
    * method).
    */
-  public void drawDots(Collection dots, Graphics g, int mode)
+  public void drawDots(Collection<Point> dots, Graphics g, int mode)
   {
-    Iterator iter = dots.iterator();
+    Iterator<Point> iter = dots.iterator();
     int x;
     int y;
 
@@ -312,7 +312,7 @@ public class PlayingDesk
     Point p;
     while (iter.hasNext())
       {
-        p = (Point) iter.next();
+        p = iter.next();
         x = p.x * W + hW;
         y = p.y * W + hW;
 

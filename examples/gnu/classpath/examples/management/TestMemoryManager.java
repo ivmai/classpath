@@ -1,5 +1,5 @@
 /* TestMemoryManager.java -- Tests the memory manager beans.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath examples.
 
@@ -31,10 +31,11 @@ public class TestMemoryManager
 
   public static void main(String[] args)
   {
-    Iterator beans = ManagementFactory.getMemoryManagerMXBeans().iterator();
+    Iterator<MemoryManagerMXBean> beans
+        = ManagementFactory.getMemoryManagerMXBeans().iterator();
     while (beans.hasNext())
       {
-        MemoryManagerMXBean bean = (MemoryManagerMXBean) beans.next();
+        MemoryManagerMXBean bean = beans.next();
         System.out.println("Bean: " + bean);
         System.out.println("Name: " + bean.getName());
         System.out.println("Memory pool names: "

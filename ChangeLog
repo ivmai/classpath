@@ -1,5 +1,103 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* examples/gnu/classpath/examples/CORBA/swing/x5/CanvasWorld.java:
+	(reds, blacks, hints, pointPresent(int, int, Collection),
+	drawDots(Collection, Graphics, int)): Add generic typing.
+	* examples/gnu/classpath/examples/CORBA/swing/x5/PlayingDesk.java:
+	(reds, blacks, hints, checkFinished(Collection, Point),
+	pointPresent(int, int, Collection), drawDots(Collection, Graphics,
+	int)): Likewise.
+	* examples/gnu/classpath/examples/awt/AicasGraphicsBenchmark.java:
+	(printReport(), TestSet.testsMap, TestSet.testIterator()): Likewise.
+	* examples/gnu/classpath/examples/awt/Demo.java:
+	(MainWindow.windows, MainWindow.buttons, MainWindow.MainWindow()):
+	Likewise.
+	* examples/gnu/classpath/examples/datatransfer/Demo.java:
+	(actionPerformed, FilesComponent.setFiles(List)): Likewise.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmark.java:
+	(printReport(), TestSet.testsMap, TestSet.testIterator()): Likewise.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmarkGUI.java:
+	(run(), Harness.elements, Harness.Harness(Hashtable, JLabel),
+	Harness.printReport(), ResultsDisplay.testResults,
+	ResultsDisplay.testDetails, ResultsDisplay.ResultsDisplay(),
+	ResultsDisplay.report(List),
+	ResultsDisplay.actionPerformed(ActionEvent)): Likewise.
+	* examples/gnu/classpath/examples/management/TestGarbageCollector.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/management/TestMemoryManager.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/management/TestMemoryPool.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/midi/Demo.java:
+	(inDevices, outDevices): Likewise.
+	* examples/gnu/classpath/examples/print/Demo.java:
+	(actionPerformed(ActionEvent)): Likewise.
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	(history, HtmlDemo()): Likewise.
+	* examples/gnu/classpath/examples/swing/TableDemo.java:
+	(getColumnClass(int)): Likewise.
+	* examples/gnu/classpath/examples/CORBA/swing/x5/CanvasWorld.java:
+	pointPresent(int, int, Collection), drawDots(Collection, Graphics,
+	int)): Remove cast (redundant after making the type generic).
+	* examples/gnu/classpath/examples/CORBA/swing/x5/PlayingDesk.java:
+	(reds, blacks, hints, checkFinished(Collection, Point),
+	pointPresent(int, int, Collection), drawDots(Collection, Graphics,
+	int)): Likewise.
+	* examples/gnu/classpath/examples/awt/AicasGraphicsBenchmark.java:
+	(printReport(), TestSet.getTest(String)): Likewise.
+	* examples/gnu/classpath/examples/awt/Demo.java:
+	(MainWindow.MainWindow()): Likewise.
+	* examples/gnu/classpath/examples/datatransfer/Demo.java:
+	(FilesComponent.setFiles(List)): Likewise.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmark.java:
+	(printReport(), TestSet.getTest(String)): Likewise.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmarkGUI.java:
+	(Harness.printReport(), ResultsDisplay.publish(LogRecord),
+	ResultsDisplay.actionPerformed(ActionEvent)): Likewise.
+	* examples/gnu/classpath/examples/management/TestGarbageCollector.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/management/TestMemoryManager.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/management/TestMemoryPool.java:
+	(main): Likewise.
+	* examples/gnu/classpath/examples/midi/Demo.java:
+	(itemStateChanged(ItemEvent)): Likewise.
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	(createToolBar()): Likewise.
+	* examples/gnu/classpath/examples/awt/AicasGraphicsBenchmark.java:
+	(withClipping): Remove unused.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmark.java:
+	(withClipping): Likewise.
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	(DEBUG): Likewise.
+	* examples/gnu/classpath/examples/swing/TextAreaDemo.java:
+	(paintHighlight(Graphics, Rectangle)): Likewise.
+	* examples/gnu/classpath/examples/swing/TextFieldDemo.java:
+	(paintHighlight(Graphics, Rectangle)): Likewise.
+	* examples/gnu/classpath/examples/datatransfer/Demo.java:
+	(actionPerformed): Add annotation to suppress "unchecked" compiler
+	warning; add comment for every empty catch block.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmarkGUI.java:
+	Import java.util.List.
+	* examples/gnu/classpath/examples/midi/Demo.java: Likewise.
+	* examples/gnu/classpath/examples/java2d/J2dBenchmarkGUI.java:
+	(Harness.printReport(), ResultsDisplay.testResults,
+	ResultsDisplay.testDetails, ResultsDisplay.report(ArrayList)): Use
+	List instead of ArrayList.
+	* examples/gnu/classpath/examples/midi/Demo.java:
+	(inDevices, outDevices): Likewise.
+	* examples/gnu/classpath/examples/midi/Demo.java: Replace
+	type-import-on-demand with a single-type-import.
+	* examples/gnu/classpath/examples/print/Demo.java: Import
+	java.util.Set.
+	* examples/gnu/classpath/examples/print/Demo.java:
+	(actionPerformed(ActionEvent)): Use Set instead of HashSet.
+	* examples/gnu/classpath/examples/swing/HtmlDemo.java:
+	(LoadActionListener.actionPerformed(ActionEvent)): Don't call
+	getText() twice (use urlStr local variable instead).
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* native/jni/java-util/java_util_VMTimeZone.c:
 	Include jcl.h file.
 	(Java_java_util_VMTimeZone_getSystemTimeZoneId): Throw

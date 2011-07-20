@@ -1,5 +1,5 @@
 /* HtmlDemo.java -- HTML viewer demo
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -83,7 +83,7 @@ public class HtmlDemo extends JPanel
       String urlStr = url.getText();
       try
         {
-          setPage(new URL(url.getText()));
+          setPage(new URL(urlStr));
         }
       catch (MalformedURLException ex)
         {
@@ -92,11 +92,6 @@ public class HtmlDemo extends JPanel
         }
     }
   }
-
-  /**
-   * Setting this to true causes the parsed element structure to be dumped.
-   */
-  private static final boolean DEBUG = true;
 
   /**
    * The URL entry field.
@@ -112,12 +107,12 @@ public class HtmlDemo extends JPanel
    *
    * Package private to avoid accessor method.
    */
-  LinkedList history;
+  LinkedList<URL> history;
 
   public HtmlDemo()
   {
     super();
-    history = new LinkedList();
+    history = new LinkedList<URL>();
     createContent();
   }
 
@@ -209,8 +204,8 @@ public class HtmlDemo extends JPanel
       {
         if (history.size() > 1)
           {
-            URL last = (URL) history.removeLast();
-            last = (URL) history.getLast();
+            URL last = history.removeLast();
+            last = history.getLast();
             url.setText(last.toString());
             try
               {
@@ -234,7 +229,7 @@ public class HtmlDemo extends JPanel
       {
         if (history.size() > 0)
           {
-            URL last = (URL) history.getLast();
+            URL last = history.getLast();
             url.setText(last.toString());
             try
               {

@@ -1,5 +1,5 @@
 /* TestGarbageCollector.java -- Tests the garbage collector beans.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath examples.
 
@@ -31,10 +31,11 @@ public class TestGarbageCollector
 
   public static void main(String[] args)
   {
-    Iterator beans = ManagementFactory.getGarbageCollectorMXBeans().iterator();
+    Iterator<GarbageCollectorMXBean> beans
+        = ManagementFactory.getGarbageCollectorMXBeans().iterator();
     while (beans.hasNext())
       {
-        GarbageCollectorMXBean bean = (GarbageCollectorMXBean) beans.next();
+        GarbageCollectorMXBean bean = beans.next();
         System.out.println("Bean: " + bean);
         System.out.println("Name: " + bean.getName());
         System.out.println("Memory pool names: "
