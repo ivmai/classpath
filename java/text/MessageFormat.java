@@ -650,10 +650,10 @@ public class MessageFormat extends Format
           }
         else if (formatter != null)
           {
-            pos.setIndex(index);
-            value = formatter.parseObject(sourceStr, pos);
-            if (value != null)
-              index = pos.getIndex();
+            ParsePosition subpos = new ParsePosition(index);
+            value = formatter.parseObject(sourceStr, subpos);
+            index = value != null ? subpos.getIndex() :
+				    subpos.getErrorIndex();
           }
         else
           {
@@ -692,6 +692,7 @@ public class MessageFormat extends Format
         index += elements[i].trailer.length();
       }
 
+    pos.setIndex(index); // update pos
     return results.toArray(new Object[results.size()]);
   }
 

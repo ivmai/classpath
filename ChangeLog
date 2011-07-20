@@ -1,5 +1,15 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/text/ChoiceFormat.java: (parse(String, ParsePosition)): Return
+	the value corresponding to the longest match; update the comment.
+	(quoteString(CPStringBuilder, String)): Make the private method
+	static.
+	* java/text/MessageFormat.java: (parse(String, ParsePosition)):
+	Adjust pos index at method return; pass subpos (instead of pos) to
+	formatter.parseObject().
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* javax/swing/text/ParagraphView.java:
 	(nextTabStop(float,int)): Implement; document.
 	(DEF_TAB_STOP_OFFSET): New private static field (used by nextTabStop).
