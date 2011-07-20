@@ -1,5 +1,20 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/util/Collections.java:
+	(emptySet(), EmptySet.iterator(), emptyList(), emptyMap(),
+	EmptyMap.entrySet(), EmptyMap.keySet(), EmptyMap.values(),
+	SingletonList.subList(int, int)): Suppress "unchecked" warnings.
+	(emptySet(), emptyList(), emptyMap()): Don't create new instance (use
+	the corresponding immutable container instance); remove FIXME.
+	(EmptySet.equals(Object), EmptyList.equals(Object),
+	EmptyMap.entrySet(), EmptyMap.equals(Object), EmptyMap.keySet(),
+	EmptyMap.values(), SingletonList.subList(int, int)): Add generic
+	typing.
+	(SynchronizedCollection.toArray(T[])): Rename T type to E (to
+	suppress compiler warning about type hiding).
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* examples/gnu/classpath/examples/CORBA/swing/x5/CanvasWorld.java:
 	(reds, blacks, hints, pointPresent(int, int, Collection),
 	drawDots(Collection, Graphics, int)): Add generic typing.
