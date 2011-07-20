@@ -1,5 +1,50 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/text/SimpleDateFormat.java: (CompiledField,
+	CompiledField.field, CompiledField.character): Make final.
+	* java/text/DecimalFormat.java: (attributes): Likewise.
+	* java/text/SimpleDateFormat.java: (CompiledField,
+	translateLocalizedPattern(String,String,String), withLeadingZeros(int,
+	int,FormatBuffer), expect(String,ParsePosition, char),
+	computeOffset(String,ParsePosition)): Make the private entity static.
+	* java/text/DecimalFormat.java: (equals(String,String),
+	patternChars(DecimalFormatSymbols), quoteFix(String,String)): Likewise.
+	* java/text/SimpleDateFormat.java: (CompiledField(int,int,char),
+	CompiledField.getField(), CompiledField.getSize(),
+	CompiledField.getCharacter()): Make package-private (instead of
+	public).
+	(parse(String, ParsePosition)): Apply numberFormat.parse() to
+	dateStr substring only if dateStr has enough length; apply
+	numberFormat.parse() to dateStr starting from its beginning (instead
+	of pos position) so not to adjust pos before and after that call;
+	don't test pos for null value; if n is non-null but not of Long type
+	then set error position before returning null; use String
+	regionMatches() instead of toUpperCase().startsWith().
+	(computeOffset(String,ParsePosition)): Treat null returned by
+	matcher.group(3) as the empty string; refine the documentation.
+	* java/text/DecimalFormat.java: (minExponentDigits): Fix comment typo.
+	(parse(String, ParsePosition)): Use String startsWith() instead of
+	contains(); adjust pos index before returning; don't use (remove)
+	isPositive, hasPositiveSuffix and positiveEqualsNegative local
+	variables; set positiveLen and negativeLen local variables only if
+	needed; don't reassign isNegative local variable to the same value;
+	handle infinity case before building number value; fix stop local
+	variable value computing (for the case when no fraction part and for
+	the case of useExponentialNotation reserving also the space for 'E'
+	symbol); increment i in 'for' clause (making the algorithm a bit more
+	clearer) instead of incrementing it after chatAt() and decrementing it
+	at break; handle the cases (when building number) of zero, exponent
+	and minus symbols are not equal to '0', 'e' and '-', respectively;
+	don't allow exponent symbol unless useExponentialNotation and the
+	exponent part is not seen yet; allow minus symbol (when building
+	number value) only for the exponent part; don't test i value to be the
+	same as start one in addition to the empty number string test; use
+	String regionMatches() instead of endsWith() when testing for the
+	suffix; adjust pos index properly (taking into account the suffix
+	length).
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/text/ChoiceFormat.java: (parse(String, ParsePosition)): Return
 	the value corresponding to the longest match; update the comment.
 	(quoteString(CPStringBuilder, String)): Make the private method

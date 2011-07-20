@@ -1,5 +1,6 @@
 /* DecimalFormat.java -- Formats and parses numbers
-   Copyright (C) 1999, 2000, 2001, 2003, 2004, 2005  Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2001, 2003, 2004, 2005, 2010
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -132,7 +133,7 @@ public class DecimalFormat extends NumberFormat
 
   /**
    * This is an internal parameter used to keep track of the number
-   * of digits the form the exponent, when exponential notation is used.
+   * of digits that form the exponent, when exponential notation is used.
    * It is used with <code>exponentRound</code>
    */
   private byte minExponentDigits;
@@ -177,7 +178,7 @@ public class DecimalFormat extends NumberFormat
   private boolean hasFractionalPattern;
 
   /** Stores a list of attributes for use by formatToCharacterIterator. */
-  private ArrayList attributes = new ArrayList();
+  private final ArrayList attributes = new ArrayList();
 
   /**
    * Constructs a <code>DecimalFormat</code> which uses the default
@@ -584,19 +585,19 @@ public class DecimalFormat extends NumberFormat
    */
   public Number parse(String str, ParsePosition pos)
   {
+    // starting parsing position
+    int start = pos.getIndex();
+
     // a special values before anything else
     // NaN
-    if (str.contains(this.symbols.getNaN()))
-      return Double.valueOf(Double.NaN);
-
-    // this will be our final number
-    CPStringBuilder number = new CPStringBuilder();
+    if (str.startsWith(symbols.getNaN(), start))
+      {
+        pos.setIndex(start + symbols.getNaN().length()); // adjust pos
+        return Double.valueOf(Double.NaN);
+      }
 
     // special character
     char minus = symbols.getMinusSign();
-
-    // starting parsing position
-    int start = pos.getIndex();
 
     // validate the string, it have to be in the
     // same form as the format string or parsing will fail
@@ -606,43 +607,52 @@ public class DecimalFormat extends NumberFormat
 
     // we check both prefixes, because one might be empty.
     // We want to pick the longest prefix that matches.
-    int positiveLen = positivePrefix.length();
-    int negativeLen = _negativePrefix.length();
-
-    boolean isNegative = str.startsWith(_negativePrefix);
-    boolean isPositive = str.startsWith(positivePrefix);
-
-    if (isPositive && isNegative)
+    boolean isNegative = str.startsWith(_negativePrefix, start);
+    if (str.startsWith(positivePrefix, start))
       {
-        // By checking this way, we preserve ambiguity in the case
-        // where the negative format differs only in suffix.
-        if (negativeLen > positiveLen)
+        int positiveLen = positivePrefix.length();
+        if (isNegative)
           {
-            start += _negativePrefix.length();
-            isNegative = true;
+            // By checking this way, we preserve ambiguity in the case
+            // where the negative format differs only in suffix.
+            int negativeLen = _negativePrefix.length();
+            if (negativeLen < positiveLen)
+              {
+                isNegative = false;
+                start += positiveLen;
+              }
+            else
+              start += negativeLen;
           }
         else
-          {
-            start += positivePrefix.length();
-            isPositive = true;
-            if (negativeLen < positiveLen)
-              isNegative = false;
-          }
+          start += positiveLen;
       }
     else if (isNegative)
       {
         start += _negativePrefix.length();
-        isPositive = false;
-      }
-    else if (isPositive)
-      {
-        start += positivePrefix.length();
-        isNegative = false;
       }
     else
       {
         pos.setErrorIndex(start);
         return null;
+      }
+
+    // 2nd special case: infinity
+    if (str.startsWith(symbols.getInfinity(), start))
+      {
+        pos.setIndex(start + symbols.getInfinity().length());
+
+        // FIXME: ouch, this is really ugly and lazy code...
+        if (this.parseBigDecimal)
+          {
+            if (isNegative)
+              return BigDecimal.valueOf(Double.NEGATIVE_INFINITY);
+            return BigDecimal.valueOf(Double.POSITIVE_INFINITY);
+          }
+
+        if (isNegative)
+          return Double.valueOf(Double.NEGATIVE_INFINITY);
+        return Double.valueOf(Double.POSITIVE_INFINITY);
       }
 
     // other special characters used by the parser
@@ -651,10 +661,11 @@ public class DecimalFormat extends NumberFormat
     char exponent = symbols.getExponential();
 
     // stop parsing position in the string
-    int stop = start + this.maximumIntegerDigits + maximumFractionDigits + 2;
-
+    int stop = start + maximumIntegerDigits;
+    if (maximumFractionDigits > 0)
+      stop += maximumFractionDigits + 1;
     if (useExponentialNotation)
-      stop += minExponentDigits + 1;
+      stop += (minExponentDigits > 0 ? minExponentDigits : 1) + 2;
 
     boolean inExponent = false;
 
@@ -663,74 +674,51 @@ public class DecimalFormat extends NumberFormat
     if (len < stop) stop = len;
     char groupingSeparator = symbols.getGroupingSeparator();
 
-    int i = start;
-    while (i < stop)
+    // this will be our final number
+    CPStringBuilder number = new CPStringBuilder();
+
+    int i;
+    for (i = start; i < stop; i++)
       {
         char ch = str.charAt(i);
-        i++;
-
         if (ch >= zero && ch <= (zero + 9))
           {
-            number.append(ch);
+            number.append((char)(ch - (zero - '0')));
           }
         else if (this.parseIntegerOnly)
           {
-            i--;
             break;
           }
         else if (ch == decimalSeparator)
           {
             number.append('.');
           }
-        else if (ch == exponent)
+        else if (ch == exponent && !inExponent && useExponentialNotation)
           {
-            number.append(ch);
-            inExponent = !inExponent;
+            number.append('e');
+            inExponent = true;
           }
-        else if ((ch == '+' || ch == '-' || ch == minus))
+        else if (ch == '+' || ch == '-' || ch == minus)
           {
             if (inExponent)
-              number.append(ch);
+              {
+                if (ch != '+')
+                  number.append('-');
+              }
             else
               {
-                i--;
                 break;
               }
           }
         else
           {
             if (!groupingUsed || ch != groupingSeparator)
-              {
-                i--;
-                break;
-              }
+              break;
           }
-      }
-
-    // 2nd special case: infinity
-    // XXX: need to be tested
-    if (str.contains(symbols.getInfinity()))
-      {
-        int inf = str.indexOf(symbols.getInfinity());
-        pos.setIndex(inf);
-
-        // FIXME: ouch, this is really ugly and lazy code...
-        if (this.parseBigDecimal)
-          {
-            if (isNegative)
-              return BigDecimal.valueOf(Double.NEGATIVE_INFINITY);
-
-            return BigDecimal.valueOf(Double.POSITIVE_INFINITY);
-          }
-
-        if (isNegative)
-          return Double.valueOf(Double.NEGATIVE_INFINITY);
-
-        return Double.valueOf(Double.POSITIVE_INFINITY);
       }
 
     // no number...
-    if (i == start || number.length() == 0)
+    if (number.length() == 0)
       {
         pos.setErrorIndex(i);
         return null;
@@ -738,25 +726,21 @@ public class DecimalFormat extends NumberFormat
 
     // now we have to check the suffix, done here after number parsing
     // or the index will not be updated correctly...
-    boolean hasNegativeSuffix = str.endsWith(this.negativeSuffix);
-    boolean hasPositiveSuffix = str.endsWith(this.positiveSuffix);
-    boolean positiveEqualsNegative = negativeSuffix.equals(positiveSuffix);
-
-    positiveLen = positiveSuffix.length();
-    negativeLen = negativeSuffix.length();
-
+    int positiveLen = positiveSuffix.length();
+    int negativeLen = negativeSuffix.length();
+    boolean hasNegativeSuffix = str.regionMatches(i, negativeSuffix, 0,
+                                                  negativeLen);
     if (isNegative && !hasNegativeSuffix)
       {
         pos.setErrorIndex(i);
         return null;
       }
-    else if (hasNegativeSuffix &&
-             !positiveEqualsNegative &&
-             (negativeLen > positiveLen))
+    else if (hasNegativeSuffix && negativeLen > positiveLen
+             && !negativeSuffix.equals(positiveSuffix))
       {
         isNegative = true;
       }
-    else if (!hasPositiveSuffix)
+    else if (!str.regionMatches(i, positiveSuffix, 0, positiveLen))
       {
         pos.setErrorIndex(i);
         return null;
@@ -764,7 +748,7 @@ public class DecimalFormat extends NumberFormat
 
     if (isNegative) number.insert(0, '-');
 
-    pos.setIndex(i);
+    pos.setIndex(i + (isNegative ? negativeLen : positiveLen));
 
     // now we handle the return type
     BigDecimal bigDecimal = new BigDecimal(number.toString());
@@ -1012,7 +996,7 @@ public class DecimalFormat extends NumberFormat
    * @return <code>true</code> if the strings are both <code>null</code> or
    * equals.
    */
-  private boolean equals(String s1, String s2)
+  private static boolean equals(String s1, String s2)
   {
     if (s1 == null || s2 == null)
       return s1 == s2;
@@ -1026,7 +1010,7 @@ public class DecimalFormat extends NumberFormat
    * This helper function creates a string consisting of all the
    * characters which can appear in a pattern and must be quoted.
    */
-  private String patternChars (DecimalFormatSymbols syms)
+  private static String patternChars (DecimalFormatSymbols syms)
   {
     CPStringBuilder buf = new CPStringBuilder ();
 
@@ -1053,7 +1037,7 @@ public class DecimalFormat extends NumberFormat
    * @param patChars
    * @return A StringBuffer with special characters quoted.
    */
-  private CPStringBuilder quoteFix(String text, String patChars)
+  private static CPStringBuilder quoteFix(String text, String patChars)
   {
     CPStringBuilder buf = new CPStringBuilder();
 
