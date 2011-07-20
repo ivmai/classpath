@@ -200,14 +200,6 @@ final class VMFile
   static native boolean isDirectory(String dirpath);
 
   /**
-   * This methods checks if a directory can be written to.
-   */
-  static boolean canWriteDirectory(File path)
-  {
-    return canWriteDirectory(path.getAbsolutePath());
-  }
-
-  /**
    * This method returns an array of filesystem roots.  Some operating systems
    * have volume oriented filesystem.  This method provides a mechanism for
    * determining which volumes exist.  GNU systems use a single hierarchical
@@ -220,6 +212,7 @@ final class VMFile
    */
   static File[] listRoots()
   {
+        // FIXME: implemented for Unix only
         File[] roots = new File[1];
         roots[0] = new File("/");
         return roots;
@@ -239,7 +232,8 @@ final class VMFile
   static boolean isHidden(String path)
   {
         // FIXME: this only works on UNIX
-        return getName(path).startsWith(".");
+    String name = path.substring(path.lastIndexOf(File.separatorChar) + 1);
+    return name.startsWith(".") && !name.equals(".") && !name.equals("..");
   }
 
   /**
@@ -251,14 +245,9 @@ final class VMFile
    */
   static String getName(String path)
   {
-        int pos = PlatformHelper.lastIndexOfSeparator(path);
-        if (pos == -1)
-          return path;
-
-        if (PlatformHelper.endWithSeparator(path))
-          return "";
-
-        return path.substring(pos + File.separator.length());
+    int prefixLen = PlatformHelper.beginWithRootPathPrefix(path);
+    int pos = path.lastIndexOf(File.separatorChar);
+    return path.substring(pos >= prefixLen ? pos + 1 : prefixLen);
   }
 
   /**
@@ -318,7 +307,8 @@ final class VMFile
    * This method returns true if the path represents an absolute file
    * path and false if it does not.  The definition of an absolute path varies
    * by system.  As an example, on GNU systems, a path is absolute if it starts
-   * with a "/".
+   * with a "/". On Win32 systems, a path is absolute if it starts with
+   * "d:\" ('d' is a drive letter) or "\\server\share".
    *
    * @param path the path to check
    *
@@ -327,15 +317,11 @@ final class VMFile
    */
   static boolean isAbsolute(String path)
   {
-    if (File.separatorChar == '\\')
-        return path.startsWith(File.separator + File.separator)
-               || (path.length() > 2
-                   && ((path.charAt(0) >= 'a' && path.charAt(0) <= 'z')
-                       || (path.charAt(0) >= 'A' && path.charAt(0) <= 'Z'))
-                       && path.charAt(1) == ':'
-                       && path.charAt(2) == '\\');
-    else
-      return path.startsWith(File.separator);
+    int prefixLen = PlatformHelper.beginWithRootPathPrefix(path);
+    return prefixLen > 0 // has root path prefix?
+            && (File.separatorChar != '\\' // is Unix?
+                || prefixLen > 2 // filter out "\path" and "d:path" cases
+                || (prefixLen == 2 && path.charAt(1) != ':'));
   }
 
   /**
@@ -355,12 +341,22 @@ final class VMFile
   {
     // On Win32, Sun's JDK returns URLs of the form "file:/c:/foo/bar.txt",
     // while on UNIX, it returns URLs of the form "file:/foo/bar.txt".
-    if (File.separatorChar == '\\')
-      return new URL ("file:/" + file.getAbsolutePath().replace ('\\', '/')
-                      + (file.isDirectory() ? "/" : ""));
-    else
-      return new URL ("file:" + file.getAbsolutePath()
-                      + (file.isDirectory() ? "/" : ""));
+    String path = file.getPath();
+    String urlPath = getAbsolutePath(path).replace(File.separatorChar, '/');
+    int len = urlPath.length();
+    if (len > 0)
+      {
+        if (urlPath.charAt(len - 1) != '/' && isDirectory(path))
+          urlPath += "/";
+        if (urlPath.charAt(0) == '/')
+          {
+            if (len > 1 && urlPath.charAt(1) == '/') // Windows UNC path?
+              urlPath = "//" + urlPath;
+          }
+        else
+          urlPath = "/" + urlPath;
+      }
+    return new URL("file:" + urlPath);
   }
 
    /**

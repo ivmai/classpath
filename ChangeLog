@@ -1,3 +1,17 @@
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
+	* vm/reference/java/io/VMFile.java:
+	(canWriteDirectory(File)): Remove unused method.
+	(listRoots()): Add FIXME.
+	(isHidden(String)): Filter out "." and ".." cases; inline getName()
+	call for Unix case.
+	(getName(String)): Use PlatformHelper.beginWithRootPathPrefix() and
+	handle all Windows (and Novell NetWare) path cases correctly.
+	(isAbsolute(String)): Likewise.
+	(isAbsolute(String)): Update the documentation.
+	(toURL(File)): Don't append '/' if the path is already terminated
+	with it; handle Windows UNC paths.
+
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
 	* java/io/File.java:
