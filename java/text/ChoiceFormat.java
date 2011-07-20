@@ -397,17 +397,34 @@ public class ChoiceFormat extends NumberFormat
   /**
    * I'm not sure what this method is really supposed to do, as it is
    * not documented.
+   * We try to find the longest match.
    */
   public Number parse (String sourceStr, ParsePosition pos)
   {
     int index = pos.getIndex();
+    int maxEndPos = -1; // initially must be less than pos index.
+    int bestItemIdx = -1; // index of the best matching choice.
+
     for (int i = 0; i < choiceLimits.length; ++i)
       {
-        if (sourceStr.startsWith(choiceFormats[i], index))
+        String choiceFormat = choiceFormats[i];
+        if (sourceStr.startsWith(choiceFormat, index))
           {
-            pos.setIndex(index + choiceFormats[i].length());
-            return Double.valueOf (choiceLimits[i]);
+            int endPos = index + choiceFormat.length();
+            if (maxEndPos < endPos)
+              {
+                bestItemIdx = i;
+                maxEndPos = endPos;
+                if (endPos == sourceStr.length())
+                  break; // maxEndPos limit is reached
+              }
           }
+      }
+
+    if (bestItemIdx != -1)
+      {
+        pos.setIndex(maxEndPos);
+        return Double.valueOf(choiceLimits[bestItemIdx]);
       }
     pos.setErrorIndex(index);
     return Double.valueOf (Double.NaN);
@@ -444,7 +461,7 @@ public class ChoiceFormat extends NumberFormat
     this.choiceLimits = (double[]) choiceLimits.clone();
   }
 
-  private void quoteString (CPStringBuilder dest, String text)
+  private static void quoteString (CPStringBuilder dest, String text)
   {
     int max = text.length();
     for (int i = 0; i < max; ++i)
