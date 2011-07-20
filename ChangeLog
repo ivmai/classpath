@@ -1,5 +1,11 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* test/Makefile.am: Add java.text to SUBDIRS.
+	* test/java.text/Makefile.am: New file.
+	* test/java.text/SimpleDateFormatTest.java: Likewise.
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/text/DecimalFormat.java: (parse): Set parse stop position to
 	the end of string (to match the RI behavior); create number string
 	buffer specifying its capacity.
