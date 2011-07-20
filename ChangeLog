@@ -1,5 +1,11 @@
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
+	* java/text/DecimalFormat.java: (parse): Set parse stop position to
+	the end of string (to match the RI behavior); create number string
+	buffer specifying its capacity.
+
+2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
+
 	* java/text/SimpleDateFormat.java: (CompiledField,
 	CompiledField.field, CompiledField.character): Make final.
 	* java/text/DecimalFormat.java: (attributes): Likewise.
