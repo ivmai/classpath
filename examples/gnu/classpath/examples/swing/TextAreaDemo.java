@@ -1,5 +1,5 @@
 /* TextAreaDemo.java -- An example showing various textareas in Swing.
- Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ Copyright (C) 2005, 2006, 2011  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath examples.
 
@@ -132,11 +132,6 @@ public class TextAreaDemo
     public DemoHighlightPainter()
     {
       super();
-    }
-
-    private void paintHighlight(Graphics g, Rectangle rect)
-    {
-      g.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent t)

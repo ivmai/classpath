@@ -1,5 +1,5 @@
 /* CanvasWorld.java --
- Copyright (C) 2005 Free Software Foundation, Inc.
+ Copyright (C) 2005, 2011  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath.
 
@@ -111,17 +111,17 @@ public class CanvasWorld
   /**
    * The collection of the red dots.
    */
-  ArrayList reds = new ArrayList();
+  ArrayList<Point> reds = new ArrayList<Point>();
 
   /**
    * The collection of the black crosses.
    */
-  ArrayList blacks = new ArrayList();
+  ArrayList<Point> blacks = new ArrayList<Point>();
 
   /**
    * The collection of the smaller blue crosses.
    */
-  ArrayList hints = new ArrayList();
+  ArrayList<Point> hints = new ArrayList<Point>();
 
   public CanvasWorld()
   {
@@ -159,13 +159,13 @@ public class CanvasWorld
   /**
    * Check for the presence of the given point in the collection.
    */
-  public final boolean pointPresent(int x, int y, Collection in)
+  public final boolean pointPresent(int x, int y, Collection<Point> in)
   {
-    Iterator iter = in.iterator();
+    Iterator<Point> iter = in.iterator();
     Point p;
     while (iter.hasNext())
       {
-        p = (Point) iter.next();
+        p = iter.next();
         if (p.x == x && p.y == y)
           return true;
       }
@@ -214,9 +214,9 @@ public class CanvasWorld
    * Draw a collection of dots (the collor must be set before calling the
    * method).
    */
-  public void drawDots(Collection dots, Graphics g, int mode)
+  public void drawDots(Collection<Point> dots, Graphics g, int mode)
   {
-    Iterator iter = dots.iterator();
+    Iterator<Point> iter = dots.iterator();
     int x;
     int y;
 
@@ -226,7 +226,7 @@ public class CanvasWorld
     Point p;
     while (iter.hasNext())
       {
-        p = (Point) iter.next();
+        p = iter.next();
         x = p.x * W + hW;
         y = p.y * W + hW;
 

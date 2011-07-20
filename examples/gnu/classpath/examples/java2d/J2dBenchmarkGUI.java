@@ -1,5 +1,5 @@
 /* J2dBenchmarkGUI.java -- GUI for java2d benchmarker
- Copyright (C) 2006  Free Software Foundation, Inc.
+ Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath.
 
@@ -51,6 +51,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -107,7 +108,7 @@ public class J2dBenchmarkGUI
   {
     // Store all elements in a hashtable so that they can be passed into the
     // harness easily.
-    Hashtable elements = new Hashtable();
+    Hashtable<String, Object> elements = new Hashtable<String, Object>();
 
     // Set up frame
     final JFrame frame = new JFrame("Java2D benchmark");
@@ -411,7 +412,7 @@ public class J2dBenchmarkGUI
   private class Harness
       implements ActionListener
   {
-    Hashtable elements;
+    Hashtable<String, Object> elements;
 
     JLabel errorLabel;
 
@@ -421,7 +422,7 @@ public class J2dBenchmarkGUI
      * @param elements Hashtable containing the swing elements from the GUI
      * @param errorLabel JLabel on which to display any error messages
      */
-    public Harness(Hashtable elements, JLabel errorLabel)
+    public Harness(Hashtable<String, Object> elements, JLabel errorLabel)
     {
       super();
 
@@ -715,10 +716,10 @@ public class J2dBenchmarkGUI
     void printReport()
     {
       // Report test results to the GUI display
-      ArrayList results = new ArrayList();
-      for (Iterator i = testSetMap.testIterator(); i.hasNext();)
+      List<String> results = new ArrayList<String>();
+      for (Iterator<String> i = testSetMap.testIterator(); i.hasNext();)
         {
-          TestRecorder recorder = testSetMap.getTest((String) i.next());
+          TestRecorder recorder = testSetMap.getTest(i.next());
 
           results.add("TEST " + recorder.getTestName() + ": average "
                       + recorder.getAverage() + "ms [" + recorder.getMinTime()
@@ -765,21 +766,21 @@ public class J2dBenchmarkGUI
     /**
      * Store all test results
      */
-    ArrayList testResults;
+    List<List<String>> testResults;
 
     /**
      * Store all test details
      */
-    ArrayList testDetails;
+    List<List<String>> testDetails;
 
     /**
      * Initialize variables
      */
     public ResultsDisplay()
     {
-      testResults = new ArrayList();
-      testDetails = new ArrayList();
-      testDetails.add(new ArrayList());
+      testResults = new ArrayList<List<String>>();
+      testDetails = new ArrayList<List<String>>();
+      testDetails.add(new ArrayList<String>());
     }
 
     /**
@@ -833,7 +834,7 @@ public class J2dBenchmarkGUI
      */
     public void publish(LogRecord record)
     {
-      ((ArrayList) testDetails.get(testDetails.size() - 1)).add(record.getMessage());
+      testDetails.get(testDetails.size() - 1).add(record.getMessage());
     }
 
     /**
@@ -841,10 +842,10 @@ public class J2dBenchmarkGUI
      *
      * @param results test results
      */
-    public void report(ArrayList results)
+    public void report(List<String> results)
     {
       testResults.add(results);
-      testDetails.add(new ArrayList());
+      testDetails.add(new ArrayList<String>());
     }
 
     /**
@@ -871,16 +872,16 @@ public class J2dBenchmarkGUI
       String message = "";
 
       // Display summary or details, as requested
-      Iterator it;
+      Iterator<String> it;
       if (details.isSelected())
-        it = ((ArrayList) testDetails.get(iteration)).iterator();
+        it = testDetails.get(iteration).iterator();
       else
-        it = ((ArrayList) testResults.get(iteration)).iterator();
+        it = testResults.get(iteration).iterator();
 
       // Parse the ArrayList's
       while (it.hasNext())
         {
-          message = message + ((String) it.next() + "\n");
+          message = message + it.next() + "\n";
         }
 
       // Output to screen

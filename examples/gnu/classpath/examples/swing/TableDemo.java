@@ -1,5 +1,5 @@
 /* TableDemo.java -- Demonstrates the use of JTable.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -141,7 +141,7 @@ public class TableDemo extends JPanel
      * The first column contains booleans, the second - icons,
      * others - default class.
      */
-    public Class getColumnClass(int column)
+    public Class<?> getColumnClass(int column)
     {
       if (column == 0)
         return Boolean.class;

@@ -1,5 +1,6 @@
 /* Demo.java -- Shows examples of AWT components
-   Copyright (C) 1998, 1999, 2002, 2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2002, 2004, 2006, 2011
+   Free Software Foundation, Inc.
 
 This file is part of GNU Classpath examples.
 
@@ -146,8 +147,8 @@ class Demo
   {
     Button closeButton;
 
-    Hashtable windows;
-    Vector buttons;
+    Hashtable<Button,Object> windows;
+    Vector<Button> buttons;
 
     void addSubWindow (String name, SubWindow w)
     {
@@ -199,8 +200,8 @@ class Demo
       closeButton.setFont (new Font ("Serif", Font.BOLD | Font.ITALIC, 18));
       add (closeButton, "South");
 
-      windows = new Hashtable ();
-      buttons = new Vector ();
+      windows = new Hashtable<Button,Object> ();
+      buttons = new Vector<Button> ();
 
       addSubWindow ("Buttons", new ButtonsWindow ());
       addSubWindow ("Cursors", new CursorsWindow ());
@@ -221,9 +222,9 @@ class Demo
       PrettyPanel p = new PrettyPanel();
       p.setLayout (new GridLayout (windows.size(), 1));
 
-      for (Enumeration e = buttons.elements (); e.hasMoreElements (); )
+      for (Enumeration<Button> e = buttons.elements (); e.hasMoreElements (); )
         {
-          p.add ((Button) e.nextElement ());
+          p.add (e.nextElement ());
         }
 
       sp.add (p);

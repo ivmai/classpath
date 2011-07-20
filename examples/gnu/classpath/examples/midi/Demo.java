@@ -1,5 +1,5 @@
 /* Demo.java -- And example of MIDI support
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2011  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath examples.
 
@@ -22,7 +22,8 @@ package gnu.classpath.examples.midi;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.sound.midi.*;
 
 /**
@@ -36,8 +37,8 @@ public class Demo extends Frame implements ItemListener
   MidiDevice inDevice = null;
   MidiDevice outDevice = null;
 
-  ArrayList inDevices = new ArrayList();
-  ArrayList outDevices = new ArrayList();
+  List<MidiDevice> inDevices = new ArrayList<MidiDevice>();
+  List<MidiDevice> outDevices = new ArrayList<MidiDevice>();
 
   public Demo () throws Exception
   {
@@ -95,7 +96,7 @@ public class Demo extends Frame implements ItemListener
           {
             if (inDevice != null)
               inDevice.close();
-            inDevice =  (MidiDevice)
+            inDevice =
               inDevices.get(midiInChoice.getSelectedIndex());
           }
 
@@ -103,7 +104,7 @@ public class Demo extends Frame implements ItemListener
           {
             if (outDevice != null)
               outDevice.close();
-            outDevice = (MidiDevice)
+            outDevice =
               outDevices.get(midiOutChoice.getSelectedIndex());
           }
 
