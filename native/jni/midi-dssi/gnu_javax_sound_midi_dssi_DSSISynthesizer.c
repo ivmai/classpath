@@ -1,5 +1,5 @@
 /* gnu_javax_sound_midi_dssi_DSSISynthesizer.c - DSSI Synth
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2011 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -287,7 +287,8 @@ Java_gnu_javax_sound_midi_dssi_DSSISynthesizer_open_1
   const char **ports;
   int controller = 0;
   dssi_data *data = (dssi_data *) (long) handle;
-  if ((data->jack_client = jack_client_new (data->desc->LADSPA_Plugin->Label)) == 0)
+  if ((data->jack_client = jack_client_open (data->desc->LADSPA_Plugin->Label,
+                                             JackNoStartServer, NULL)) == 0)
     {
       /*	JCL_ThrowException (env, "javax/sound/midi/MidiUnavailableException",   */
       JCL_ThrowException (env, "java/io/IOException", 

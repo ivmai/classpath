@@ -1,3 +1,9 @@
+2011-07-18  Ivan Maidanski  <ivmai@mail.ru>
+
+	* native/jni/midi-dssi/gnu_javax_sound_midi_dssi_DSSISynthesizer.c
+	(Java_gnu_javax_sound_midi_dssi_DSSISynthesizer_open_1): Replace
+	deprecated jack_client_new call with jack_client_open.
+
 2012-06-17  Ivan Maidanski  <ivmai@mail.ru>
 
 	* .gitignore: Add auto-generated "config.h.in~".
