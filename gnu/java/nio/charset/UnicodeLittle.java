@@ -1,5 +1,5 @@
 /* UnicodeLittle.java --
-   Copyright (C) 2005  Free Software Foundation, Inc.
+   Copyright (C) 2005, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -45,8 +45,7 @@ import java.nio.charset.CharsetEncoder;
 /**
  * UTF-16 little endian with a byte-order mark
  * Included for java.io completeness.
- * ("UTF-16" is equal to UnicodeBig, and
- * UTF-16BE/LE do not have a BOM
+ * (UTF-16BE/LE do not have a BOM.)
  */
 final class UnicodeLittle extends Charset
 {

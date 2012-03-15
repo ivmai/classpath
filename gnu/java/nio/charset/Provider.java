@@ -1,5 +1,5 @@
 /* Provider.java --
-   Copyright (C) 2002, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -105,6 +105,9 @@ public final class Provider extends CharsetProvider
 
     // UTF-16
     addCharset (new UTF_16 ());
+
+    // UTF-16BE (marked)
+    addCharset (new UnicodeBig ());
 
     // UTF-16LE (marked)
     addCharset (new UnicodeLittle ());
