@@ -1,5 +1,5 @@
 /* BasicToolBarUI.java --
-   Copyright (C) 2004, 2005, 2006  Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -468,13 +468,15 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
       }
 
     Point p = dragWindow.getOffset();
-    Insets insets = toolBar.getInsets();
+    if (p != null)
+      {
+        Insets insets = toolBar.getInsets();
 
-    dragWindow.setBounds((origin.x + position.x) - p.x
-                         - ((insets.left + insets.right) / 2),
-                         (origin.y + position.y) - p.y
-                         - ((insets.top + insets.bottom) / 2), w, h);
-
+        dragWindow.setBounds((origin.x + position.x) - p.x
+                             - ((insets.left + insets.right) / 2),
+                             (origin.y + position.y) - p.y
+                             - ((insets.top + insets.bottom) / 2), w, h);
+      }
     if (! dragWindow.isVisible())
       dragWindow.show();
   }
@@ -550,10 +552,11 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
     Insets insets = floatFrame.getInsets();
     Dimension dims = toolBar.getPreferredSize();
     p = dragWindow.getOffset();
-    setFloatingLocation((position.x + origin.x) - p.x
-                        - ((insets.left + insets.right) / 2),
-                        (position.y + origin.y) - p.y
-                        - ((insets.top + insets.bottom) / 2));
+    if (p != null)
+      setFloatingLocation((position.x + origin.x) - p.x
+                          - ((insets.left + insets.right) / 2),
+                          (position.y + origin.y) - p.y
+                          - ((insets.top + insets.bottom) / 2));
 
     if (aoc == -1)
       {
@@ -1212,7 +1215,7 @@ public class BasicToolBarUI extends ToolBarUI implements SwingConstants
 
       isDragging = true;
 
-      if (dragWindow != null)
+      if (dragWindow != null && cachedBounds != null)
         dragWindow.setOffset(new Point(cachedBounds.width / 2,
             cachedBounds.height / 2));
 

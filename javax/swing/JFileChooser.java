@@ -1,5 +1,5 @@
 /* JFileChooser.java --
-   Copyright (C) 2002, 2004, 2005, 2006,  Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
 
@@ -615,11 +615,29 @@ public class JFileChooser extends JComponent implements Accessible
    */
   public void setCurrentDirectory(File dir)
   {
-    if (currentDir != dir || dir == null)
-      {
-        if (dir == null)
-          dir = fsv.getDefaultDirectory();
+    if (dir != null && !dir.exists())
+      return;
 
+    if (dir == null)
+      dir = fsv.getDefaultDirectory();
+
+    if (dir != currentDir)
+      {
+        File prev = null;
+        while (!isTraversable(dir) && prev != dir)
+          {
+            prev = dir;
+            dir = getFileSystemView().getParentDirectory(dir);
+            if (dir == null)
+              {
+                dir = fsv.getDefaultDirectory();
+                break;
+              }
+          }
+      }
+
+    if (!dir.equals(currentDir))
+      {
         File old = currentDir;
         currentDir = dir;
         firePropertyChange(DIRECTORY_CHANGED_PROPERTY, old, currentDir);

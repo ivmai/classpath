@@ -1,5 +1,5 @@
 /* BasicTreeUI.java --
- Copyright (C) 2002, 2004, 2005, 2006, Free Software Foundation, Inc.
+ Copyright (C) 2002, 2004, 2005, 2006, 2010  Free Software Foundation, Inc.
 
  This file is part of GNU Classpath.
 
@@ -2738,6 +2738,9 @@ public class BasicTreeUI
         }
       else
         {
+          if (currentCellRenderer == null)
+            return null;
+
           // Not editing, ask renderer for preferred size.
           Component rend =
             currentCellRenderer.getTreeCellRendererComponent(tree, cell,
