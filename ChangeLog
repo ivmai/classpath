@@ -1,3 +1,78 @@
+2012-06-10  Ivan Maidanski  <ivmai@mail.ru>
+
+	* .gitignore: Add '/' prefix to file names existing (and to be
+	ignored) only in the project root folder (INSTALL, aclocal.m4,
+	autom4te*.cache, compile, config.cache, config.guess, config.log,
+	config.status, config.sub, configure, depcomp, install, install-sh,
+	libtool, ltmain.sh, missing, mkinstalldirs).
+	* .gitignore: Add file names common for many child .gitignore files
+	(.deps, .dirstamp, .libs, *.la, *.lo).
+	* compat/.gitignore,
+	* compat/java.net/.gitignore,
+	* doc/api/.gitignore,
+	* doc/www.gnu.org/announce/.gitignore,
+	* doc/www.gnu.org/cp-tools/.gitignore,
+	* doc/www.gnu.org/docs/.gitignore,
+	* doc/www.gnu.org/downloads/.gitignore,
+	* doc/www.gnu.org/events/.gitignore,
+	* doc/www.gnu.org/faq/.gitignore,
+	* external/.gitignore,
+	* external/jsr166/.gitignore,
+	* external/relaxngDatatype/.gitignore,
+	* external/sax/.gitignore,
+	* external/w3c_dom/.gitignore,
+	* gnu/test/.gitignore,
+	* native/fdlibm/.gitignore,
+	* native/jawt/.gitignore,
+	* native/jni/.gitignore,
+	* native/jni/classpath/.gitignore,
+	* native/jni/gconf-peer/.gitignore,
+	* native/jni/gstreamer-peer/.gitignore,
+	* native/jni/gtk-peer/.gitignore,
+	* native/jni/java-io/.gitignore,
+	* native/jni/java-lang/.gitignore,
+	* native/jni/java-net/.gitignore,
+	* native/jni/java-nio/.gitignore,
+	* native/jni/java-util/.gitignore,
+	* native/jni/native-lib/.gitignore,
+	* native/jni/xmlj/.gitignore,
+	* native/plugin/.gitignore,
+	* native/testsuite/.gitignore,
+	* native/vmi/.gitignore,
+	* resource/.gitignore,
+	* test/.gitignore,
+	* test/gnu.java.lang.reflect/.gitignore,
+	* test/java.io/.gitignore,
+	* test/java.lang.reflect/.gitignore,
+	* test/java.net/.gitignore,
+	* test/java.util/.gitignore,
+	* tools/gnu/classpath/tools/doclets/.gitignore,
+	* tools/gnu/classpath/tools/doclets/debugdoclet/.gitignore,
+	* tools/gnu/classpath/tools/doclets/htmldoclet/.gitignore,
+	* tools/gnu/classpath/tools/doclets/xmldoclet/.gitignore,
+	* tools/gnu/classpath/tools/doclets/xmldoclet/doctranslet/.gitignore,
+	* tools/gnu/classpath/tools/gjdoc/.gitignore,
+	* tools/gnu/classpath/tools/java2xhtml/.gitignore,
+	* tools/gnu/classpath/tools/taglets/.gitignore,
+	* vm/.gitignore,
+	* vm/reference/.gitignore: Remove .gitignore files containing only
+	entries duplicate to that in the parent or root .gitignore.
+	* doc/.gitignore,
+	* examples/.gitignore,
+	* include/.gitignore,
+	* lib/.gitignore,
+	* native/.gitignore,
+	* scripts/.gitignore,
+	* tools/.gitignore,
+	* tools/gnu/classpath/tools/gjdoc/expr/.gitignore: Remove entries
+	duplicate to that contained in the project root .gitignore file
+	(Makefile, Makefile.in, *.la, *.lo, .libs, .deps, .dirstamp).
+	* native/jni/java-math/.gitignore,
+	* native/jni/midi-alsa/.gitignore,
+	* native/jni/midi-dssi/.gitignore,
+	* native/jni/qt-peer/.gitignore:  Remove entries duplicate to that
+	contained in /.gitignore or /native/.gitignore files.
+
 2011-07-19  Ivan Maidanski  <ivmai@mail.ru>
 
 	* test/Makefile.am: Add java.lang.reflect and java.lang to SUBDIRS.

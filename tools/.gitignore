@@ -1,10 +1,7 @@
 jarsigner
 keytool
-Makefile.in
-Makefile
 tools.zip
 appletviewer
-.deps
 gappletviewer
 gjarsigner
 gkeytool

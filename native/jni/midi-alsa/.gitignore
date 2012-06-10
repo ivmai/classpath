@@ -1,9 +1,1 @@
-*.o
-*.a
-*.lo
-*.la
-.libs
 .depsMakefile
-Makefile.in
-Makefile
-.deps
