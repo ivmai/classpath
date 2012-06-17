@@ -12,6 +12,7 @@ classes.locale
 classes.standard
 classes.standardx
 classes.xml
+collections.jar
 glibj.zip
 deps.sh
 gen-classlist.sh

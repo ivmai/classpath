@@ -1,3 +1,11 @@
+2012-06-17  Ivan Maidanski  <ivmai@mail.ru>
+
+	* .gitignore: Add auto-generated "config.h.in~".
+	* lib/.gitignore: Add auto-generated "collections.jar".
+	* m4/.gitignore: New file (to ignore auto-generated .m4 files).
+	* scripts/.gitignore: Add auto-generated "check_jni_methods.sh".
+	* tools/.gitignore: Add "asm" and "gjdoc".
+
 2012-06-10  Ivan Maidanski  <ivmai@mail.ru>
 
 	* .gitignore: Add '/' prefix to file names existing (and to be
@@ -6270,14 +6278,14 @@
 	* gnu/xml/stream/XMLEventAllocatorImpl.java,
 	* gnu/xml/stream/XMLEventFactoryImpl.java: Update implementation to
 	  match final version of StAX API.
-	
+
 2009-07-06  Ludovic Claude  <ludovic.claude@laposte.net>
 
 	PR xml/40653:
 	* gnu/xml/stream/XMLStreamWriterImpl.java:
 	Weaken testing of namespace prefix to match
 	reference implementation and spec.
-	
+
 2009-07-07  Andrew John Hughes  <ahughes@redhat.com>
 
 	PR classpath/40630
@@ -6294,10 +6302,10 @@
 	* java/util/Scanner.java,
 	* java/util/regex/Matcher.java:
 	Replace tab characters with spaces.
-	
+
 2009-06-29  Andrew Haley  <aph@redhat.com>
 
-	PR java/40590	
+	PR java/40590
 	* tools/gnu/classpath/tools/javah/FieldHelper.java (print):
 	Use printName().
 	* tools/gnu/classpath/tools/javah/MethodHelper.java (print):
@@ -6585,7 +6593,7 @@
 	* org/omg/PortableServer/_ServantLocatorStub.java:
 	Turn off warnings where Class is used; forced
 	to use raw type for API compatibility.
-	
+
 2009-02-06  Andrew John Hughes  <ahughes@redhat.com>
 
 	* NEWS:
@@ -6600,7 +6608,7 @@
 2009-02-05  Andrew John Hughes  <ahughes@redhat.com>
 
 	* NEWS: Add VM updates.
-	
+
 2009-02-05  Andrew John Hughes  <ahughes@redhat.com>
 
 	* NEWS: Updated.
@@ -6629,13 +6637,13 @@
 	(cpproc_forkAndExec): Don't return on a -1
 	result from chdir as this may be valid in
 	some cases.  A better fix is needed.
-	
+
 2009-02-03  Andrew John Hughes  <ahughes@redhat.com>
 
 	* native/jni/native-lib/cpproc.c:
 	(cpproc_forkAndExec): Handle return of
 	chdir.
-	
+
 2009-02-03  Andrew John Hughes  <ahughes@redhat.com>
 
 	PR classpath/38417:
@@ -6665,12 +6673,12 @@
 	(engineNextBytes(byte[])): Initialise using new seed.
 	* gnu/javax/crypto/jce/prng/FortunaImpl.java:
 	(engineSetSeed(byte[])): Initialise with new seed if unused.
-	(engineGenerateSeed(int)): Use SecureRandomAdapter.	
+	(engineGenerateSeed(int)): Use SecureRandomAdapter.
 	* gnu/javax/crypto/jce/prng/ICMRandomSpi.java:
-	(engineGenerateSeed(int)): Use SecureRandomAdapter.	
+	(engineGenerateSeed(int)): Use SecureRandomAdapter.
 	(engineNextBytes(byte[])): Initialise using new seed.
 	* gnu/javax/crypto/jce/prng/UMacRandomSpi.java:
-	(engineGenerateSeed(int)): Use SecureRandomAdapter.	
+	(engineGenerateSeed(int)): Use SecureRandomAdapter.
 	(engineNextBytes(byte[])): Initialise using new seed.
 	* gnu/javax/crypto/prng/ICMGenerator.java:
 	(setup(Map)): Call fillBlock().
@@ -6689,11 +6697,11 @@
 
 	* Makefile.am:
 	Add ChangeLog-2008 to EXTRA_DIST.
-	
+
 2009-01-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* ChangeLog-2008: New file.
-	
+
 2009-01-02  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* java/text/MessageFormat.java:
@@ -6702,6 +6710,5 @@
 
 
 Local Variables:
-coding: iso-latin-1-unix	
+coding: iso-latin-1-unix
 End:
-	
