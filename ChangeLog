@@ -1,3 +1,11 @@
+2012-06-17  Ivan Maidanski  <ivmai@mail.ru>
+
+	* .gitignore: Add auto-generated "config.h.in~".
+	* lib/.gitignore: Add auto-generated "collections.jar",
+	"genclasses", "gen-xpath-parser".
+	* scripts/.gitignore: Add auto-generated "check_jni_methods.sh".
+	* tools/.gitignore: Add "asm" and "gjdoc".
+
 2012-06-10  Ivan Maidanski  <ivmai@mail.ru>
 
 	* .gitignore: Add '/' prefix to file names existing (and to be

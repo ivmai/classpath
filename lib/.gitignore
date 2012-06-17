@@ -12,8 +12,11 @@ classes.locale
 classes.standard
 classes.standardx
 classes.xml
+collections.jar
 glibj.zip
 deps.sh
+genclasses
+gen-xpath-parser
 gen-classlist.sh
 mkdep.pl
 errors.txt
