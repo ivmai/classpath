@@ -1,3 +1,24 @@
+2012-08-05  Ivan Maidanski  <ivmai@mail.ru>
+
+	* java/lang/Character.java (UnassignedCharacters.isDigit,
+	UnassignedCharacters.isIdentifierIgnorable,
+	UnassignedCharacters.isJavaIdentifierPart,
+	UnassignedCharacters.isJavaIdentiferStart,
+	UnassignedCharacters.isLetter, UnassignedCharacters.isLetterOrDigit,
+	UnassignedCharacters.isLowerCase, UnassignedCharacters.isSpaceChar,
+	UnassignedCharacters.isTitleCase,
+	UnassignedCharacters.isUnicodeIdentifierPart,
+	UnassignedCharacters.isUnicodeIdentifierStart,
+	UnassignedCharacters.isUpperCase, UnassignedCharacters.toTitleCase):
+	Remove unused static method in a private class.
+	(TYPE): Add @SuppressWarnings for unchecked type conversion.
+	(offsetByCodePoints(CharSequence,int,int),
+	offsetByCodePoints(char[],int,int,int,int)): Remove unused 'adjust'
+	local variable.
+	(isJavaLetter, isJavaLetterOrDigit, isSpace): Add @Deprecated
+	annotation (duplicating similar documentation tag).
+	(toChars(int)): Remove 'ignored' local variable (its value is unused).
+
 2011-07-20  Ivan Maidanski  <ivmai@mail.ru>
 
 	* java/util/Collections.java:

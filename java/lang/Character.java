@@ -1750,137 +1750,11 @@ public final class Character implements Serializable, Comparable<Character>
     }
 
     /**
-     * Returns false to indicate that the character is not a digit.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isDigit(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot be ignored
-     * within an identifier
-     * @param cp the character
-     * @return false
-     */
-    static boolean isIdentifierIgnorable(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot be part of a
-     * Java identifier.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isJavaIdentifierPart(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot be start a
-     * Java identifier.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isJavaIdentiferStart(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character is not a letter.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isLetter(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot is neither a letter
-     * nor a digit.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isLetterOrDigit(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character is not a lowercase letter.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isLowerCase(int cp)
-    {
-      return false;
-    }
-
-    /**
      * Returns false to indicate that the character cannot is not mirrored.
      * @param cp the character
      * @return false
      */
     static boolean isMirrored(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character is not a space character.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isSpaceChar(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character it not a titlecase letter.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isTitleCase(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot be part of a
-     * Unicode identifier.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isUnicodeIdentifierPart(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character cannot start a
-     * Unicode identifier.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isUnicodeIdentifierStart(int cp)
-    {
-      return false;
-    }
-
-    /**
-     * Returns false to indicate that the character is not an uppercase letter.
-     * @param cp the character
-     * @return false
-     */
-    static boolean isUpperCase(int cp)
     {
       return false;
     }
@@ -1902,16 +1776,6 @@ public final class Character implements Serializable, Comparable<Character>
      * @return cp
      */
     static int toLowerCase(int cp)
-    {
-      return cp;
-    }
-
-    /**
-     * Returns cp to indicate this character has no titlecase conversion.
-     * @param cp the character
-     * @return cp
-     */
-    static int toTitleCase(int cp)
     {
       return cp;
     }
@@ -2043,6 +1907,7 @@ public final class Character implements Serializable, Comparable<Character>
    *
    * @since 1.1
    */
+  @SuppressWarnings("unchecked")
   public static final Class<Character> TYPE = (Class<Character>) VMClassLoader.getPrimitiveClass('C');
 
   /**
@@ -2873,7 +2738,6 @@ public final class Character implements Serializable, Comparable<Character>
 
     int numToGo = codePointOffset;
     int offset = index;
-    int adjust = 1;
     if (numToGo >= 0)
       {
         for (; numToGo > 0; offset++)
@@ -2940,7 +2804,6 @@ public final class Character implements Serializable, Comparable<Character>
 
     int numToGo = codePointOffset;
     int offset = index;
-    int adjust = 1;
     if (numToGo >= 0)
       {
         for (; numToGo > 0; offset++)
@@ -3109,6 +2972,7 @@ public final class Character implements Serializable, Comparable<Character>
    * @see #isLetterOrDigit(char)
    * @see #isUnicodeIdentifierStart(char)
    */
+  @Deprecated
   public static boolean isJavaLetter(char ch)
   {
     return isJavaIdentifierStart(ch);
@@ -3132,6 +2996,7 @@ public final class Character implements Serializable, Comparable<Character>
    * @see #isUnicodeIdentifierPart(char)
    * @see #isIdentifierIgnorable(char)
    */
+  @Deprecated
   public static boolean isJavaLetterOrDigit(char ch)
   {
     return isJavaIdentifierPart(ch);
@@ -3713,6 +3578,7 @@ public final class Character implements Serializable, Comparable<Character>
    * @see #isSpaceChar(char)
    * @see #isWhitespace(char)
    */
+  @Deprecated
   public static boolean isSpace(char ch)
   {
     // Performing the subtraction up front alleviates need to compare longs.
@@ -4164,7 +4030,7 @@ public final class Character implements Serializable, Comparable<Character>
       throw new IllegalArgumentException("Illegal Unicode code point : "
                                          + codePoint);
     char[] result = new char[charCount(codePoint)];
-    int ignore = toChars(codePoint, result, 0);
+    toChars(codePoint, result, 0);
     return result;
   }
 
